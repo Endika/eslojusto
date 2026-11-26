@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { computeSeverance } from '../../src/engine/severance';
+import { SOURCES, type Source } from '../../src/engine/sources';
+import type { FixedTermType, StatedCause } from '../../src/engine/types';
 import { parseDate as f } from '../../src/engine/date';
 import { calculationText } from '../../src/calculator/calculation';
 import type { Calculation } from '../../src/engine/calculation';
@@ -35,6 +37,7 @@ describe('unfair dismissal — CGPJ oracle', () => {
     const r = testCase('unfair_dismissal', '1970-01-01', '2026-09-30', 36500);
     expect(r.salaryDays).toBe(1260);
     expect(r.amount).toBe(126000);
+    expect(r.capApplied).toBe(true);
   });
 });
 
@@ -166,5 +169,192 @@ describe('the first source of a zero severance is the rule that sets it to zero'
   it('a disciplinary dismissal keeps art. 56 for the unfair dismissal reference', () => {
     const r = computeSeverance({ ...base, cause: 'disciplinary_dismissal' });
     expect(r.sources.map((x) => x.id)).toContain('et56');
+  });
+});
+
+describe('the months the CGPJ calculator and its guide count', () => {
+  // 100 € a day, 2.75 days a month: the range is the days of the month count it takes, as euros.
+  it.each([
+    ['one leftover day', '2025-01-01', '2025-02-01', 275, 550],
+    ['two leftover days', '2025-01-01', '2025-02-02', 275, 550],
+    ['three leftover days', '2025-01-01', '2025-02-03', 550, 550],
+    ['an anniversary from the 16th', '2025-01-16', '2025-02-15', 275, 550],
+    ['an anniversary from the 1st', '2025-01-01', '2025-01-31', 275, 275],
+  ])('%s: %s → %s', (_, start, end, low, high) => {
+    const r = testCase('unfair_dismissal', start, end, 36500);
+    expect(r.range).toEqual({ min: low, max: high });
+  });
+});
+
+describe('what each severance says about itself', () => {
+  const run = (
+    cause: StatedCause,
+    startDate: string,
+    endDate: string,
+    fixedTermType?: FixedTermType,
+  ) =>
+    computeSeverance({
+      cause,
+      startDate: f(startDate),
+      endDate: f(endDate),
+      annualSalary: 36500,
+      fixedTermType,
+    });
+  const ids = (sources: readonly Source[]) => sources.map((x) => x.id);
+  const unfairSources = [SOURCES.et56, SOURCES.etDt11, SOURCES.cgpjGuide];
+  const objectiveSources = [SOURCES.et53, SOURCES.cgpjGuide, SOURCES.sts651_2026];
+  const fixedSources = [SOURCES.et49_1c, SOURCES.etDt8, SOURCES.cgpjGuide];
+
+  const cases: [string, () => ReturnType<typeof run>, string[], boolean, Source[]][] = [
+    [
+      'unfair, from 12 February 2012',
+      () => run('unfair_dismissal', '2012-02-12', '2020-02-11'),
+      ['severance.unfair', 'severance.total'],
+      false,
+      unfairSources,
+    ],
+    [
+      'unfair, from 12 February 2012, over the cap',
+      () => run('unfair_dismissal', '2012-02-12', '2040-01-31'),
+      ['severance.unfair', 'severance.cap', 'severance.total'],
+      true,
+      unfairSources,
+    ],
+    [
+      'unfair, before 12 February 2012, ending after it',
+      () => run('unfair_dismissal', '2010-03-01', '2026-09-15'),
+      ['severance.first_stretch', 'severance.second_stretch', 'severance.total'],
+      false,
+      unfairSources,
+    ],
+    [
+      'unfair, ending before 12 February 2012',
+      () => run('unfair_dismissal', '2010-03-01', '2011-03-01'),
+      ['severance.first_stretch', 'severance.total'],
+      false,
+      unfairSources,
+    ],
+    [
+      'unfair, both stretches over the cap',
+      () => run('unfair_dismissal', '2005-01-01', '2026-09-30'),
+      ['severance.first_stretch', 'severance.second_stretch', 'severance.cap', 'severance.total'],
+      true,
+      unfairSources,
+    ],
+    [
+      'unfair, first stretch at the cap',
+      () => run('unfair_dismissal', '1996-02-12', '2012-02-11'),
+      ['severance.first_stretch', 'severance.total'],
+      false,
+      unfairSources,
+    ],
+    [
+      'unfair, first stretch at the cap, then a second',
+      () => run('unfair_dismissal', '1996-02-12', '2013-02-11'),
+      ['severance.first_stretch', 'severance.second_stretch', 'severance.cap', 'severance.total'],
+      true,
+      unfairSources,
+    ],
+    [
+      'unfair, both stretches adding up to the cap',
+      () => run('unfair_dismissal', '2006-03-12', '2025-11-11'),
+      ['severance.first_stretch', 'severance.second_stretch', 'severance.total'],
+      false,
+      unfairSources,
+    ],
+    [
+      'unfair, first stretch over the cap',
+      () => run('unfair_dismissal', '1990-01-01', '2026-06-30'),
+      ['severance.first_stretch', 'severance.over_cap', 'severance.total'],
+      false,
+      unfairSources,
+    ],
+    [
+      'unfair, first stretch over the absolute maximum',
+      () => run('unfair_dismissal', '1970-01-01', '2026-09-30'),
+      ['severance.first_stretch', 'severance.over_cap', 'severance.total'],
+      true,
+      unfairSources,
+    ],
+    [
+      'objective',
+      () => run('objective_dismissal', '2020-01-01', '2020-12-31'),
+      ['severance.objective', 'severance.total'],
+      false,
+      objectiveSources,
+    ],
+    [
+      'objective, over the cap',
+      () => run('objective_dismissal', '2000-01-01', '2026-09-30'),
+      ['severance.objective', 'severance.cap', 'severance.total'],
+      true,
+      objectiveSources,
+    ],
+    [
+      'objective, at the cap',
+      () => run('objective_dismissal', '2007-02-12', '2025-02-11'),
+      ['severance.objective', 'severance.total'],
+      false,
+      objectiveSources,
+    ],
+    [
+      'collective',
+      () => run('collective_dismissal', '2020-01-01', '2020-12-31'),
+      ['severance.collective', 'severance.objective', 'severance.total'],
+      false,
+      [SOURCES.et51, ...objectiveSources],
+    ],
+    [
+      'fixed term',
+      () => run('fixed_term_end', '2025-01-01', '2025-12-31'),
+      ['severance.fixed_term'],
+      false,
+      fixedSources,
+    ],
+    [
+      'fixed term, before 4 March 2001',
+      () => run('fixed_term_end', '2001-03-03', '2002-03-02'),
+      ['severance.fixed_term_before_2001'],
+      false,
+      fixedSources,
+    ],
+    [
+      'fixed term, replacement',
+      () => run('fixed_term_end', '2025-01-01', '2025-12-31', 'replacement'),
+      ['severance.replacement'],
+      false,
+      fixedSources,
+    ],
+    [
+      'fixed term, training',
+      () => run('fixed_term_end', '2025-01-01', '2025-12-31', 'training'),
+      ['severance.training'],
+      false,
+      fixedSources,
+    ],
+    [
+      'resignation',
+      () => run('resignation', '2020-01-01', '2020-12-31'),
+      ['severance.resignation'],
+      false,
+      [SOURCES.et49_1d, SOURCES.cgpjGuide],
+    ],
+    [
+      'disciplinary dismissal',
+      () => run('disciplinary_dismissal', '2020-01-01', '2020-12-31'),
+      ['severance.disciplinary'],
+      false,
+      [SOURCES.et55, SOURCES.et56, SOURCES.cgpjGuide],
+    ],
+  ];
+
+  it.each(cases)('%s', (_, build, keys, capApplied, sources) => {
+    const r = build();
+    expect(r.calculation.map((x) => x.key).filter((k) => k !== 'severance.cgpj_range')).toEqual(
+      keys,
+    );
+    expect(r.capApplied).toBe(capApplied);
+    expect(ids(r.sources)).toEqual(ids(sources));
+    expect(text(r.calculation)).not.toMatch(/\{\w+\}|NaN|undefined/);
   });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Range } from '../../src/engine/money';
 import {
+  addDays,
   fromOrdinal,
   daysInMonth,
   ordinal,
@@ -416,6 +417,23 @@ describe('benefit: other contracts in the last 6 years', () => {
     ]);
     // Union 2023-01-01 → 2024-04-30: 365 + 121 (2024 is leap: 31 + 29 + 31 + 30).
     expect(days).toBe(486);
+  });
+
+  it('a one-day period counts one day', () => {
+    expect(contributedDays(f('2026-06-30'), [period('2025-05-01', '2025-05-01')])).toBe(1);
+  });
+
+  it('other contracts that bring the total to exactly 360 days meet the requirement', () => {
+    const e = input('objective_dismissal', '2026-01-01', '2026-09-30', 2000, 14);
+    const contract = entitled(e, 0).contractDays;
+    const before = (days: number) =>
+      withOtherContracts(
+        [{ startDate: addDays(f('2025-12-31'), 1 - days), endDate: f('2025-12-31') }],
+        false,
+      );
+    const missing = BENEFIT_2026.qualifyingDays - contract;
+    expect(entitled(e, 0, before(missing)).qualifying).toBe('met_with_other_contracts');
+    expect(entitled(e, 0, before(missing - 1)).qualifying).toBe('depends_on_work_history');
   });
 
   it('unvalidated, a period past the end date is clipped and a reversed one adds nothing', () => {

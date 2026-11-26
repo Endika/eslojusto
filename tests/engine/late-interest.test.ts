@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate as f } from '../../src/engine/date';
+import { phrase } from '../../src/engine/calculation';
 import { lateInterest } from '../../src/engine/late-interest';
 import { exact } from '../../src/engine/money';
 import { reviewFinalPay } from '../../src/engine/review';
@@ -30,6 +31,27 @@ describe('late-payment interest (art. 29.3 ET)', () => {
     expect(l.base).toBe(1500);
     expect(l.daysLate).toBe(100);
     expect(l.amount).toBe(41.1);
+    expect(l.calculation).toEqual([
+      phrase('late_interest', {
+        base: { euros: 1500 },
+        dias: { integer: 100 },
+        importe: { euros: 41.1 },
+      }),
+      phrase('late_interest.scope'),
+    ]);
+  });
+
+  it('counts only the salary credits that have a range', () => {
+    const l = lateInterest(
+      [
+        item('pending_salary', 1000),
+        { ...item('extra_pay', 500), direction: 'deduction' },
+        { ...item('extra_pay', 700), range: null },
+      ],
+      f('2026-01-01'),
+      f('2026-04-11'),
+    );
+    expect(l.base).toBe(1000);
   });
 
   it('never runs on the severance, the notice or the untaken holidays', () => {
