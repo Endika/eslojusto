@@ -42,8 +42,13 @@ describe('last day to give notice of not renewing (art. 22.2 LCS)', () => {
 
   it('is open with the days left, and asks for the notice to arrive by then', () => {
     const f = nonRenewal(policy(), TODAY, INSURANCE_NORMS);
+    expect(f.id).toBe('non_renewal');
     expect(f.status).toBe('open');
     expect(f.daysLeft).toBe(115);
+    expect(f.calculation[0]).toEqual({
+      key: 'non_renewal.last_day',
+      vars: { day: { date: '2027-02-01' }, expiry: { date: '2027-03-01' } },
+    });
     expect(keys(f)).toEqual([
       'non_renewal.last_day',
       'non_renewal.days_left',
@@ -62,7 +67,10 @@ describe('last day to give notice of not renewing (art. 22.2 LCS)', () => {
   it('the day after, it has ended', () => {
     const f = nonRenewal(policy(), parseDate('2027-02-02'), INSURANCE_NORMS);
     expect([f.status, f.daysLeft]).toEqual(['ended', null]);
-    expect(keys(f)).toContain('non_renewal.ended');
+    expect(f.calculation[1]).toEqual({
+      key: 'non_renewal.ended',
+      vars: { day: { date: '2027-02-01' } },
+    });
   });
 
   it.each([
@@ -84,7 +92,9 @@ describe('last day to give notice of not renewing (art. 22.2 LCS)', () => {
 
   it('a policy that does not extend itself has nothing to oppose', () => {
     const f = nonRenewal(policy({ renews: false }), TODAY, INSURANCE_NORMS);
-    expect([f.status, f.lastDay]).toEqual(['not_applicable', null]);
+    expect([f.id, f.status, f.lastDay]).toEqual(['non_renewal', 'not_applicable', null]);
+    expect(f.calculation).toEqual([{ key: 'non_renewal.no_extension' }]);
+    expect(f.sources.map((s) => s.id)).toEqual(['non_renewal']);
   });
 
   it('«No lo sé» on the extension still gives the date, saying it assumes one', () => {
@@ -126,6 +136,16 @@ describe('notice of changes (art. 22.3 LCS)', () => {
     expect(f.lastDay).toBe('2027-01-01');
     expect(f.calculation[1]?.vars?.days).toEqual({ days });
     expect(keys(f)).toContain('change_notice.any_change');
+  });
+
+  it('gives the last day, and the sources, of the notice', () => {
+    const f = noticeOf(policy({ notice: notice() }), TODAY, INSURANCE_NORMS);
+    expect(f.id).toBe('change_notice');
+    expect(f.calculation[0]).toEqual({
+      key: 'change_notice.deadline',
+      vars: { day: { date: '2027-01-01' } },
+    });
+    expect(f.sources.map((s) => s.id)).toEqual(['change_notice']);
   });
 
   it.each([
@@ -184,7 +204,11 @@ describe('notice of changes (art. 22.3 LCS)', () => {
       TODAY,
       INSURANCE_NORMS,
     );
-    expect(keys(f)).not.toContain('change_notice.premium_only');
+    expect(keys(f)).toEqual([
+      'change_notice.deadline',
+      'change_notice.late',
+      'change_notice.any_change',
+    ]);
   });
 
   it('without a notice there is nothing to check', () => {
@@ -195,6 +219,7 @@ describe('notice of changes (art. 22.3 LCS)', () => {
 describe('premium change', () => {
   it('a rise is given in euros and per cent, as a fact', () => {
     const f = premiumOf(policy({ notice: notice() }), INSURANCE_NORMS);
+    expect(f.id).toBe('premium');
     expect(f.status).toBe('up');
     expect(f.calculation[0]?.vars).toEqual({
       previous: { euros: 300 },
@@ -214,21 +239,36 @@ describe('premium change', () => {
       policy({ notice: notice({ previousPremium: previous, newPremium: next }) }),
       INSURANCE_NORMS,
     );
+    expect(f.id).toBe('premium');
     expect(f.status).toBe(status);
+    expect(f.calculation[0]?.key).toBe(`premium.${status}`);
     expect(f.calculation[0]?.vars?.difference).toEqual({ euros: difference });
     expect(f.calculation[0]?.vars?.percent).toEqual({ percent });
   });
 
-  it('without both premiums there is nothing to compare', () => {
-    const nextOnly = premiumOf(
-      policy({ notice: notice({ previousPremium: null }) }),
+  it('with only the new premium, it is given as such', () => {
+    const f = premiumOf(policy({ notice: notice({ previousPremium: null }) }), INSURANCE_NORMS);
+    expect([f.id, f.status]).toEqual(['premium', 'next_only']);
+    expect(f.calculation).toEqual([
+      { key: 'premium.next_only', vars: { next: { euros: notice().newPremium } } },
+    ]);
+    expect(f.sources).toEqual([]);
+  });
+
+  it.each([
+    [300, null],
+    [null, null],
+  ])('with the premiums %s and %s there is nothing to compare', (previousPremium, newPremium) => {
+    const f = premiumOf(
+      policy({ notice: notice({ previousPremium, newPremium }) }),
       INSURANCE_NORMS,
     );
-    expect(nextOnly.status).toBe('next_only');
-    expect(nextOnly.calculation[0]?.vars?.next).toEqual({ euros: notice().newPremium });
-    expect(
-      premiumOf(policy({ notice: notice({ newPremium: null }) }), INSURANCE_NORMS).status,
-    ).toBe('not_entered');
+    expect([f.id, f.status]).toEqual(['premium', 'not_entered']);
+    expect(f.calculation).toStrictEqual([{ key: 'item.not_entered' }]);
+    expect(f.sources).toEqual([]);
+  });
+
+  it('without a notice there is no premium item', () => {
     expect(premiumChange(policy(), INSURANCE_NORMS)).toBeNull();
   });
 });

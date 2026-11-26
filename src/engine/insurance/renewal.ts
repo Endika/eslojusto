@@ -1,7 +1,7 @@
-import { compareDates, type CivilDate } from '../date';
+import { compareDates, daysBetween, type CivilDate } from '../date';
 import { round2 } from '../money';
 import { insurancePhrase } from './calculation';
-import { daysBetween, deadlineState, day, finding, monthsBefore } from './deadline';
+import { deadlineState, day, finding, monthsBefore } from './deadline';
 import type { NormTable } from './norms';
 import type { Finding, InsuranceInput } from './types';
 
@@ -83,21 +83,22 @@ export function changeNotice(
 export function premiumChange(input: InsuranceInput, norms: NormTable): Finding | null {
   const notice = input.notice;
   if (notice === null) return null;
-  if (notice.previousPremium === null && notice.newPremium !== null)
+  const { previousPremium, newPremium } = notice;
+  if (newPremium === null)
+    return finding('premium', 'not_entered', [insurancePhrase('item.not_entered')], [], norms);
+  if (previousPremium === null)
     return finding(
       'premium',
       'next_only',
-      [insurancePhrase('premium.next_only', { next: { euros: notice.newPremium } })],
+      [insurancePhrase('premium.next_only', { next: { euros: newPremium } })],
       [],
       norms,
     );
-  if (notice.previousPremium === null || notice.newPremium === null)
-    return finding('premium', 'not_entered', [insurancePhrase('item.not_entered')], [], norms);
-  const difference = round2(notice.newPremium - notice.previousPremium);
-  const percent = round2((difference / notice.previousPremium) * PERCENT);
+  const difference = round2(newPremium - previousPremium);
+  const percent = round2((difference / previousPremium) * PERCENT);
   const vars = {
-    previous: { euros: notice.previousPremium },
-    next: { euros: notice.newPremium },
+    previous: { euros: previousPremium },
+    next: { euros: newPremium },
     difference: { euros: Math.abs(difference) },
     percent: { percent: Math.abs(percent) },
   };

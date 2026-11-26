@@ -1,8 +1,8 @@
 import {
   addMonthsClamped,
   compareDates,
+  daysBetween,
   daysInMonth,
-  ordinal,
   toIso,
   type CivilDate,
 } from '../date';
@@ -26,8 +26,6 @@ export function monthsBefore(date: CivilDate, months: number): MonthsBefore {
 }
 
 export const day = (date: CivilDate): { readonly date: string } => ({ date: toIso(date) });
-
-export const daysBetween = (from: CivilDate, to: CivilDate): number => ordinal(to) - ordinal(from);
 
 export const finding = (
   id: FindingId,

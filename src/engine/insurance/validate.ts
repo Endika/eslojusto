@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, daysInMonth, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, isRealDate, type CivilDate } from '../date';
 import type { InsuranceInput } from './types';
 
 export type InsuranceField =
@@ -26,15 +26,6 @@ export interface ValidationError {
 const MAX_PREMIUM = 1_000_000;
 // A policy period runs a year at most, so its end is never further ahead than this.
 const MONTHS_AHEAD = 24;
-
-const isRealDate = ({ y, m, d }: CivilDate): boolean =>
-  Number.isInteger(y) &&
-  Number.isInteger(m) &&
-  Number.isInteger(d) &&
-  m >= 1 &&
-  m <= 12 &&
-  d >= 1 &&
-  d <= daysInMonth(y, m);
 
 const isPremium = (v: number): boolean => Number.isFinite(v) && v > 0 && v <= MAX_PREMIUM;
 
