@@ -4,6 +4,7 @@ import {
   MIN_REDUCTION_PERCENT,
   RED_MONTHLY_CAP,
   consumption,
+  belowFullTimeMinimum,
   erteInputError,
   estimateErte,
   type ErteInput,
@@ -160,7 +161,25 @@ describe('invalid input', () => {
   it('keeps the bounds of arts. 262.3 LGSS and 47.7.a ET', () => {
     expect([MIN_REDUCTION_PERCENT, MAX_REDUCTION_PERCENT]).toEqual([10, 70]);
   });
+  it('accepts the largest base', () => {
+    expect(erteInputError(input({ base: 1_000_000 }))).toBeNull();
+  });
   it('accepts a valid input', () => {
     expect(erteInputError(input({ measure: reduction(40) }))).toBeNull();
+  });
+});
+
+describe('belowFullTimeMinimum', () => {
+  const min = BENEFIT_2026.minBaseAtep;
+  it.each<ErteRegime>(['etop', 'force_majeure'])(
+    '%s: true only under the minimum base',
+    (regime) => {
+      expect(belowFullTimeMinimum(input({ regime, base: min - 0.01 }))).toBe(true);
+      expect(belowFullTimeMinimum(input({ regime, base: min }))).toBe(false);
+      expect(belowFullTimeMinimum(input({ regime, base: min + 0.01 }))).toBe(false);
+    },
+  );
+  it('RED has no minimum', () => {
+    expect(belowFullTimeMinimum(input({ regime: 'red', base: min - 0.01 }))).toBe(false);
   });
 });

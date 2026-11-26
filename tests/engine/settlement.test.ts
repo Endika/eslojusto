@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate as f } from '../../src/engine/date';
-import type { FinalPayInput } from '../../src/engine/types';
+import type { FinalPayInput, Item } from '../../src/engine/types';
 import {
   noticeDeductionItem,
   extraPayItem,
@@ -8,7 +8,10 @@ import {
   pendingSalaryItem,
   holidayPayItem,
   annualSalary,
+  calendarDaysPer,
+  minimumHolidays,
 } from '../../src/engine/settlement';
+import { SOURCES } from '../../src/engine/sources';
 import { compareItem } from '../../src/engine/compare';
 import { calculationText } from '../../src/calculator/calculation';
 import type { Calculation } from '../../src/engine/calculation';
@@ -357,5 +360,233 @@ describe('notice', () => {
     expect(
       noticeDeductionItem(withInput({ agreementNoticeDays: 15, noticeDaysGiven: 5 }))?.range,
     ).toEqual({ min: 0, max: 575.34 });
+  });
+});
+
+describe('minimum holidays', () => {
+  it.each([
+    ['calendar', undefined, 30],
+    ['working', undefined, 22],
+    ['working', 5, 22],
+    ['working', 6, 26],
+    ['working', 3, 13],
+    ['working', 7, 30],
+  ] as const)('%s, %s days a week: %i days', (unit, week, days) => {
+    expect(minimumHolidays(unit, week)).toBe(days);
+  });
+
+  it('turns the days of the person’s unit into calendar days at 30 to the minimum', () => {
+    expect(calendarDaysPer('calendar')).toBe(1);
+    expect(calendarDaysPer('working')).toBeCloseTo(30 / 22, 10);
+    expect(calendarDaysPer('working', 6)).toBeCloseTo(30 / 26, 10);
+  });
+
+  it('shows the days left in calendar days beside the working ones', () => {
+    const p = holidayPayItem(
+      withInput({ holidayUnit: 'working', annualHolidayDays: 22, holidayDaysTaken: 10 }),
+    );
+    const vars = p.calculation[0]?.vars;
+    for (const [days, calendar] of [
+      ['minimo', 'minimo_naturales'],
+      ['maximo', 'maximo_naturales'],
+    ] as const) {
+      const left = vars?.[days];
+      expect(left).toMatchObject({ days: expect.any(Number) });
+      expect(vars?.[calendar]).toEqual({ days: (left as { days: number }).days * (30 / 22) });
+    }
+  });
+});
+
+describe('what each item says about itself', () => {
+  const working = withInput({
+    holidayUnit: 'working',
+    annualHolidayDays: 22,
+    holidayDaysTaken: 10,
+  });
+  const fromStart = { startDate: f('2026-03-15'), endDate: f('2026-10-14') };
+  const only = (...sources: { id: string }[]) => sources.map((x) => x.id);
+  const apart = (o: Partial<FinalPayInput>) => extraPay(withInput(o));
+  const notice = (o: Partial<FinalPayInput>) => {
+    const p = employerNoticeItem(withInput(o));
+    if (p === null) throw new Error('no notice item');
+    return p;
+  };
+  const deduction = (o: Partial<FinalPayInput>) => {
+    const p = noticeDeductionItem(withInput(o));
+    if (p === null) throw new Error('no deduction item');
+    return p;
+  };
+  const cases: [string, () => Item, string[], boolean, boolean, string[]][] = [
+    [
+      'pending salary',
+      () => pendingSalaryItem(base),
+      ['pending_salary'],
+      false,
+      false,
+      only(SOURCES.et26),
+    ],
+    [
+      'holiday pay',
+      () => holidayPayItem(base),
+      ['holiday_pay.pending', 'methods.two_counts'],
+      true,
+      false,
+      only(SOURCES.et38),
+    ],
+    [
+      'holiday pay in working days',
+      () => holidayPayItem(working),
+      ['holiday_pay.pending_working', 'methods.two_counts'],
+      true,
+      false,
+      only(SOURCES.et38),
+    ],
+    [
+      'holiday pay with the start mid-month',
+      () => holidayPayItem(withInput(fromStart)),
+      ['holiday_pay.pending', 'methods.three_counts'],
+      true,
+      false,
+      only(SOURCES.et38),
+    ],
+    [
+      'holiday pay with the start mid-month before the year',
+      () => holidayPayItem(withInput({ startDate: f('2020-03-15') })),
+      ['holiday_pay.pending', 'methods.two_counts'],
+      true,
+      false,
+      only(SOURCES.et38),
+    ],
+    [
+      'holiday pay with the start on the 1st inside the year',
+      () => holidayPayItem(withInput({ startDate: f('2026-03-01') })),
+      ['holiday_pay.pending', 'methods.two_counts'],
+      true,
+      false,
+      only(SOURCES.et38),
+    ],
+    [
+      'holiday pay without the days taken',
+      () => holidayPayItem(withInput({ holidayDaysTaken: null })),
+      ['holiday_pay.days_unknown'],
+      true,
+      false,
+      only(SOURCES.et38),
+    ],
+    [
+      'holiday pay with more taken than accrued',
+      () => holidayPayItem(withInput({ endDate: f('2026-02-01'), holidayDaysTaken: 15 })),
+      ['holiday_pay.over_taken'],
+      true,
+      false,
+      only(SOURCES.et38),
+    ],
+    [
+      'extra pay, annual',
+      () => apart({}),
+      ['extra_pay.annual', 'methods.two_counts', 'extra_pay.same_count_for_both'],
+      true,
+      true,
+      only(SOURCES.et31),
+    ],
+    [
+      'extra pay, semiannual',
+      () => apart({ extraPayAccrual: 'semiannual' }),
+      ['extra_pay.semiannual', 'methods.two_counts'],
+      true,
+      true,
+      only(SOURCES.et31),
+    ],
+    [
+      'extra pay, accrual unknown',
+      () => apart({ extraPayAccrual: 'unknown' }),
+      ['extra_pay.unknown', 'methods.two_counts', 'extra_pay.same_count_for_both'],
+      true,
+      false,
+      only(SOURCES.et31),
+    ],
+    [
+      'extra pay, one a year',
+      () => apart({ extraPayCount: 1 }),
+      ['extra_pay.annual', 'methods.two_counts', 'extra_pay.single'],
+      true,
+      true,
+      only(SOURCES.et31),
+    ],
+    [
+      'extra pay, three a year',
+      () => apart({ extraPayCount: 3 }),
+      [
+        'extra_pay.annual',
+        'methods.two_counts',
+        'extra_pay.same_count_for_both',
+        'extra_pay.over_two',
+      ],
+      true,
+      true,
+      only(SOURCES.et31),
+    ],
+    [
+      'extra pay with the start mid-month',
+      () => apart(fromStart),
+      ['extra_pay.annual', 'methods.three_counts', 'extra_pay.same_count_for_both'],
+      true,
+      true,
+      only(SOURCES.et31),
+    ],
+    [
+      'notice of an objective dismissal',
+      () => notice({ cause: 'objective_dismissal' }),
+      ['employer_notice'],
+      false,
+      false,
+      only(SOURCES.et53),
+    ],
+    [
+      'notice of a collective dismissal',
+      () => notice({ cause: 'collective_dismissal' }),
+      ['employer_notice'],
+      false,
+      false,
+      only(SOURCES.et53, SOURCES.et51),
+    ],
+    [
+      'notice of a long fixed-term contract',
+      () => notice({ cause: 'fixed_term_end' }),
+      ['employer_notice', 'employer_notice_fixed_term_criterion'],
+      false,
+      false,
+      only(SOURCES.et49),
+    ],
+    [
+      'notice deduction without the agreement',
+      () => deduction({}),
+      ['notice_deduction.agreement_unknown'],
+      true,
+      false,
+      only(SOURCES.et49),
+    ],
+    [
+      'notice deduction',
+      () => deduction({ agreementNoticeDays: 15 }),
+      ['notice_deduction'],
+      false,
+      true,
+      only(SOURCES.et49),
+    ],
+  ];
+
+  it.each(cases)('%s', (_, build, keys, dependsOnAgreement, basedOnYourAnswer, sources) => {
+    const item = build();
+    expect(item.calculation.map((x) => x.key)).toEqual(keys);
+    expect(item.dependsOnAgreement).toBe(dependsOnAgreement);
+    expect(item.basedOnYourAnswer).toBe(basedOnYourAnswer);
+    expect(item.sources.map((x) => x.id)).toEqual(sources);
+    expect(text(item.calculation)).not.toMatch(/\{\w+\}|NaN|undefined/);
+  });
+
+  it('a notice is owed to the person, a deduction is taken from them', () => {
+    expect(notice({ cause: 'objective_dismissal' }).direction).toBe('credit');
+    expect(deduction({}).direction).toBe('deduction');
   });
 });

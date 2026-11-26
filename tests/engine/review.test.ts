@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { phrase } from '../../src/engine/calculation';
+import { SOURCES } from '../../src/engine/sources';
 import { exact } from '../../src/engine/money';
 import { parseDate as f } from '../../src/engine/date';
 import { reviewFinalPay, type EmployerFigures } from '../../src/engine/review';
@@ -158,10 +160,20 @@ describe('reviewFinalPay', () => {
     }
   });
 
-  it('additional extra payments only when there are more than two', () => {
-    expect(review(base).uncheckedCodes).not.toContain('additional_extra_pay');
-    const e = withInput({ extraPayProrated: false, extraPayCount: 3, extraPayAmount: 2500 });
-    expect(review(e).uncheckedCodes).toContain('additional_extra_pay');
+  it('lists what it does not check, with additional extra payments only above two', () => {
+    const apart = { extraPayProrated: false, extraPayAmount: 2500 };
+    const always = ['net_pay', 'bonuses'];
+    const rest = ['dismissal_cause', 'processing_wages'];
+    expect(review(base).uncheckedCodes).toEqual([...always, ...rest]);
+    expect(review(withInput({ ...apart, extraPayCount: 2 })).uncheckedCodes).toEqual([
+      ...always,
+      ...rest,
+    ]);
+    expect(review(withInput({ ...apart, extraPayCount: 3 })).uncheckedCodes).toEqual([
+      ...always,
+      'additional_extra_pay',
+      ...rest,
+    ]);
   });
 
   it('rejects an end date more than a year ahead', () => {
@@ -228,6 +240,15 @@ describe('a collective dismissal (ERE)', () => {
   });
 });
 
+describe('the zero severance reason', () => {
+  it('belongs to the cause, not to a fixed-term type left in the form', () => {
+    const e = withInput({ cause: 'unfair_dismissal', fixedTermType: 'replacement' });
+    const severance = itemOf(e, 'severance')?.item;
+    expect(severance?.zeroReason).toBeUndefined();
+    expect(severance?.range?.min).toBeGreaterThan(0);
+  });
+});
+
 describe('a cause the person does not know', () => {
   const unknown = withInput({ cause: 'unknown' });
 
@@ -238,6 +259,8 @@ describe('a cause the person does not know', () => {
     expect(severance?.item.range).toBeNull();
     expect(severance?.item.missingAnswer).toBe('cause');
     expect(severance?.status).toBe('not_checkable');
+    expect(severance?.item.calculation).toEqual([phrase('severance.cause_unknown')]);
+    expect(severance?.item.sources).toEqual([SOURCES.et49]);
     expect(r.unfairReference).toBeNull();
   });
 
