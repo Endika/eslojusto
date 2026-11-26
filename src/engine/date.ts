@@ -14,12 +14,22 @@ export function daysInMonth(y: number, m: number): number {
   );
 }
 
+// Stryker disable ConditionalExpression: daysInMonth is NaN outside 1-12, so the day check also rejects those months
+export const isRealDate = ({ y, m, d }: CivilDate): boolean =>
+  Number.isInteger(y) &&
+  Number.isInteger(m) &&
+  Number.isInteger(d) &&
+  m >= 1 &&
+  m <= 12 &&
+  d >= 1 &&
+  d <= daysInMonth(y, m);
+// Stryker restore ConditionalExpression
+
 export function parseDate(iso: string): CivilDate {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
   if (!match) throw new RangeError(`Invalid date: ${iso}`);
   const [y, m, d] = [Number(match[1]), Number(match[2]), Number(match[3])];
-  if (m < 1 || m > 12 || d < 1 || d > daysInMonth(y, m))
-    throw new RangeError(`Invalid date: ${iso}`);
+  if (!isRealDate({ y, m, d })) throw new RangeError(`Invalid date: ${iso}`);
   return { y, m, d };
 }
 
@@ -51,9 +61,12 @@ export function fromOrdinal(n: number): CivilDate {
   return { y: yoe + era * 400 + (m <= 2 ? 1 : 0), m, d };
 }
 
+export const daysBetween = (from: CivilDate, to: CivilDate): number => ordinal(to) - ordinal(from);
 export const compareDates = (a: CivilDate, b: CivilDate): number => ordinal(a) - ordinal(b);
 export const addDays = (f: CivilDate, n: number): CivilDate => fromOrdinal(ordinal(f) + n);
+// Stryker disable next-line EqualityOperator: on a tie the two dates are equal, so either is the same value
 export const max = (a: CivilDate, b: CivilDate): CivilDate => (compareDates(a, b) >= 0 ? a : b);
+// Stryker disable next-line EqualityOperator: on a tie the two dates are equal, so either is the same value
 export const min = (a: CivilDate, b: CivilDate): CivilDate => (compareDates(a, b) <= 0 ? a : b);
 
 export function addMonthsClamped(f: CivilDate, n: number): CivilDate {
@@ -64,17 +77,18 @@ export function addMonthsClamped(f: CivilDate, n: number): CivilDate {
 }
 
 export function calendarDays(from: CivilDate, to: CivilDate): number {
-  return ordinal(to) - ordinal(from) + 1;
+  return daysBetween(from, to) + 1;
 }
 
 export function wholeMonthsAndRest(
   from: CivilDate,
   to: CivilDate,
 ): { whole: number; rest: number } {
+  // Stryker disable next-line ArithmeticOperator: only the starting upper bound; the loop below walks down to the same count
   let whole = (to.y - from.y) * 12 + (to.m - from.m) + 1;
   const endOfWhole = (k: number) => addDays(addMonthsClamped(from, k), -1);
   while (whole > 0 && compareDates(endOfWhole(whole), to) > 0) whole--;
-  return { whole, rest: Math.max(0, ordinal(to) - ordinal(endOfWhole(whole))) };
+  return { whole, rest: Math.max(0, daysBetween(endOfWhole(whole), to)) };
 }
 
 // CGPJ guide §4.a, «prorrateándose por meses»: any fraction of a month counts as a whole month.

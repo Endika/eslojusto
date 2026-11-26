@@ -1,4 +1,4 @@
-import { compareDates, daysInMonth, addDays, type CivilDate } from './date';
+import { compareDates, addDays, isRealDate, type CivilDate } from './date';
 import { minimumHolidays } from './settlement';
 import type { FinalPayInput, ContributionPeriod } from './types';
 
@@ -27,15 +27,6 @@ export type InputError = {
 const MAX_SALARY = 1_000_000;
 const MAX_DAYS_AHEAD = 365;
 
-const isValidDate = (f: CivilDate): boolean =>
-  Number.isInteger(f.y) &&
-  Number.isInteger(f.m) &&
-  Number.isInteger(f.d) &&
-  f.m >= 1 &&
-  f.m <= 12 &&
-  f.d >= 1 &&
-  f.d <= daysInMonth(f.y, f.m);
-
 const isIntInRange = (n: number, min: number, max: number): boolean =>
   Number.isInteger(n) && n >= min && n <= max;
 
@@ -43,9 +34,9 @@ export function validate(e: FinalPayInput, today: CivilDate): readonly InputErro
   const errors: InputError[] = [];
   const err = (field: keyof FinalPayInput, code: InputErrorCode) => errors.push({ field, code });
 
-  if (!isValidDate(e.startDate)) err('startDate', 'invalid_start_date');
-  if (!isValidDate(e.endDate)) err('endDate', 'invalid_end_date');
-  else if (isValidDate(e.startDate) && compareDates(e.endDate, e.startDate) < 0)
+  if (!isRealDate(e.startDate)) err('startDate', 'invalid_start_date');
+  if (!isRealDate(e.endDate)) err('endDate', 'invalid_end_date');
+  else if (isRealDate(e.startDate) && compareDates(e.endDate, e.startDate) < 0)
     err('endDate', 'end_before_start');
   else if (compareDates(e.endDate, addDays(today, MAX_DAYS_AHEAD)) > 0)
     err('endDate', 'end_too_far_ahead');
@@ -123,13 +114,13 @@ export function validateOtherContracts(
   contracts: readonly ContributionPeriod[],
 ): readonly OtherContractError[] {
   const errors: OtherContractError[] = [];
-  const endValid = isValidDate(e.endDate);
+  const endValid = isRealDate(e.endDate);
   contracts.forEach((o, row) => {
     const err = (key: keyof ContributionPeriod, code: OtherContractErrorCode) =>
       errors.push({ field: `otherContracts.${row}.${key}`, row, code });
-    const startValid = isValidDate(o.startDate);
+    const startValid = isRealDate(o.startDate);
     if (!startValid) err('startDate', 'other_contract_invalid_start_date');
-    if (!isValidDate(o.endDate)) err('endDate', 'other_contract_invalid_end_date');
+    if (!isRealDate(o.endDate)) err('endDate', 'other_contract_invalid_end_date');
     else if (startValid && compareDates(o.endDate, o.startDate) < 0)
       err('endDate', 'other_contract_end_before_start');
     else if (endValid && compareDates(o.endDate, e.endDate) > 0)
