@@ -1,0 +1,88 @@
+# A full mutation run over a set of files, split across parallel jobs. The report is the
+# mutation-report artifact: every mutant with the tests that cover and kill it.
+name: Mutation sweep
+
+on:
+  workflow_dispatch:
+    inputs:
+      mutate:
+        description: Files to mutate, as comma-separated globs
+        required: true
+        default: src/engine/**/*.ts
+      tests:
+        description: Tests to run, as comma-separated globs (empty runs the whole suite)
+        required: false
+        default: ''
+      shards:
+        description: Parallel jobs
+        required: true
+        default: '12'
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.shards.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: shards
+        env:
+          MUTATE: ${{ inputs.mutate }}
+          SHARDS: ${{ inputs.shards }}
+        run: |
+          mapfile -t globs < <(tr ',' '\n' <<<"$MUTATE" | sed 's/^/:(glob)/')
+          mapfile -t files < <(git ls-files -- "${globs[@]}" | grep -v '\.d\.ts$')
+          [ "${#files[@]}" -gt 0 ] || { echo "No files match $MUTATE"; exit 1; }
+          echo "matrix=$(node stryker/shards.mjs "$SHARDS" "${files[@]}")" >> "$GITHUB_OUTPUT"
+
+  mutate:
+    name: mutate (${{ matrix.shard }})
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      # The copy tests read the built pages.
+      - if: inputs.tests == ''
+        run: npm run build
+      - run: npm i --no-save @stryker-mutator/core@10.1.1 @stryker-mutator/vitest-runner@10.1.1
+      - env:
+          FILES: ${{ matrix.files }}
+          STRYKER_TESTS: ${{ inputs.tests }}
+        run: |
+          [ -n "$STRYKER_TESTS" ] || unset STRYKER_TESTS
+          npx stryker run stryker/sweep.config.json --mutate "$FILES"
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: mutation-shard-${{ matrix.shard }}
+          path: reports/mutation/mutation.json
+          if-no-files-found: error
+
+  merge:
+    needs: mutate
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: mutation-shard-*
+          path: shards
+      - run: |
+          totals=$(node stryker/merge.mjs mutation.json shards/*/mutation.json)
+          echo "$(ls shards | wc -l) shards: $totals" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mutation-report
+          path: mutation.json

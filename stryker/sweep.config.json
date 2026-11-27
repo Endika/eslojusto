@@ -1,0 +1,19 @@
+{
+  "$schema": "../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "testRunner": "vitest",
+  "plugins": ["@stryker-mutator/vitest-runner", "./stryker/noise-ignorer.mjs"],
+  "ignorers": ["noise"],
+  "reporters": ["json", "clear-text"],
+  "clearTextReporter": {
+    "logTests": false,
+    "reportMutants": false
+  },
+  "vitest": {
+    "configFile": "stryker/vitest.config.ts"
+  },
+  "concurrency": 4,
+  "dryRunTimeoutMinutes": 30,
+  "disableBail": true,
+  "disableTypeChecks": false,
+  "ignoreStatic": true
+}
