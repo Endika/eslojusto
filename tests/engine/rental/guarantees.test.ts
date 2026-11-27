@@ -5,7 +5,7 @@ import { checkAdvance, checkGuarantees } from '../../../src/engine/rental/guaran
 import { itemAmount, type ItemResult } from '../../../src/engine/rental/item';
 import { countedAmount } from '../../../src/engine/rental/outcome';
 import type { Guarantee, RentalInput } from '../../../src/engine/rental/types';
-import { contract } from './fixtures';
+import { contract, readingOf } from './fixtures';
 import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const RENT = 850;
@@ -65,13 +65,6 @@ describe('deposit and extra guarantees in money', () => {
     });
     // A cent of rounding is not a difference.
     expect(money({ guarantees: [cash(1700.01)] }).status).toBe('within_limit');
-  });
-
-  it('nothing entered', () => {
-    expect(money({ deposit: null, guarantees: [] })).toEqual({
-      status: 'not_entered',
-      amount: null,
-    });
   });
 });
 
@@ -162,5 +155,189 @@ describe('rent paid in advance', () => {
     [3, 'over_cap', 1700],
   ] as const)('%s months → %s', (months, status, amount) => {
     expect(advance(months)).toEqual({ status, amount });
+  });
+});
+
+describe('how each guarantee reading is worded and sourced', () => {
+  const MONEY_RULES = ['deposit_one_month', 'guarantee_cap'];
+  const LONG = (months: number, limit: number) => ({
+    key: 'guarantees.long_contract',
+    vars: { months: { integer: months }, limit: { integer: limit } },
+  });
+  const MONEY = (money: number, cap: number) => ({
+    key: 'guarantees.money',
+    vars: { money: { euros: money }, cap: { euros: cap } },
+  });
+  const EXCESS = (deposit: number, excess: number) => ({
+    key: 'guarantees.deposit_excess',
+    vars: { deposit: { euros: deposit }, rent: { euros: RENT }, excess: { euros: excess } },
+  });
+  const moneyRow = (change: Partial<RentalInput>) =>
+    readingOf(checkGuarantees(input(change), NORMS)[0]);
+  const BANK: Guarantee = { kind: 'bank_guarantee', amount: 5000 };
+
+  it.each<[string, () => ReturnType<typeof readingOf>, object]>([
+    [
+      'money over the cap',
+      () => moneyRow({ deposit: 2 * RENT, guarantees: [cash(2 * RENT)] }),
+      {
+        status: 'over_cap',
+        amount: RENT,
+        calculation: [
+          EXCESS(1700, 850),
+          MONEY(2550, 1700),
+          { key: 'guarantees.over_cap', vars: { amount: { euros: 850 } } },
+        ],
+        rules: MONEY_RULES,
+      },
+    ],
+    [
+      'a deposit a cent over the rent is rounding',
+      () => moneyRow({ deposit: RENT + 0.01 }),
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [MONEY(0.01, 1700), { key: 'guarantees.within_cap' }],
+        rules: MONEY_RULES,
+      },
+    ],
+    [
+      'a long contract with a deposit over the rent',
+      () => moneyRow({ deposit: 2 * RENT, agreedMonths: 72 }),
+      {
+        status: 'not_applicable_to_date',
+        amount: null,
+        calculation: [EXCESS(1700, 850), LONG(72, 60)],
+        rules: MONEY_RULES,
+      },
+    ],
+    [
+      'nothing entered',
+      () => moneyRow({ deposit: null, guarantees: [] }),
+      {
+        status: 'not_entered',
+        amount: null,
+        calculation: [{ key: 'item.not_entered' }],
+        rules: MONEY_RULES,
+      },
+    ],
+    [
+      'no deposit and only guarantees that are not money',
+      () => moneyRow({ deposit: null, guarantees: [BANK, { kind: 'cash', amount: null }] }),
+      {
+        status: 'not_entered',
+        amount: null,
+        calculation: [{ key: 'item.not_entered' }],
+        rules: MONEY_RULES,
+      },
+    ],
+    [
+      'no deposit and some cash',
+      () => moneyRow({ deposit: null, guarantees: [cash(100)] }),
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [MONEY(100, 1700), { key: 'guarantees.within_cap' }],
+        rules: MONEY_RULES,
+      },
+    ],
+  ])('%s', (_, actual, expected) => {
+    expect(actual()).toEqual(expected);
+  });
+
+  const guaranteeRow = (guarantee: Guarantee, change: Partial<RentalInput> = {}) =>
+    readingOf(
+      checkGuarantees(input({ guarantees: [guarantee], ...change }), NORMS).find(
+        (r) => r.kind === 'guarantee',
+      ),
+    );
+  const AFTER_VOTE = { signedOn: f('2026-10-08'), startDate: f('2026-10-15') };
+
+  it.each<[string, () => ReturnType<typeof readingOf>, object]>([
+    [
+      'cash with no amount',
+      () => guaranteeRow({ kind: 'cash', amount: null }),
+      {
+        status: 'not_entered',
+        amount: null,
+        calculation: [{ key: 'item.not_entered' }],
+        rules: ['guarantee_cap'],
+      },
+    ],
+    [
+      'a bank guarantee',
+      () => guaranteeRow(BANK),
+      {
+        status: 'review_it',
+        amount: null,
+        calculation: [{ key: 'guarantees.not_money' }],
+        rules: ['guarantee_cap'],
+      },
+    ],
+    [
+      'an insurance before the ban',
+      () =>
+        guaranteeRow(
+          { kind: 'insurance', amount: null },
+          { signedOn: f('2026-10-07'), startDate: f('2026-10-07') },
+        ),
+      {
+        status: 'review_it',
+        amount: null,
+        calculation: [{ key: 'guarantees.insurance_before_ban' }],
+        rules: ['guarantee_cap'],
+      },
+    ],
+    [
+      'an insurance before the ban, in a long contract',
+      () =>
+        guaranteeRow(
+          { kind: 'insurance', amount: null },
+          { signedOn: f('2026-10-07'), startDate: f('2026-10-07'), agreedMonths: 120 },
+        ),
+      {
+        status: 'not_applicable_to_date',
+        amount: null,
+        calculation: [LONG(120, 60)],
+        rules: ['guarantee_cap'],
+      },
+    ],
+    [
+      'an insurance under the ban',
+      () => guaranteeRow({ kind: 'insurance', amount: 300 }, AFTER_VOTE),
+      {
+        status: 'over_cap',
+        amount: null,
+        calculation: [{ key: 'guarantees.insurance_banned' }],
+        rules: ['insurance_ban'],
+      },
+    ],
+  ])('%s', (_, actual, expected) => {
+    expect(actual()).toEqual(expected);
+  });
+
+  it.each([
+    [3, 1700, 'over_cap'],
+    [0, null, 'within_limit'],
+  ] as const)('rent paid %i months in advance is worded', (months, amount, status) => {
+    const calculation =
+      amount === null
+        ? [{ key: 'advance.within_cap' }]
+        : [
+            {
+              key: 'advance.over_cap',
+              vars: {
+                months: { integer: months },
+                rent: { euros: RENT },
+                amount: { euros: amount },
+              },
+            },
+          ];
+    expect(readingOf(checkAdvance(input({ advanceMonths: months }), NORMS))).toEqual({
+      status,
+      amount,
+      calculation,
+      rules: ['advance_cap'],
+    });
   });
 });

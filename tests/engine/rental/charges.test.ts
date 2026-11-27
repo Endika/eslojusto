@@ -9,7 +9,7 @@ import type { IndexSeries } from '../../../src/engine/rental/indices';
 import { itemAmount, type ItemResult } from '../../../src/engine/rental/item';
 import { countedAmount, highestAmount } from '../../../src/engine/rental/outcome';
 import type { Charge, RentalDeps, RentalInput } from '../../../src/engine/rental/types';
-import { contract } from './fixtures';
+import { contract, readingOf } from './fixtures';
 import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const DEPS: RentalDeps = { norms: NORMS, indices: { irav: IRAV, ipc: IPC, igc: IGC } };
@@ -309,5 +309,351 @@ describe('what was charged in a year', () => {
     expect(results.map((r) => r.year)).toEqual([2025, 2026]);
     // 700 in 2026 against 629,64.
     expect(singleOf(results[1])).toEqual({ status: 'paid_over', amount: 70.36 });
+  });
+});
+
+const YEAR_CAP = (year: number, previous: number, rise: number, cap: number) => ({
+  key: 'charges.year_cap',
+  vars: {
+    year: { integer: year },
+    previous: { euros: previous },
+    rise: { percent: rise },
+    cap: { euros: cap },
+  },
+});
+const AGREED_600 = { key: 'charges.agreed', vars: { amount: { euros: 600 } } };
+const OLD_CONTRACT = { signedOn: f('2024-02-01'), startDate: f('2024-02-01') };
+const NOVEMBER_2026 = { signedOn: f('2026-11-02'), startDate: f('2026-11-02') };
+const IRAV_RULES = ['charges_pact', 'charges_increase', 'update_clause', 'cap_irav', 'cap_ipc'];
+
+describe('how each charge is worded and sourced', () => {
+  type Words = {
+    index: number;
+    year: number | null;
+    status: string;
+    calculation: readonly object[];
+    rules: readonly string[];
+  };
+  const words = (r: ItemResult | undefined): Words => {
+    if (r?.outcome.kind !== 'single') throw new Error('expected single');
+    const { status, calculation, rules } = r.outcome.value;
+    expect(r.sources.map((x) => x.id)).toEqual(rules);
+    return { index: r.index ?? -1, year: r.year, status, calculation, rules };
+  };
+  const one = (charge: Charge, change: Partial<RentalInput> = {}) =>
+    words(checkCharges(input([charge], change), DEPS)[0]);
+
+  it.each<[string, () => Words, Words]>([
+    [
+      'not in the contract, second in its list',
+      () =>
+        words(
+          checkCharges(
+            input([
+              community(),
+              community({
+                inContract: false,
+                annualAgreed: null,
+                charged: [{ year: 2026, amount: 5 }],
+              }),
+            ]),
+            DEPS,
+          )[1],
+        ),
+      {
+        index: 1,
+        year: null,
+        status: 'review_it',
+        calculation: [{ key: 'charges.not_in_contract', vars: { charged: { euros: 5 } } }],
+        rules: ['charges_pact'],
+      },
+    ],
+    [
+      'in the contract with no yearly amount',
+      () => one(community({ annualAgreed: null, charged: [{ year: 2026, amount: 5 }] })),
+      {
+        index: 0,
+        year: null,
+        status: 'review_it',
+        calculation: [{ key: 'charges.no_annual_amount' }],
+        rules: ['charges_pact'],
+      },
+    ],
+    [
+      'nothing charged',
+      () => one(community()),
+      {
+        index: 0,
+        year: null,
+        status: 'not_entered',
+        calculation: [{ key: 'item.not_entered' }],
+        rules: ['charges_pact'],
+      },
+    ],
+    [
+      'a cent over the cap is rounding',
+      () => one(community({ charged: [{ year: 2026, amount: 629.65 }] })),
+      {
+        index: 0,
+        year: 2026,
+        status: 'within_limit',
+        calculation: [
+          AGREED_600,
+          YEAR_CAP(2026, 600, 2.47, 629.64),
+          {
+            key: 'charges.within_cap',
+            vars: { charged: { euros: 629.65 }, cap: { euros: 629.64 } },
+          },
+        ],
+        rules: IRAV_RULES,
+      },
+    ],
+    [
+      'two cents over the cap',
+      () => one(community({ charged: [{ year: 2026, amount: 629.66 }] })),
+      {
+        index: 0,
+        year: 2026,
+        status: 'paid_over',
+        calculation: [
+          AGREED_600,
+          YEAR_CAP(2026, 600, 2.47, 629.64),
+          {
+            key: 'charges.over_cap',
+            vars: { charged: { euros: 629.66 }, cap: { euros: 629.64 }, amount: { euros: 0.02 } },
+          },
+        ],
+        rules: IRAV_RULES,
+      },
+    ],
+    [
+      'under a clause naming no index, below the bound nothing can be told',
+      () => one(community({ charged: [{ year: 2026, amount: 610 }] }), { updateClause: 'other' }),
+      {
+        index: 0,
+        year: 2026,
+        status: 'not_checkable',
+        calculation: [
+          AGREED_600,
+          YEAR_CAP(2026, 600, 2.47, 629.64),
+          { key: 'charges.rise_upper_bound' },
+        ],
+        rules: IRAV_RULES,
+      },
+    ],
+    [
+      'a year whose index is not out',
+      () =>
+        one(community({ charged: [{ year: 2030, amount: 640 }] }), {
+          signedOn: f('2029-10-15'),
+          startDate: f('2029-10-20'),
+        }),
+      {
+        index: 0,
+        year: 2030,
+        status: 'not_checkable',
+        calculation: [
+          AGREED_600,
+          { key: 'charges.rise_not_checkable', vars: { year: { integer: 2030 } } },
+        ],
+        rules: ['charges_pact', 'charges_increase', 'update_clause'],
+      },
+    ],
+    [
+      'two yearly bills',
+      () =>
+        one(
+          community({
+            charged: [
+              { year: 2025, amount: 600 },
+              { year: 2025, amount: 618 },
+            ],
+          }),
+        ),
+      {
+        index: 0,
+        year: 2025,
+        status: 'review_it',
+        calculation: [
+          AGREED_600,
+          {
+            key: 'charges.year_unclear',
+            vars: { year: { integer: 2025 }, charged: { euros: 1218 } },
+          },
+        ],
+        rules: ['charges_pact', 'charges_increase'],
+      },
+    ],
+    [
+      'a tax with nothing charged',
+      () => one(community({ kind: 'property_tax' }), OLD_CONTRACT),
+      {
+        index: 0,
+        year: null,
+        status: 'not_checkable',
+        calculation: [{ key: 'charges.tax_outside_cap' }],
+        rules: ['charges_increase'],
+      },
+    ],
+    [
+      'a waste fee',
+      () => one(community({ kind: 'waste', charged: [{ year: 2026, amount: 900 }] })),
+      {
+        index: 0,
+        year: null,
+        status: 'not_checkable',
+        calculation: [{ key: 'charges.waste_may_be_tax' }],
+        rules: ['charges_increase'],
+      },
+    ],
+    [
+      'a tax the tenant may not bear',
+      () =>
+        one(
+          community({
+            kind: 'property_tax',
+            annualAgreed: 300,
+            charged: [{ year: 2026, amount: 300 }],
+          }),
+          NOVEMBER_2026,
+        ),
+      {
+        index: 0,
+        year: 2026,
+        status: 'paid_over',
+        calculation: [{ key: 'charges.tax_banned', vars: { charged: { euros: 300 } } }],
+        rules: ['taxes_ban'],
+      },
+    ],
+    [
+      'another kind',
+      () =>
+        one(community({ kind: 'other', annualAgreed: 300, charged: [{ year: 2026, amount: 5 }] })),
+      {
+        index: 0,
+        year: null,
+        status: 'review_it',
+        calculation: [{ key: 'charges.other_kind' }],
+        rules: ['charges_meters'],
+      },
+    ],
+    [
+      'past the first seven years of a company',
+      () =>
+        one(community({ charged: [{ year: 2028, amount: 900 }] }), {
+          signedOn: f('2021-03-15'),
+          startDate: f('2021-03-20'),
+          landlordType: 'company',
+        }),
+      {
+        index: 0,
+        year: 2028,
+        status: 'not_applicable_to_date',
+        calculation: [{ key: 'charges.past_first_years', vars: { years: { integer: 7 } } }],
+        rules: ['charges_increase'],
+      },
+    ],
+  ])('%s', (_, actual, expected) => {
+    expect(actual()).toEqual(expected);
+  });
+});
+
+describe('a year charged far over the agreed amount', () => {
+  const STARTED = {
+    signedOn: f('2019-06-01'),
+    startDate: f('2019-06-01'),
+    updateClause: 'ipc',
+  } as const;
+  const month = (n: number): string =>
+    `${2018 + Math.floor(n / 12)}-${String((n % 12) + 1).padStart(2, '0')}`;
+  // Every month of the CPI is out on the first day of the next one, the day of each anniversary.
+  const synthetic = (
+    rateOf: (month: string) => number,
+    series: IndexSeries = IPC,
+  ): IndexSeries => ({
+    ...series,
+    coveredUntil: '2031-12-31',
+    loadedFromStart: true,
+    pendingFlash: null,
+    values: Array.from({ length: 14 * 12 }, (_, n) => ({
+      month: month(n),
+      rate: rateOf(month(n)),
+      publishedOn: `${month(n + 1)}-01`,
+      publishedUrl: SYNTHETIC,
+    })),
+  });
+  const deps = (rateOf: (month: string) => number): RentalDeps => ({
+    ...DEPS,
+    indices: { ...DEPS.indices, ipc: synthetic(rateOf) },
+  });
+  const in2021 = (amount: number) =>
+    input([community({ charged: [{ year: 2021, amount }] })], STARTED);
+
+  it('is counted when the cap allows it in every reading', () => {
+    // 600 × 1,3 × 1,3 = 1.014.
+    const [r] = checkCharges(
+      in2021(1000),
+      deps(() => 15),
+    );
+    expect(singleOf(r).status).toBe('within_limit');
+  });
+
+  it('is left to review when only some readings allow it', () => {
+    // The CPI is 15 % in odd months and 5 % in even ones, and the day each month comes out the
+    // reading before it is the other candidate.
+    const [r] = checkCharges(
+      in2021(1000),
+      deps((m) => (Number(m.slice(5)) % 2 === 1 ? 15 : 5)),
+    );
+    expect(singleOf(r).status).toBe('review_it');
+  });
+});
+
+describe('a year with many open doubts', () => {
+  const SIGNED = {
+    signedOn: f('2023-06-01'),
+    startDate: f('2023-06-01'),
+    landlordType: 'company',
+  } as const;
+  // Both the CPI and the IRAV come out on every anniversary: two doubts a year.
+  const month = (n: number): string =>
+    `${2023 + Math.floor(n / 12)}-${String((n % 12) + 1).padStart(2, '0')}`;
+  const synthetic = (series: IndexSeries): IndexSeries => ({
+    ...series,
+    coveredUntil: '2031-12-31',
+    pendingFlash: null,
+    values: Array.from({ length: 9 * 12 }, (_, n) => ({
+      month: month(n),
+      rate: n % 2 === 0 ? 1 : 2,
+      publishedOn: `${month(n + 1)}-01`,
+      publishedUrl: SYNTHETIC,
+    })),
+  });
+  const deps: RentalDeps = {
+    ...DEPS,
+    indices: { ...DEPS.indices, irav: synthetic(IRAV), ipc: synthetic(IPC) },
+  };
+  const inYear = (year: number) =>
+    readingOf(
+      checkCharges(
+        input([community({ charged: [{ year, amount: 640 }] })], {
+          ...SIGNED,
+          updateClause: 'ipc',
+        }),
+        deps,
+      )[0],
+    );
+
+  it('is worked out with ten', () => {
+    expect(inYear(2028).status).not.toBe('not_checkable');
+  });
+
+  it('is not worked out with more than ten', () => {
+    expect(inYear(2029)).toEqual({
+      status: 'not_checkable',
+      amount: null,
+      calculation: [{ key: 'charges.too_many_readings' }],
+      rules: ['charges_pact', 'charges_increase'],
+    });
   });
 });
