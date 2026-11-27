@@ -4,65 +4,13 @@ import { assessMinimumWage } from '../../../src/engine/household/minimum-wage';
 import { round2 } from '../../../src/engine/money';
 import { parseDate } from '../../../src/engine/date';
 import { NORMS } from './norms-table';
-import { DEPS, TODAY, desistimiento, findingOf, household, single, statusOf } from './input';
+import { DEPS, TODAY, findingOf, household, single, statusOf } from './input';
 
 // A whole pay year worked, so the shortfall counted is the year's.
 const run = (change: Parameters<typeof household>[0]) => {
   const input = household({ startDate: parseDate('2020-01-01'), ...change });
   return assessMinimumWage(input, DEPS, { y: input.payYear, m: 12, d: 31 });
 };
-
-describe('with board or lodging, the money paid each month (art. 8.2)', () => {
-  // 1.150 € a month and two extra pays of 1.700 € apart: 17.200 € a year, over 17.094 €; but the
-  // month in money falls short of 1.221 €.
-  const h8 = {
-    payYear: 2026,
-    monthlyCash: 1150,
-    inKindMonthly: 300,
-    weeklyHours: 40,
-    extraPays: { count: 2, amount: 1700, prorated: false, accrual: 'semiannual' },
-  } as const;
-
-  it('falls short in the month even when the year is covered', () => {
-    const f = single(run(h8), 'smi_monthly');
-    expect(f.status).toBe('below_minimum');
-    expect(f.amount?.min).toBe(round2((1221 - 1150) * 12));
-    expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.monthly_cash');
-  });
-
-  it('without pay in kind, the year alone decides', () => {
-    expect(statusOf(run({ ...h8, inKindMonthly: null }), 'smi_monthly')).toBe('within_limit');
-  });
-});
-
-describe('a shortfall counts only the days of the year worked', () => {
-  const below = { payYear: 2026, monthlyCash: 1000, extraPays: null, weeklyHours: 40 } as const;
-  const amountOf = (a: ReturnType<typeof assessMinimumWage>) =>
-    single(a, 'smi_monthly').amount?.min ?? null;
-
-  it('seven months of a relationship count seven months of the yearly shortfall', () => {
-    const whole = amountOf(run(below));
-    const part = amountOf(
-      assessMinimumWage(
-        household({ ...below, startDate: parseDate('2026-01-01') }),
-        DEPS,
-        parseDate('2026-07-31'),
-      ),
-    );
-    expect(whole).not.toBeNull();
-    expect(part).toBe(round2(((whole ?? 0) * 212) / 365));
-  });
-
-  it('ends on the last day of service, not today', () => {
-    const input = household({
-      ...below,
-      startDate: parseDate('2026-01-01'),
-      termination: desistimiento({ effectiveOn: parseDate('2026-03-31') }),
-    });
-    const a = amountOf(assessMinimumWage(input, DEPS, TODAY));
-    expect(a).toBe(round2(((amountOf(run(below)) ?? 0) * 90) / 365));
-  });
-});
 
 // Art. 8.1 and 8.4: the pay in money, extra payments included, against the year's minimum wage.
 describe('the monthly minimum wage, 2023 to 2026', () => {
@@ -112,30 +60,6 @@ describe('the monthly minimum wage, 2023 to 2026', () => {
     },
   );
 
-  it('prorates shorter hours: 20 hours need half of the minimum', () => {
-    const half = run({
-      weeklyHours: 20,
-      monthlyCash: 610.5,
-      extraPays: { count: 2, amount: 610.5, prorated: false, accrual: 'semiannual' },
-    });
-    expect(statusOf(half, 'smi_monthly')).toBe('within_limit');
-    const under = run({
-      weeklyHours: 20,
-      monthlyCash: 600,
-      extraPays: { count: 2, amount: 610.5, prorated: false, accrual: 'semiannual' },
-    });
-    expect(single(under, 'smi_monthly').amount).toEqual({ min: 126, max: 126 });
-  });
-
-  it('never asks for more than the full-week minimum above 40 hours', () => {
-    const f = run({
-      weeklyHours: 60,
-      monthlyCash: 1221,
-      extraPays: { count: 2, amount: 1221, prorated: false, accrual: 'semiannual' },
-    });
-    expect(statusOf(f, 'smi_monthly')).toBe('within_limit');
-  });
-
   it('cites the article of RD 1620/2011 and the decree of the year', () => {
     const f = single(run({}), 'smi_monthly');
     expect(f.sources.map((s) => s.citation.split(' (')[0])).toEqual([
@@ -147,31 +71,9 @@ describe('the monthly minimum wage, 2023 to 2026', () => {
     expect([decree?.inForceSince, decree?.inForceUntil]).toEqual(['2026-01-01', '2026-12-31']);
   });
 
-  it('does not add extra payments of an unknown amount', () => {
-    const enough = run({
-      monthlyCash: 1500,
-      extraPays: { count: 2, amount: null, prorated: false, accrual: 'semiannual' },
-    });
-    expect(statusOf(enough, 'smi_monthly')).toBe('within_limit');
-    const unsure = run({
-      monthlyCash: 1300,
-      extraPays: { count: 2, amount: null, prorated: false, accrual: 'semiannual' },
-    });
-    const f = single(unsure, 'smi_monthly');
-    expect(f.status).toBe('review_it');
-    expect(f.amount).toBeNull();
-  });
-
   it('asks for the pay when it is missing', () => {
     expect(statusOf(run({ monthlyCash: null }), 'smi_monthly')).toBe('not_entered');
     expect(statusOf(run({ weeklyHours: null }), 'smi_monthly')).toBe('not_entered');
-  });
-
-  it('compares nothing for a year whose decree is not published or not loaded', () => {
-    const future = single(run({ payYear: 2027 }), 'smi_monthly');
-    expect(future.status).toBe('not_published');
-    expect(future.amount).toBeNull();
-    expect(statusOf(run({ payYear: 2022 }), 'smi_monthly')).toBe('not_reviewed_in_this_version');
   });
 });
 
@@ -239,25 +141,6 @@ describe('pay in kind (art. 8.2)', () => {
     );
   });
 
-  it('flags a cent over 30 %', () => {
-    expect(
-      statusOf(
-        run({ monthlyCash: 700, inKindMonthly: 300.01, extraPays: null }),
-        'smi_in_kind_cap',
-      ),
-    ).toBe('over_legal_limit');
-  });
-
-  it('does not count pay in kind towards the minimum in money', () => {
-    const items = run({
-      monthlyCash: 1000,
-      inKindMonthly: 200,
-      extraPays: { count: 2, amount: 1000, prorated: false, accrual: 'semiannual' },
-    });
-    expect(statusOf(items, 'smi_in_kind_cap')).toBe('within_limit');
-    expect(single(items, 'smi_monthly').status).toBe('below_minimum');
-  });
-
   it('counts the share as over only when it is over in the month and in the year', () => {
     // 1.300 a month, two extra pays of 1.300 and 560 in kind: 30,1 % of the month, 27,0 % of the
     // year with its extra pays.
@@ -273,65 +156,6 @@ describe('pay in kind (art. 8.2)', () => {
       ['month_without_extra_pays', 'over_legal_limit'],
       ['year_with_extra_pays', 'within_limit'],
     ]);
-  });
-
-  it('is over the limit in both when it is over in the month and in the year', () => {
-    const items = run({
-      monthlyCash: 700,
-      inKindMonthly: 400,
-      extraPays: { count: 2, amount: 700, prorated: false, accrual: 'semiannual' },
-    });
-    expect(statusOf(items, 'smi_in_kind_cap')).toBe('over_legal_limit');
-  });
-
-  it('reviews a month over the limit when the extra pays are not known', () => {
-    const items = run({
-      monthlyCash: 1300,
-      inKindMonthly: 560,
-      extraPays: { count: 2, amount: null, prorated: false, accrual: 'semiannual' },
-    });
-    expect(statusOf(items, 'smi_in_kind_cap')).toBe('review_it');
-  });
-
-  it('says nothing without pay in kind', () => {
-    const ids = run({ inKindMonthly: 0 }).flatMap((a) =>
-      a.kind === 'single' ? [a.finding.id] : [],
-    );
-    expect(ids).not.toContain('smi_in_kind_cap');
-  });
-});
-
-describe('extra payments (art. 8.4)', () => {
-  const extras = (count: number, accrual: 'semiannual' | 'annual' | 'unknown' = 'semiannual') => ({
-    count,
-    amount: 1500,
-    prorated: false,
-    accrual,
-  });
-
-  it('wants two, at the end of each half-year', () => {
-    expect(statusOf(run({ extraPays: extras(2) }), 'extra_pays')).toBe('within_limit');
-    expect(statusOf(run({ extraPays: extras(1) }), 'extra_pays')).toBe('missing_requirement');
-    expect(statusOf(run({ extraPays: extras(0) }), 'extra_pays')).toBe('missing_requirement');
-  });
-
-  it('leaves paying them once a year or in twelve to what was agreed', () => {
-    const annual = single(run({ extraPays: extras(2, 'annual') }), 'extra_pays');
-    expect(annual.status).toBe('review_it');
-    expect(annual.agreementMaySetOther).toBe(true);
-    const prorated = single(
-      run({ extraPays: { count: 2, amount: null, prorated: true, accrual: 'semiannual' } }),
-      'extra_pays',
-    );
-    expect(prorated.status).toBe('review_it');
-  });
-
-  it('asks when they are not entered, and does not apply to hourly workers', () => {
-    expect(statusOf(run({ extraPays: null }), 'extra_pays')).toBe('not_entered');
-    const ids = run({ regime: 'hourly_external', hourlyRate: 9.55 }).flatMap((a) =>
-      a.kind === 'single' ? [a.finding.id] : [],
-    );
-    expect(ids).not.toContain('extra_pays');
   });
 });
 

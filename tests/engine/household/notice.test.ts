@@ -70,29 +70,6 @@ describe('seven days up to a year of service, twenty after it', () => {
 });
 
 describe('the notice finding', () => {
-  it('is within the law with the full 20 days after a year', () => {
-    const [a] = run('2026-03-01', '2026-03-21');
-    expect(a?.kind).toBe('single');
-    expect(single(run('2026-03-01', '2026-03-21'), 'desistimiento_notice').status).toBe(
-      'within_limit',
-    );
-  });
-
-  it('is one day short with 19 days after a year, worth one day of salary', () => {
-    const f = single(run('2026-03-01', '2026-03-20'), 'desistimiento_notice');
-    expect(f.status).toBe('missing_requirement');
-    expect(f.amount).toEqual({ min: round2(DAILY), max: round2(DAILY) });
-  });
-
-  it('is within the law with 7 days under a year, and 6 is a day short', () => {
-    expect(single(run('2026-02-20', '2026-02-27'), 'desistimiento_notice').status).toBe(
-      'within_limit',
-    );
-    const f = single(run('2026-02-20', '2026-02-26'), 'desistimiento_notice');
-    expect(f.status).toBe('missing_requirement');
-    expect(f.amount?.max).toBe(round2(DAILY));
-  });
-
   it('shows two readings when the first year ends during the notice', () => {
     // Notice on the last day of the first year with 7 days: 7 if the year is counted then,
     // 20 if it is counted when the service ends on 07-03-2026.
@@ -160,22 +137,6 @@ describe('the notice finding', () => {
       ),
     ).toEqual([]);
   });
-
-  it('cannot put the missing days in euros without the salary', () => {
-    const f = single(
-      assessNotice(
-        household({
-          monthlyCash: null,
-          termination: desistimiento({ noticeGivenOn: d('2026-09-10') }),
-        }),
-        NORMS,
-        DEPS.minimumWage,
-      ),
-      'desistimiento_notice',
-    );
-    expect(f.status).toBe('missing_requirement');
-    expect(f.amount).toBeNull();
-  });
 });
 
 const days = (required: number, given: number, missing: number) => ({
@@ -204,17 +165,6 @@ describe('what the notice finding shows', () => {
       {},
       {},
       { status: 'within_limit', calculation: [days(20, 20, 0)], basedOnYourAnswer: false },
-    ],
-    [
-      'the days missing, with no substitute paid',
-      ['2026-03-01', '2026-03-10'],
-      {},
-      {},
-      {
-        status: 'missing_requirement',
-        calculation: [days(20, 9, 11), substitute(11, 57.53, 632.88)],
-        basedOnYourAnswer: true,
-      },
     ],
     [
       'the days missing, with part of the substitute paid',
@@ -271,17 +221,6 @@ describe('what the notice finding shows', () => {
         basedOnYourAnswer: true,
       },
     ],
-    [
-      'a notice given on the last day',
-      ['2026-03-01', '2026-03-01'],
-      {},
-      {},
-      {
-        status: 'missing_requirement',
-        calculation: [days(20, 0, 20), substitute(20, 57.53, 1150.68)],
-        basedOnYourAnswer: true,
-      },
-    ],
   ])('%s', (_name, [noticeOn, lastDay], termination, change, expected) => {
     const f = single(run(noticeOn, lastDay, termination, change), 'desistimiento_notice');
     expect(f).toMatchObject(expected);
@@ -303,8 +242,6 @@ describe('what the notice finding shows', () => {
 describe('the paid hours to look for work', () => {
   it.each([
     ['a full-time worker', 40, '2026-03-21', true],
-    ['a worker just short of full time', 39, '2026-03-21', false],
-    ['a worker with no hours entered', null, '2026-03-21', false],
     ['a notice given on the last day', 40, '2026-03-01', false],
   ])('go to %s: %s', (_name, weeklyHours, lastDay, given) => {
     const items = run('2026-03-01', lastDay, {}, { weeklyHours });

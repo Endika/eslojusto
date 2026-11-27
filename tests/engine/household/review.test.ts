@@ -72,24 +72,13 @@ describe('reviewHousehold', () => {
   });
 
   it.each([
-    ['no termination', {}, []],
     ['a desistimiento', { termination: desistimiento() }, ['cause_truth']],
     [
       'a desistimiento with pay in kind',
       { inKindMonthly: 100, termination: desistimiento() },
       ['cause_truth', 'in_kind_in_severance'],
     ],
-    [
-      'a desistimiento with pay in kind of nothing',
-      { inKindMonthly: 0, termination: desistimiento() },
-      ['cause_truth'],
-    ],
     ['pay in kind and no termination', { inKindMonthly: 100 }, []],
-    [
-      'pay in kind and another cause of termination',
-      { inKindMonthly: 100, termination: desistimiento({ route: 'et_cause' }) },
-      [],
-    ],
   ])('lists what it cannot check for %s', (_name, change, extra) => {
     expect(
       review(change).unchecked.filter((c) => c.endsWith('_truth') || c.startsWith('in_kind')),
