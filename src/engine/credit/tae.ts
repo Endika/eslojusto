@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, daysInMonth, ordinal, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, daysBetween, daysInMonth, type CivilDate } from '../date';
 import type { CreditInput } from './types';
 
 // The APR equation of annex I LCC: Σ Aₖ (1 + X)^(−tₖ) = 0, with what the consumer receives positive,
@@ -59,7 +59,7 @@ const followsMonthly = (first: CivilDate, k: number, on: CivilDate): boolean => 
 // Days of the whole year counted back from `end` to the same day of the year before: 366 when
 // that year holds a 29 February.
 const yearLength = (end: CivilDate): number =>
-  ordinal(end) - ordinal(addMonthsClamped(end, -MONTHS_A_YEAR));
+  daysBetween(addMonthsClamped(end, -MONTHS_A_YEAR), end);
 
 // Years from `from` to `to`: the whole periods of `periodMonths` counted back from `to`, then the
 // days left back to `from`, the first day left out and the last one counted, over the days of the
@@ -74,7 +74,7 @@ export function yearsBetween(from: CivilDate, to: CivilDate, periodMonths: numbe
   const next = (periods + 1) * periodMonths;
   if (compareDates(addMonthsClamped(from, next), to) === 0) return next / MONTHS_A_YEAR;
   const stubEnd = addMonthsClamped(to, -periods * periodMonths);
-  const days = ordinal(stubEnd) - ordinal(from);
+  const days = daysBetween(from, stubEnd);
   return (periods * periodMonths) / MONTHS_A_YEAR + (days === 0 ? 0 : days / yearLength(stubEnd));
 }
 

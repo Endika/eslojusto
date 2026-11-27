@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, ordinal } from '../date';
+import { addMonthsClamped, compareDates, daysBetween } from '../date';
 import { assessAcross } from '../law/readings';
 import { round2 } from '../money';
 import { creditPhrase, type CreditPhrase } from './calculation';
@@ -149,8 +149,8 @@ export function unusedPremiumGuide(input: CreditInput): number | null {
   const repayment = input.earlyRepayment;
   const insurance = input.insurance;
   if (repayment === null || insurance === null || !insurance.single) return null;
-  const term = ordinal(repayment.agreedEndOn) - ordinal(input.drawnOn);
-  const left = ordinal(repayment.agreedEndOn) - ordinal(repayment.on);
+  const term = daysBetween(input.drawnOn, repayment.agreedEndOn);
+  const left = daysBetween(repayment.on, repayment.agreedEndOn);
   if (term <= 0) return null;
   return round2((insurance.premium * left) / term);
 }

@@ -1,4 +1,4 @@
-import { addDays, compareDates, max, ordinal, type CivilDate } from '../date';
+import { addDays, compareDates, max, daysBetween, type CivilDate } from '../date';
 import { creditPhrase, type CreditPhrase } from './calculation';
 import { creditFinding, dayOf, single, type CreditItem } from './finding';
 import type { NormTable } from './norms';
@@ -37,7 +37,7 @@ export function checkWithdrawal(
     ),
     open
       ? creditPhrase('withdrawal.days_left', {
-          days: { days: ordinal(lastDay) - ordinal(today) },
+          days: { days: daysBetween(today, lastDay) },
           day: dayOf(lastDay),
         })
       : creditPhrase('withdrawal.ended', { day: dayOf(lastDay) }),
