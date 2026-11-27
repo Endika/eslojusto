@@ -139,6 +139,16 @@ describe('item 1: the APR against the one the contract states', () => {
     expect(keys(only(insured(false)))).toContain('apr.insurance_left_out');
     expect(keys(only(insured(true)))).toContain('apr.insurance_counted');
     expect(keys(check())).not.toContain('apr.insurance_counted');
+    expect(only(insured(true)).calculation).toContainEqual({
+      key: 'apr.contribution.insurance',
+      vars: { points: { points: expect.any(Number) } },
+    });
+  });
+
+  it('works out a loan agreed before the card assumptions as any other', () => {
+    const f = check({ agreedOn: parseDate('2012-02-15'), drawnOn: parseDate('2012-02-15') });
+    expect(f.status).not.toBe('review_it');
+    expect(f.detail).not.toBeNull();
   });
 
   it('tells where an undated balloon falls, and nothing for a dated one or none', () => {

@@ -61,14 +61,14 @@ interface FindingExtras {
   readonly deadline?: { readonly lastDay: CivilDate; readonly today: CivilDate } | null;
 }
 
-export const creditFinding = (
+export function creditFinding(
   id: FindingId,
   status: FindingStatus,
   calculation: CreditCalculation,
   rules: readonly StatuteRuleId[],
   norms: NormTable,
   extras: FindingExtras = {},
-): CreditFinding => {
+): CreditFinding {
   const deadline = extras.deadline ?? null;
   return {
     id,
@@ -81,7 +81,7 @@ export const creditFinding = (
     calculation,
     sources: [...new Set(rules)].map((rule) => ruleSource(rule, norms)),
   };
-};
+}
 
 export const single = (finding: CreditFinding): CreditItem => ({ kind: 'single', finding });
 

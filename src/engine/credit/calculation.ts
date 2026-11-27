@@ -103,5 +103,6 @@ export interface CreditPhrase {
 // Sentences, in order; the UI joins them with a space.
 export type CreditCalculation = readonly CreditPhrase[];
 
-export const creditPhrase = (key: CreditPhraseKey, vars?: CreditPhrase['vars']): CreditPhrase =>
-  vars === undefined ? { key } : { key, vars };
+export function creditPhrase(key: CreditPhraseKey, vars?: CreditPhrase['vars']): CreditPhrase {
+  return vars === undefined ? { key } : { key, vars };
+}
