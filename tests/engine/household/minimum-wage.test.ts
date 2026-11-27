@@ -3,6 +3,7 @@ import { MINIMUM_WAGE } from '../../../src/engine/employment/data/minimum-wage';
 import { assessMinimumWage } from '../../../src/engine/household/minimum-wage';
 import { round2 } from '../../../src/engine/money';
 import { parseDate } from '../../../src/engine/date';
+import { NORMS } from './norms-table';
 import { DEPS, TODAY, desistimiento, findingOf, household, single, statusOf } from './input';
 
 // A whole pay year worked, so the shortfall counted is the year's.
@@ -331,5 +332,31 @@ describe('extra payments (art. 8.4)', () => {
       a.kind === 'single' ? [a.finding.id] : [],
     );
     expect(ids).not.toContain('extra_pays');
+  });
+});
+
+describe('the decree a figure comes from', () => {
+  const decreeOf = (deps: typeof DEPS) => {
+    const f = single(
+      assessMinimumWage(household({ startDate: parseDate('2020-01-01') }), deps, TODAY),
+      'smi_monthly',
+    );
+    return f.sources.at(-1);
+  };
+
+  it('keeps the date its end is uncertain until, when the norm has one', () => {
+    const norms = {
+      ...NORMS,
+      rd126_2026: { ...NORMS.rd126_2026, endUncertainUntil: '2027-01-01' },
+    };
+    expect(decreeOf({ ...DEPS, norms })?.endUncertainUntil).toBe('2027-01-01');
+    expect(decreeOf(DEPS)?.endUncertainUntil).toBeNull();
+  });
+
+  it('refuses a decree that is not among the norms', () => {
+    const minimumWage = MINIMUM_WAGE.map((row) => ({ ...row, norm: 'rd0_2000' }));
+    expect(() => decreeOf({ ...DEPS, minimumWage })).toThrow(
+      'The minimum wage of 2026 rests on rd0_2000, not in the norms',
+    );
   });
 });

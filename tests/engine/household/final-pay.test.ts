@@ -75,6 +75,41 @@ describe('final pay of a worker paid monthly', () => {
     expect(pay.items.map((i) => i.id)).toEqual(['pending_salary', 'holiday_pay']);
   });
 
+  it('reckons no extra payments, missing or not, for a worker who has none', () => {
+    const none = ending({ extraPays: null });
+    const zero = ending({
+      extraPays: { count: 0, amount: null, prorated: false, accrual: 'semiannual' },
+    });
+    for (const pay of [none, zero]) {
+      if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
+      expect(pay.extraPayAmountMissing).toBe(false);
+      expect(pay.items.map((i) => i.id)).toEqual(['pending_salary', 'holiday_pay']);
+    }
+  });
+
+  it.each([
+    ['takes the 30 days of art. 9 when no holidays are entered', null, 30],
+    [
+      'takes the days agreed when they are entered',
+      { days: 26, longestStretch: 15, taken: 10 },
+      26,
+    ],
+  ])('%s', (_name, holidays, days) => {
+    const pay = ending({ holidays });
+    if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
+    expect(JSON.stringify(pay.items[1]?.calculation)).toContain(`"anuales":{"days":${days}}`);
+  });
+
+  it('works the extra payments with the accrual entered', () => {
+    const pay = ending({
+      extraPays: { count: 2, amount: 1500, prorated: false, accrual: 'annual' },
+    });
+    if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
+    expect(pay.items.find((i) => i.id === 'extra_pay')?.calculation[0]?.key).toBe(
+      'extra_pay.annual',
+    );
+  });
+
   it('cites the household rules, not the Estatuto', () => {
     const pay = ending();
     if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');

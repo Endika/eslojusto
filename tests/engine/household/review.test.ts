@@ -71,10 +71,29 @@ describe('reviewHousehold', () => {
     expect(r.unchecked).toContain('cause_truth');
   });
 
-  it('reports pay in kind left out of the severance', () => {
-    expect(review({ inKindMonthly: 100, termination: desistimiento() }).unchecked).toContain(
-      'in_kind_in_severance',
-    );
+  it.each([
+    ['no termination', {}, []],
+    ['a desistimiento', { termination: desistimiento() }, ['cause_truth']],
+    [
+      'a desistimiento with pay in kind',
+      { inKindMonthly: 100, termination: desistimiento() },
+      ['cause_truth', 'in_kind_in_severance'],
+    ],
+    [
+      'a desistimiento with pay in kind of nothing',
+      { inKindMonthly: 0, termination: desistimiento() },
+      ['cause_truth'],
+    ],
+    ['pay in kind and no termination', { inKindMonthly: 100 }, []],
+    [
+      'pay in kind and another cause of termination',
+      { inKindMonthly: 100, termination: desistimiento({ route: 'et_cause' }) },
+      [],
+    ],
+  ])('lists what it cannot check for %s', (_name, change, extra) => {
+    expect(
+      review(change).unchecked.filter((c) => c.endsWith('_truth') || c.startsWith('in_kind')),
+    ).toEqual(extra);
   });
 
   it('stops at the door for a relationship that ended before the reform', () => {
@@ -125,6 +144,11 @@ describe('the unemployment note', () => {
     if (f?.kind !== 'single') throw new Error('expected one finding');
     expect(f.finding.status).toBe('information');
     expect(f.finding.amount).toBeNull();
+    expect(f.finding.item).toBe('unemployment');
+    expect(f.finding.calculation).toEqual([
+      { key: 'unemployment.situation' },
+      { key: 'unemployment.general_rules' },
+    ]);
     expect(f.finding.sources.map((s) => s.citation.split(' (')[0])).toEqual([
       'Ley General de la Seguridad Social, art. 267.1.a) 8.º',
       'Real Decreto-ley 16/2022, disposición transitoria 2.ª',
