@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, daysInMonth, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, isRealDate, type CivilDate } from '../date';
 import type { HouseholdInput } from './types';
 
 export type HouseholdField =
@@ -49,14 +49,6 @@ const FIRST_YEAR = 2000;
 // A review may look at a year ahead of today.
 const MONTHS_AHEAD = 12;
 
-const isRealDate = ({ y, m, d }: CivilDate): boolean =>
-  Number.isInteger(y) &&
-  Number.isInteger(m) &&
-  Number.isInteger(d) &&
-  m >= 1 &&
-  m <= 12 &&
-  d >= 1 &&
-  d <= daysInMonth(y, m);
 const inRange = (v: number, min: number, max: number): boolean =>
   Number.isFinite(v) && v >= min && v <= max;
 const positiveUpTo = (v: number, max: number): boolean => Number.isFinite(v) && v > 0 && v <= max;

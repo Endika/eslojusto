@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, ordinal, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, daysBetween, type CivilDate } from '../date';
 import { assessAcross } from '../law/readings';
 import { exact, round2 } from '../money';
 import { phrase, type HouseholdPhrase } from './calculation';
@@ -26,8 +26,9 @@ export const requiredNoticeDays = (start: CivilDate, on: CivilDate): number =>
 
 // Calendar days of notice given. The count starts the day after the notice and rest days count
 // (Código Civil 5.1 and 5.2), so a notice on the 1st with the last day on the 21st gives 20.
-export const noticeDaysGiven = (noticeOn: CivilDate, lastDay: CivilDate): number =>
-  ordinal(lastDay) - ordinal(noticeOn);
+export function noticeDaysGiven(noticeOn: CivilDate, lastDay: CivilDate): number {
+  return daysBetween(noticeOn, lastDay);
+}
 
 const euros = (n: number) => ({ euros: round2(n) });
 
