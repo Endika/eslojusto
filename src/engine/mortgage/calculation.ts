@@ -117,7 +117,9 @@ export interface MortgagePhrase {
 // Sentences, in order; the UI joins them with a space.
 export type MortgageCalculation = readonly MortgagePhrase[];
 
-export const mortgagePhrase = (
+export function mortgagePhrase(
   key: MortgagePhraseKey,
   vars?: MortgagePhrase['vars'],
-): MortgagePhrase => (vars === undefined ? { key } : { key, vars });
+): MortgagePhrase {
+  return vars === undefined ? { key } : { key, vars };
+}

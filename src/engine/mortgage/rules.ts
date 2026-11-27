@@ -111,15 +111,13 @@ const rule = (
   basis: 'statute',
 });
 
-// The consolidated text anchors article 1 as `#ar` and article N as `#ar-N`.
-const lcciAnchor = (article: number): string => (article === 1 ? '#ar' : `#ar-${article}`);
-
+// The consolidated text anchors article N as `#ar-N`.
 const lcci = (id: StatuteRuleId, article: string, output: RuleOutput): StatuteRule =>
   rule(
     id,
     'lcci',
     `Ley de contratos de crédito inmobiliario, art. ${article}`,
-    `${LCCI}${lcciAnchor(Number(article.split(/[.\s]/)[0]))}`,
+    `${LCCI}#ar-${article.split(/[.\s]/)[0]}`,
     LCCI_SINCE,
     null,
     output,
@@ -388,6 +386,7 @@ export function readRulings(id: CaseLawRuleId, sources: SourceTable): ReadRuling
   if (read.length === 0) return null;
   return {
     sources: read,
+    // Stryker disable next-line EqualityOperator: on a tie both days are the same
     asOf: read.map((s) => s.lastVerified).reduce((a, b) => (a < b ? a : b)),
   };
 }

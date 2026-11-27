@@ -1,5 +1,5 @@
-import { mortgagePhrase, type MortgagePhrase, type MortgagePhraseKey } from './calculation';
-import type { MortgageInput, OutOfScopeReason, Scope } from './types';
+import { mortgagePhrase, type MortgagePhrase } from './calculation';
+import type { MortgageInput, Scope } from './types';
 
 // A natural person's standard mortgage on a home only: anything else stops at the door, says why,
 // and nothing is worked out. A developer's loan taken over on buying carries the developer's
@@ -11,15 +11,7 @@ export function scope(input: Pick<MortgageInput, 'borrower' | 'purpose' | 'loanK
   return { inScope: true };
 }
 
-const OUT_OF_SCOPE: Readonly<Record<OutOfScopeReason, MortgagePhraseKey>> = {
-  company: 'scope.company',
-  business_purpose: 'scope.business_purpose',
-  developer_subrogation: 'scope.developer_subrogation',
-  multicurrency: 'scope.multicurrency',
-  reverse: 'scope.reverse',
-  not_mortgage: 'scope.not_mortgage',
-};
-
 // Why the review stops; nothing for a mortgage it covers.
-export const scopePhrases = (reach: Scope): readonly MortgagePhrase[] =>
-  reach.inScope ? [] : [mortgagePhrase(OUT_OF_SCOPE[reach.reason])];
+export function scopePhrases(reach: Scope): readonly MortgagePhrase[] {
+  return reach.inScope ? [] : [mortgagePhrase(`scope.${reach.reason}`)];
+}
