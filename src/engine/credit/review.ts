@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, max, type CivilDate } from '../date';
 import { round2 } from '../money';
 import { checkDealerDiscount, checkEarlyRepayment } from './early-repayment';
 import { findingsOf, type CreditFinding, type CreditItem, type FindingStatus } from './finding';
@@ -84,8 +84,7 @@ function totalOf(items: readonly CreditItem[]): Total {
 }
 
 // The APR worked out, in its lowest reading, when every reading worked one out.
-function recalculatedApr(item: CreditItem | null): number | null {
-  if (item === null) return null;
+function recalculatedApr(item: CreditItem): number | null {
   const aprs = findingsOf(item).flatMap((f) => (f.detail === null ? [] : [f.detail.apr]));
   return aprs.length === findingsOf(item).length ? Math.min(...aprs) : null;
 }
@@ -102,20 +101,20 @@ export function termMonths(input: CreditInput, reading: BalloonReading): number 
     plan.kind === 'regular'
       ? [monthlyDue(plan.firstDueOn, plan.count - 1)]
       : plan.rows.map((r) => r.dueOn);
-  const later = (a: CivilDate, b: CivilDate) => (compareDates(a, b) >= 0 ? a : b);
-  const last = dues.reduce(later);
+  const last = dues.reduce(max);
   const end =
-    input.balloon === null ? last : later(last, balloonDue(last, input.balloon.dueOn, reading));
-  let months = (end.y - input.drawnOn.y) * 12 + (end.m - input.drawnOn.m);
-  while (months > 0 && compareDates(addMonthsClamped(input.drawnOn, months), end) > 0) months--;
-  return months;
+    input.balloon === null ? last : max(last, balloonDue(last, input.balloon.dueOn, reading));
+  const months = (end.y - input.drawnOn.y) * 12 + (end.m - input.drawnOn.m);
+  return compareDates(addMonthsClamped(input.drawnOn, months), end) > 0 ? months - 1 : months;
 }
 
 // The term the indicator reads. An undated balloon is read with the last instalment and a month
 // after it; when those two terms fall in different series, the term is left unknown.
 function indicatorTerm(input: CreditInput): number | null {
   const withLast = termMonths(input, 'balloon_with_last');
+  // Stryker disable next-line StringLiteral: balloonDue reads any reading but balloon_with_last as a month after
   const monthAfter = termMonths(input, 'balloon_month_after');
+  // Stryker disable next-line ConditionalExpression,LogicalOperator: both terms are null together, when there are no instalments
   if (withLast === null || monthAfter === null) return null;
   return loanSeries(withLast, input.rateType) === loanSeries(monthAfter, input.rateType)
     ? withLast
@@ -137,7 +136,7 @@ export function reviewCredit(input: CreditInput, today: CivilDate, deps: CreditD
     information: readonly InformationBlock[],
   ): CreditResult => {
     const overCharged = totalOf(items);
-    const apr = items.find((i) => findingsOf(i)[0]?.id === 'apr');
+    const [apr] = items;
     return {
       ok: true,
       review: {
@@ -154,7 +153,7 @@ export function reviewCredit(input: CreditInput, today: CivilDate, deps: CreditD
     };
   };
   if (!reach.inScope) return { ok: true, review: emptyReview(reach) };
-  const term = input.product === 'revolving' ? null : indicatorTerm(input);
+  const term = indicatorTerm(input);
   if (reach.indicatorOnly)
     return review(
       [],

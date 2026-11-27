@@ -61,6 +61,7 @@ interface AprWorld {
 }
 
 const solve = (flows: AprFlows | null): number | null => {
+  // Stryker disable next-line ConditionalExpression: aprFlows has no flows only without instalments, and then no reading gets here
   if (flows === null) return null;
   const solution = solveApr(flows.flows);
   return solution.kind === 'solved' ? solution.rate * PERCENT : null;
@@ -72,6 +73,7 @@ function contributions(input: CreditInput, world: AprWorld, apr: number): readon
   if (input.insurance !== null && world.insurance) costs.push({ kind: 'insurance' });
   return costs.flatMap((cost) => {
     const without = solve(aprFlows(input, { ...world, leaveOut: cost }));
+    // Stryker disable next-line ConditionalExpression,ArrayDeclaration: leaving a cost out only raises what is received, so the equation keeps its one change of sign
     return without === null ? [] : [{ cost, points: round2(apr - without) }];
   });
 }
@@ -133,11 +135,11 @@ function aprReading(input: CreditInput, world: AprWorld, norms: NormTable): Cred
   const status =
     declared === null
       ? 'contract_missing'
-      : oneDecimal(declared) === oneDecimal(exact)
-        ? 'matches'
-        : oneDecimal(declared) < oneDecimal(exact)
-          ? 'contract_lower'
-          : 'contract_higher';
+      : oneDecimal(declared) < oneDecimal(exact)
+        ? 'contract_lower'
+        : oneDecimal(declared) > oneDecimal(exact)
+          ? 'contract_higher'
+          : 'matches';
   const insurancePhrases =
     input.insurance === null
       ? []
@@ -202,11 +204,13 @@ export function checkApr(input: CreditInput, norms: NormTable): CreditItem {
   const insuranceWorlds: readonly InsuranceReading[] =
     required === null
       ? ['insurance_counted', 'insurance_left_out']
-      : [required === false ? 'insurance_left_out' : 'insurance_counted'];
+      : // Stryker disable next-line StringLiteral: any world but insurance_counted leaves the insurance out
+        [required === false ? 'insurance_left_out' : 'insurance_counted'];
   const balloonWorlds: readonly BalloonReading[] =
     input.balloon !== null && input.balloon.dueOn === null
       ? ['balloon_with_last', 'balloon_month_after']
-      : ['balloon_month_after'];
+      : // Stryker disable next-line StringLiteral: with the balloon dated, or none, the reading is not used
+        ['balloon_month_after'];
   const [insuranceOnly] = insuranceWorlds;
   const [balloonOnly] = balloonWorlds;
   if (balloonWorlds.length === 1 && balloonOnly !== undefined)

@@ -108,7 +108,6 @@ describe('credit validation', () => {
   });
 
   it('checks every row of a schedule', () => {
-    const row = (dueOn: string, amount = 100) => ({ dueOn: parseDate(dueOn), amount });
     expect(errors({ instalments: { kind: 'schedule', rows: [row('2019-03-15')] } })).toEqual([]);
     expect(errors({ instalments: { kind: 'schedule', rows: [] } })).toEqual([
       'instalments.rows:count_range',
@@ -116,6 +115,225 @@ describe('credit validation', () => {
     expect(errors({ instalments: { kind: 'schedule', rows: [row('2019-03-15', 0)] } })).toEqual([
       'instalments.rows:amount_range',
     ]);
+  });
+
+  const row = (dueOn: string, amount = 100) => ({ dueOn: parseDate(dueOn), amount });
+  const badDate = { y: 2019, m: 2, d: 30 };
+  const regular = (change: object) => ({
+    kind: 'regular' as const,
+    count: 48,
+    amount: 273.35,
+    frequency: 'monthly' as const,
+    firstDueOn: parseDate('2019-03-15'),
+    ...change,
+  });
+  const dated = (change: Partial<ReturnType<typeof repayment>>) => ({
+    earlyRepayment: repayment(change),
+  });
+
+  it.each<[string, Partial<CreditInput>, string[]]>([
+    ['a drawdown day in the future', { drawnOn: parseDate('2026-10-10') }, ['drawnOn:in_future']],
+    ['a net amount of nothing', { netDisbursed: 0 }, ['netDisbursed:amount_range']],
+    ['a declared APR over 100', { declaredApr: 100.1 }, ['declaredApr:rate_range']],
+    [
+      'a declared total of nothing',
+      { declaredTotalPayable: 0 },
+      ['declaredTotalPayable:amount_range'],
+    ],
+    ['no declared APR nor total', { declaredApr: null, declaredTotalPayable: null }, []],
+    [
+      'an instalment of nothing',
+      { instalments: regular({ amount: 0 }) },
+      ['instalments.amount:amount_range'],
+    ],
+    [
+      'a first instalment on no day',
+      { instalments: regular({ firstDueOn: badDate }) },
+      ['instalments.firstDueOn:invalid_date'],
+    ],
+    [
+      'a schedule with one row on no day',
+      {
+        instalments: {
+          kind: 'schedule',
+          rows: [row('2019-03-15'), { ...row('2019-04-15'), dueOn: badDate }],
+        },
+      },
+      ['instalments.rows:invalid_date'],
+    ],
+    [
+      'a schedule with one row of nothing and one on no day',
+      {
+        instalments: {
+          kind: 'schedule',
+          rows: [row('2019-03-15'), row('2019-04-15', 0), { ...row('2019-05-15'), dueOn: badDate }],
+        },
+      },
+      ['instalments.rows:invalid_date'],
+    ],
+    [
+      'a schedule with one row of nothing',
+      { instalments: { kind: 'schedule', rows: [row('2019-03-15'), row('2019-04-15', 0)] } },
+      ['instalments.rows:amount_range'],
+    ],
+    [
+      'a balloon next to a schedule that already failed',
+      {
+        instalments: {
+          kind: 'schedule',
+          rows: [row('2019-03-15'), { ...row('2019-04-15', 3_300), dueOn: badDate }],
+        },
+        balloon: { amount: 3_000, dueOn: null },
+      },
+      ['instalments.rows:invalid_date'],
+    ],
+    ...(
+      [
+        [
+          'a later row holding it, listed first',
+          [
+            [5, 3_300],
+            [3, 300],
+            [4, 300],
+          ],
+          ['balloon:in_schedule'],
+        ],
+        [
+          'a last row equal to it',
+          [
+            [3, 300],
+            [4, 300],
+            [5, 3_000],
+          ],
+          ['balloon:in_schedule'],
+        ],
+        [
+          'a last row below it',
+          [
+            [3, 100],
+            [4, 200],
+            [5, 300],
+          ],
+          [],
+        ],
+        [
+          'an earlier row as large as the last',
+          [
+            [3, 3_300],
+            [4, 100],
+            [5, 3_300],
+          ],
+          [],
+        ],
+        [
+          'a middle row as large as the last',
+          [
+            [3, 100],
+            [4, 3_300],
+            [5, 3_300],
+          ],
+          [],
+        ],
+      ] satisfies [string, [number, number][], string[]][]
+    ).map(([label, rows, expected]): [string, Partial<CreditInput>, string[]] => [
+      `a schedule with ${label}, and a balloon of 3.000 €`,
+      {
+        instalments: {
+          kind: 'schedule',
+          rows: rows.map(([m, amount]) => row(`2019-0${m}-15`, amount)),
+        },
+        balloon: { amount: 3_000, dueOn: null },
+      },
+      expected,
+    ]),
+    [
+      'an agreement on no day, far after the drawdown',
+      { agreedOn: { y: 2019, m: 12, d: 40 } },
+      ['agreedOn:invalid_date'],
+    ],
+    [
+      'a balloon on no day, before the drawdown',
+      { balloon: { amount: 3_000, dueOn: { y: 2018, m: 2, d: 30 } } },
+      ['balloon.dueOn:invalid_date'],
+    ],
+    [
+      'an agreement and a drawdown today',
+      {
+        agreedOn: TODAY,
+        drawnOn: TODAY,
+        instalments: regular({ firstDueOn: parseDate('2026-11-09') }),
+      },
+      [],
+    ],
+    [
+      'a balloon with no instalments',
+      { instalments: null, balloon: { amount: 3_000, dueOn: null } },
+      [],
+    ],
+    [
+      'a dated balloon when the drawdown day is wrong',
+      { drawnOn: badDate, balloon: { amount: 3_000, dueOn: parseDate('2019-02-15') } },
+      ['drawnOn:invalid_date'],
+    ],
+    [
+      'a charge on no day',
+      { charges: [{ kind: 'study', amount: 0, paidOn: badDate, how: 'paid' }] },
+      ['charges:invalid_date'],
+    ],
+    ['a card limit of nothing', { card: card({ limit: 0 }) }, ['card.limit:amount_range']],
+    ['a card with no fee and nothing owed', { card: card({ annualFee: 0, balance: 0 }) }, []],
+    ['a card fee below zero', { card: card({ annualFee: -1 }) }, ['card.annualFee:amount_range']],
+    ['a card balance below zero', { card: card({ balance: -1 }) }, ['card.balance:amount_range']],
+    [
+      'a repayment day in the future',
+      dated({ on: parseDate('2026-10-10') }),
+      ['earlyRepayment.on:in_future'],
+    ],
+    [
+      'an agreed end on no day',
+      dated({ agreedEndOn: badDate }),
+      ['earlyRepayment.agreedEndOn:invalid_date'],
+    ],
+    [
+      'an agreed end before the drawdown',
+      dated({ on: parseDate('2019-02-15'), agreedEndOn: parseDate('2019-02-14') }),
+      ['earlyRepayment.on:outside_term', 'earlyRepayment.agreedEndOn:outside_term'],
+    ],
+    [
+      'an agreed end on the drawdown',
+      dated({ on: parseDate('2019-02-15'), agreedEndOn: parseDate('2019-02-15') }),
+      ['earlyRepayment.agreedEndOn:outside_term'],
+    ],
+    [
+      'a repayment of nothing',
+      dated({ principalRepaid: 0 }),
+      ['earlyRepayment.principalRepaid:amount_range'],
+    ],
+    ['a repayment of the whole principal', dated({ principalRepaid: 10_500 }), []],
+    [
+      'a compensation below zero',
+      dated({ compensationCharged: -1 }),
+      ['earlyRepayment.compensationCharged:amount_range'],
+    ],
+    [
+      'interest settled below zero',
+      dated({ interestSettled: -1 }),
+      ['earlyRepayment.interestSettled:amount_range'],
+    ],
+    [
+      'remaining interest below zero',
+      dated({ remainingInterest: -1 }),
+      ['earlyRepayment.remainingInterest:amount_range'],
+    ],
+    ['no interest known', dated({ interestSettled: null, remainingInterest: null }), []],
+    [
+      'a receipt before the contract when the contract day is wrong',
+      { agreedOn: badDate, infoReceivedOn: parseDate('2019-02-14') },
+      ['agreedOn:invalid_date'],
+    ],
+    ['a receipt on the contract day', { infoReceivedOn: parseDate('2019-02-15') }, []],
+  ])('%s', (_, change, expected) => {
+    expect(errors(change)).toEqual(expected);
   });
 
   it('checks the charges, the insurance and the card', () => {

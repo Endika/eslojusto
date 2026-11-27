@@ -61,10 +61,51 @@ describe('item 3: compensation for an early repayment', () => {
     });
   });
 
-  it('says the lender may charge more only by proving its loss', () => {
+  const workings = [
+    {
+      key: 'early_repayment.over_a_year',
+      vars: { end: { date: '2023-02-15' }, on: { date: '2021-02-15' } },
+    },
+    {
+      key: 'early_repayment.base_principal',
+      vars: { base: { euros: 5000 }, rate: { percent: 1 }, cap: { euros: 50 } },
+    },
+  ];
+
+  it('shows the working and says the lender may charge more only by proving its loss', () => {
     const f = only(check({ compensationCharged: 80 }));
-    expect(f.calculation.map((p) => p.key)).toContain('early_repayment.losses');
+    expect(f.calculation).toStrictEqual([
+      ...workings,
+      {
+        key: 'early_repayment.above_general_cap',
+        vars: { charged: { euros: 80 }, over: { euros: 30 } },
+      },
+      { key: 'early_repayment.losses' },
+    ]);
     expect(anchors(f)).toEqual(['early_repayment_cap', 'period_count', 'early_repayment_losses']);
+  });
+
+  it('shows the working of a charge within the cap', () => {
+    const f = only(check());
+    expect(f.calculation).toStrictEqual([
+      ...workings,
+      { key: 'early_repayment.within_cap', vars: { charged: { euros: 50 } } },
+    ]);
+    expect(anchors(f)).toEqual(['early_repayment_cap', 'period_count']);
+  });
+
+  it('reads a single reading on the capital when no interest was settled', () => {
+    for (const interestSettled of [null, 0]) {
+      const item = check({ interestSettled });
+      expect(item.kind).toBe('single');
+      expect(only(item).calculation[1]?.key).toBe('early_repayment.base_principal');
+    }
+  });
+
+  it('does not call the interest cap in when the interest left equals the general cap', () => {
+    const f = only(check({ remainingInterest: 50 }));
+    expect(anchors(f)).toEqual(['early_repayment_cap', 'period_count']);
+    expect(f.calculation.map((p) => p.key)).not.toContain('early_repayment.interest_cap');
   });
 
   it('never caps above the interest the schedule had left', () => {
@@ -75,16 +116,25 @@ describe('item 3: compensation for an early repayment', () => {
   });
 
   it.each([
-    ['a variable rate', {}, { rateType: 'variable' as const }],
-    ['a repayment an insurance pays', { paidByInsurance: true }, {}],
-  ])('allows nothing for %s: whatever was charged is over', (_, change, input) => {
+    ['a variable rate', 'early_repayment.variable_rate', {}, { rateType: 'variable' as const }],
+    [
+      'a repayment an insurance pays',
+      'early_repayment.paid_by_insurance',
+      { paidByInsurance: true },
+      {},
+    ],
+  ])('allows nothing for %s: whatever was charged is over', (_, key, change, input) => {
     const f = only(check(change, input));
     expect(f).toMatchObject({ status: 'charged_without_basis', amount: 50 });
+    expect(f.calculation).toStrictEqual([
+      { key },
+      { key: 'early_repayment.charged_without_basis', vars: { charged: { euros: 50 } } },
+    ]);
     expect(anchors(f)).toEqual(['early_repayment_none']);
-    expect(only(check({ ...change, compensationCharged: 0 }, input))).toMatchObject({
-      status: 'nothing_charged',
-      amount: null,
-    });
+    const none = only(check({ ...change, compensationCharged: 0 }, input));
+    expect(none).toMatchObject({ status: 'nothing_charged', amount: null });
+    expect(none.calculation).toStrictEqual([{ key }, { key: 'early_repayment.nothing_charged' }]);
+    expect(anchors(none)).toEqual(['early_repayment_none']);
   });
 
   it('works out the cap on the capital and on capital and interest when the base is in doubt', () => {
@@ -110,11 +160,10 @@ describe("the car dealer's discount", () => {
       loan({ product: 'car_loan', earlyRepayment: repayment({ discountLost: true }) }),
       CREDIT_NORMS,
     );
-    expect(item && only(item)).toMatchObject({
-      id: 'dealer_discount',
-      status: 'review_it',
-      amount: null,
-    });
+    const finding = item && only(item);
+    expect(finding).toMatchObject({ id: 'dealer_discount', status: 'review_it', amount: null });
+    expect(finding?.calculation).toStrictEqual([{ key: 'dealer_discount.review_it' }]);
+    expect(finding && anchors(finding)).toEqual(['contract_mentions', 'early_repayment_cap']);
     expect(checkDealerDiscount(loan({ earlyRepayment: repayment() }), CREDIT_NORMS)).toBeNull();
   });
 });
@@ -129,11 +178,24 @@ describe('the unused premium of a linked insurance', () => {
     expect(unusedPremiumGuide(input)).toBe(239.84);
   });
 
-  it('has nothing to share for a periodic premium', () => {
-    const input = loan({
-      insurance: { premium: 10, single: false, financed: false, required: true },
-      earlyRepayment: repayment(),
-    });
-    expect(unusedPremiumGuide(input)).toBeNull();
+  const single = { premium: 480, single: true, financed: true, required: true };
+
+  it.each([
+    [
+      'a periodic premium',
+      { insurance: { ...single, single: false }, earlyRepayment: repayment() },
+    ],
+    ['no insurance', { insurance: null, earlyRepayment: repayment() }],
+    ['no early repayment', { insurance: single, earlyRepayment: null }],
+    [
+      'a term of no days',
+      { insurance: single, earlyRepayment: repayment({ agreedEndOn: parseDate('2019-02-15') }) },
+    ],
+    [
+      'an end before the loan was drawn',
+      { insurance: single, earlyRepayment: repayment({ agreedEndOn: parseDate('2019-02-14') }) },
+    ],
+  ])('has nothing to share for %s', (_, change) => {
+    expect(unusedPremiumGuide(loan(change))).toBeNull();
   });
 });

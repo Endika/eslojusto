@@ -65,10 +65,10 @@ function capReading(
 
   const longTerm = overAYearLeft(repayment);
   const rate = longTerm ? OVER_A_YEAR : UP_TO_A_YEAR;
-  const amount =
-    base === 'principal_and_interest'
-      ? repayment.principalRepaid + (repayment.interestSettled ?? 0)
-      : repayment.principalRepaid;
+  const principalOnly = base === 'principal_only';
+  const amount = principalOnly
+    ? repayment.principalRepaid
+    : repayment.principalRepaid + (repayment.interestSettled ?? 0);
   const general = round2(amount * rate);
   const remaining = repayment.remainingInterest;
   // 30.5: never more than the interest the schedule had left to pay.
@@ -82,9 +82,7 @@ function capReading(
       on: dayOf(repayment.on),
     }),
     creditPhrase(
-      base === 'principal_and_interest'
-        ? 'early_repayment.base_with_interest'
-        : 'early_repayment.base_principal',
+      principalOnly ? 'early_repayment.base_principal' : 'early_repayment.base_with_interest',
       {
         base: { euros: round2(amount) },
         rate: { percent: rate * PERCENT },
@@ -122,7 +120,7 @@ export function checkEarlyRepayment(input: CreditInput, norms: NormTable): Credi
   const repayment = input.earlyRepayment;
   if (repayment === null) return null;
   const bases: readonly RepaymentBase[] =
-    repayment.interestSettled !== null && repayment.interestSettled > 0
+    (repayment.interestSettled ?? 0) > 0
       ? ['principal_and_interest', 'principal_only']
       : ['principal_only'];
   return assessAcross('repayment_base', bases, (base) => capReading(input, repayment, base, norms));

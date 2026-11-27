@@ -63,9 +63,8 @@ const isCount = (v: number): boolean => Number.isInteger(v) && v >= 1 && v <= MA
 // it: entered again as the balloon, it would be counted twice.
 function holdsBalloon(rows: readonly ScheduleRow[], balloon: number): boolean {
   const sorted = [...rows].sort((a, b) => compareDates(a.dueOn, b.dueOn));
-  const last = sorted.at(-1);
-  if (last === undefined || last.amount < balloon) return false;
-  return sorted.slice(0, -1).every((r) => r.amount < last.amount);
+  const last = sorted[sorted.length - 1] as ScheduleRow;
+  return last.amount >= balloon && sorted.slice(0, -1).every((r) => r.amount < last.amount);
 }
 
 export function validate(input: CreditInput, today: CivilDate): readonly ValidationError[] {

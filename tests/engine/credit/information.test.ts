@@ -68,6 +68,124 @@ describe('information blocks', () => {
     expect(payoff?.calculation[0]).toMatchObject({ key: 'information.card_payoff.never' });
   });
 
+  const shape = (change: Partial<CreditInput>) =>
+    blocks(change).map((b) => [b.id, b.calculation, b.sources.map((s) => s.id)]);
+  const phrases = (...keys: string[]) => keys.map((key) => ({ key }));
+  const mentionsBlock = (...keys: string[]) => [
+    'contract_mentions',
+    phrases('information.contract_mentions', ...keys, 'information.contract_mentions.consequences'),
+    ['contract_mentions', 'tae_missing', 'tae_inexact'],
+  ];
+  const lawChange = [
+    'law_change',
+    phrases('information.law_change'),
+    ['directive_notice', 'repayment_under_500', 'withdrawal_cap_12m', 'tae_caps'],
+  ];
+  const cashOption = ['contract_mentions', 'cash_option'];
+
+  it.each([
+    [
+      'a loan with a single insurance and a mention missing',
+      {
+        insurance: { premium: 480, single: true, financed: true, required: true },
+        earlyRepayment: repayment(),
+        mentions: { a: false },
+      },
+      [
+        mentionsBlock('information.contract_mentions.missing'),
+        [
+          'linked_insurance',
+          phrases(
+            'information.linked_insurance.apr',
+            'information.linked_insurance.withdrawal',
+            'information.linked_insurance.unused_premium',
+          ),
+          ['tae_formula', 'withdrawal', 'unused_premium'],
+        ],
+        [
+          'unused_premium',
+          [{ key: 'information.unused_premium.guide', vars: { euros: { euros: 239.84 } } }],
+          ['unused_premium'],
+        ],
+        [
+          'linked_credit',
+          phrases('information.linked_credit', 'information.cash_option'),
+          ['linked_credit', ...cashOption],
+        ],
+        lawChange,
+      ],
+    ],
+    [
+      'a car loan, mentions all present',
+      { product: 'car_loan', mentions: { a: true } },
+      [
+        mentionsBlock(),
+        ['cash_price', phrases('information.cash_price', 'information.cash_option'), cashOption],
+        lawChange,
+      ],
+    ],
+    [
+      'a card paid off in months',
+      { ...card, card: { ...card.card, minimumPayment: 100 } },
+      [
+        mentionsBlock(),
+        ['revolving_info', phrases('information.revolving_info'), ['revolving_info']],
+        [
+          'card_payoff',
+          [
+            {
+              key: 'information.card_payoff.months',
+              vars: {
+                balance: { euros: 3000 },
+                payment: { euros: 100 },
+                months: { integer: 47 },
+                interest: { euros: 1627.31 },
+              },
+            },
+          ],
+          [],
+        ],
+        lawChange,
+      ],
+    ],
+    [
+      'a card never paid off',
+      card,
+      [
+        mentionsBlock(),
+        ['revolving_info', phrases('information.revolving_info'), ['revolving_info']],
+        [
+          'card_payoff',
+          [
+            {
+              key: 'information.card_payoff.never',
+              vars: {
+                balance: { euros: 3000 },
+                payment: { euros: 60 },
+                interest: { euros: 60 },
+              },
+            },
+          ],
+          [],
+        ],
+        lawChange,
+      ],
+    ],
+  ] as const)('spell out %s', (_, change, expected) => {
+    expect(shape(change as Partial<CreditInput>)).toStrictEqual(expected);
+  });
+
+  it.each([
+    ['no card', null],
+    ['a card with nothing owed', { ...card.card, balance: 0 }],
+  ])('give a revolving card with %s no payoff', (_, cardData) => {
+    expect(ids({ ...card, card: cardData })).toEqual([
+      'contract_mentions',
+      'revolving_info',
+      'law_change',
+    ]);
+  });
+
   it('mark the change of law as a draft, never as law in force', () => {
     const law = blocks().find((b) => b.id === 'law_change');
     expect(law?.sources.map((s) => s.status)).toEqual(['draft', 'draft', 'draft', 'draft']);
