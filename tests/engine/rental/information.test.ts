@@ -204,3 +204,140 @@ describe('the tacit extension source', () => {
     });
   });
 });
+
+describe('what each block says and cites', () => {
+  const SERPAVI = 'https://www.mivau.gob.es/vivienda/alquila-bien-es-tu-derecho/serpavi';
+  const LAU = 'https://www.boe.es/buscar/act.php?id=BOE-A-1994-26003';
+  const shape = (bs: readonly InformationBlock[]) =>
+    bs.map(({ id, dates, answer, region, links, sources }) => ({
+      id,
+      dates,
+      answer,
+      region,
+      links,
+      sources: sources.map((x) => x.id),
+    }));
+  const plain = { dates: {}, answer: null, region: null, links: [] };
+
+  it('a plain contract: the reference price, the term, the notice windows and what always is', () => {
+    expect(shape(blocks())).toEqual([
+      { ...plain, id: 'reference_price', links: [SERPAVI], sources: ['cap_2_rdl29'] },
+      {
+        ...plain,
+        id: 'minimum_term',
+        dates: { contractEnd: '2026-03-20', mandatoryEnd: '2026-03-20' },
+        sources: ['term_minimum'],
+      },
+      {
+        ...plain,
+        id: 'notice_windows',
+        dates: { landlordBy: '2025-11-20', tenantBy: '2026-01-20', tacitUntil: '2029-03-20' },
+        sources: ['term_tacit'],
+      },
+      { ...plain, id: 'deposit_lodging', sources: ['deposit_lodging'] },
+      { ...plain, id: 'regional_rules', region: 'MD', links: [LAU], sources: [] },
+      { ...plain, id: 'meters', sources: ['charges_meters'] },
+    ]);
+  });
+
+  it('a stressed zone, a cash guarantee and a move-out add their blocks', () => {
+    const bs = blocks({
+      signedOn: f('2024-02-01'),
+      startDate: f('2024-02-01'),
+      agreedMonths: 12,
+      stressedZone: true,
+      guarantees: [{ kind: 'cash', amount: 1500 }],
+      moveOut: { keysReturnedOn: f('2026-10-20'), returns: [], deductions: [] },
+    });
+    expect(shape(bs)).toEqual([
+      {
+        ...plain,
+        id: 'stressed_zone',
+        answer: 'yes',
+        links: [SERPAVI],
+        sources: ['stressed_zone'],
+      },
+      {
+        ...plain,
+        id: 'minimum_term',
+        dates: { contractEnd: '2025-02-01', mandatoryEnd: '2029-02-01' },
+        sources: ['term_minimum'],
+      },
+      {
+        ...plain,
+        id: 'notice_windows',
+        dates: { landlordBy: '2028-10-01', tenantBy: '2028-12-01', tacitUntil: '2032-02-01' },
+        sources: ['term_tacit'],
+      },
+      { ...plain, id: 'deposit_lodging', sources: ['deposit_lodging'] },
+      { ...plain, id: 'regional_rules', region: 'MD', links: [LAU], sources: [] },
+      { ...plain, id: 'meters', sources: ['charges_meters'] },
+      { ...plain, id: 'guarantee_return', sources: ['deposit_interest'] },
+      { ...plain, id: 'closing_document', sources: ['closing_document'] },
+    ]);
+  });
+
+  it('a term ending in the extension window gives the window and, pending, the RDL 28 term', () => {
+    const bs = blocks(
+      { signedOn: f('2022-01-05'), startDate: f('2022-01-10'), agreedMonths: 12 },
+      NORMS_BEFORE_VOTE,
+    );
+    expect(shape(bs).filter((b) => b.id.startsWith('extension'))).toEqual([
+      {
+        ...plain,
+        id: 'extensions_rdl28',
+        dates: { mandatoryEnd: '2027-01-10' },
+        sources: ['term_rdl28'],
+      },
+      {
+        ...plain,
+        id: 'extension_rdl29',
+        dates: { from: '2026-10-08', until: '2028-12-31' },
+        sources: ['extension_rdl29'],
+      },
+    ]);
+  });
+});
+
+describe('where the windows of RDL 29/2026 stop', () => {
+  const termOf = (start: string, agreedMonths: number) => ({
+    signedOn: f(start),
+    startDate: f(start),
+    agreedMonths,
+  });
+
+  it.each<[string, () => Partial<RentalInput>, boolean]>([
+    ['a term ending on the last day of the extension window', () => termOf('2023-12-31', 12), true],
+  ])('%s', (_, change, named) => {
+    expect(ids(blocks(change())).includes('extension_rdl29')).toBe(named);
+  });
+
+  const refPrice = (change: Partial<RentalInput>) =>
+    ids(blocks(change)).includes('reference_price');
+
+  it('the reference price is not named for the start day itself, only for an anniversary', () => {
+    expect(refPrice({ signedOn: f('2027-02-01'), startDate: f('2027-02-01') })).toBe(false);
+    expect(refPrice({ signedOn: f('2026-10-20'), startDate: f('2026-10-20') })).toBe(true);
+  });
+
+  it('the reference price is not named for an anniversary on the day the keys are back', () => {
+    const keys = (day: string) => ({ keysReturnedOn: f(day), returns: [], deductions: [] });
+    expect(refPrice({ moveOut: keys('2027-03-20') })).toBe(false);
+    expect(refPrice({ moveOut: keys('2027-03-21') })).toBe(true);
+  });
+
+  it.each<[string, () => RentalInput['guarantees'], boolean]>([
+    ['cash with no amount names nothing', () => [{ kind: 'cash', amount: null }], false],
+    [
+      'a bank guarantee only names nothing',
+      () => [{ kind: 'bank_guarantee', amount: 5000 }],
+      false,
+    ],
+    ['no guarantee names nothing', () => [], false],
+  ])('on moving out, %s', (_, guarantees, named) => {
+    const moveOut = { keysReturnedOn: f('2026-09-30'), returns: [], deductions: [] };
+    expect(ids(blocks({ moveOut, guarantees: guarantees() })).includes('guarantee_return')).toBe(
+      named,
+    );
+  });
+});

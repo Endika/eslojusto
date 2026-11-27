@@ -42,6 +42,11 @@ describe('the door', () => {
     expect(r.scope).toEqual({ inScope: false, reason });
     expect(r.items).toEqual([]);
     expect(r.information).toEqual([]);
+    expect(r.totals).toStrictEqual({
+      paidOver: { counted: 0, upTo: 0 },
+      owed: { counted: 0, upTo: 0 },
+      overCap: { counted: 0, upTo: 0 },
+    });
     expect(r.offerPass).toBe(false);
     expect(r.unchecked).toEqual(UNCHECKED);
   });

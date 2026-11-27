@@ -213,6 +213,36 @@ describe('reference month', () => {
       expect(lookup(s, '2030-02-20')).toMatchObject({ kind: 'ok', value: { month: '2030-01' } });
     });
 
+    it('is loaded up to and including the covered day', () => {
+      const s = series([value('2030-01', '2030-02-14')]);
+      expect(lookup(s, '2030-12-31')).toMatchObject({ kind: 'ok', value: { month: '2030-01' } });
+      expect(lookup(s, '2031-01-01')).toEqual({ kind: 'not_loaded' });
+    });
+
+    it('says a flash is not loaded when it has no press release', () => {
+      const s = series([
+        value('2030-01', '2030-02-14'),
+        { ...value('2030-02', '2030-03-14'), flashRate: 2.5, flashPublishedOn: '2030-02-27' },
+      ]);
+      expect(lookup(s, '2030-02-27')).toMatchObject({ kind: 'flash_not_loaded', month: '2030-02' });
+    });
+
+    it('weighs the pending flash of the month after the last one', () => {
+      const pendingFlash = {
+        month: '2030-03',
+        rate: 2.2,
+        publishedOn: '2030-03-28',
+        url: `${INE}calendar`,
+      };
+      const s = { ...series([value('2030-02', '2030-03-14')]), pendingFlash };
+      expect(lookup(s, '2030-03-28')).toMatchObject({
+        kind: 'flash_window',
+        definitive: { month: '2030-02' },
+        flash: pendingFlash,
+      });
+      expect(lookup(s, '2030-03-27')).toMatchObject({ kind: 'ok', value: { month: '2030-02' } });
+    });
+
     it('never takes a month as published within that same month', () => {
       const s = series([value('2030-01', '2030-01-31')]);
       expect(lookup(s, '2030-01-31')).toEqual({ kind: 'not_loaded' });
