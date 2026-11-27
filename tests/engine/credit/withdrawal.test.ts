@@ -65,9 +65,10 @@ describe('item 4: the withdrawal period', () => {
 
   it('says sending is enough and what follows, citing art. 28 and the counting of days', () => {
     const f = withdraw(oct1, '2026-10-09');
-    expect(f.calculation.map((p) => p.key)).toEqual(
-      expect.arrayContaining(['withdrawal.send_by', 'withdrawal.effects']),
-    );
+    expect(f.calculation.slice(-2)).toStrictEqual([
+      { key: 'withdrawal.send_by' },
+      { key: 'withdrawal.effects' },
+    ]);
     expect(f.sources.map((s) => s.id)).toEqual(['withdrawal', 'period_count']);
   });
 });
