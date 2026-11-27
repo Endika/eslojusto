@@ -3,11 +3,13 @@ import { parseDate } from '../../../src/engine/date';
 import {
   assessNotice,
   noticeDaysGiven,
+  noticeShort,
   overOneYear,
   requiredNoticeDays,
 } from '../../../src/engine/household/notice';
 import { countedAmount, highestAmount } from '../../../src/engine/household/review';
 import { round2 } from '../../../src/engine/money';
+import type { HouseholdInput } from '../../../src/engine/household/types';
 import { desistimiento, household, single, DEPS } from './input';
 import { NORMS } from './norms-table';
 
@@ -15,10 +17,16 @@ const d = parseDate;
 const DAILY = 21_000 / 365;
 const START = d('2025-03-01');
 
-const run = (noticeOn: string, lastDay: string, termination = {}) =>
+const run = (
+  noticeOn: string,
+  lastDay: string,
+  termination = {},
+  change: Partial<HouseholdInput> = {},
+) =>
   assessNotice(
     household({
       startDate: START,
+      ...change,
       termination: desistimiento({
         noticeGivenOn: d(noticeOn),
         effectiveOn: d(lastDay),
@@ -167,5 +175,178 @@ describe('the notice finding', () => {
     );
     expect(f.status).toBe('missing_requirement');
     expect(f.amount).toBeNull();
+  });
+});
+
+const days = (required: number, given: number, missing: number) => ({
+  key: 'notice.days',
+  vars: { required, given, missing },
+});
+const substitute = (missing: number, daily: number, amount: number) => ({
+  key: 'notice.substitute',
+  vars: { missing, daily: { euros: daily }, amount: { euros: amount } },
+});
+const LEAVE = { key: 'notice.leave', vars: { hours: 6 } };
+
+describe('what the notice finding shows', () => {
+  it.each<
+    [
+      string,
+      [string, string],
+      Partial<HouseholdInput['termination'] & object>,
+      Partial<HouseholdInput>,
+      { status: string; calculation: object[]; basedOnYourAnswer: boolean },
+    ]
+  >([
+    [
+      'the full notice',
+      ['2026-03-01', '2026-03-21'],
+      {},
+      {},
+      { status: 'within_limit', calculation: [days(20, 20, 0)], basedOnYourAnswer: false },
+    ],
+    [
+      'the days missing, with no substitute paid',
+      ['2026-03-01', '2026-03-10'],
+      {},
+      {},
+      {
+        status: 'missing_requirement',
+        calculation: [days(20, 9, 11), substitute(11, 57.53, 632.88)],
+        basedOnYourAnswer: true,
+      },
+    ],
+    [
+      'the days missing, with part of the substitute paid',
+      ['2026-03-01', '2026-03-10'],
+      { substitutePaid: 100 },
+      {},
+      {
+        status: 'missing_requirement',
+        calculation: [
+          days(20, 9, 11),
+          substitute(11, 57.53, 632.88),
+          {
+            key: 'notice.substitute_short',
+            vars: { paid: { euros: 100 }, difference: { euros: 532.88 } },
+          },
+        ],
+        basedOnYourAnswer: true,
+      },
+    ],
+    [
+      'the days missing, with the substitute paid',
+      ['2026-03-01', '2026-03-10'],
+      { substitutePaid: 633 },
+      {},
+      {
+        status: 'within_limit',
+        calculation: [
+          days(20, 9, 11),
+          substitute(11, 57.53, 632.88),
+          { key: 'notice.substitute_paid', vars: { paid: { euros: 633 } } },
+        ],
+        basedOnYourAnswer: true,
+      },
+    ],
+    [
+      'the days missing, with no salary to put them in euros',
+      ['2026-03-01', '2026-03-10'],
+      {},
+      { monthlyCash: null },
+      {
+        status: 'missing_requirement',
+        calculation: [days(20, 9, 11), { key: 'notice.salary_unknown' }],
+        basedOnYourAnswer: false,
+      },
+    ],
+    [
+      'the days missing, with a salary raised to the minimum wage',
+      ['2026-03-01', '2026-03-10'],
+      {},
+      { monthlyCash: 1000, extraPays: null },
+      {
+        status: 'missing_requirement',
+        calculation: [days(20, 9, 11), { key: 'base.minimum_wage' }, substitute(11, 46.83, 515.16)],
+        basedOnYourAnswer: true,
+      },
+    ],
+    [
+      'a notice given on the last day',
+      ['2026-03-01', '2026-03-01'],
+      {},
+      {},
+      {
+        status: 'missing_requirement',
+        calculation: [days(20, 0, 20), substitute(20, 57.53, 1150.68)],
+        basedOnYourAnswer: true,
+      },
+    ],
+  ])('%s', (_name, [noticeOn, lastDay], termination, change, expected) => {
+    const f = single(run(noticeOn, lastDay, termination, change), 'desistimiento_notice');
+    expect(f).toMatchObject(expected);
+    expect(f.item).toBe('notice');
+    expect(f.sources).toHaveLength(2);
+  });
+
+  it('shows what each reading rests on when they differ', () => {
+    const [a] = run('2026-02-28', '2026-03-07');
+    if (a?.kind !== 'readings') throw new Error('expected two readings');
+    expect(a.readings.map((r) => r.finding.calculation)).toEqual([
+      [days(7, 7, 0)],
+      [days(20, 7, 13), substitute(13, 57.53, 747.95)],
+    ]);
+    expect(a.readings.map((r) => r.finding.basedOnYourAnswer)).toEqual([false, true]);
+  });
+});
+
+describe('the paid hours to look for work', () => {
+  it.each([
+    ['a full-time worker', 40, '2026-03-21', true],
+    ['a worker just short of full time', 39, '2026-03-21', false],
+    ['a worker with no hours entered', null, '2026-03-21', false],
+    ['a notice given on the last day', 40, '2026-03-01', false],
+  ])('go to %s: %s', (_name, weeklyHours, lastDay, given) => {
+    const items = run('2026-03-01', lastDay, {}, { weeklyHours });
+    const leave = items.filter(
+      (a) => a.kind === 'single' && a.finding.id === 'desistimiento_leave',
+    );
+    expect(leave.length).toBe(given ? 1 : 0);
+    if (given) expect(single(items, 'desistimiento_leave').calculation).toEqual([LEAVE]);
+  });
+});
+
+describe('a notice that is short', () => {
+  const short = (change: Partial<HouseholdInput['termination'] & object>, noTermination = false) =>
+    noticeShort(
+      household({
+        startDate: START,
+        termination: noTermination ? null : desistimiento({ ...change }),
+      }),
+    );
+
+  it.each([
+    [
+      'a desistimiento with 19 days after a year',
+      { noticeGivenOn: d('2026-03-01'), effectiveOn: d('2026-03-20') },
+      true,
+    ],
+    [
+      'a desistimiento with the full 20 days',
+      { noticeGivenOn: d('2026-03-01'), effectiveOn: d('2026-03-21') },
+      false,
+    ],
+    ['no day of notice', { noticeGivenOn: null }, false],
+    [
+      'another cause of termination',
+      { route: 'et_cause', noticeGivenOn: d('2026-03-01'), effectiveOn: d('2026-03-05') },
+      false,
+    ],
+  ] as const)('is told for %s', (_name, change, expected) => {
+    expect(short(change)).toBe(expected);
+  });
+
+  it('is not there without a termination', () => {
+    expect(short({}, true)).toBe(false);
   });
 });
