@@ -1,4 +1,4 @@
-import { ordinal, toIso, type CivilDate } from '../date';
+import { daysBetween, toIso, type CivilDate } from '../date';
 import type { Across } from '../law/readings';
 import type { NormSource } from '../law/sources';
 import type { CreditCalculation } from './calculation';
@@ -76,9 +76,7 @@ export const creditFinding = (
     amount: extras.amount ?? null,
     lastDay: deadline === null ? null : toIso(deadline.lastDay),
     daysLeft:
-      deadline === null || status !== 'open'
-        ? null
-        : ordinal(deadline.lastDay) - ordinal(deadline.today),
+      deadline === null || status !== 'open' ? null : daysBetween(deadline.today, deadline.lastDay),
     detail: extras.detail ?? null,
     calculation,
     sources: [...new Set(rules)].map((rule) => ruleSource(rule, norms)),

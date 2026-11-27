@@ -1,4 +1,4 @@
-import { addDays, compareDates, daysInMonth, type CivilDate } from '../date';
+import { addDays, compareDates, isRealDate, type CivilDate } from '../date';
 import type { CreditInput, ScheduleRow } from './types';
 
 export type CreditField =
@@ -52,15 +52,6 @@ const MAX_RATE = 100;
 const MAX_INSTALMENTS = 600;
 // The money may arrive a little before the contract is dated, never long before.
 const DRAWN_BEFORE_DAYS = 30;
-
-const isRealDate = ({ y, m, d }: CivilDate): boolean =>
-  Number.isInteger(y) &&
-  Number.isInteger(m) &&
-  Number.isInteger(d) &&
-  m >= 1 &&
-  m <= 12 &&
-  d >= 1 &&
-  d <= daysInMonth(y, m);
 
 const isAmount = (v: number): boolean => Number.isFinite(v) && v > 0 && v <= MAX_AMOUNT;
 // An amount that may be zero, such as a fee not charged.
