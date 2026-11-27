@@ -4,10 +4,11 @@ import { IGC } from '../../../src/engine/rental/data/igc';
 import { IPC } from '../../../src/engine/rental/data/ipc';
 import { IRAV } from '../../../src/engine/rental/data/irav';
 import { NORMS } from '../../../src/engine/rental/data/norms';
-import type { IndexSeries, IndexTables } from '../../../src/engine/rental/indices';
+import type { IndexId, IndexSeries, IndexTables } from '../../../src/engine/rental/indices';
 import type { Norm, NormTable } from '../../../src/engine/rental/norms';
 import { countedAmount, letterAmount } from '../../../src/engine/rental/outcome';
 import {
+  allowedRise,
   checkRentUpdates,
   rentUpdateAmount,
   type RentUpdateReading,
@@ -391,6 +392,34 @@ describe('the cap in force on each anniversary', () => {
       expect(depends(r).reasons).toEqual(['repealed_window']);
       expect(counted(r)).toBe(0);
     });
+  });
+
+  it('2028: a clause naming no index follows the IRAV even once the IRAV caps no more', () => {
+    // RDL 29/2026 reads the clause as the IRAV whatever the cap: synthetic February 2028 2,30 %.
+    const uncapped: RentalDeps = {
+      norms: {
+        ...NORMS,
+        ineIravResolution: { ...NORMS.ineIravResolution, inForceUntil: '2027-12-31' },
+      },
+      indices: FUTURE,
+    };
+    const v = single(
+      first(
+        check(
+          contract({
+            signedOn: f('2024-03-15'),
+            startDate: f('2024-03-20'),
+            updateClause: 'unspecified_index',
+            updates: [update('2028-03-20', 1050, 1080)],
+          }),
+          f('2028-06-10'),
+          uncapped,
+        ),
+      ),
+    );
+    expect(v.agreed).toMatchObject({ kind: 'index', figure: { index: 'irav', rate: 2.3 } });
+    expect(v.rules).toContain('update_clause_rdl29');
+    expect(v.cap).toBeNull();
   });
 
   it('2028: the IRAV alone, the same in every reading for a contract from 2024', () => {
@@ -1212,5 +1241,1153 @@ describe('work bound', () => {
     const after = next?.outcome.kind === 'depends' ? next.outcome.low : next?.outcome.value;
     expect(after?.calculation[0]?.key).toBe('rent_update.base_from_answer');
     expect(depends(first(checkRentUpdates(input, TODAY, DEPS))).reasons.length).toBe(3);
+  });
+});
+
+// What each reading says, word for word, and which doubt each world takes the other side of.
+describe('how each rent update is worded and sourced', () => {
+  const E = (euros: number) => ({ euros });
+  const P = (percent: number) => ({ percent });
+  const I = (integer: number) => ({ integer });
+  const M = (month: string) => ({ month });
+  const D = (date: string) => ({ date });
+  const ph = (name: string, vars?: object) => ({
+    key: `rent_update.${name}`,
+    ...(vars === undefined ? {} : { vars }),
+  });
+  const index = (id: string, month: string, rate: number, published: string, kind = 'index') => ({
+    key: `rent_update.figure.${kind}`,
+    vars: { index: { index: id }, month: M(month), rate: P(rate), published: D(published) },
+  });
+  const fixed = (rate: number) => ({ key: 'rent_update.figure.fixed', vars: { rate: P(rate) } });
+  const rent = (name: string, euros: number) => ph(name, { rent: E(euros) });
+  const maxRent = (base: number, rate: number, max: number) =>
+    ph('max_rent', { base: E(base), rate: P(rate), max: E(max) });
+  const months = (n: number, from: string, to: string) =>
+    ph('months', { months: I(n), from: M(from), to: M(to) });
+  const over = (monthly: number) => ph('monthly_over', { monthly: E(monthly) });
+  const words = (v: RentUpdateReading) => ({
+    status: v.status,
+    unchecked: v.unchecked,
+    base: v.base,
+    maxRent: v.maxRent,
+    monthly: v.monthly,
+    accumulated: v.accumulated,
+    months: v.months,
+    monthsBeforeDue: v.monthsBeforeDue,
+    calculation: v.calculation,
+    rules: v.rules,
+  });
+  // Each reading with the doubts it took the side of.
+  const readings = (r: RentUpdateResult) =>
+    depends(r).readings.map((x) => ({ ...words(x.value), worlds: x.worlds }));
+
+  const from2024 = { signedOn: f('2024-03-15'), startDate: f('2024-03-20') };
+  const from2023 = { signedOn: f('2023-06-01'), startDate: f('2023-06-01') };
+  const IPC_2025 = index('ipc', '2025-02', 3, '2025-03-14');
+  const IRAV_2025 = index('irav', '2025-02', 2.08, '2025-03-14');
+  const CAP_2025 = ph('cap', { rate: IRAV_2025 });
+  const MAX_2025 = maxRent(1000, 2.08, 1020.8);
+  const TO_SEPTEMBER = months(19, '2025-03', '2026-09');
+
+  it('a rise applied a month before the anniversary is paid over for that month', () => {
+    const v = single(
+      first(
+        check(
+          contract({
+            ...from2024,
+            updateClause: 'irav',
+            updates: [
+              update('2025-03-20', 1000, 1020.8, {
+                effectiveOn: f('2025-02-01'),
+                chargedFrom: f('2025-02-01'),
+                noticeOn: f('2025-02-10'),
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(v.calculation).toEqual([
+      rent('base_initial', 1000),
+      ph('agreed', { rate: IRAV_2025 }),
+      CAP_2025,
+      MAX_2025,
+      ph('before_anniversary', { months: I(1), anniversary: D('2025-03-20'), base: E(1000) }),
+      months(20, '2025-02', '2026-09'),
+      ph('until_today'),
+      over(0),
+    ]);
+    expect(v).toMatchObject({ monthsBeforeDue: 1, accumulated: 20.8, monthly: 0 });
+  });
+
+  it('an email notice: as if never notified, and as if written, each with its world', () => {
+    const r = first(
+      check(
+        contract({
+          ...from2024,
+          updates: [
+            update('2025-03-20', 1000, 1030, { notice: 'email', noticeOn: f('2025-04-10') }),
+          ],
+        }),
+      ),
+    );
+    const [unwritten, written] = readings(r);
+    expect(unwritten).toMatchObject({
+      accumulated: 570,
+      monthsBeforeDue: 19,
+      worlds: [{ 'notice:2025-03-20': false }],
+      calculation: [
+        rent('base_initial', 1000),
+        ph('agreed', { rate: IPC_2025 }),
+        CAP_2025,
+        MAX_2025,
+        ph('notice_not_written', { months: I(19), base: E(1000) }),
+        TO_SEPTEMBER,
+        ph('until_today'),
+        over(9.2),
+      ],
+    });
+    expect(written).toMatchObject({
+      accumulated: 216.4,
+      monthsBeforeDue: 2,
+      worlds: [{ 'notice:2025-03-20': true }],
+    });
+    expect(written?.calculation[4]).toEqual(
+      ph('charged_before_notice', { months: I(2), base: E(1000) }),
+    );
+  });
+
+  it('paying a rise inside the cap is accepting it, and a rise a cent over the cap is not within it', () => {
+    const rise = (newRent: number) =>
+      readings(
+        first(
+          check(
+            contract({
+              ...from2023,
+              updates: [update('2024-06-01', 1000, newRent, { notice: 'none', noticeOn: null })],
+            }),
+          ),
+        ),
+      );
+    const [, accepted] = rise(1030);
+    expect(accepted).toMatchObject({ status: 'within_limit', accumulated: 0, months: 28 });
+    expect(accepted?.calculation.map((p) => p.key)).toEqual([
+      'rent_update.base_initial',
+      'rent_update.agreed',
+      'rent_update.cap',
+      'rent_update.max_rent',
+      'rent_update.accepted_by_paying',
+      'rent_update.months',
+      'rent_update.until_today',
+      'rent_update.within_limit',
+    ]);
+    expect(rise(1030.01)[1]?.calculation[4]).toEqual(ph('accepted_by_paying'));
+    expect(rise(1030.02)[1]?.calculation[4]).toEqual(ph('accepted_by_paying_up_to_max'));
+  });
+
+  it('an agreement in writing or by word of mouth, each worded and with its world', () => {
+    const accepted = (change: Parameters<typeof update>[3]) =>
+      readings(
+        first(
+          check(contract({ ...from2023, updates: [update('2024-06-01', 1000, 1050, change)] })),
+        ),
+      );
+    const verbal = accepted({ agreedInWriting: false, agreedVerbally: true });
+    expect(verbal[1]).toMatchObject({
+      status: 'not_checkable',
+      unchecked: 'agreed_in_writing',
+      maxRent: null,
+      accumulated: 0,
+      calculation: [rent('base_initial', 1000), ph('agreed_verbally')],
+      rules: ['update_clause'],
+      worlds: [
+        { 'index:ipc:2024-06-01': false, 'agreement:2024-06-01': true },
+        { 'index:ipc:2024-06-01': true, 'agreement:2024-06-01': true },
+      ],
+    });
+    expect(verbal[0]?.worlds).toEqual([
+      { 'index:ipc:2024-06-01': false, 'agreement:2024-06-01': false },
+      { 'index:ipc:2024-06-01': true, 'agreement:2024-06-01': false },
+    ]);
+    const unknown = accepted({ agreedInWriting: null });
+    expect(unknown[1]?.calculation).toEqual([rent('base_initial', 1000), ph('agreed_in_writing')]);
+    const written = single(
+      first(
+        check(
+          contract({
+            ...from2023,
+            updates: [update('2024-06-01', 1000, 1050, { agreedInWriting: true })],
+          }),
+        ),
+      ),
+    );
+    expect(written.calculation).toEqual([rent('base_initial', 1000), ph('agreed_in_writing')]);
+    expect(written.rules).toEqual(['update_clause']);
+  });
+
+  it('a large landlord keeps its cap beside the agreement, and it is a world when unknown', () => {
+    const agreed = (
+      largeLandlord: boolean | null,
+      change: Parameters<typeof update>[3] = {},
+      fixedPercent = 5,
+    ) =>
+      first(
+        check(
+          contract({
+            signedOn: f('2020-06-20'),
+            startDate: f('2020-06-25'),
+            landlordType: 'company',
+            largeLandlord,
+            updateClause: 'fixed_percent',
+            fixedPercent,
+            updates: [update('2023-06-25', 1000, 1050, { agreedInWriting: true, ...change })],
+          }),
+        ),
+      );
+    const igc = index('igc', '2023-04', 2, '2023-06-19');
+    expect(words(single(agreed(true)))).toMatchObject({
+      calculation: [
+        rent('base_from_answer', 1000),
+        ph('agreed_in_writing'),
+        ph('large_landlord_cap'),
+        ph('cap', { rate: igc }),
+        maxRent(1000, 2, 1020),
+        months(40, '2023-06', '2026-09'),
+        ph('until_today'),
+        over(30),
+      ],
+      rules: ['igc_clamp', 'cap_igc_2023', 'update_notice'],
+    });
+    const verbal = readings(agreed(true, { agreedInWriting: false, agreedVerbally: true }, 1));
+    expect(verbal[1]?.calculation.slice(1, 3)).toEqual([
+      ph('agreed_verbally'),
+      ph('large_landlord_cap'),
+    ]);
+    const [no, yes] = readings(agreed(null));
+    expect(no).toMatchObject({
+      unchecked: 'agreed_in_writing',
+      worlds: [{ large_landlord: false }],
+    });
+    expect(yes).toMatchObject({ status: 'paid_over', worlds: [{ large_landlord: true }] });
+    expect(agreed(null).sources.map((x) => x.id)).toEqual([
+      'update_clause',
+      'igc_clamp',
+      'cap_igc_2023',
+      'update_notice',
+    ]);
+  });
+
+  it('a negative IGC counts as nothing, and a second rise and a clause-less one allow nothing', () => {
+    const neg = single(
+      first(
+        check(
+          contract({
+            signedOn: f('2021-04-05'),
+            startDate: f('2021-04-10'),
+            updateClause: 'unspecified_index',
+            updates: [update('2025-04-10', 1000, 1010)],
+          }),
+        ),
+      ),
+    );
+    expect(neg.calculation.slice(0, 4)).toEqual([
+      rent('base_from_answer', 1000),
+      ph('agreed', { rate: index('igc', '2025-01', 0, '2025-03-20') }),
+      ph('cap', { rate: index('ipc', '2025-02', 3, '2025-03-14') }),
+      maxRent(1000, 0, 1000),
+    ]);
+    expect(neg.rules).toEqual(['update_clause', 'igc_clamp', 'cap_ipc', 'update_notice']);
+
+    const [rise, second] = check(
+      contract({
+        updates: [
+          update('2022-03-20', 1076, 1100, {
+            effectiveOn: f('2022-09-01'),
+            chargedFrom: f('2022-09-01'),
+            noticeOn: f('2022-08-01'),
+          }),
+          update('2022-03-20', 1000, 1076),
+        ],
+      }),
+    ).map(single);
+    expect(rise?.calculation.at(-1)).toEqual(ph('within_limit'));
+    expect(second?.calculation).toEqual([
+      rent('base_previous_max', 1076),
+      ph('second_rise', { anniversary: D('2022-03-20'), date: D('2022-09-01') }),
+      months(49, '2022-09', '2026-09'),
+      ph('until_today'),
+      over(24),
+    ]);
+    expect(second?.rules).toEqual(['update_clause', 'update_notice']);
+
+    const none = single(
+      first(check(contract({ updateClause: 'none', updates: [update('2025-03-20', 1000, 1100)] }))),
+    );
+    expect(none.calculation).toEqual([
+      rent('base_from_answer', 1000),
+      ph('no_clause'),
+      months(19, '2025-03', '2026-09'),
+      ph('until_today'),
+      over(100),
+    ]);
+    expect(none.rules).toEqual(['update_clause', 'update_notice']);
+  });
+
+  it('an `other` clause shows only the cap, and a fixed percentage its own rate', () => {
+    const other = single(
+      first(
+        check(contract({ updateClause: 'other', updates: [update('2025-03-20', 1000, 1025)] })),
+      ),
+    );
+    expect(other.calculation).toEqual([
+      rent('base_from_answer', 1000),
+      ph('agreed_other'),
+      ph('cap', { rate: IPC_2025 }),
+      maxRent(1000, 3, 1030),
+      months(19, '2025-03', '2026-09'),
+      ph('until_today'),
+      ph('other_clause_within_cap'),
+    ]);
+    const percent = single(
+      first(
+        check(
+          contract({
+            updateClause: 'fixed_percent',
+            fixedPercent: 1,
+            updates: [update('2025-03-20', 1000, 1100)],
+          }),
+        ),
+      ),
+    );
+    expect(percent.calculation.slice(1, 3)).toEqual([
+      ph('agreed', { rate: fixed(1) }),
+      ph('cap', { rate: IPC_2025 }),
+    ]);
+    expect(percent.agreed).toEqual({ kind: 'fixed', rate: 1 });
+  });
+
+  it('the CPI flash and the definitive figure, each with its world', () => {
+    const r = first(
+      check(
+        contract({
+          signedOn: f('2021-03-15'),
+          startDate: f('2021-03-20'),
+          updateClause: 'ipc',
+          updates: [update('2025-04-05', 1000, 1100)],
+        }),
+      ),
+    );
+    const [definitive, flash] = readings(r);
+    expect(definitive?.worlds).toEqual([{ 'index:ipc:2025-04-05': false }]);
+    expect(flash?.worlds).toEqual([{ 'index:ipc:2025-04-05': true }]);
+    expect(flash?.calculation.slice(1, 3)).toEqual([
+      ph('agreed', { rate: index('ipc', '2025-03', 2.3, '2025-03-28', 'flash') }),
+      ph('cap', { rate: index('ipc', '2025-03', 2.3, '2025-03-28', 'flash') }),
+    ]);
+  });
+});
+
+describe('the doubts each update opens', () => {
+  const day = (iso: string) => f(iso);
+  const publishedOn = (series: IndexSeries, iso: string): IndexSeries => ({
+    ...series,
+    coveredUntil: '2031-12-31',
+    loadedFromStart: true,
+    pendingFlash: null,
+    values: [{ month: '2019-01', rate: 1, publishedOn: iso, publishedUrl: SYNTHETIC }],
+  });
+  // The indices named come out on `iso`, the others as they are.
+  const comingOut = (
+    iso: string,
+    ids: readonly IndexId[],
+    norms: NormTable = NORMS,
+  ): RentalDeps => ({
+    norms,
+    indices: Object.fromEntries(
+      (['irav', 'ipc', 'igc'] as const).map((id) => [
+        id,
+        ids.includes(id) ? publishedOn(INDICES[id], iso) : INDICES[id],
+      ]),
+    ) as IndexTables,
+  });
+  const risesOpen = (input: RentalInput, iso: string, deps: RentalDeps) =>
+    [...new Set(allowedRise(input, day(iso), deps).doubts.map((d) => d.id))].sort();
+  const signed = (iso: string, change: Partial<RentalInput>) =>
+    contract({ signedOn: f(iso), startDate: f(iso), ...change });
+
+  it.each<[string, () => string[], string[]]>([
+    [
+      'a CPI clause on a contract from before Ley 12/2023 reads no IRAV cap',
+      () =>
+        risesOpen(
+          signed('2019-03-15', { updateClause: 'ipc' }),
+          '2025-03-20',
+          comingOut('2025-03-20', ['ipc', 'irav', 'igc']),
+        ),
+      ['index:ipc:2025-03-20'],
+    ],
+    [
+      'a fixed percentage under the RDL 29/2026 wording reads the IRAV, not the CPI',
+      () =>
+        risesOpen(
+          contract({
+            signedOn: f('2024-03-15'),
+            startDate: f('2024-10-20'),
+            updateClause: 'fixed_percent',
+            fixedPercent: 1,
+          }),
+          '2026-10-20',
+          comingOut('2026-10-20', ['ipc', 'irav', 'igc']),
+        ),
+      ['extraordinary_caps', 'index:irav:2026-10-20'],
+    ],
+    [
+      'a norm still pending on the day of a rise, but not RDL 28/2026 for a term it never touches',
+      () =>
+        risesOpen(signed('2021-03-15', { updateClause: 'ipc' }), '2026-11-20', {
+          ...DEPS,
+          norms: NORMS_BEFORE_VOTE,
+        }),
+      ['extraordinary_caps', 'norm:rdl29_2026'],
+    ],
+  ])('%s', (_, actual, expected) => {
+    expect(actual()).toEqual(expected);
+  });
+
+  // The smallest bound that still works the first update out tells how many doubts it opens.
+  const openDoubts = (input: RentalInput, k = 0, deps: RentalDeps = DEPS): number => {
+    for (let n = 0; n < 8; n++) {
+      const r = checkRentUpdates(input, TODAY, deps, 2 ** n)[k];
+      if (r?.outcome.kind !== 'single' || r.outcome.value.unchecked !== 'too_many_readings')
+        return n;
+    }
+    throw new Error('too many doubts');
+  };
+  const june = {
+    signedOn: f('2023-06-15'),
+    startDate: f('2023-06-20'),
+    updateClause: 'ipc',
+  } as const;
+  const rise = (change: Parameters<typeof update>[3], input: Partial<RentalInput> = {}) =>
+    openDoubts(
+      contract({
+        ...june,
+        landlordType: 'company',
+        largeLandlord: null,
+        ...input,
+        updates: [update('2024-06-20', 1000, 1050, change)],
+      }),
+    );
+
+  it.each<[string, () => number, number]>([
+    [
+      'a letter and a verbal agreement',
+      () => rise({ agreedInWriting: false, agreedVerbally: true }),
+      2,
+    ],
+    [
+      'a written agreement said to be verbal too',
+      () => rise({ agreedInWriting: true, agreedVerbally: true }),
+      1,
+    ],
+    ['no notice', () => rise({ notice: 'none', noticeOn: null }), 1],
+    [
+      'no clause: nothing is read',
+      () => rise({ notice: 'email', agreedInWriting: null }, { updateClause: 'none' }),
+      0,
+    ],
+    [
+      'a second rise in a year opens none of its own',
+      () =>
+        openDoubts(
+          contract({
+            ...june,
+            updates: [
+              update('2024-06-20', 1000, 1030, { notice: 'email', agreedInWriting: null }),
+              update('2024-06-20', 1030, 1040, { notice: 'email', agreedInWriting: null }),
+            ],
+          }),
+          1,
+        ),
+      0,
+    ],
+  ])('%s', (_, actual, expected) => {
+    expect(actual()).toBe(expected);
+  });
+});
+
+describe('the months a rise counts, at the edges', () => {
+  const from2024 = {
+    signedOn: f('2024-03-15'),
+    startDate: f('2024-03-20'),
+    updateClause: 'irav',
+  } as const;
+  const keys = (v: RentUpdateReading) =>
+    v.calculation.map((p) => p.key.replace('rent_update.', ''));
+
+  it.each([
+    ['2026-03-05', false],
+    ['2026-03-10', true],
+  ])(
+    'says the rent stayed as charged only from the next anniversary month: today %s → %s',
+    (today, said) => {
+      const v = single(
+        first(
+          check(contract({ ...from2024, updates: [update('2025-03-20', 1000, 1030)] }), f(today)),
+        ),
+      );
+      expect(keys(v).includes('until_today')).toBe(said);
+    },
+  );
+
+  it('keeps counting past a later update that is charged no later than it', () => {
+    const [a] = check(
+      contract({
+        ...from2024,
+        updates: [
+          update('2025-03-20', 1000, 1030, { chargedFrom: f('2025-04-01') }),
+          update('2026-03-20', 1020.8, 1040, { chargedFrom: f('2025-04-01') }),
+        ],
+      }),
+    );
+    expect(a && single(a).months).toBe(18);
+  });
+
+  it('counts nothing and says nothing of the months for a rent charged from the future', () => {
+    const v = single(
+      first(
+        check(
+          contract({
+            ...from2024,
+            updates: [update('2025-03-20', 1000, 1030, { chargedFrom: f('2027-01-01') })],
+          }),
+        ),
+      ),
+    );
+    expect(v.months).toBe(0);
+    expect(keys(v)).toEqual(['base_initial', 'agreed', 'cap', 'max_rent', 'monthly_over']);
+  });
+
+  it('counts nothing and says nothing of the five years when the keys went back before them', () => {
+    const v = single(
+      first(
+        check(
+          contract({
+            signedOn: f('2019-03-15'),
+            startDate: f('2019-03-20'),
+            updateClause: 'ipc',
+            updates: [update('2020-03-20', 1000, 1100)],
+            moveOut: { keysReturnedOn: f('2021-05-01'), returns: [], deductions: [] },
+          }),
+        ),
+      ),
+    );
+    expect(v.months).toBe(0);
+    expect(keys(v)).not.toContain('five_years');
+    expect(keys(v)).not.toContain('months');
+  });
+
+  it('a letter with no date is never due', () => {
+    const v = single(
+      first(
+        check(
+          contract({
+            ...from2024,
+            updates: [update('2025-03-20', 1000, 1030, { noticeOn: null })],
+          }),
+        ),
+      ),
+    );
+    expect(v).toMatchObject({ months: 19, monthsBeforeDue: 19, accumulated: 570 });
+    expect(v.calculation[4]).toEqual({
+      key: 'rent_update.charged_before_notice',
+      vars: { months: { integer: 19 }, base: { euros: 1000 } },
+    });
+  });
+
+  it('is not charged before it is due when the rent did not rise, or when nothing allowed a rise', () => {
+    const late = { noticeOn: f('2025-04-10') };
+    const same = single(
+      first(check(contract({ ...from2024, updates: [update('2025-03-20', 1000, 1000, late)] }))),
+    );
+    expect(same).toMatchObject({ status: 'within_limit', monthsBeforeDue: 0 });
+    expect(keys(same)).not.toContain('charged_before_notice');
+    const none = single(
+      first(
+        check(
+          contract({
+            ...from2024,
+            updateClause: 'none',
+            updates: [update('2025-03-20', 1000, 1030, late)],
+          }),
+        ),
+      ),
+    );
+    expect(none).toMatchObject({ status: 'paid_over', monthsBeforeDue: 0 });
+    expect(keys(none)).not.toContain('charged_before_notice');
+  });
+
+  it('a cent over the highest rent is rounding; two are not', () => {
+    const rise = (newRent: number) =>
+      single(
+        first(check(contract({ ...from2024, updates: [update('2025-03-20', 1000, newRent)] }))),
+      );
+    expect(rise(1020.81)).toMatchObject({ status: 'within_limit', monthly: 0, accumulated: 0 });
+    expect(rise(1020.82)).toMatchObject({ status: 'paid_over', monthly: 0.02, accumulated: 0.38 });
+  });
+
+  it('a rise paid by accepting it counts from the anniversary month even if applied before it', () => {
+    const v = readings(
+      first(
+        check(
+          contract({
+            ...from2024,
+            updates: [
+              update('2025-03-20', 1000, 1030, {
+                notice: 'verbal',
+                noticeOn: null,
+                effectiveOn: f('2025-02-01'),
+                chargedFrom: f('2025-02-01'),
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(v[1]).toMatchObject({ accumulated: 204.8, monthsBeforeDue: 1 });
+  });
+
+  // The readings of one update, with the doubts each took the side of.
+  function readings(r: RentUpdateResult) {
+    return depends(r).readings.map((x) => ({ ...x.value, worlds: x.worlds }));
+  }
+});
+
+describe('what an index that cannot be read says', () => {
+  const series = (values: IndexSeries['values'], loadedFromStart = false): IndexSeries => ({
+    ...IRAV,
+    coveredUntil: '2031-12-31',
+    loadedFromStart,
+    pendingFlash: null,
+    values,
+  });
+  const value = (month: string, publishedOn: string | null) => ({
+    month,
+    rate: 2,
+    publishedOn,
+    publishedUrl: publishedOn === null ? null : SYNTHETIC,
+  });
+  const readIn = (irav: IndexSeries, anniversary: string, base: Partial<RentalInput> = {}) =>
+    check(
+      contract({
+        signedOn: f('2023-06-01'),
+        startDate: f('2023-06-01'),
+        updateClause: 'irav',
+        updates: [update(anniversary, 1000, 1030)],
+        ...base,
+      }),
+      TODAY,
+      { norms: NORMS, indices: { ...INDICES, irav } },
+    );
+  const unchecked = (v: RentUpdateReading) => [v.unchecked, v.calculation[1]?.key, v.rules];
+
+  it.each<[string, () => RentUpdateReading[], string]>([
+    [
+      'the figure of the month has no known publication day',
+      () => [single(first(readIn(series([value('2024-04', null)]), '2024-06-01')))],
+      'index_publication_unknown',
+    ],
+    [
+      'the figure before the one out today has no known publication day',
+      () => {
+        const o = depends(
+          first(
+            readIn(series([value('2024-03', null), value('2024-04', '2024-06-01')]), '2024-06-01'),
+          ),
+        );
+        return [o.low, o.high];
+      },
+      'index_publication_unknown',
+    ],
+    [
+      'nothing was out before the one out today',
+      () => {
+        const o = depends(
+          first(readIn(series([value('2024-04', '2024-06-01')], true), '2024-06-01')),
+        );
+        return [o.low, o.high];
+      },
+      'index_none_published',
+    ],
+    [
+      'a CPI flash was out and is not loaded',
+      () => [
+        single(
+          first(
+            check(
+              contract({
+                signedOn: f('2018-02-01'),
+                startDate: f('2018-02-05'),
+                updateClause: 'ipc',
+                updates: [update('2019-02-05', 1000, 1030)],
+              }),
+            ),
+          ),
+        ),
+      ],
+      'flash_not_loaded',
+    ],
+  ])('%s', (_, readings, kind) => {
+    const checked = readings().filter((v) => v.unchecked !== null);
+    expect(checked.length).toBeGreaterThan(0);
+    for (const v of checked)
+      expect(unchecked(v)).toEqual([kind, `rent_update.${kind}`, expect.anything()]);
+  });
+});
+
+describe('which caps bind, and what they cite', () => {
+  const rules = (input: RentalInput, today = f('2026-12-20'), deps: RentalDeps = DEPS) =>
+    single(first(check(input, today, deps))).rules;
+  const ipcRise = (signed: string, anniversary: string, change: Partial<RentalInput> = {}) =>
+    contract({
+      signedOn: f(signed),
+      startDate: f(signed.slice(0, 8) + '20'),
+      updateClause: 'ipc',
+      updates: [update(anniversary, 1000, 1100)],
+      ...change,
+    });
+  const flat = (series: IndexSeries, rate: number): IndexSeries => ({
+    ...series,
+    values: series.values.map((v) => ({ ...v, rate })),
+  });
+
+  it('under the RDL 29/2026 wording the CPI cap goes, and the IRAV for every contract is cited only for an older one', () => {
+    expect(rules(ipcRise('2024-10-15', '2026-10-20'))).toEqual([
+      'update_clause',
+      'cap_irav',
+      'cap_2_rdl29',
+      'update_notice',
+    ]);
+    expect(rules(ipcRise('2021-10-15', '2026-10-20'))).toEqual([
+      'update_clause',
+      'irav_all_contracts',
+      'cap_irav',
+      'cap_2_rdl29',
+      'update_notice',
+    ]);
+  });
+
+  it('of equal caps, the first one binds', () => {
+    const tied: RentalDeps = {
+      norms: NORMS,
+      indices: { ...INDICES, irav: flat(IRAV, 2), ipc: flat(IPC, 2) },
+    };
+    const v = single(first(check(ipcRise('2024-03-15', '2025-03-20'), TODAY, tied)));
+    expect(v.cap?.rule).toBe('cap_irav');
+    expect(v.maxRent).toBe(1020);
+  });
+
+  it('with no cap in force the clause alone decides, and an `other` clause cannot be checked', () => {
+    const noCaps: RentalDeps = {
+      norms: { ...NORMS, rdl7_2019: { ...NORMS.rdl7_2019, inForceUntil: '2020-12-31' } },
+      indices: INDICES,
+    };
+    const rise = (updateClause: RentalInput['updateClause']) =>
+      single(first(check(ipcRise('2021-03-15', '2025-03-20', { updateClause }), TODAY, noCaps)));
+    expect(rise('ipc')).toMatchObject({ status: 'paid_over', maxRent: 1030, cap: null });
+    const other = rise('other');
+    expect(other).toMatchObject({ status: 'not_checkable', unchecked: 'other_clause_within_cap' });
+    expect(other.calculation.map((p) => p.key)).toEqual([
+      'rent_update.base_from_answer',
+      'rent_update.other_clause_within_cap',
+    ]);
+    expect(other.rules).toEqual(['update_clause']);
+  });
+
+  it('says the agreement was verbal only where that is why the rise cannot be checked', () => {
+    const stale: RentalDeps = {
+      norms: NORMS,
+      indices: { ...INDICES, ipc: { ...IPC, coveredUntil: '2025-01-01' } },
+    };
+    const r = first(
+      check(
+        contract({
+          updateClause: 'fixed_percent',
+          fixedPercent: 1,
+          updates: [
+            update('2025-03-20', 1000, 1100, { agreedInWriting: false, agreedVerbally: true }),
+          ],
+        }),
+        TODAY,
+        stale,
+      ),
+    );
+    const [noAgreement, agreement] = depends(r).readings.map((x) => x.value.calculation[1]?.key);
+    expect(noAgreement).toBe('rent_update.index_not_loaded');
+    expect(agreement).toBe('rent_update.agreed_verbally');
+  });
+
+  it('a large landlord is bound only by the caps that bind one, even with a written agreement', () => {
+    for (const [signed, anniversary] of [
+      ['2021-09-25', '2026-10-01'],
+      ['2021-10-15', '2026-10-20'],
+    ] as const) {
+      const v = single(
+        first(
+          check(
+            ipcRise(signed, anniversary, {
+              largeLandlord: true,
+              updates: [update(anniversary, 1000, 1100, { agreedInWriting: true })],
+            }),
+            f('2026-12-20'),
+          ),
+        ),
+      );
+      expect(v).toMatchObject({ status: 'not_checkable', unchecked: 'agreed_in_writing' });
+    }
+  });
+
+  it('a negative index gives no rise, and an index at nothing is not called negative', () => {
+    const negative: RentalDeps = {
+      norms: NORMS,
+      indices: {
+        ...INDICES,
+        ipc: {
+          ...IPC,
+          values: IPC.values.map((v) => (v.month === '2025-02' ? { ...v, rate: -0.5 } : v)),
+        },
+      },
+    };
+    const v = single(first(check(ipcRise('2021-03-15', '2025-03-20'), TODAY, negative)));
+    expect(v.maxRent).toBe(1000);
+    expect(v.calculation[3]).toEqual({
+      key: 'rent_update.negative_rate',
+      vars: { rate: { percent: -0.5 } },
+    });
+    const zero: RentalDeps = {
+      norms: NORMS,
+      indices: { ...INDICES, ipc: flat(IPC, 0), irav: flat(IRAV, 0) },
+    };
+    const none = single(first(check(ipcRise('2021-03-15', '2025-03-20'), TODAY, zero)));
+    expect(none.maxRent).toBe(1000);
+    expect(none.calculation.map((p) => p.key)).not.toContain('rent_update.negative_rate');
+  });
+
+  it('the rise a cap allows depends on whether the extraordinary caps count', () => {
+    const rise = allowedRise(
+      contract({
+        signedOn: f('2019-03-15'),
+        startDate: f('2019-06-10'),
+        updateClause: 'fixed_percent',
+        fixedPercent: 5,
+      }),
+      f('2022-06-10'),
+      DEPS,
+    );
+    expect(rise.rateIn({})).toMatchObject({ ok: true, rate: 5 });
+    expect(rise.rateIn({ extraordinary_caps: true })).toMatchObject({ ok: true, rate: 2 });
+    expect(rise.rateIn({ extraordinary_caps: false })).toMatchObject({ ok: true, rate: 5 });
+  });
+});
+
+describe('years that build on each other', () => {
+  const years: [string, number, number][] = [
+    ['2019-03-20', 0.5, 1.7],
+    ['2020-03-20', 0.9, 1.3],
+    ['2021-03-20', 0.6, 1.9],
+    ['2022-03-20', 0.8, 1.1],
+  ];
+  // The CPI of each anniversary comes out that same day: the month before it, and the one before.
+  const synthetic = (rows: typeof years): IndexSeries => ({
+    ...IPC,
+    coveredUntil: '2031-12-31',
+    loadedFromStart: true,
+    pendingFlash: null,
+    values: rows.flatMap(([day, earlier, latest]) => [
+      {
+        month: `${day.slice(0, 4)}-01`,
+        rate: earlier,
+        publishedOn: `${day.slice(0, 4)}-02-14`,
+        publishedUrl: SYNTHETIC,
+      },
+      { month: `${day.slice(0, 4)}-02`, rate: latest, publishedOn: day, publishedUrl: SYNTHETIC },
+    ]),
+  });
+  const deps: RentalDeps = { norms: NORMS, indices: { ...INDICES, ipc: synthetic(years) } };
+  const input = (days: readonly string[]) =>
+    contract({
+      signedOn: f('2018-03-15'),
+      startDate: f('2018-03-20'),
+      updateClause: 'ipc',
+      updates: days.map((d, i) => update(d, 1000 + i * 40, 1040 + i * 40)),
+    });
+  const all = years.map(([day]) => day);
+
+  it('keep every rent a year could leave until there are more than four, then only the lowest and the highest', () => {
+    const results = check(input(all), TODAY, deps);
+    const [y1, y2, y3, y4] = results.map(depends);
+    expect([y1, y2, y3, y4].map((d) => d?.readings.length)).toEqual([2, 4, 8, 4]);
+    expect(y4?.readings.map((r) => r.value.base)).toEqual([1020.13, 1020.13, 1049.79, 1049.79]);
+    expect(y3?.readings.map((r) => r.value.base)).toEqual([
+      1014.05, 1014.05, 1018.07, 1018.07, 1026.15, 1026.15, 1030.22, 1030.22,
+    ]);
+  });
+
+  it('start again from the rent given after a year with no update, whatever the years before left', () => {
+    const results = checkRentUpdates(input([all[0] as string, all[2] as string]), TODAY, deps, 2);
+    const [, y3] = results.map(depends);
+    expect(y3?.readings.map((r) => r.value.base)).toEqual([1040, 1040]);
+    expect(y3?.readings.map((r) => r.value.calculation[0]?.key)).toEqual([
+      'rent_update.base_from_answer',
+      'rent_update.base_from_answer',
+    ]);
+  });
+
+  it('keep the side taken on a doubt that comes back, and name its reason in every year', () => {
+    const company = (largeLandlord: boolean | null) =>
+      contract({
+        signedOn: f('2020-06-20'),
+        startDate: f('2020-06-25'),
+        landlordType: 'company',
+        largeLandlord,
+        updateClause: 'fixed_percent',
+        fixedPercent: 5,
+        updates: [
+          update('2023-06-25', 1000, 1050, { agreedInWriting: true }),
+          update('2024-06-25', 1050, 1060, { agreedInWriting: true }),
+          update('2025-06-25', 1060, 1070, { agreedInWriting: true }),
+        ],
+      });
+    const [y1, y2, y3] = check(company(null)).map(depends);
+    const summary = (d: ReturnType<typeof depends> | undefined) =>
+      d?.readings.map((r) => [r.value.status, r.value.base, r.worlds]);
+    expect(summary(y1)).toEqual([
+      ['not_checkable', 1000, [{ large_landlord: false }]],
+      ['paid_over', 1000, [{ large_landlord: true }]],
+    ]);
+    expect(summary(y2)).toEqual([
+      ['not_checkable', 1050, [{ large_landlord: false }]],
+      ['paid_over', 1020, [{ large_landlord: true }]],
+    ]);
+    expect(summary(y3)).toEqual([
+      ['not_checkable', 1050.6, [{}]],
+      ['not_checkable', 1060, [{}]],
+    ]);
+    expect([y1, y2, y3].map((d) => d?.reasons)).toEqual([
+      ['large_landlord_unknown'],
+      ['large_landlord_unknown'],
+      ['large_landlord_unknown'],
+    ]);
+  });
+});
+
+describe('the reasons of a year that builds on doubts of the years before', () => {
+  const reasons = (input: RentalInput, today: CivilDate = TODAY) =>
+    check(input, today).map((r) => (r.outcome.kind === 'depends' ? r.outcome.reasons : []));
+
+  it('leave out a doubt of an earlier year that left every base alike', () => {
+    // An `other` clause leaves no rent to carry, so the large landlord of 2024 moves nothing in 2025.
+    const input = contract({
+      signedOn: f('2019-05-10'),
+      startDate: f('2019-05-19'),
+      landlordType: 'company',
+      largeLandlord: null,
+      updateClause: 'other',
+      initialRent: 1458,
+      updates: [
+        update('2024-05-19', 877.76, 890.93, {
+          notice: 'annex',
+          noticeOn: f('2024-05-30'),
+          agreedInWriting: null,
+        }),
+        update('2025-05-19', 890.93, 909.64, {
+          notice: 'verbal',
+          noticeOn: null,
+          agreedInWriting: null,
+        }),
+      ],
+    });
+    expect(reasons(input)).toEqual([
+      ['large_landlord_unknown', 'agreement_unknown'],
+      ['agreement_unknown', 'notice_missing_paid'],
+    ]);
+  });
+});
+
+describe('what a bounded update says, and the few paths left', () => {
+  it('says an update was not worked out, and cites the clause', () => {
+    const input = contract({
+      signedOn: f('2020-02-20'),
+      startDate: f('2020-02-29'),
+      initialRent: 700,
+      updates: [update('2021-02-28', 700, 710, { notice: 'email', agreedInWriting: null })],
+    });
+    const v = single(first(checkRentUpdates(input, TODAY, DEPS, 2)));
+    expect(v.calculation).toEqual([{ key: 'rent_update.too_many_readings' }]);
+    expect(v.rules).toEqual(['update_clause']);
+  });
+
+  it('does not say the rent stayed as charged when a later update is charged only from the future', () => {
+    const v = single(
+      first(
+        check(
+          contract({
+            signedOn: f('2024-03-15'),
+            startDate: f('2024-03-20'),
+            updateClause: 'irav',
+            updates: [
+              update('2025-03-20', 1000, 1030),
+              update('2026-03-20', 1020.8, 1040, { chargedFrom: f('2027-01-01') }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(v.calculation.map((p) => p.key)).not.toContain('rent_update.until_today');
+  });
+
+  it('weighs the flash of a CPI month against its definitive figure on the day that comes out', () => {
+    const r = first(
+      check(
+        contract({
+          signedOn: f('2021-03-11'),
+          startDate: f('2021-03-11'),
+          updateClause: 'ipc',
+          updates: [update('2022-03-11', 1000, 1100)],
+        }),
+      ),
+    );
+    const [flash, definitive] = depends(r).readings;
+    expect(flash?.value.calculation[1]).toEqual({
+      key: 'rent_update.agreed',
+      vars: {
+        rate: {
+          key: 'rent_update.figure.flash',
+          vars: {
+            index: { index: 'ipc' },
+            month: { month: '2022-02' },
+            rate: { percent: 7.4 },
+            published: { date: '2022-02-28' },
+          },
+        },
+      },
+    });
+    expect(definitive?.value.agreed).toMatchObject({
+      kind: 'index',
+      figure: { rate: 7.6, flash: false },
+    });
+  });
+
+  it('cannot check a clause naming no index when that index is not loaded', () => {
+    const stale: RentalDeps = {
+      norms: NORMS,
+      indices: { ...INDICES, igc: { ...IGC, coveredUntil: '2020-01-01' } },
+    };
+    const v = single(
+      first(
+        check(
+          contract({
+            signedOn: f('2019-03-15'),
+            startDate: f('2019-03-20'),
+            updateClause: 'unspecified_index',
+            updates: [update('2021-03-20', 1000, 1100)],
+          }),
+          TODAY,
+          stale,
+        ),
+      ),
+    );
+    expect(v).toMatchObject({ status: 'not_checkable', unchecked: 'index_not_loaded' });
+    expect(v.rules).toEqual(['update_clause', 'igc_clamp']);
+  });
+
+  it('starts a second rise of the first year from the rent given when nothing was carried', () => {
+    const [, second] = check(
+      contract({
+        updateClause: 'other',
+        updates: [update('2022-03-20', 1000, 1030), update('2022-03-20', 1030, 1040)],
+      }),
+    ).map(single);
+    expect(second?.base).toBe(1030);
+    expect(second?.calculation[0]?.key).toBe('rent_update.base_from_answer');
+  });
+});
+
+describe('five years of doubts that come back', () => {
+  const series = (base: IndexSeries, rows: readonly [string, number, string][]): IndexSeries => ({
+    ...base,
+    coveredUntil: '2031-12-31',
+    loadedFromStart: true,
+    pendingFlash: null,
+    values: rows.map(([month, rate, publishedOn]) => ({
+      month,
+      rate,
+      publishedOn,
+      publishedUrl: SYNTHETIC,
+    })),
+  });
+  // Each CPI and IRAV month comes out the day of some anniversary, the others the day before.
+  const deps: RentalDeps = {
+    norms: NORMS_BEFORE_VOTE,
+    indices: {
+      ...INDICES,
+      ipc: series(IPC, [
+        ['2023-09', 2.2, '2023-10-10'],
+        ['2023-10', 0.2, '2023-11-20'],
+        ['2024-09', 1.6, '2024-10-10'],
+        ['2024-10', 0.1, '2024-11-20'],
+        ['2025-09', 2.2, '2025-10-10'],
+        ['2025-10', 2.4, '2025-11-20'],
+        ['2026-09', 1.8, '2026-10-10'],
+        ['2026-10', 3.5, '2026-11-20'],
+        ['2027-09', 3.2, '2027-10-10'],
+        ['2027-10', 3.1, '2027-11-20'],
+      ]),
+      irav: series(IRAV, [
+        ['2023-09', 0.1, '2023-10-10'],
+        ['2023-10', 1.8, '2023-11-20'],
+        ['2024-10', 1.3, '2024-11-05'],
+        ['2025-09', 1, '2025-10-10'],
+        ['2025-10', 0.1, '2025-11-20'],
+        ['2026-09', 0.8, '2026-10-10'],
+        ['2026-10', 0.7, '2026-11-20'],
+        ['2027-09', 1.8, '2027-10-10'],
+        ['2027-10', 1.5, '2027-11-20'],
+      ]),
+    },
+  };
+
+  it('keep naming a norm still pending in the last year, with the doubts of the years before', () => {
+    const results = check(
+      contract({
+        signedOn: f('2022-11-10'),
+        startDate: f('2022-11-20'),
+        landlordType: 'company',
+        largeLandlord: true,
+        updateClause: 'fixed_percent',
+        fixedPercent: 0.41,
+        updates: [
+          update('2023-11-20', 1000, 1030, { agreedInWriting: null }),
+          update('2024-11-20', 1030, 1060.9, { agreedInWriting: null }),
+          update('2025-11-20', 1060.9, 1092.73, {
+            notice: 'verbal',
+            agreedInWriting: null,
+            agreedVerbally: true,
+          }),
+          update('2026-11-20', 1092.73, 1125.51, { notice: 'email', agreedInWriting: false }),
+          update('2027-11-20', 1125.51, 1159.28, { agreedInWriting: true, agreedVerbally: true }),
+        ],
+      }),
+      f('2031-01-01'),
+      deps,
+    );
+    expect(results.map((r) => depends(r).reasons)).toEqual([
+      ['index_month_doubtful', 'agreement_unknown'],
+      ['index_month_doubtful', 'agreement_unknown'],
+      ['index_month_doubtful', 'agreement_unknown', 'notice_missing_paid'],
+      ['index_month_doubtful', 'agreement_unknown', 'notice_form_doubtful'],
+      ['pending_validation', 'index_month_doubtful', 'agreement_unknown'],
+    ]);
   });
 });
