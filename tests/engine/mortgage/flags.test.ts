@@ -388,3 +388,129 @@ describe('flag states', () => {
     expect(citedUnread.filter((id) => id.startsWith('sts'))).toEqual([]);
   });
 });
+
+describe('the clauses in the cases left over', () => {
+  const ruleIds = (flag: ClauseFlag) => flag.parts.map((x) => x.rule);
+  // The LCCI ends before a 2021 deed: neither its articles nor the courts' earlier criteria reach it.
+  const lcciEnded: typeof DEPS = {
+    ...DEPS,
+    norms: { ...DEPS.norms, lcci: { ...DEPS.norms.lcci, inForceUntil: '2020-12-31' } },
+  };
+  const afterLcci = (clauses: Clause) =>
+    reviewFlags(mortgage({ deedOn: d('2021-05-10'), clauses: [clauses] }), TODAY, lcciEnded)[0];
+  const rates = (...table: [string, string, number][]): typeof DEPS => ({
+    ...DEPS,
+    legalInterest: table.map(([from, until, rate]) => ({ from, until, rate, url: '' })),
+  });
+  const late = (deps: typeof DEPS, defaultRate?: number) =>
+    reviewFlags(
+      mortgage({
+        deedOn: d('2016-03-01'),
+        clauses: [
+          clause(
+            'default_interest',
+            defaultRate === undefined ? { ordinaryRate: 2 } : { defaultRate, ordinaryRate: 2 },
+          ),
+        ],
+      }),
+      d('2026-10-19'),
+      deps,
+    )[0]?.parts[0]?.calculation;
+
+  it('a floor without its percentage is told without a figure', () => {
+    expect(one('2020-06-01', clause('floor_clause')).parts[0]?.calculation).toEqual([
+      { key: 'flags.floor_statute' },
+    ]);
+    expect(one('2010-06-01', clause('floor_clause')).parts[0]?.calculation).toEqual([
+      { key: 'flags.floor_case_law' },
+    ]);
+  });
+
+  it('a floor in a deed no rule of the floor reaches has nothing to say', () => {
+    expect(afterLcci(clause('floor_clause', { floorPercent: 3 }))).toEqual({
+      label: 'floor_clause',
+      state: 'in_deed',
+      calculation: [],
+      parts: [],
+    });
+  });
+
+  it('late interest in a deed no rule of it reaches has nothing to say', () => {
+    expect(
+      afterLcci(clause('default_interest', { defaultRate: 20, ordinaryRate: 2 }))?.parts,
+    ).toEqual([]);
+  });
+
+  it('a clause that stays under the case law after the statute ends carries the statute alone', () => {
+    expect(
+      ruleIds(afterLcci(clause('early_termination', { missedInstalments: 1 })) as ClauseFlag),
+    ).toEqual(['early_termination']);
+  });
+
+  it('a zero floor is no floor only for the floor clause', () => {
+    expect(one('2020-06-01', clause('irph', { floorPercent: 0 })).state).toBe('in_deed');
+  });
+
+  it.each([
+    ['the default rate alone', { defaultRate: 20 }],
+    ['the ordinary rate alone', { ordinaryRate: 2 }],
+  ])('late interest from the LCCI with %s has the rule only', (_, rates) => {
+    const flag = one('2020-06-01', clause('default_interest', rates));
+    expect(flag.parts.map((x) => x.calculation.map((c) => c.key))).toEqual([
+      ['flags.default_interest_lcci'],
+    ]);
+  });
+
+  it('a default rate within half a cent of the legal one matches it', () => {
+    const flag = one(
+      '2020-06-01',
+      clause('default_interest', { defaultRate: 0.005, ordinaryRate: -3 }),
+    );
+    expect(flag.parts[0]?.calculation[1]?.key).toBe('flags.default_interest_lcci_matches');
+  });
+
+  it('three times the legal interest is the most, not too much', () => {
+    expect(late(DEPS, 9.75)?.map((c) => c.key)).toEqual(['flags.default_interest_lh114']);
+    expect(late(DEPS)?.map((c) => c.key)).toEqual(['flags.default_interest_lh114']);
+  });
+
+  it('without a published rate there is no limit to go over', () => {
+    expect(late(rates(), 50)?.map((c) => c.key)).toEqual(['flags.default_interest_lh114']);
+  });
+
+  it('the limit counts the years from the deed to today, both included', () => {
+    const edges = (start: number, end: number) =>
+      rates(
+        ['2000-01-01', '2015-12-31', 50],
+        ['2016-03-01', '2016-03-01', start],
+        ['2016-03-02', '2026-10-18', 1],
+        ['2026-10-19', '2026-10-19', end],
+        ['2026-10-20', '2030-12-31', 40],
+      );
+    expect(late(edges(3, 2), 12)?.[1]?.vars).toEqual({
+      default: { percent: 12 },
+      limit: { percent: 9 },
+    });
+    expect(late(edges(2, 3), 12)?.[1]?.vars).toEqual({
+      default: { percent: 12 },
+      limit: { percent: 9 },
+    });
+  });
+
+  it('a deed of 15-05-2013 is under Ley 1/2013 from its first day', () => {
+    expect(
+      ruleIds(one('2013-05-15', clause('default_interest', { defaultRate: 4, ordinaryRate: 2 }))),
+    ).toEqual(['default_interest_lh114', 'default_interest_case_law']);
+  });
+
+  it('an opening fee without an amount gives no figure', () => {
+    expect(one('2015-05-10', clause('opening_fee')).calculation).toEqual([]);
+  });
+
+  it('only an opening fee charged with a study fee carries art. 14.4', () => {
+    expect(ruleIds(one('2021-05-10', clause('opening_fee')))).toEqual(['opening_fee_case_law']);
+    expect(ruleIds(one('2021-05-10', clause('opening_fee', { duplicateFee: false })))).toEqual([
+      'opening_fee_case_law',
+    ]);
+  });
+});

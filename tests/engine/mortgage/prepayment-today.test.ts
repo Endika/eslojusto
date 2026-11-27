@@ -6,6 +6,7 @@ import {
   type TodayCap,
   type TodayItem,
 } from '../../../src/engine/mortgage/fees';
+import { reviewMortgage } from '../../../src/engine/mortgage/review';
 import type { MortgageInput } from '../../../src/engine/mortgage/types';
 import { DEPS, mortgage } from './input';
 
@@ -133,8 +134,7 @@ describe('repaying capital today', () => {
     ]);
   });
 
-  it('is part of a completed review, and absent out of scope', async () => {
-    const { reviewMortgage } = await import('../../../src/engine/mortgage/review');
+  it('is part of a completed review, and absent out of scope', () => {
     const done = reviewMortgage(
       mortgage({ deedOn: d('2023-02-01'), rateType: 'fixed' }),
       TODAY,
@@ -143,5 +143,141 @@ describe('repaying capital today', () => {
     expect(done.ok && done.review.prepaymentToday?.kind).toBe('single');
     const out = reviewMortgage(mortgage({ borrower: 'company' }), TODAY, DEPS);
     expect(out.ok && out.review.prepaymentToday).toBeNull();
+  });
+});
+
+describe('the next change, when a later day is not checkable', () => {
+  it('says none while the window that follows is in doubt', () => {
+    const deps = {
+      ...DEPS,
+      norms: {
+        ...DEPS.norms,
+        rdl19_2022: { ...DEPS.norms.rdl19_2022, status: 'pending_validation' as const },
+      },
+    };
+    const item = prepaymentToday(
+      mortgage({ deedOn: d('2021-03-01'), rateType: 'variable', prepaymentOption: 'a_015_5y' }),
+      d('2022-06-01'),
+      deps,
+    );
+    expect(item.kind === 'single' && item.finding.next).toBeNull();
+  });
+});
+
+describe('the next change, reading by reading', () => {
+  const at = (change: Partial<MortgageInput>, today: string) => {
+    const item = prepaymentToday(mortgage(change), d(today), DEPS);
+    return item.kind === 'readings'
+      ? item.readings.map((r) => [r.when, ...brief(r.finding)])
+      : ['single', ...brief(item.finding)];
+  };
+  const old = { deedOn: d('2012-05-10'), rateType: 'variable' as const };
+  const fixed2023 = { deedOn: d('2023-02-01'), rateType: 'fixed' as const };
+
+  it('a reading of the deed regime does not take the end of the window as its next day', () => {
+    expect(at({ ...old, rateRevisionMonths: 12 }, '2023-06-01')).toEqual([
+      ['variable.deed_regime', 'cap', 0.25, null, 25, null],
+      ['variable.lcci_reach', 'cap', 0, null, 0, null],
+    ]);
+  });
+
+  it('an unknown revision splits the readings, none with a next day', () => {
+    expect(at({ ...old, rateRevisionMonths: null }, '2023-06-01')).toEqual([
+      ['variable.deed_regime.revised_yearly', 'cap', 0.25, null, 25, null],
+      ['variable.deed_regime.revised_less_often', 'not_checkable', null, null, null, null],
+      ['variable.lcci_reach', 'cap', 0, null, 0, null],
+    ]);
+  });
+
+  it('a window opening the readings disagree on is no next day', () => {
+    expect(
+      at({ deedOn: d('2017-12-01'), rateType: 'variable', rateRevisionMonths: 12 }, '2022-06-01'),
+    ).toEqual(['single', 'cap', 0.5, null, 50, null]);
+  });
+
+  it('the deed percentage of a mixed rate follows each reading', () => {
+    expect(
+      at(
+        {
+          deedOn: d('2023-02-01'),
+          rateType: 'mixed',
+          prepaymentOption: 'a_015_5y',
+          deedPercents: { variable: 0.1 },
+        },
+        '2026-10-19',
+      ),
+    ).toEqual([
+      ['fixed', 'cap', 2, null, 200, null],
+      ['variable.option_a', 'cap', 0.15, 0.1, 10, ['2028-02-01', 0]],
+    ]);
+  });
+
+  it.each([
+    [2, null, 200, ['2033-02-01', 1.5]],
+    [1.5, 1.5, 150, null],
+    [0, 0, 0, null],
+  ])('a deed percentage of %s', (percent, deedPercent, cap, next) => {
+    expect(at({ ...fixed2023, deedPercents: { fixed: percent } }, '2026-10-19')).toEqual([
+      'single',
+      'cap',
+      2,
+      deedPercent,
+      cap,
+      next,
+    ]);
+  });
+
+  it('a deed percentage at nothing leaves no loss to bound', () => {
+    const item = prepaymentToday(
+      mortgage({ ...fixed2023, deedPercents: { fixed: 0 } }),
+      TODAY,
+      DEPS,
+    );
+    expect(item.kind === 'single' && item.finding.calculation.map((c) => c.key)).toEqual([
+      'fees.lcci_fixed_first',
+      'fees.deed_lower',
+    ]);
+  });
+
+  it('a variable reading under Ley 41/2007 ignores the fixed reading of a mixed rate', () => {
+    expect(
+      at({ deedOn: d('2015-01-01'), rateType: 'mixed', rateRevisionMonths: 12 }, '2018-06-01'),
+    ).toEqual([
+      ['fixed', 'not_checkable', null, null, null, null],
+      ['variable', 'cap', 0.5, null, 50, ['2020-01-01', 0.25]],
+    ]);
+  });
+
+  it('each revision of the rate keeps its own next day, and the window is told apart', () => {
+    expect(
+      at({ deedOn: d('2017-12-01'), rateType: 'variable', rateRevisionMonths: null }, '2020-01-01'),
+    ).toEqual([
+      ['variable.revised_yearly', 'cap', 0.5, null, 50, ['2022-12-01', 0.25]],
+      ['variable.revised_less_often', 'not_checkable', null, null, null, null],
+    ]);
+  });
+
+  it('the window being over is no next day of a reading that was inside it', () => {
+    expect(
+      at({ deedOn: d('2010-05-10'), rateType: 'variable', rateRevisionMonths: 12 }, '2022-12-01'),
+    ).toEqual([
+      ['variable.deed_regime', 'cap', 0.25, null, 25, null],
+      ['variable.lcci_reach', 'cap', 0, null, 0, null],
+    ]);
+  });
+
+  it('a deed percentage with no change of the law to come leaves none', () => {
+    expect(
+      at({ deedOn: d('2019-07-01'), rateType: 'fixed', deedPercents: { fixed: 1 } }, '2030-01-01'),
+    ).toEqual(['single', 'cap', 1.5, 1, 100, null]);
+  });
+
+  it('a reading inside the window follows its own reach to a later day inside it', () => {
+    expect(
+      at({ deedOn: d('2018-06-01'), rateType: 'variable', rateRevisionMonths: 12 }, '2022-12-01'),
+    ).toEqual([
+      ['variable.deed_regime', 'cap', 0.5, null, 50, ['2023-06-01', 0.25]],
+      ['variable.lcci_reach', 'cap', 0, null, 0, null],
+    ]);
   });
 });
