@@ -34,9 +34,9 @@ export function basePay(input: HouseholdInput, table: MinimumWageTable): BasePay
   const annual = annualPay(input);
   if (annual === null) return null;
   const lookup = minimumWageFor(input.payYear, table);
-  if (lookup.kind !== 'published' || input.weeklyHours === null)
-    return { annual, raisedToMinimum: false };
-  const minimum = lookup.row.annual * (Math.min(input.weeklyHours, FULL_WEEK) / FULL_WEEK);
+  if (lookup.kind !== 'published') return { annual, raisedToMinimum: false };
+  // Hours not known ask for no minimum.
+  const minimum = lookup.row.annual * (Math.min(input.weeklyHours ?? 0, FULL_WEEK) / FULL_WEEK);
   // Pay in kind is salary too, though it stays out of the base: only the money is raised, to what
   // the minimum leaves once the pay in kind is counted.
   const inKind = (input.inKindMonthly ?? 0) * MONTHS_IN_YEAR;

@@ -3,11 +3,11 @@ import { exact, round2 } from '../money';
 import { dailySalary } from '../severance';
 import { assessAcross } from '../law/readings';
 import { phrase, type HouseholdPhrase } from './calculation';
-import { findingsFor, type Verdict } from './finding';
+import { findingsFor, single, type CalculatedVerdict } from './finding';
 import type { NormTable } from './norms';
 import type { MinimumWageTable } from '../law/minimum-wage';
 import { basePay } from './salary';
-import type { Assessed, Finding, HouseholdInput, ReadingCode } from './types';
+import type { Assessed, Finding, HouseholdInput, HouseholdTermination } from './types';
 
 // Art. 11.2: twelve days of salary per year of service, six monthly salaries at most. A monthly
 // salary is thirty days, as the Estatuto's caps are counted in the severance of the site (the
@@ -80,8 +80,11 @@ export function severanceFigures(
 const euros = (n: number) => ({ euros: round2(n) });
 
 // The verdict on what was made available, against what the reading requires.
-function verdictOf(figures: HouseholdSeverance, p: SeverancePart, input: HouseholdInput): Verdict {
-  const t = input.termination;
+function verdictOf(
+  figures: HouseholdSeverance,
+  p: SeverancePart,
+  t: HouseholdTermination,
+): CalculatedVerdict {
   const calculation: HouseholdPhrase[] = [
     phrase('severance.figure', {
       days: { days: p.days },
@@ -92,12 +95,12 @@ function verdictOf(figures: HouseholdSeverance, p: SeverancePart, input: Househo
       ? [phrase('severance.capped', { months: CAP_MONTHS, amount: euros(p.amount) })]
       : []),
   ];
-  const owed = (amount: number, extra: HouseholdPhrase): Verdict => ({
+  const owed = (amount: number, extra: HouseholdPhrase): CalculatedVerdict => ({
     status: amount > 0 ? 'below_minimum' : 'within_limit',
     amount: amount > 0 ? exact(amount) : null,
     calculation: amount > 0 ? [...calculation, extra] : calculation,
   });
-  if (t?.severanceAvailable === false)
+  if (t.severanceAvailable === false)
     return {
       status: p.amount > 0 ? 'missing_requirement' : 'within_limit',
       amount: p.amount > 0 ? exact(p.amount) : null,
@@ -105,7 +108,7 @@ function verdictOf(figures: HouseholdSeverance, p: SeverancePart, input: Househo
         p.amount > 0 ? [...calculation, phrase('severance.not_made_available')] : calculation,
       basedOnYourAnswer: true,
     };
-  if (t?.severanceAvailable === true && t.severanceOffered !== null)
+  if (t.severanceAvailable === true && t.severanceOffered !== null)
     return {
       ...owed(
         round2(p.amount - t.severanceOffered),
@@ -145,28 +148,25 @@ export function assessSeverance(
     };
   const figures = severanceFigures(input.startDate, t.effectiveOn, base.annual);
   const raised = base.raisedToMinimum ? [phrase('base.minimum_wage')] : [];
-  const finding = (world: ReadingCode<'incomplete_year'>): Finding => {
-    const verdict = verdictOf(
-      figures,
-      world === 'complete_years_only' ? figures.completeYearsOnly : figures.proratedByMonths,
-      input,
-    );
+  const finding = (p: SeverancePart): Finding => {
+    const verdict = verdictOf(figures, p, t);
     return make(
       'desistimiento_severance',
-      { ...verdict, calculation: [...raised, ...(verdict.calculation ?? [])] },
+      { ...verdict, calculation: [...raised, ...verdict.calculation] },
       norms,
     );
   };
+  const counted = finding(figures.completeYearsOnly);
+  const higher = finding(figures.proratedByMonths);
+  // The counted reading never owes more than the higher one: nothing owed in the higher is nothing
+  // owed in either, and the incomplete year changes nothing.
+  if (higher.status === 'within_limit') return single(counted);
   const readings = assessAcross(
     'incomplete_year',
     ['complete_years_only', 'prorated_by_months'],
-    finding,
+    (world) => (world === 'complete_years_only' ? counted : higher),
   );
   if (readings.kind === 'single') return readings;
-  // Nothing owed in either reading: the incomplete year changes nothing.
-  const [counted, higher] = readings.readings;
-  if (counted?.finding.status === 'within_limit' && higher?.finding.status === 'within_limit')
-    return { kind: 'single', finding: counted.finding };
   // The prorated reading is only «y hasta»: a note says why it is not the counted one.
   return {
     ...readings,

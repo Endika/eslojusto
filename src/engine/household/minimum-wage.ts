@@ -9,7 +9,13 @@ import {
 import { assessAcross } from '../law/readings';
 import { exact, round2 } from '../money';
 import { phrase, type HouseholdPhrase } from './calculation';
-import { findingsFor, single, type FindingMaker, type Verdict } from './finding';
+import {
+  findingsFor,
+  single,
+  type CalculatedVerdict,
+  type FindingMaker,
+  type Verdict,
+} from './finding';
 import type { NormTable } from './norms';
 import type { HouseholdRuleId } from './rules';
 import type { Assessed, Finding, HouseholdInput } from './types';
@@ -185,6 +191,7 @@ function monthlyPay(
   const shortfall = Math.max(yearShort, monthShort);
   const days = daysCovered(input, today);
   const yearDays = daysInYear(input.payYear);
+  // Stryker disable next-line ConditionalExpression,EqualityOperator: a whole year prorated gives the shortfall again, bar float noise
   const accrued = days >= yearDays ? shortfall : (shortfall * days) / yearDays;
   return done({
     status: 'below_minimum',
@@ -251,16 +258,16 @@ function hourlyPay(input: HouseholdInput, deps: MinimumWageDeps, make: FindingMa
 // without the extra payments paid apart and on the year with them; it is over the limit only when
 // it is in both.
 function inKind(input: HouseholdInput, norms: NormTable, make: FindingMaker): Assessed | null {
-  const kind = input.inKindMonthly;
+  const kind = input.inKindMonthly ?? 0;
   const cash = input.monthlyCash;
-  if (kind === null || kind <= 0 || cash === null) return null;
+  if (kind <= 0 || cash === null) return null;
   const { extraPays } = input;
   const apart = extraPays !== null && !extraPays.prorated && extraPays.count > 0 ? extraPays : null;
   const verdictOf = (
     key: 'in_kind.share' | 'in_kind.share_annual',
     inKind: number,
     total: number,
-  ): Verdict => ({
+  ): CalculatedVerdict => ({
     status:
       cents(inKind) * PERCENT > cents(total) * IN_KIND_PERCENT
         ? 'over_legal_limit'
@@ -284,7 +291,7 @@ function inKind(input: HouseholdInput, norms: NormTable, make: FindingMaker): As
         month.status === 'over_legal_limit'
           ? {
               status: 'review_it',
-              calculation: [...(month.calculation ?? []), phrase('in_kind.extra_pays_unknown')],
+              calculation: [...month.calculation, phrase('in_kind.extra_pays_unknown')],
             }
           : month,
         norms,
@@ -302,7 +309,7 @@ function inKind(input: HouseholdInput, norms: NormTable, make: FindingMaker): As
         'smi_in_kind_cap',
         {
           status: month.status,
-          calculation: [...(month.calculation ?? []).slice(0, 1), ...(year.calculation ?? [])],
+          calculation: [...month.calculation.slice(0, 1), ...year.calculation],
         },
         norms,
       ),
@@ -315,12 +322,7 @@ function inKind(input: HouseholdInput, norms: NormTable, make: FindingMaker): As
 }
 
 // Art. 8.4: two extra payments a year.
-function extraPayments(
-  input: HouseholdInput,
-  norms: NormTable,
-  make: FindingMaker,
-): Assessed | null {
-  if (input.regime !== 'monthly') return null;
+function extraPayments(input: HouseholdInput, norms: NormTable, make: FindingMaker): Assessed {
   const e = input.extraPays;
   const done = (verdict: Verdict) => single(make('extra_pays', verdict, norms));
   if (e === null) return done({ status: 'not_entered' });

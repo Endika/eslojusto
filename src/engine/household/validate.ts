@@ -49,9 +49,8 @@ const FIRST_YEAR = 2000;
 // A review may look at a year ahead of today.
 const MONTHS_AHEAD = 12;
 
-const inRange = (v: number, min: number, max: number): boolean =>
-  Number.isFinite(v) && v >= min && v <= max;
-const positiveUpTo = (v: number, max: number): boolean => Number.isFinite(v) && v > 0 && v <= max;
+const inRange = (v: number, min: number, max: number): boolean => v >= min && v <= max;
+const positiveUpTo = (v: number, max: number): boolean => v > 0 && v <= max;
 const isCount = (v: number, max: number): boolean => Number.isInteger(v) && v >= 0 && v <= max;
 
 // A time of day, as minutes since midnight; null when it is not a real 'HH:MM'.
@@ -69,7 +68,7 @@ export function validate(input: HouseholdInput, today: CivilDate): readonly Vali
     if (v !== null && !positiveUpTo(v, MAX_AMOUNT)) fail(field, 'amount_range');
   };
   const amountOrZero = (field: HouseholdField, v: number | null) => {
-    if (v !== null && !inRange(v, 0, MAX_AMOUNT)) fail(field, 'amount_range');
+    if (!inRange(v ?? 0, 0, MAX_AMOUNT)) fail(field, 'amount_range');
   };
   const hours = (field: HouseholdField, v: number | null, max: number) => {
     if (v !== null && !positiveUpTo(v, max)) fail(field, 'hours_range');
