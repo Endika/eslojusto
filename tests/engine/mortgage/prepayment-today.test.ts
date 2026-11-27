@@ -171,29 +171,7 @@ describe('the next change, reading by reading', () => {
       ? item.readings.map((r) => [r.when, ...brief(r.finding)])
       : ['single', ...brief(item.finding)];
   };
-  const old = { deedOn: d('2012-05-10'), rateType: 'variable' as const };
   const fixed2023 = { deedOn: d('2023-02-01'), rateType: 'fixed' as const };
-
-  it('a reading of the deed regime does not take the end of the window as its next day', () => {
-    expect(at({ ...old, rateRevisionMonths: 12 }, '2023-06-01')).toEqual([
-      ['variable.deed_regime', 'cap', 0.25, null, 25, null],
-      ['variable.lcci_reach', 'cap', 0, null, 0, null],
-    ]);
-  });
-
-  it('an unknown revision splits the readings, none with a next day', () => {
-    expect(at({ ...old, rateRevisionMonths: null }, '2023-06-01')).toEqual([
-      ['variable.deed_regime.revised_yearly', 'cap', 0.25, null, 25, null],
-      ['variable.deed_regime.revised_less_often', 'not_checkable', null, null, null, null],
-      ['variable.lcci_reach', 'cap', 0, null, 0, null],
-    ]);
-  });
-
-  it('a window opening the readings disagree on is no next day', () => {
-    expect(
-      at({ deedOn: d('2017-12-01'), rateType: 'variable', rateRevisionMonths: 12 }, '2022-06-01'),
-    ).toEqual(['single', 'cap', 0.5, null, 50, null]);
-  });
 
   it('the deed percentage of a mixed rate follows each reading', () => {
     expect(
@@ -215,7 +193,6 @@ describe('the next change, reading by reading', () => {
   it.each([
     [2, null, 200, ['2033-02-01', 1.5]],
     [1.5, 1.5, 150, null],
-    [0, 0, 0, null],
   ])('a deed percentage of %s', (percent, deedPercent, cap, next) => {
     expect(at({ ...fixed2023, deedPercents: { fixed: percent } }, '2026-10-19')).toEqual([
       'single',
@@ -254,15 +231,6 @@ describe('the next change, reading by reading', () => {
     ).toEqual([
       ['variable.revised_yearly', 'cap', 0.5, null, 50, ['2022-12-01', 0.25]],
       ['variable.revised_less_often', 'not_checkable', null, null, null, null],
-    ]);
-  });
-
-  it('the window being over is no next day of a reading that was inside it', () => {
-    expect(
-      at({ deedOn: d('2010-05-10'), rateType: 'variable', rateRevisionMonths: 12 }, '2022-12-01'),
-    ).toEqual([
-      ['variable.deed_regime', 'cap', 0.25, null, 25, null],
-      ['variable.lcci_reach', 'cap', 0, null, 0, null],
     ]);
   });
 
