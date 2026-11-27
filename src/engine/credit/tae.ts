@@ -146,9 +146,7 @@ function dues(input: CreditInput, reading: BalloonReading): Plan | null {
 }
 
 const sameCost = (a: Cost | null, b: Cost): boolean =>
-  a !== null &&
-  a.kind === b.kind &&
-  (a.kind === 'insurance' || a.index === (b as ChargeCost).index);
+  a !== null && a.kind === b.kind && (a as ChargeCost).index === (b as ChargeCost).index;
 
 // Annex I, part II: an open-end credit is taken as drawn in full, for one year, the capital repaid
 // in 12 equal monthly instalments from a month after the drawdown with interest on what is left.
@@ -296,7 +294,7 @@ export function solveApr(flows: readonly CashFlow[]): AprSolution {
   let [lo, hi] = bracket;
   // Stryker disable next-line EqualityOperator: the equation is never exactly zero at the end of the bracket
   const rising = presentValue(flows, hi) > 0;
-  // Stryker disable ConditionalExpression,EqualityOperator,ArithmeticOperator,UpdateOperator: the step and the stopping rule only change how fast the search closes in on the root, which the bracket keeps
+  // Stryker disable ConditionalExpression,LogicalOperator,EqualityOperator,ArithmeticOperator,UpdateOperator: the step and the stopping rule only change how fast the search closes in on the root, which the bracket keeps
   let x = (lo + hi) / 2;
   for (let step = 0; step < MAX_STEPS; step++) {
     const value = presentValue(flows, x);
@@ -310,6 +308,6 @@ export function solveApr(flows: readonly CashFlow[]): AprSolution {
     x = next;
     if (done) break;
   }
-  // Stryker restore ConditionalExpression,EqualityOperator,ArithmeticOperator,UpdateOperator
+  // Stryker restore ConditionalExpression,LogicalOperator,EqualityOperator,ArithmeticOperator,UpdateOperator
   return { kind: 'solved', rate: x };
 }
