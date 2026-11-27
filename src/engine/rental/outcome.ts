@@ -86,8 +86,7 @@ export function worldsFor(doubts: readonly Doubt[]): readonly World[] {
   return worlds;
 }
 
-const worldKey = (doubts: readonly Doubt[], w: World): string =>
-  doubts.map((d) => (w[d.id] === true ? '1' : '0')).join('');
+const worldKey = (doubts: readonly Doubt[], w: World): string => doubts.map((d) => w[d.id]).join();
 
 // Groups results by the measure into readings: one reading is a single outcome; more give the
 // lowest and highest and the reasons that move them.
@@ -113,7 +112,7 @@ export function outcomeFrom<T>(
   }
   // Readings with no figure weigh the same, yet differ: the two shown are never one and the same.
   if (measure.same(low, high))
-    high = readings.find((r) => !measure.same(r.value, low))?.value ?? high;
+    high = (readings.find((r) => !measure.same(r.value, low)) as { value: T }).value;
   return {
     kind: 'depends',
     reasons: REASON_ORDER.filter((r) => reasons.has(r)),
@@ -135,9 +134,8 @@ function outcomeOf<T>(
   const moving = new Set<DoubtReason>();
   for (const d of open) {
     for (const { world, value } of results) {
-      if (world[d.id] === true) continue;
-      const flipped = byWorld.get(worldKey(open, { ...world, [d.id]: true }));
-      if (flipped !== undefined && !measure.same(value, flipped)) moving.add(d.reason);
+      const flipped = byWorld.get(worldKey(open, { ...world, [d.id]: true })) as T;
+      if (!measure.same(value, flipped)) moving.add(d.reason);
     }
   }
   return outcomeFrom(results, moving, measure);

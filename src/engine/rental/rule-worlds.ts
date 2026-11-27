@@ -5,14 +5,22 @@ import { activeRules, RULES, type ActiveRule, type RuleId } from './rules';
 
 // One doubt per norm, shared by every item and year that rests on it: a norm is validated or
 // repealed for the whole review at once.
-export const normDoubtId = (norm: NormId): string => `norm:${norm}`;
+function normDoubtId(norm: NormId): string {
+  return `norm:${norm}`;
+}
 
-// The norm whose doubt an active rule carries: its own, or the doubtful successor's.
-export function doubtNorm(active: ActiveRule, day: string, norms: NormTable): NormId | null {
-  if (active.doubt === null) return null;
-  if (normStanding(norms[active.rule.norm], day) !== 'in_force') return active.rule.norm;
-  const successor = active.rule.supersededBy;
-  return successor === null ? null : RULES[successor].norm;
+// The doubt an active rule carries, and whether it is its own norm's or its successor's.
+export function carriedDoubt(
+  active: ActiveRule,
+  day: string,
+  norms: NormTable,
+): { readonly doubt: Doubt; readonly own: boolean } | null {
+  const { rule, doubt: reason } = active;
+  if (reason === null) return null;
+  const own = normStanding(norms[rule.norm], day) !== 'in_force';
+  // An in-force norm is doubtful only through its successor.
+  const norm = own ? rule.norm : RULES[rule.supersededBy as RuleId].norm;
+  return { doubt: { id: normDoubtId(norm), reason }, own };
 }
 
 // Whether an active rule holds in a reading: a doubtful rule holds when its norm does, and a rule
@@ -26,10 +34,10 @@ export function ruleHolds(
 ): boolean {
   const a = active.get(id);
   if (a === undefined) return false;
-  const norm = doubtNorm(a, day, norms);
-  if (norm === null) return true;
-  const doubtful = world[normDoubtId(norm)] === true;
-  return norm === a.rule.norm ? doubtful : !doubtful;
+  const carried = carriedDoubt(a, day, norms);
+  if (carried === null) return true;
+  const doubtful = world[carried.doubt.id] === true;
+  return carried.own ? doubtful : !doubtful;
 }
 
 interface RuleFrame {
@@ -49,8 +57,8 @@ export function ruleFrame(date: CivilDate, ids: readonly RuleId[], norms: NormTa
   for (const a of activeRules(date, norms)) {
     if (!wanted.has(a.rule.id)) continue;
     active.set(a.rule.id, a);
-    const norm = doubtNorm(a, day, norms);
-    if (norm !== null && a.doubt !== null) doubts.push({ id: normDoubtId(norm), reason: a.doubt });
+    const carried = carriedDoubt(a, day, norms);
+    if (carried !== null) doubts.push(carried.doubt);
   }
   return {
     day,

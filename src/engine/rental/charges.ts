@@ -82,12 +82,10 @@ function compare(
 // rise at all. Whether the extraordinary caps count as that rise is read both ways.
 function cappedYear(
   agreed: number,
-  year: number,
   charged: number,
   rises: readonly { readonly year: number; readonly rise: AllowedRise }[],
 ): Outcome<ItemReading> {
-  const upTo = rises.filter((r) => r.year <= year);
-  const doubts: Doubt[] = [...uniqueById(upTo.flatMap((r) => r.rise.doubts))];
+  const doubts: Doubt[] = [...uniqueById(rises.flatMap((r) => r.rise.doubts))];
   const base: RuleId[] = ['charges_pact', 'charges_increase'];
   if (doubts.length > MAX_DOUBTS)
     return single(itemReading('not_checkable', null, [p('charges.too_many_readings')], base));
@@ -96,7 +94,7 @@ function cappedYear(
     let upperBoundOnly = false;
     const phrases: RentalPhrase[] = [p('charges.agreed', { amount: { euros: agreed } })];
     const rules: RuleId[] = [...base];
-    for (const r of upTo) {
+    for (const r of rises) {
       const rate = r.rise.rateIn(world);
       rules.push(...rate.rules);
       if (!rate.ok)
@@ -130,8 +128,7 @@ function chargeItems(
   rises: (until: number) => readonly { readonly year: number; readonly rise: AllowedRise }[],
 ): readonly ItemResult[] {
   const item = (outcome: Outcome<ItemReading>, year?: number) =>
-    itemResult('charge', year === undefined ? { index } : { index, year }, outcome, deps.norms);
-  const tax = c.kind === 'property_tax' || c.kind === 'waste';
+    itemResult('charge', { index, year }, outcome, deps.norms);
   const missing = unagreed(c);
   // Taxes are left out of the cap (art. 20.2). A waste fee is a tax in most towns but not all, so
   // it is not capped either.
@@ -164,7 +161,7 @@ function chargeItems(
       ),
     );
   }
-  if (tax || missing !== null) return [item(single(informative))];
+  if (c.kind === 'waste' || missing !== null) return [item(single(informative))];
   // A charge of another kind may be a supply read by meter (art. 20.3, the tenant's) or a tax, both
   // outside the cap: left to look at, with no figure.
   if (c.kind === 'other')
@@ -188,7 +185,7 @@ function chargeItems(
         ),
         year,
       );
-    const outcome = cappedYear(agreed, year, amount, rises(year));
+    const outcome = cappedYear(agreed, amount, rises(year));
     const values =
       outcome.kind === 'single' ? [outcome.value] : outcome.readings.map((r) => r.value);
     if (amount > agreed * SUSPECT_SHARE && values.some((v) => v.status !== 'within_limit'))
@@ -218,9 +215,11 @@ export function checkCharges(input: RentalInput, deps: RentalDeps): readonly Ite
   const cache = new Map<number, AllowedRise>();
   const riseIn = (year: number): AllowedRise => {
     const found = cache.get(year);
+    // Stryker disable next-line ConditionalExpression: the cache only saves working out a rise twice
     if (found) return found;
     const day: CivilDate = anniversaryIn(start, year);
     const rise = allowedRise(input, day, deps);
+    // Stryker disable next-line CallExpression: the cache only saves working out a rise twice
     cache.set(year, rise);
     return rise;
   };
