@@ -50,11 +50,12 @@ function moneyItem(input: RentalInput, frame: Frame): ItemReading {
   if (input.deposit === null && cash.length === 0) return notEntered(rules);
   const { rent } = frame;
   const phrases: RentalPhrase[] = [];
-  const depositExcess = input.deposit === null ? 0 : Math.max(0, round2(input.deposit - rent));
+  const deposit = input.deposit ?? 0;
+  const depositExcess = Math.max(0, round2(deposit - rent));
   if (depositExcess > TOLERANCE)
     phrases.push(
       p('guarantees.deposit_excess', {
-        deposit: { euros: input.deposit ?? 0 },
+        deposit: { euros: deposit },
         rent: { euros: rent },
         excess: { euros: depositExcess },
       }),

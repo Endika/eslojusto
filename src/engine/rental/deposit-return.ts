@@ -23,16 +23,16 @@ const INTEREST_RULES: readonly RuleId[] = ['deposit_interest', 'legal_interest_r
 const sum = (xs: readonly { readonly amount: number }[]): number =>
   round2(xs.reduce((s, x) => s + x.amount, 0));
 
-// What is still to come back of the deposit; null without a deposit to start from.
-const pendingOf = (deposit: number | null, out: MoveOut): number | null =>
-  deposit === null ? null : round2(deposit - sum(out.returns) - sum(out.deductions));
+// What is still to come back of the deposit.
+const pendingOf = (deposit: number, out: MoveOut): number =>
+  round2(deposit - sum(out.returns) - sum(out.deductions));
 
 // The deposit less what came back and what was kept. What was kept is listed as the landlord
 // gave it: whether damage justifies it is not something this review can weigh.
 function returnReading(deposit: number | null, out: MoveOut, today: CivilDate): ItemReading {
   const rules: RuleId[] = ['deposit_interest'];
+  if (deposit === null) return notEntered(rules);
   const pending = pendingOf(deposit, out);
-  if (deposit === null || pending === null) return notEntered(rules);
   const phrases: RentalPhrase[] = [
     p('deposit.pending', {
       deposit: { euros: deposit },
@@ -100,7 +100,8 @@ function interestIn(
       );
     }
     if (counted.kind !== 'complete')
-      missingYear = Math.min(missingYear ?? counted.missingYear, counted.missingYear);
+      // Every stretch starts the same day, so each one misses the same year.
+      missingYear ??= counted.missingYear;
   }
   total = round2(total);
   phrases.push(
@@ -142,8 +143,8 @@ function interestItem(
     return round2(amount - kept);
   };
   const stretches: Stretch[] = [];
-  const pending = pendingOf(deposit, out);
-  const stillOwed = pending !== null && pending > TOLERANCE;
+  const pending = pendingOf(deposit ?? 0, out);
+  const stillOwed = pending > TOLERANCE;
   let lateMoney = false;
   if (stillOwed && late(today)) {
     lateMoney = true;

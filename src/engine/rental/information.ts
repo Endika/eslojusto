@@ -69,8 +69,23 @@ function termEnds(input: RentalInput): {
   return { contract, mandatory: max(contract, anniversaryIn(start, start.y + years)) };
 }
 
-const inWindow = (day: string, rule: RuleId, until: string | null): boolean =>
-  day >= RULES[rule].from && (until === null || day <= until);
+// RDL 29/2026, DF 6.ª a): no rise while the rent is above the reference price; SERPAVI again.
+// It matters when an anniversary of the contract, before the keys are back, falls in the rule's days.
+function referencePriceApplies(input: RentalInput, norms: NormTable): boolean {
+  const { from, until } = RULES.cap_2_rdl29;
+  const keysBack = input.moveOut === null ? null : toIso(input.moveOut.keysReturnedOn);
+  const lastYear = Number((until ?? from).slice(0, 4));
+  for (let y = Number(from.slice(0, 4)); y <= lastYear; y++) {
+    const d = anniversaryIn(input.startDate, y);
+    if (
+      d.y > input.startDate.y &&
+      (keysBack === null || toIso(d) < keysBack) &&
+      ruleFrame(d, ['cap_2_rdl29'], norms).active.has('cap_2_rdl29')
+    )
+      return true;
+  }
+  return false;
+}
 
 export function informationBlocks(
   input: RentalInput,
@@ -78,7 +93,6 @@ export function informationBlocks(
 ): readonly InformationBlock[] {
   const source = (id: RuleId) => ruleSource(id, norms);
   const blocks: InformationBlock[] = [];
-  const start = input.startDate;
   const signed = ruleFrame(input.signedOn, ['stressed_zone'], norms);
 
   // LAU art. 17.6 and 17.7: in a stressed zone the initial rent may be capped; checked in SERPAVI.
@@ -90,26 +104,7 @@ export function informationBlocks(
       }),
     );
 
-  // RDL 29/2026, DF 6.ª a): no rise while the rent is above the reference price; SERPAVI again.
-  const capRule = RULES.cap_2_rdl29;
-  const keysBack = input.moveOut === null ? null : toIso(input.moveOut.keysReturnedOn);
-  const capYears = Array.from(
-    {
-      length:
-        Number((capRule.until ?? capRule.from).slice(0, 4)) - Number(capRule.from.slice(0, 4)) + 1,
-    },
-    (_, k) => Number(capRule.from.slice(0, 4)) + k,
-  );
-  const anniversaries = capYears
-    .map((y) => anniversaryIn(start, y))
-    .filter((d) => d.y > start.y && (keysBack === null || toIso(d) < keysBack));
-  if (
-    anniversaries.some(
-      (d) =>
-        inWindow(toIso(d), 'cap_2_rdl29', capRule.until) &&
-        ruleFrame(d, ['cap_2_rdl29'], norms).active.has('cap_2_rdl29'),
-    )
-  )
+  if (referencePriceApplies(input, norms))
     blocks.push(block('reference_price', [source('cap_2_rdl29')], { links: [SERPAVI] }));
 
   const ends = termEnds(input);
@@ -140,7 +135,7 @@ export function informationBlocks(
   const extensionRule = RULES.extension_rdl29;
   const endsInExtension = [ends.mandatory, tacitEnd].some(
     (d) =>
-      inWindow(toIso(d), 'extension_rdl29', RDL29_EXTENSION_UNTIL) &&
+      toIso(d) <= RDL29_EXTENSION_UNTIL &&
       ruleFrame(d, ['extension_rdl29'], norms).active.has('extension_rdl29'),
   );
   if (endsInExtension)

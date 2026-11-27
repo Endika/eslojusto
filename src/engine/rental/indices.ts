@@ -77,9 +77,8 @@ export function referenceMonth(series: IndexSeries, date: CivilDate): ReferenceM
   const day = toIso(date);
   if (day > series.coveredUntil) return { kind: 'not_loaded' };
   const { values, pendingFlash } = series;
-  for (let i = values.length - 1; i >= 0; i--) {
-    const value = values[i];
-    if (value === undefined || value.month >= day.slice(0, 7)) continue;
+  for (const [i, value] of [...values.entries()].reverse()) {
+    if (value.month >= day.slice(0, 7)) continue;
     if (value.publishedOn === null) return { kind: 'publication_unknown' };
     if (value.publishedOn > day) continue;
     if (value.publishedOn === day) {

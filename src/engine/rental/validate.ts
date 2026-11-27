@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, daysInMonth, toIso, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, isRealDate, toIso, type CivilDate } from '../date';
 import { anniversaryIn, isAnniversary } from './anniversary';
 import { REGION_CODES, type RentalInput } from './types';
 
@@ -34,16 +34,7 @@ export interface RentalInputError {
 const MAX_AMOUNT = 1_000_000;
 const MAX_MONTHS = 600;
 
-const isValidDate = (f: CivilDate): boolean =>
-  Number.isInteger(f.y) &&
-  Number.isInteger(f.m) &&
-  Number.isInteger(f.d) &&
-  f.y >= 1900 &&
-  f.y <= 2200 &&
-  f.m >= 1 &&
-  f.m <= 12 &&
-  f.d >= 1 &&
-  f.d <= daysInMonth(f.y, f.m);
+const isValidDate = (f: CivilDate): boolean => isRealDate(f) && f.y >= 1900 && f.y <= 2200;
 
 const isAmount = (n: number): boolean => Number.isFinite(n) && n > 0 && n <= MAX_AMOUNT;
 const isIntInRange = (n: number, min: number, max: number): boolean =>
@@ -77,10 +68,7 @@ export function validateRental(e: RentalInput, today: CivilDate): readonly Renta
   amount('initialRent', e.initialRent);
   if (e.updateClause === 'fixed_percent' && e.fixedPercent === undefined)
     err('fixedPercent', 'percent_missing');
-  if (
-    e.fixedPercent !== undefined &&
-    !(Number.isFinite(e.fixedPercent) && e.fixedPercent >= 0 && e.fixedPercent <= 100)
-  )
+  if (e.fixedPercent !== undefined && !(e.fixedPercent >= 0 && e.fixedPercent <= 100))
     err('fixedPercent', 'percent_out_of_range');
   if (!(REGION_CODES as readonly string[]).includes(e.region)) err('region', 'unknown_region');
 
@@ -109,7 +97,7 @@ export function validateRental(e: RentalInput, today: CivilDate): readonly Renta
         // A rise is its anniversary's update even when applied early or late, so it must fall
         // after the anniversary before and before the next one.
         const year = u.anniversary.y;
-        const opens = year - 1 > e.startDate.y ? anniversaryIn(e.startDate, year - 1) : e.startDate;
+        const opens = anniversaryIn(e.startDate, year - 1);
         if (
           compareDates(u.effectiveOn, opens) <= 0 ||
           compareDates(u.effectiveOn, anniversaryIn(e.startDate, year + 1)) >= 0

@@ -14,7 +14,7 @@ import {
   type Outcome,
   type World,
 } from './outcome';
-import { doubtNorm, normDoubtId, ruleHolds } from './rule-worlds';
+import { carriedDoubt, ruleHolds } from './rule-worlds';
 import { activeRules, ruleSource, type ActiveRule, type RentalSource, type RuleId } from './rules';
 import type { RentalDeps, RentalInput, RentUpdateInput } from './types';
 
@@ -139,28 +139,27 @@ const indexDoubtId = (index: IndexId, day: string) => `index:${index}:${day}`;
 
 function frameOf(
   input: RentalInput,
-  sorted: readonly { readonly index: number; readonly update: RentUpdateInput }[],
-  k: number,
+  { index, update }: { readonly index: number; readonly update: RentUpdateInput },
+  {
+    previous,
+    next,
+  }: {
+    readonly previous?: RentUpdateInput | undefined;
+    readonly next?: RentUpdateInput | undefined;
+  },
   today: CivilDate,
   { norms, indices }: RentalDeps,
 ): Frame {
-  const entry = sorted[k];
-  if (entry === undefined) throw new RangeError(`No update ${k}`);
-  const { index, update } = entry;
   const start = input.startDate;
   const day = toIso(update.anniversary);
-  const previousEntry = sorted[k - 1]?.update;
   const rise =
-    previousEntry && compareDates(previousEntry.anniversary, update.anniversary) === 0
-      ? 'second'
-      : 'valid';
+    previous && compareDates(previous.anniversary, update.anniversary) === 0 ? 'second' : 'valid';
   const ids = { agreement: `agreement:${day}`, notice: `notice:${day}` };
   const firstYear = update.anniversary.y === start.y + 1;
 
   // Months charged at this rent: up to the next update, while the contract lasts, and only those
   // already due. Without a later update the rent is taken to have stayed as charged until today,
   // and the review says so; months over five years old are left out (arts. 1964.2 and 1966 CC).
-  const next = sorted[k + 1]?.update;
   const due = monthIndex(today) - (today.d > PAYMENT_DAY ? 0 : 1);
   const nextAnniversary = anniversaryIn(start, update.anniversary.y + 1);
   let endMonth = due;
@@ -181,18 +180,13 @@ function frameOf(
     for (const a of activeRules(update.anniversary, norms)) {
       if (!UPDATE_RULES.has(a.rule.id)) continue;
       active.set(a.rule.id, a);
-      const norm = doubtNorm(a, day, norms);
-      if (norm !== null && a.doubt !== null)
-        doubts.push({ id: normDoubtId(norm), reason: a.doubt });
+      const carried = carriedDoubt(a, day, norms);
+      if (carried !== null) doubts.push(carried.doubt);
     }
     const needed = new Set<IndexId>();
     const clause = input.updateClause;
     if (clause === 'ipc' || clause === 'irav' || clause === 'igc') needed.add(clause);
-    if (clause === 'unspecified_index') {
-      if (active.has('update_clause')) needed.add('igc');
-      if (active.has('update_clause_rdl26') || active.has('update_clause_rdl29'))
-        needed.add('irav');
-    }
+    if (clause === 'unspecified_index' && active.has('update_clause')) needed.add('igc');
     const signedAfterLaw12 = toIso(input.signedOn) >= norms.law12_2023.inForceSince;
     const iravForAll = active.has('irav_all_contracts') || active.has('irav_all_contracts_rdl26');
     if (active.has('cap_irav') && (signedAfterLaw12 || iravForAll)) needed.add('irav');
@@ -237,12 +231,7 @@ type Looked =
   | { readonly ok: true; readonly figure: IndexFigure }
   | { readonly ok: false; readonly unchecked: RentUpdateUnchecked };
 
-function lookUp(
-  index: IndexId,
-  ref: ReferenceMonth | undefined,
-  world: World,
-  day: string,
-): Looked {
+function lookUp(index: IndexId, ref: ReferenceMonth, world: World, day: string): Looked {
   const latest = world[indexDoubtId(index, day)] === true;
   const fig = (month: string, rate: number, publishedOn: string, flash: boolean): Looked => {
     // Ley 2/2015, annex: a negative IGC counts as 0 and anything above 2 % as 2 %.
@@ -263,7 +252,7 @@ function lookUp(
     v.publishedOn === null
       ? ({ ok: false, unchecked: 'index_publication_unknown' } as const)
       : fig(v.month, v.rate, v.publishedOn, false);
-  switch (ref?.kind) {
+  switch (ref.kind) {
     case 'ok':
       return definitive(ref.value);
     case 'same_day': {
@@ -288,7 +277,6 @@ function lookUp(
     case 'publication_unknown':
       return { ok: false, unchecked: 'index_publication_unknown' };
     case 'not_loaded':
-    case undefined:
       return { ok: false, unchecked: 'index_not_loaded' };
   }
 }
@@ -382,7 +370,8 @@ function allowance(
   const rules: RuleId[] = [];
   const look = (index: IndexId) => {
     if (index === 'igc') rules.push('igc_clamp');
-    return lookUp(index, refs.get(index), world, day);
+    // Every index a rule reads was looked up with the frame.
+    return lookUp(index, refs.get(index) as ReferenceMonth, world, day);
   };
   const rate = (r: IndexId | number): Looked | { ok: true; fixed: number } =>
     typeof r === 'number' ? { ok: true, fixed: r } : look(r);
@@ -392,13 +381,13 @@ function allowance(
     'fixed' in l ? { kind: 'fixed', rate: l.fixed } : { kind: 'index', figure: l.figure };
 
   // LAU art. 18.1 and RDL 6/2022 art. 46: a new agreement replaces the clause, in any form.
-  const agreedInWriting =
-    update.agreedInWriting === true ||
-    ((update.agreedInWriting === null || update.agreedVerbally === true) &&
-      world[frame.ids.agreement] === true);
+  const agreedInWriting = update.agreedInWriting === true || world[frame.ids.agreement] === true;
   const largeLandlord = input.largeLandlord ?? world[LARGE_LANDLORD] === true;
   const extra = extraordinary
-    ? [...active.keys()].filter((id) => EXTRA_CAPS[id] !== undefined && holds(id))
+    ? [...active.keys()].flatMap((id) => {
+        const cap = EXTRA_CAPS[id];
+        return cap !== undefined && holds(id) ? [{ rule: id, cap }] : [];
+      })
     : [];
 
   // The caps that bind: with a new agreement, only those that bind a large landlord anyway.
@@ -406,10 +395,10 @@ function allowance(
   let agreed: RateFigure | null = null;
   const phrases: RentalPhrase[] = [];
   if (agreedInWriting) {
-    const binding = largeLandlord ? extra.filter((id) => EXTRA_CAPS[id]?.largeLandlord) : [];
+    const binding = largeLandlord ? extra.filter((e) => e.cap.largeLandlord) : [];
     if (binding.length === 0)
       return { ok: false, unchecked: 'agreed_in_writing', rules: ['update_clause'] };
-    for (const id of binding) caps.push({ rule: id, rate: EXTRA_CAPS[id]?.rate ?? 0 });
+    for (const e of binding) caps.push({ rule: e.rule, rate: e.cap.rate });
     phrases.push(
       rentalPhrase(
         update.agreedVerbally === true
@@ -447,7 +436,7 @@ function allowance(
       if (!signedAfterLaw12 && iravForAll) rules.push(iravForAll);
     }
     if (holds('cap_ipc') && !rewording) caps.push({ rule: 'cap_ipc', rate: 'ipc' });
-    for (const id of extra) caps.push({ rule: id, rate: EXTRA_CAPS[id]?.rate ?? 0 });
+    for (const e of extra) caps.push({ rule: e.rule, rate: e.cap.rate });
   }
 
   let cap: { rule: RuleId; rate: RateFigure } | null = null;
@@ -648,17 +637,21 @@ function readUpdate(
   };
 }
 
+const readingKey = (r: RentUpdateReading): string =>
+  JSON.stringify([
+    r.status,
+    r.unchecked,
+    r.base,
+    r.maxRent,
+    r.monthly,
+    r.accumulated,
+    r.months,
+    r.monthsBeforeDue,
+  ]);
+
 const measure: Measure<RentUpdateReading> = {
-  amount: (r) => (r.status === 'paid_over' ? r.accumulated : 0),
-  same: (a, b) =>
-    a.status === b.status &&
-    a.unchecked === b.unchecked &&
-    a.base === b.base &&
-    a.maxRent === b.maxRent &&
-    a.monthly === b.monthly &&
-    a.accumulated === b.accumulated &&
-    a.months === b.months &&
-    a.monthsBeforeDue === b.monthsBeforeDue,
+  amount: (r) => r.accumulated,
+  same: (a, b) => readingKey(a) === readingKey(b),
 };
 
 export const rentUpdateAmount = measure.amount;
@@ -701,17 +694,13 @@ export function allowedRise(
     previousRent: input.initialRent,
     newRent: input.initialRent,
     chargedFrom: anniversary,
+    // Stryker disable next-line StringLiteral: any notice that is neither electronic nor unwritten opens no doubt
     notice: 'letter',
     noticeOn: anniversary,
     agreedInWriting: false,
   };
-  const frame = frameOf(
-    { ...input, updates: [update] },
-    [{ index: 0, update }],
-    0,
-    anniversary,
-    deps,
-  );
+  const entry = { index: 0, update };
+  const frame = frameOf(input, entry, {}, anniversary, deps);
   const extraordinary = [...frame.active.keys()].some((id) => EXTRA_CAPS[id] !== undefined);
   return {
     doubts: extraordinary ? [...frame.doubts, EXTRAORDINARY_CAPS] : frame.doubts,
@@ -753,16 +742,18 @@ interface Branch {
 
 interface Output {
   readonly branch: number;
+  // The side the branch had taken on the doubts that came back.
+  readonly assign: World;
   readonly world: World;
   readonly reading: RentUpdateReading;
   readonly carried: number | null;
 }
 
-const keyOf = (w: World): string =>
-  Object.keys(w)
-    .sort()
-    .map((id) => `${id}=${w[id] === true ? 1 : 0}`)
-    .join(',');
+const keyOf = (w: World): string => {
+  // Stryker disable next-line MethodExpression: the worlds of a frame list their doubts in one order, so sorting only makes the key canonical
+  const ids = Object.keys(w).sort();
+  return JSON.stringify(ids.map((id) => [id, w[id]]));
+};
 
 // The reasons that move `value` across outputs: a doubt opened here when flipping it alone, in the
 // same branch, changes it; a doubt taken from an earlier year when flipping it changes it in any
@@ -776,19 +767,21 @@ function movingReasons<V>(
   same: (a: V, b: V) => boolean,
 ): Set<DoubtReason> {
   const moving = new Set<DoubtReason>();
-  const local = (w: World) =>
-    keyOf(Object.fromEntries(doubts.map((d) => [d.id, w[d.id] === true])));
+  const local = (w: World) => doubts.map((d) => w[d.id]).join();
   const exact = new Map(outputs.map((o) => [`${o.branch}|${keyOf(o.world)}`, o]));
   const byLocal = new Map<string, Output[]>();
   for (const o of outputs) byLocal.set(local(o.world), [...(byLocal.get(local(o.world)) ?? []), o]);
+  const alike = (w: World): readonly Output[] =>
+    // Stryker disable next-line ArrayDeclaration: another branch always holds the flipped world
+    byLocal.get(local(w)) ?? [];
   for (const d of doubts)
     for (const o of outputs) {
-      if (o.world[d.id] === true || moving.has(d.reason)) continue;
+      // Stryker disable next-line BooleanLiteral: flipping to false compares the same pairs of worlds from the other side
       const flipped = { ...o.world, [d.id]: true };
       const others = fresh(o, d.id)
-        ? [exact.get(`${o.branch}|${keyOf(flipped)}`)]
-        : (byLocal.get(local(flipped)) ?? []);
-      if (others.some((x) => x !== undefined && !same(value(o), value(x)))) moving.add(d.reason);
+        ? [exact.get(`${o.branch}|${keyOf(flipped)}`) as Output]
+        : alike(flipped);
+      if (others.some((x) => !same(value(o), value(x)))) moving.add(d.reason);
     }
   for (const group of byLocal.values())
     if (group.some((o) => !same(value(o), value(group[0] as Output))))
@@ -836,7 +829,7 @@ export function checkRentUpdates(
   input: RentalInput,
   today: CivilDate,
   deps: RentalDeps,
-  { maxReadings }: { readonly maxReadings: number } = { maxReadings: MAX_READINGS },
+  maxReadings = MAX_READINGS,
 ): readonly RentUpdateResult[] {
   const sorted = input.updates
     .map((update, index) => ({ index, update }))
@@ -845,7 +838,15 @@ export function checkRentUpdates(
         compareDates(a.update.anniversary, b.update.anniversary) ||
         compareDates(a.update.effectiveOn, b.update.effectiveOn),
     );
-  const frames = sorted.map((_, k) => frameOf(input, sorted, k, today, deps));
+  const frames = sorted.map((entry, k) =>
+    frameOf(
+      input,
+      entry,
+      { previous: sorted[k - 1]?.update, next: sorted[k + 1]?.update },
+      today,
+      deps,
+    ),
+  );
   const lastSeen = new Map<string, number>();
   frames.forEach((f, k) => f.doubts.forEach((d) => lastSeen.set(d.id, k)));
 
@@ -881,10 +882,10 @@ export function checkRentUpdates(
       worldsFor(openIn(b)).map((w) => {
         const world = { ...b.assign, ...w };
         const step = readUpdate(input, frame, baseOf(b.carried), world, deps.norms);
-        return { branch: i, world, reading: step.reading, carried: step.carried };
+        return { branch: i, assign: b.assign, world, reading: step.reading, carried: step.carried };
       }),
     );
-    const fresh = (o: Output, id: string) => !(id in (branches[o.branch]?.assign ?? {}));
+    const fresh = (o: Output, id: string) => !(id in o.assign);
     const carriedIn = consecutive ? inherited : new Set<DoubtReason>();
     const reasons = movingReasons(
       outputs,

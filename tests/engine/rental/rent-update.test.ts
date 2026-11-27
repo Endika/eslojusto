@@ -1203,7 +1203,7 @@ describe('work bound', () => {
         update('2022-02-28', 710, 720),
       ],
     });
-    const [bounded, next] = checkRentUpdates(input, TODAY, DEPS, { maxReadings: 4 });
+    const [bounded, next] = checkRentUpdates(input, TODAY, DEPS, 4);
     expect(bounded && single(bounded)).toMatchObject({
       status: 'not_checkable',
       unchecked: 'too_many_readings',

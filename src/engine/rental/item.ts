@@ -56,7 +56,7 @@ export interface ItemResult {
 
 export function itemResult(
   kind: ItemKind,
-  where: { readonly index?: number; readonly year?: number },
+  where: { readonly index?: number | undefined; readonly year?: number | undefined },
   outcome: Outcome<ItemReading>,
   norms: NormTable,
 ): ItemResult {

@@ -19,8 +19,7 @@ function feeReading(
   const named = NAMED.has(fee.kind);
   const requestId = `fee_request:${index}`;
   const doubts: Doubt[] = [...frame.doubts];
-  if (!named && fee.requestedInWriting === null && frame.active.has('fees_2026'))
-    doubts.push({ id: requestId, reason: 'agreement_unknown' });
+  if (fee.requestedInWriting === null) doubts.push({ id: requestId, reason: 'agreement_unknown' });
   const paidOver = (why: RentalPhrase, rule: RuleId) =>
     itemReading(
       'paid_over',
