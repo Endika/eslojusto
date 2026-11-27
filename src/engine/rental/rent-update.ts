@@ -186,7 +186,11 @@ function frameOf(
     const needed = new Set<IndexId>();
     const clause = input.updateClause;
     if (clause === 'ipc' || clause === 'irav' || clause === 'igc') needed.add(clause);
-    if (clause === 'unspecified_index' && active.has('update_clause')) needed.add('igc');
+    if (clause === 'unspecified_index') {
+      if (active.has('update_clause')) needed.add('igc');
+      if (active.has('update_clause_rdl26') || active.has('update_clause_rdl29'))
+        needed.add('irav');
+    }
     const signedAfterLaw12 = toIso(input.signedOn) >= norms.law12_2023.inForceSince;
     const iravForAll = active.has('irav_all_contracts') || active.has('irav_all_contracts_rdl26');
     if (active.has('cap_irav') && (signedAfterLaw12 || iravForAll)) needed.add('irav');
