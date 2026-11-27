@@ -14,7 +14,7 @@ import {
   type FlowOptions,
   type TimeBasis,
 } from './tae';
-import type { CreditInput } from './types';
+import type { Charge, CreditInput } from './types';
 
 const PERCENT = 100;
 
@@ -86,11 +86,11 @@ const CHARGE_PHRASE = {
 } as const;
 
 function contributionPhrase(input: CreditInput, c: Contribution): CreditPhrase {
-  const charge = c.cost.kind === 'charge' ? input.charges[c.cost.index] : undefined;
-  return creditPhrase(
-    charge === undefined ? 'apr.contribution.insurance' : CHARGE_PHRASE[charge.kind],
-    { points: { points: c.points } },
-  );
+  const key =
+    c.cost.kind === 'insurance'
+      ? 'apr.contribution.insurance'
+      : CHARGE_PHRASE[(input.charges[c.cost.index] as Charge).kind];
+  return creditPhrase(key, { points: { points: c.points } });
 }
 
 function detailOf(input: CreditInput, flows: AprFlows, exact: number, world: AprWorld): AprDetail {
@@ -185,6 +185,11 @@ const INSURANCE_WORLDS: Readonly<Record<InsuranceReading, boolean>> = {
   insurance_counted: true,
   insurance_left_out: false,
 };
+const INSURANCE_READINGS = ['insurance_counted', 'insurance_left_out'] as const;
+const BALLOON_READINGS = ['balloon_with_last', 'balloon_month_after'] as const;
+// The reading is read only for a balloon with no day; with it dated, or none, any one will do.
+// Stryker disable next-line StringLiteral: balloonDue reads any reading but balloon_with_last as a month after
+const UNUSED_BALLOON: BalloonReading = 'balloon_month_after';
 
 // Item 1: the APR worked out from the contract's own figures against the one it states. Compared
 // to one decimal, shown to two. A linked insurance the person does not know to be required, and a
@@ -201,28 +206,23 @@ export function checkApr(input: CreditInput, norms: NormTable): CreditItem {
       ),
     );
   const required = input.insurance?.required;
-  const insuranceWorlds: readonly InsuranceReading[] =
-    required === null
-      ? ['insurance_counted', 'insurance_left_out']
-      : // Stryker disable next-line StringLiteral: any world but insurance_counted leaves the insurance out
-        [required === false ? 'insurance_left_out' : 'insurance_counted'];
-  const balloonWorlds: readonly BalloonReading[] =
-    input.balloon !== null && input.balloon.dueOn === null
-      ? ['balloon_with_last', 'balloon_month_after']
-      : // Stryker disable next-line StringLiteral: with the balloon dated, or none, the reading is not used
-        ['balloon_month_after'];
-  const [insuranceOnly] = insuranceWorlds;
-  const [balloonOnly] = balloonWorlds;
-  if (balloonWorlds.length === 1 && balloonOnly !== undefined)
-    return assessAcross('insurance_required', insuranceWorlds, (world) =>
-      aprReading(input, { insurance: INSURANCE_WORLDS[world], balloon: balloonOnly }, norms),
+  // Stryker disable next-line StringLiteral: any world but insurance_counted leaves the insurance out
+  const known: InsuranceReading = required === false ? 'insurance_left_out' : 'insurance_counted';
+  const insuranceUnknown = required === null;
+  const balloonUnknown = input.balloon !== null && input.balloon.dueOn === null;
+  if (!balloonUnknown)
+    return assessAcross(
+      'insurance_required',
+      insuranceUnknown ? INSURANCE_READINGS : [known],
+      (world) =>
+        aprReading(input, { insurance: INSURANCE_WORLDS[world], balloon: UNUSED_BALLOON }, norms),
     );
-  if (insuranceWorlds.length === 1 && insuranceOnly !== undefined)
-    return assessAcross('balloon_due', balloonWorlds, (balloon) =>
-      aprReading(input, { insurance: INSURANCE_WORLDS[insuranceOnly], balloon }, norms),
+  if (!insuranceUnknown)
+    return assessAcross('balloon_due', BALLOON_READINGS, (balloon) =>
+      aprReading(input, { insurance: INSURANCE_WORLDS[known], balloon }, norms),
     );
-  const both = insuranceWorlds.flatMap((i) =>
-    balloonWorlds.map((b): `${InsuranceReading}.${BalloonReading}` => `${i}.${b}`),
+  const both = INSURANCE_READINGS.flatMap((i) =>
+    BALLOON_READINGS.map((b): `${InsuranceReading}.${BalloonReading}` => `${i}.${b}`),
   );
   return assessAcross('insurance_required_and_balloon_due', both, (world) => {
     const [insurance, balloon] = world.split('.') as [InsuranceReading, BalloonReading];

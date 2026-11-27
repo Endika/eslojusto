@@ -40,10 +40,12 @@ describe('item 4: the withdrawal period', () => {
   });
 
   it('has not started while the terms have not arrived', () => {
-    expect(withdraw({ ...oct1, infoReceived: false }, '2026-10-09')).toMatchObject({
-      status: 'not_started',
-      lastDay: null,
-    });
+    const f = withdraw({ ...oct1, infoReceived: false }, '2026-10-09');
+    expect(f).toMatchObject({ id: 'withdrawal', status: 'not_started', lastDay: null });
+    expect(f.calculation).toStrictEqual([
+      { key: 'withdrawal.not_started' },
+      { key: 'withdrawal.effects' },
+    ]);
   });
 
   it('counts from the contract when the day of receipt is unknown, and says so', () => {
@@ -52,10 +54,16 @@ describe('item 4: the withdrawal period', () => {
     expect(f.calculation.map((p) => p.key)).toContain('withdrawal.receipt_unknown');
   });
 
-  it('reads terms received with no day as received with the contract', () => {
-    expect(withdraw(oct1, '2026-10-09').calculation.map((p) => p.key)).not.toContain(
-      'withdrawal.receipt_unknown',
-    );
+  it.each([
+    ['terms received with no day', {}],
+    [
+      'terms of unknown receipt, with the day given',
+      { infoReceived: null, infoReceivedOn: parseDate('2026-10-05') },
+    ],
+  ])('does not say the receipt is unknown for %s', (_, change) => {
+    expect(
+      withdraw({ ...oct1, ...change }, '2026-10-09').calculation.map((p) => p.key),
+    ).not.toContain('withdrawal.receipt_unknown');
   });
 
   it('crosses a 29 February like any other day', () => {
@@ -65,7 +73,12 @@ describe('item 4: the withdrawal period', () => {
 
   it('says sending is enough and what follows, citing art. 28 and the counting of days', () => {
     const f = withdraw(oct1, '2026-10-09');
-    expect(f.calculation.slice(-2)).toStrictEqual([
+    expect(f.calculation).toStrictEqual([
+      { key: 'withdrawal.start', vars: { day: { date: '2026-10-01' } } },
+      {
+        key: 'withdrawal.days_left',
+        vars: { days: { days: 6 }, day: { date: '2026-10-15' } },
+      },
       { key: 'withdrawal.send_by' },
       { key: 'withdrawal.effects' },
     ]);

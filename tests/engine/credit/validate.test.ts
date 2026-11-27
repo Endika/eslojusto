@@ -181,7 +181,10 @@ describe('credit validation', () => {
       {
         instalments: {
           kind: 'schedule',
-          rows: [row('2019-03-15'), { ...row('2019-04-15', 3_300), dueOn: badDate }],
+          rows: [
+            row('2019-03-15'),
+            { ...row('2019-04-15', 3_300), dueOn: { y: 2019, m: 6, d: 31 } },
+          ],
         },
         balloon: { amount: 3_000, dueOn: null },
       },
@@ -264,6 +267,11 @@ describe('credit validation', () => {
         instalments: regular({ firstDueOn: parseDate('2026-11-09') }),
       },
       [],
+    ],
+    [
+      'an early repayment when the drawdown day is wrong',
+      { drawnOn: badDate, ...dated({}) },
+      ['drawnOn:invalid_date'],
     ],
     [
       'a balloon with no instalments',

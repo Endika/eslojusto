@@ -169,7 +169,7 @@ describe('the indicator against the Bank of Spain average rate', () => {
   it.each([
     [
       'a loan with its distance',
-      indicate('personal_loan', '2019-02-15', { value: 16.61, origin: 'recalculated' }),
+      () => indicate('personal_loan', '2019-02-15', { value: 16.61, origin: 'recalculated' }),
       [
         { key: 'indicator.apr_recalculated', vars: { apr: { percent: 16.61 } } },
         {
@@ -182,7 +182,7 @@ describe('the indicator against the Bank of Spain average rate', () => {
     ],
     [
       'a card against the monthly series',
-      indicate('revolving', '2026-08-20', declared(24.29), null),
+      () => indicate('revolving', '2026-08-20', declared(24.29), null),
       [
         { key: 'indicator.apr_declared', vars: { apr: { percent: 24.29 } } },
         {
@@ -195,7 +195,7 @@ describe('the indicator against the Bank of Spain average rate', () => {
     ],
     [
       'a card against the 2010 ruling',
-      indicate('revolving', '2008-05-10', declared(25.42), null),
+      () => indicate('revolving', '2008-05-10', declared(25.42), null),
       [
         { key: 'indicator.apr_declared', vars: { apr: { percent: 25.42 } } },
         { key: 'indicator.reference_2010', vars: { rate: { percent: 19.32 } } },
@@ -206,26 +206,26 @@ describe('the indicator against the Bank of Spain average rate', () => {
     ],
     [
       'no APR entered',
-      indicate('personal_loan', '2019-02-15', null),
+      () => indicate('personal_loan', '2019-02-15', null),
       [{ key: 'indicator.not_entered' }],
     ],
     [
       'no term',
-      indicate('personal_loan', '2019-02-15', declared(10), null),
+      () => indicate('personal_loan', '2019-02-15', declared(10), null),
       [{ key: 'indicator.term_unknown' }],
     ],
     [
       'a month not published yet',
-      indicate('revolving', '2026-09-03', declared(30), null),
+      () => indicate('revolving', '2026-09-03', declared(30), null),
       [{ key: 'indicator.not_published', vars: month('2026-09') }],
     ],
     [
       'a month before the series',
-      indicate('personal_loan', '2002-12-10', declared(10)),
+      () => indicate('personal_loan', '2002-12-10', declared(10)),
       [{ key: 'indicator.no_data', vars: month('2002-12') }],
     ],
   ])('spells out the calculation of %s', (_, indicator, calculation) => {
-    expect(indicator.calculation).toStrictEqual([...calculation, ...CLOSING]);
+    expect(indicator().calculation).toStrictEqual([...calculation, ...CLOSING]);
   });
 
   it('always closes with the judge and the official channels, and carries no amount', () => {
