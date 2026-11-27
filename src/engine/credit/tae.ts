@@ -146,7 +146,10 @@ function dues(input: CreditInput, reading: BalloonReading): Plan | null {
 }
 
 const sameCost = (a: Cost | null, b: Cost): boolean =>
-  a !== null && a.kind === b.kind && (a as ChargeCost).index === (b as ChargeCost).index;
+  a !== null &&
+  // Stryker disable next-line ConditionalExpression: the index below already tells a charge from an insurance
+  a.kind === b.kind &&
+  (a as ChargeCost).index === (b as ChargeCost).index;
 
 // Annex I, part II: an open-end credit is taken as drawn in full, for one year, the capital repaid
 // in 12 equal monthly instalments from a month after the drawdown with interest on what is left.
