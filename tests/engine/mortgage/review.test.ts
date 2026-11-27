@@ -2,7 +2,6 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import {
   reviewMortgage,
-  UNCHECKED,
   type MortgageReview,
   type MortgageTotals,
 } from '../../../src/engine/mortgage/review';
@@ -82,7 +81,15 @@ describe('reviewMortgage', () => {
     ]);
     expect(r.information.map((b) => b.id)).toContain('fein_timing');
     expect(r.offerPass).toBe(true);
-    expect(r.unchecked).toEqual(UNCHECKED);
+    expect(r.unchecked).toEqual([
+      'clause_transparency',
+      'floor_irph_paid',
+      'time_limits',
+      'novations',
+      'insurance',
+      'purchase',
+      'purchase_taxes',
+    ]);
   });
 
   it('the notary record charged under the LCCI is a figure by law of its own, out of the totals', () => {
@@ -95,6 +102,17 @@ describe('reviewMortgage', () => {
     ]);
     expect(r.totals.statute.principal).toBe(0);
     expect(r.offerPass).toBe(true);
+  });
+
+  it.each([
+    [
+      'a notary record of less than a cent',
+      [invoice('transparency_deed', 0.001, paid('2021-05-09'))],
+      null,
+    ],
+    ['a cost given back in full', [invoice('notary_loan', 100, paid('2021-05-10'))], 500],
+  ])('%s offers no pass', (_, invoices, alreadyReturned) => {
+    expect(reviewOf({ deedOn: d('2021-05-10'), invoices, alreadyReturned }).offerPass).toBe(false);
   });
 
   it('a 2018-12 deed: the tax by law, the rest by the split, on separate lines', () => {

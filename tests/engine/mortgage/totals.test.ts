@@ -1,6 +1,10 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
-import { reviewExpenses } from '../../../src/engine/mortgage/expenses';
+import {
+  reviewExpenses,
+  type ExpenseInterest,
+  type ExpenseItem,
+} from '../../../src/engine/mortgage/expenses';
 import {
   basisTotals,
   type BasisAmounts,
@@ -87,5 +91,55 @@ describe('totals by basis', () => {
       statute: { principal: 0, interest: null },
       caseLaw: { principal: 0, interest: null },
     });
+  });
+});
+
+describe('the interest of a line', () => {
+  const lent = (interest: ExpenseInterest | null): ExpenseItem => ({
+    index: 0,
+    kind: 'registry_mortgage',
+    basis: 'case_law',
+    status: 'lender_bears',
+    share: 100,
+    amount: 100,
+    interest,
+    calculation: [],
+    sources: [],
+  });
+  const interest = (change: Partial<ExpenseInterest>): ExpenseInterest => ({
+    amount: 5,
+    until: '2026-10-08',
+    estimated: false,
+    missingYear: null,
+    ...change,
+  });
+  const total = (...changes: Partial<ExpenseInterest>[]) =>
+    basisTotals(
+      changes.map((c) => lent(interest(c))),
+      0,
+    ).caseLaw.interest;
+
+  it('an item alone with none has none', () => {
+    expect(basisTotals([lent(null)], 0).caseLaw.interest).toBeNull();
+  });
+
+  it('adds up, and stops at the earliest last day whatever the order', () => {
+    expect(total({ until: '2025-12-31' }, { until: '2026-10-08', amount: 2.5 })).toMatchObject({
+      amount: 7.5,
+      until: '2025-12-31',
+    });
+    expect(total({ until: '2026-10-08' }, { until: '2025-12-31' })?.until).toBe('2025-12-31');
+  });
+
+  it('is an estimate if any item is, whatever the order', () => {
+    expect(total({ estimated: true }, { estimated: false })?.estimated).toBe(true);
+    expect(total({ estimated: false }, { estimated: true })?.estimated).toBe(true);
+    expect(total({ estimated: false }, { estimated: false })?.estimated).toBe(false);
+  });
+
+  it('names the first year without a rate, whatever the order', () => {
+    expect(total({ missingYear: null }, { missingYear: 2027 })?.missingYear).toBe(2027);
+    expect(total({ missingYear: 2027 }, { missingYear: null })?.missingYear).toBe(2027);
+    expect(total({ missingYear: 2027 }, { missingYear: 2028 })?.missingYear).toBe(2027);
   });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import { informationBlocks } from '../../../src/engine/mortgage/information';
+import type { SourceTable } from '../../../src/engine/mortgage/norms';
 import { DEPS, mortgage, TODAY } from './input';
 import { MORTGAGE_NORMS_BEFORE_VOTE } from './norms-before-vote';
 
@@ -64,7 +65,13 @@ describe('information blocks', () => {
   });
 
   it('a 2016 deed tells of the handwritten statement of Ley 1/2013', () => {
-    expect(brief('2016-03-01').map((b) => b[0])).toContain('handwritten_statement');
+    expect(brief('2016-03-01')[0]).toEqual([
+      'handwritten_statement',
+      'statute',
+      ['information.handwritten_statement'],
+      ['handwritten_statement'],
+      null,
+    ]);
     expect(brief('2012-05-10').map((b) => b[0])).not.toContain('handwritten_statement');
   });
 
@@ -96,4 +103,18 @@ describe('information blocks', () => {
       'prior_step_439bis',
     );
   });
+
+  it.each([{ verified: false }, { basis: 'official_data' }])(
+    'the time limit is not told while none of its rulings counts as read: %j',
+    (change) => {
+      const sources = { ...DEPS.sources };
+      for (const id of ['tjue_c561_21', 'sts857_2024'] as const)
+        sources[id] = { ...sources[id], ...change } as SourceTable[typeof id];
+      const ids = informationBlocks(mortgage({ deedOn: d('2012-05-10') }), TODAY, {
+        ...DEPS,
+        sources,
+      }).map((b) => b.id);
+      expect(ids).toEqual(['prior_step_439bis', 'loan_assignment', 'complaints_service']);
+    },
+  );
 });

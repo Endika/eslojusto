@@ -327,3 +327,15 @@ describe('mortgage case-law rules', () => {
     }
   });
 });
+
+describe('a court criterion with a first day', () => {
+  it('reaches the deeds from that day on', () => {
+    const irph = CASE_LAW_RULES.irph as { from: string | null };
+    irph.from = '2010-01-01';
+    try {
+      expect([reaches('irph', '2009-12-31'), reaches('irph', '2010-01-01')]).toEqual([false, true]);
+    } finally {
+      irph.from = null;
+    }
+  });
+});

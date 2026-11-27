@@ -131,4 +131,30 @@ describe('mortgage validation', () => {
         'clauses.missedInstalments[0]:count_range',
       ]);
   });
+
+  it('a day that does not exist is told once, not also as before the deed', () => {
+    const month13 = { y: 2000, m: 13, d: 1 };
+    expect(errors({ invoices: [invoice('notary_loan', 600, { paidOn: month13 })] })).toEqual([
+      'invoices.paidOn[0]:invalid_date',
+    ]);
+    expect(errors({ operations: [operation({ on: month13 })] })).toEqual([
+      'operations.on[0]:invalid_date',
+    ]);
+  });
+
+  it('an invalid deed leaves the days after it unplaced', () => {
+    expect(errors({ deedOn: { y: 2015, m: 2, d: 29 }, operations: [operation()] })).toEqual([
+      'deedOn:invalid_date',
+    ]);
+  });
+
+  it('every outlay of an agency must be an amount', () => {
+    expect(errors({ invoices: [invoice('agency', 300, { supplied: [100, -5] })] })).toEqual([
+      'invoices.supplied[0]:amount_range',
+    ]);
+  });
+
+  it('takes 30 % as the most for a percentage', () => {
+    expect(errors({ deedPercents: { fixed: 30 } })).toEqual([]);
+  });
 });

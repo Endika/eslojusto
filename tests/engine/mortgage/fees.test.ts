@@ -7,7 +7,7 @@ import {
   type FeeFinding,
   type FeeItem,
 } from '../../../src/engine/mortgage/fees';
-import type { MortgageInput, Operation } from '../../../src/engine/mortgage/types';
+import type { MortgageDeps, MortgageInput, Operation } from '../../../src/engine/mortgage/types';
 import { DEPS, mortgage } from './input';
 
 const d = parseDate;
@@ -514,5 +514,250 @@ describe('fee total', () => {
 
   it('is nothing without operations', () => {
     expect(feeTotal(run({}))).toEqual({ counted: 0, upTo: 0 });
+  });
+});
+
+describe('what each cap says and cites', () => {
+  const norm = (id: keyof MortgageDeps['norms'], change: object): MortgageDeps => ({
+    ...DEPS,
+    norms: { ...DEPS.norms, [id]: { ...DEPS.norms[id], ...change } },
+  });
+  const pending = { status: 'pending_validation' };
+  const draft = { status: 'draft' };
+  const variable2020 = { deedOn: d('2020-03-01'), rateType: 'variable' as const };
+  const view = (f: FeeFinding | undefined) => [
+    f?.status,
+    keys(f as FeeFinding),
+    sourceIds(f as FeeFinding),
+  ];
+  const first = (deps: MortgageDeps, change: Partial<MortgageInput>) => {
+    const item = reviewFees(mortgage(change), deps)[0];
+    return item?.kind === 'single' ? item.finding : undefined;
+  };
+
+  it.each([
+    [
+      'a switch no wording covers',
+      draft,
+      { ...variable2020, operations: [operation('2025-03-01', 'fixed_rate_novation', 100_000, 0)] },
+      ['not_checkable', ['fees.earlier_deed_novation'], []],
+    ],
+    [
+      'a switch under a pending wording',
+      pending,
+      { ...variable2020, operations: [operation('2025-03-01', 'fixed_rate_novation', 100_000, 0)] },
+      ['review_it', ['fees.doubtful_norm'], ['conversion_cap_2023']],
+    ],
+  ] as const)('%s', (_, change, input, expected) => {
+    expect(view(first(norm('rdl8_2023', change), input))).toEqual(expected);
+  });
+
+  it.each([
+    [
+      'the LCCI pending',
+      'lcci',
+      'review_it',
+      ['prepayment_lcci_variable'],
+      variable2020,
+      '2021-05-10',
+    ],
+    [
+      'Ley 41/2007 pending',
+      'law41_2007',
+      'review_it',
+      ['prepayment_law41'],
+      { deedOn: d('2010-04-20'), rateType: 'variable' as const },
+      '2012-06-01',
+    ],
+    [
+      'the window pending',
+      'rdl19_2022',
+      'review_it',
+      ['fee_free_window'],
+      variable2020,
+      '2023-05-10',
+    ],
+  ] as const)('a repayment with %s', (_, id, status, rules, input, on) => {
+    const f = first(norm(id, pending), {
+      ...input,
+      operations: [operation(on, 'partial_prepayment', 10_000, 0)],
+    });
+    expect(view(f)).toEqual([status, ['fees.doubtful_norm'], rules]);
+  });
+
+  it.each([
+    [
+      '2021',
+      '2021-05-10',
+      ['not_checkable', ['fees.conversion_no_repayment_2019'], ['conversion_cap_2019']],
+    ],
+    [
+      '2025',
+      '2025-03-01',
+      ['within_cap', ['fees.conversion_no_repayment', 'fees.within_cap'], ['conversion_cap_2023']],
+    ],
+  ] as const)('a switch that repays nothing, %s', (_, on, expected) => {
+    expect(
+      view(
+        first(DEPS, { ...variable2020, operations: [operation(on, 'fixed_rate_novation', 0, 0)] }),
+      ),
+    ).toEqual(expected);
+  });
+
+  it('a switch within its cap carries no word on the lender’s loss', () => {
+    const f = first(DEPS, {
+      ...variable2020,
+      operations: [operation('2021-05-10', 'fixed_rate_novation', 100_000, 100)],
+    });
+    expect(view(f)).toEqual([
+      'within_cap',
+      ['fees.conversion', 'fees.within_cap'],
+      ['conversion_cap_2019'],
+    ]);
+    expect(f?.calculation[0]?.vars).toEqual({ percent: { percent: 0.15 }, years: { integer: 3 } });
+  });
+
+  it('a repayment after the period carries its years', () => {
+    const f = first(DEPS, {
+      ...variable2020,
+      prepaymentOption: 'b_025_3y',
+      operations: [operation('2025-06-01', 'partial_prepayment', 10_000, 0)],
+    });
+    expect(f?.calculation.slice(0, 2)).toEqual([
+      { key: 'fees.lcci_variable', vars: { percent: { percent: 0.25 }, years: { integer: 3 } } },
+      { key: 'fees.after_period', vars: { years: { integer: 3 } } },
+    ]);
+    expect(view(f)).toEqual([
+      'within_cap',
+      ['fees.lcci_variable', 'fees.after_period', 'fees.within_cap'],
+      ['prepayment_lcci_variable'],
+    ]);
+  });
+
+  it.each([
+    ['first', '2012-06-01', 'fees.law41_first'],
+    ['after', '2016-06-01', 'fees.law41_after'],
+  ] as const)('Ley 41/2007 %s period carries its five years', (_, on, key) => {
+    const f = first(DEPS, {
+      deedOn: d('2010-04-20'),
+      rateType: 'variable',
+      operations: [operation(on, 'partial_prepayment', 10_000, 0)],
+    });
+    expect(f?.calculation[0]).toEqual({ key, vars: { years: { integer: 5 } } });
+  });
+
+  it.each([
+    ['a fixed rate', { rateType: 'fixed' as const }, 'fees.law41_fixed'],
+    ['a rate revised every two years', { rateRevisionMonths: 24 }, 'fees.law41_revised_less_often'],
+  ] as const)('Ley 41/2007 on %s cites its own rule', (_, change, key) => {
+    const f = first(DEPS, {
+      deedOn: d('2010-04-20'),
+      rateType: 'variable',
+      ...change,
+      operations: [operation('2012-06-01', 'partial_prepayment', 10_000, 0)],
+    });
+    expect(view(f)).toEqual(['not_checkable', [key], ['prepayment_law41']]);
+  });
+
+  it.each([
+    [12, 'within_cap'],
+    [13, 'not_checkable'],
+  ] as const)('a rate revised every %i months', (rateRevisionMonths, status) => {
+    const f = first(DEPS, {
+      deedOn: d('2010-04-20'),
+      rateType: 'variable',
+      rateRevisionMonths,
+      operations: [operation('2012-06-01', 'partial_prepayment', 10_000, 0)],
+    });
+    expect(f?.status).toBe(status);
+  });
+
+  it('only a full repayment tells of the unused premium', () => {
+    const f = first(DEPS, {
+      ...variable2020,
+      prepaymentOption: 'a_015_5y',
+      operations: [
+        operation('2021-05-10', 'partial_prepayment', 10_000, 0, { hadInsurance: true }),
+      ],
+    });
+    expect(keys(f as FeeFinding)).not.toContain('fees.unused_premium');
+  });
+
+  it('a cap of less than a cent leaves no loss to bound', () => {
+    const f = first(DEPS, {
+      ...variable2020,
+      prepaymentOption: 'b_025_3y',
+      operations: [operation('2021-05-10', 'partial_prepayment', 1, 0)],
+    });
+    expect(keys(f as FeeFinding)).not.toContain('fees.financial_loss');
+  });
+});
+
+describe('the readings an operation is worked out in', () => {
+  const whens = (change: Partial<MortgageInput>) => {
+    const item = run(change)[0];
+    return item?.kind === 'readings' ? [item.question, item.readings.map((r) => r.when)] : 'single';
+  };
+  const old = { deedOn: d('2012-05-10'), rateRevisionMonths: null };
+
+  it('a repayment outside the window under Ley 41/2007 splits only by the revision', () => {
+    expect(
+      whens({
+        ...old,
+        rateType: 'variable',
+        operations: [operation('2021-05-10', 'partial_prepayment', 10_000, 0)],
+      }),
+    ).toEqual(['rate_revision', ['variable.revised_yearly', 'variable.revised_less_often']]);
+  });
+
+  it('a mixed rate splits the revision of its variable reading only', () => {
+    expect(
+      whens({
+        ...old,
+        rateType: 'mixed',
+        operations: [operation('2021-05-10', 'partial_prepayment', 10_000, 0)],
+      }),
+    ).toEqual([
+      'rate_type_and_rate_revision',
+      ['fixed', 'variable.revised_yearly', 'variable.revised_less_often'],
+    ]);
+  });
+
+  it('a switch is never split by the revision', () => {
+    expect(
+      whens({
+        ...old,
+        rateType: 'variable',
+        operations: [operation('2023-05-10', 'fixed_rate_novation', 10_000, 0)],
+      }),
+    ).toEqual(['earlier_deed', ['variable.deed_regime', 'variable.lcci_reach']]);
+  });
+
+  it('a deed before Ley 41/2007 is never split by the revision', () => {
+    expect(
+      whens({
+        deedOn: d('2005-05-10'),
+        rateRevisionMonths: null,
+        rateType: 'variable',
+        operations: [operation('2023-05-10', 'partial_prepayment', 10_000, 0)],
+      }),
+    ).toEqual(['earlier_deed', ['variable.deed_regime', 'variable.lcci_reach']]);
+  });
+
+  it('a repayment in the window splits the revision of the deed regime only', () => {
+    expect(
+      whens({
+        ...old,
+        rateType: 'variable',
+        operations: [operation('2023-05-10', 'partial_prepayment', 10_000, 0)],
+      }),
+    ).toEqual([
+      'earlier_deed_and_rate_revision',
+      [
+        'variable.deed_regime.revised_yearly',
+        'variable.deed_regime.revised_less_often',
+        'variable.lcci_reach',
+      ],
+    ]);
   });
 });
