@@ -132,11 +132,9 @@ export function averageRateIndicator(
   const variable = !revolving && input.rateType === 'variable';
   const series: IndicatorSeriesId | null = revolving
     ? 'BE_19_4.7'
-    : variable
-      ? loanSeries(0, 'variable')
-      : termMonths === null
-        ? null
-        : loanSeries(termMonths, 'fixed');
+    : termMonths === null && !variable
+      ? null
+      : loanSeries(termMonths ?? 0, input.rateType);
   if (series === null) return result('not_entered', [creditPhrase('indicator.term_unknown')]);
 
   let reference: IndicatorReference;
@@ -195,7 +193,7 @@ export function averageRateIndicator(
       against,
       ...fixation,
       creditPhrase(`indicator.${status}`, { points: { points } }),
-      ...(revolving ? [creditPhrase('indicator.revolving_criterion')] : []),
+      creditPhrase('indicator.revolving_criterion'),
       ...(status === 'edge' ? [creditPhrase('indicator.edge_reason')] : []),
     ],
     reference,

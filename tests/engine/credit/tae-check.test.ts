@@ -44,7 +44,18 @@ describe('item 1: the APR against the one the contract states', () => {
       totalPayable: 13_120.8,
       totalCost: 3_382.05,
     });
-    expect(keys(f)).toContain('apr.contract_lower');
+    expect(f.calculation).toStrictEqual([
+      { key: 'apr.recomputed', vars: { apr: { percent: 16.61 } } },
+      {
+        key: 'apr.contract_lower',
+        vars: { apr: { percent: 16.61 }, declared: { percent: 12 } },
+      },
+      { key: 'apr.one_decimal' },
+      { key: 'apr.total_payable', vars: { euros: { euros: 13_120.8 } } },
+      { key: 'apr.total_cost', vars: { euros: { euros: 3_382.05 } } },
+      { key: 'apr.declared_total', vars: { euros: { euros: 13_120.8 } } },
+      { key: 'apr.contribution.opening', vars: { points: { points: 4.61 } } },
+    ]);
     expect(articles(f)).toEqual(['a32', 'a21']);
     expect(f.sources.map((s) => s.citation)).toContainEqual(expect.stringContaining('art. 21.4'));
   });
@@ -75,18 +86,28 @@ describe('item 1: the APR against the one the contract states', () => {
   it('points to art. 21.2 when the contract states no APR, with no figure owed', () => {
     const f = check({ declaredApr: null });
     expect(f).toMatchObject({ status: 'contract_missing', amount: null });
-    expect(keys(f)).toContain('apr.contract_missing');
     expect(articles(f)).toEqual(['a32', 'a21']);
-  });
-
-  it('always gives the total payable, the total cost and the stated total', () => {
-    expect(keys(check())).toEqual(
-      expect.arrayContaining(['apr.total_payable', 'apr.total_cost', 'apr.declared_total']),
-    );
+    expect(check({ declaredApr: null, declaredTotalPayable: null }).calculation).toStrictEqual([
+      { key: 'apr.recomputed', vars: { apr: { percent: 16.61 } } },
+      { key: 'apr.contract_missing' },
+      { key: 'apr.one_decimal' },
+      { key: 'apr.total_payable', vars: { euros: { euros: 13_120.8 } } },
+      { key: 'apr.total_cost', vars: { euros: { euros: 3_382.05 } } },
+      { key: 'apr.contribution.opening', vars: { points: { points: 4.61 } } },
+    ]);
   });
 
   it('says it was not entered without instalments', () => {
-    expect(check({ instalments: null }).status).toBe('not_entered');
+    const f = check({ instalments: null });
+    expect(f).toMatchObject({ status: 'not_entered', detail: null });
+    expect(f.calculation).toStrictEqual([{ key: 'item.not_entered' }]);
+    expect(articles(f)).toEqual(['a32']);
+  });
+
+  it('gives no figure when the equation has no single root', () => {
+    const f = check({ netDisbursed: 0 });
+    expect(f).toMatchObject({ status: 'unsolvable', detail: null });
+    expect(f.calculation).toStrictEqual([{ key: 'apr.unsolvable' }]);
   });
 
   it('works out both readings when the person does not know if the insurance was required', () => {
@@ -115,6 +136,31 @@ describe('item 1: the APR against the one the contract states', () => {
       );
     expect(only(insured(false)).detail?.apr).toBe(16.61);
     expect(only(insured(true)).detail?.apr).toBeGreaterThan(16.61);
+    expect(keys(only(insured(false)))).toContain('apr.insurance_left_out');
+    expect(keys(only(insured(true)))).toContain('apr.insurance_counted');
+    expect(keys(check())).not.toContain('apr.insurance_counted');
+  });
+
+  it('tells where an undated balloon falls, and nothing for a dated one or none', () => {
+    const item = checkApr(loan({ balloon: { amount: 3_000, dueOn: null } }), CREDIT_NORMS);
+    if (item.kind !== 'readings') throw new Error('expected readings');
+    expect(
+      item.readings.map((r) => keys(r.finding).filter((k) => k.startsWith('apr.balloon'))),
+    ).toEqual([['apr.balloon_with_last'], ['apr.balloon_month_after']]);
+    const dated = { amount: 3_000, dueOn: parseDate('2023-02-15') };
+    expect(keys(check({ balloon: dated })).filter((k) => k.startsWith('apr.balloon'))).toEqual([]);
+    expect(keys(check()).filter((k) => k.startsWith('apr.balloon'))).toEqual([]);
+  });
+
+  it('works out an unknown insurance in two readings whatever the dated balloon', () => {
+    const item = checkApr(
+      loan({
+        balloon: { amount: 3_000, dueOn: parseDate('2023-02-15') },
+        insurance: { premium: 400, single: true, financed: false, required: null },
+      }),
+      CREDIT_NORMS,
+    );
+    expect(item).toMatchObject({ kind: 'readings', question: 'insurance_required' });
   });
 
   it('works out a revolving card on the assumptions in force since 09-02-2013', () => {
@@ -143,8 +189,15 @@ describe('item 1: the APR against the one the contract states', () => {
       );
     const f = card('2013-02-09');
     expect(f).toMatchObject({ status: 'matches', detail: { apr: 24.29 } });
-    expect(keys(f)).toContain('apr.revolving_assumption');
+    expect(f.calculation[0]).toStrictEqual({
+      key: 'apr.revolving_assumption',
+      vars: { limit: { euros: 1_500 } },
+    });
+    expect(f.sources.map((src) => src.id)).toEqual(['tae_formula', 'tae_assumptions']);
     // The earlier wording of part II has not been read: no figure.
-    expect(card('2013-02-08')).toMatchObject({ status: 'review_it', detail: null });
+    const early = card('2013-02-08');
+    expect(early).toMatchObject({ id: 'apr', status: 'review_it', detail: null });
+    expect(early.calculation).toStrictEqual([{ key: 'apr.revolving_before_2013' }]);
+    expect(early.sources.map((src) => src.id)).toEqual(['tae_formula', 'tae_assumptions']);
   });
 });

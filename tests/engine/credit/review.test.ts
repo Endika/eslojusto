@@ -151,6 +151,26 @@ describe('reviewCredit', () => {
     expect(termMonths(loan({ balloon: dated }), 'balloon_with_last')).toBe(48);
   });
 
+  it('leaves the past month out of the term when the drawdown day comes after the last due day', () => {
+    expect(termMonths(loan({ drawnOn: parseDate('2019-02-20') }), 'balloon_month_after')).toBe(47);
+  });
+
+  it('has no term without instalments', () => {
+    expect(termMonths(loan({ instalments: null }), 'balloon_with_last')).toBeNull();
+  });
+
+  it('compares the lowest APR worked out, and the stated one when a reading works none out', () => {
+    const insurance = { premium: 400, single: true, financed: false, required: null };
+    expect(review({ confirmedApr: true, insurance }).indicator).toMatchObject({
+      apr: 16.61,
+      aprOrigin: 'recalculated',
+    });
+    expect(review({ confirmedApr: true, instalments: null }).indicator).toMatchObject({
+      apr: 12,
+      aprOrigin: 'declared',
+    });
+  });
+
   it('opens the pass on an undated balloon only when both of its days give a lower APR', () => {
     // 20.000 €, 36 × 300 € and 12.000 € at the end: 5,80 % in month 37, 5,91 % in month 36.
     const balloonLoan = (declaredApr: number, dueOn: string | null) =>
