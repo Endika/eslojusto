@@ -1,4 +1,5 @@
 import { parseDate as f } from '../../../src/engine/date';
+import type { ItemResult } from '../../../src/engine/rental/item';
 import type { RentalInput, RentUpdateInput } from '../../../src/engine/rental/types';
 
 // A synthetic contract; every test overrides what it looks at.
@@ -44,3 +45,11 @@ export const update = (
     ...change,
   };
 };
+
+// What a single-reading item says and cites; its sources must be exactly its rules.
+export function readingOf(r: ItemResult | undefined) {
+  if (r?.outcome.kind !== 'single') throw new Error(`expected single, got ${r?.outcome.kind}`);
+  const { status, amount, calculation, rules } = r.outcome.value;
+  if (r.sources.map((x) => x.id).join() !== rules.join()) throw new Error('sources differ');
+  return { status, amount, calculation, rules };
+}

@@ -6,7 +6,7 @@ import { itemAmount, type ItemResult } from '../../../src/engine/rental/item';
 import type { Norm, NormTable } from '../../../src/engine/rental/norms';
 import { countedAmount } from '../../../src/engine/rental/outcome';
 import type { Fee, FeeKind, LandlordType } from '../../../src/engine/rental/types';
-import { contract } from './fixtures';
+import { contract, readingOf } from './fixtures';
 import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const fee = (kind: FeeKind, change: Partial<Fee> = {}): Fee => ({
@@ -173,5 +173,116 @@ describe('a charge under another name', () => {
       status: 'review_it',
       amount: null,
     });
+  });
+});
+
+describe('how each fee reading is worded and sourced', () => {
+  const PAID = (amount: number) => ({ key: 'fees.paid_over', vars: { amount: { euros: amount } } });
+  const read = (signed: string, landlord: LandlordType, f1: Fee) =>
+    readingOf(check(signed, landlord, [f1])[0]);
+
+  it.each<[string, () => ReturnType<typeof readingOf>, object]>([
+    [
+      'a named fee of a company, 2019',
+      () => read('2019-03-06', 'company', fee('agency_fee')),
+      {
+        status: 'paid_over',
+        amount: 726,
+        calculation: [{ key: 'fees.company_landlord' }, PAID(726)],
+        rules: ['fees_2019'],
+      },
+    ],
+    [
+      'another name for a company, 2019',
+      () => read('2019-03-06', 'company', fee('reservation')),
+      {
+        status: 'review_it',
+        amount: null,
+        calculation: [{ key: 'fees.other_name' }],
+        rules: ['fees_2019'],
+      },
+    ],
+    [
+      'a person, 2019',
+      () => read('2019-03-06', 'person', fee('agency_fee')),
+      {
+        status: 'not_applicable_to_date',
+        amount: null,
+        calculation: [{ key: 'fees.person_landlord' }],
+        rules: ['fees_2019'],
+      },
+    ],
+    [
+      'another name, 2023',
+      () => read('2023-05-26', 'person', fee('other')),
+      {
+        status: 'review_it',
+        amount: null,
+        calculation: [{ key: 'fees.other_name' }],
+        rules: ['fees_2023'],
+      },
+    ],
+    [
+      'any name, 2026',
+      () => read('2026-10-20', 'person', fee('other')),
+      {
+        status: 'paid_over',
+        amount: 726,
+        calculation: [{ key: 'fees.any_name' }, PAID(726)],
+        rules: ['fees_2026'],
+      },
+    ],
+    [
+      'an optional service asked for in writing, 2026',
+      () => read('2026-10-20', 'person', fee('other', { requestedInWriting: true })),
+      {
+        status: 'not_checkable',
+        amount: null,
+        calculation: [{ key: 'fees.requested_in_writing' }],
+        rules: ['fees_2026'],
+      },
+    ],
+    [
+      'signed before the review starts',
+      () => read('2019-03-05', 'company', fee('agency_fee')),
+      { status: 'not_applicable_to_date', amount: null, calculation: [], rules: [] },
+    ],
+  ])('%s', (_, actual, expected) => {
+    expect(actual()).toEqual(expected);
+  });
+
+  it('keys the unknown written request by the position of its fee', () => {
+    const [, other] = check(
+      '2026-10-20',
+      'person',
+      [fee('agency_fee'), fee('management', { requestedInWriting: null })],
+      NORMS_BEFORE_VOTE,
+    );
+    if (other?.outcome.kind !== 'depends') throw new Error('expected depends');
+    expect(other.outcome.readings.map((r) => [r.value.status, r.worlds])).toEqual([
+      [
+        'review_it',
+        [
+          { 'norm:rdl29_2026': false, 'fee_request:1': false },
+          { 'norm:rdl29_2026': false, 'fee_request:1': true },
+        ],
+      ],
+      ['paid_over', [{ 'norm:rdl29_2026': true, 'fee_request:1': false }]],
+      ['not_checkable', [{ 'norm:rdl29_2026': true, 'fee_request:1': true }]],
+    ]);
+  });
+
+  it('opens no world for a written request that is known', () => {
+    const [r] = check(
+      '2026-10-20',
+      'person',
+      [fee('management', { requestedInWriting: false })],
+      NORMS_BEFORE_VOTE,
+    );
+    if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
+    expect(r.outcome.readings.map((x) => x.worlds)).toEqual([
+      [{ 'norm:rdl29_2026': false }],
+      [{ 'norm:rdl29_2026': true }],
+    ]);
   });
 });

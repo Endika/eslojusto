@@ -18,7 +18,7 @@ import { checkDepositReturn } from '../../../src/engine/rental/deposit-return';
 import { itemAmount, type ItemResult } from '../../../src/engine/rental/item';
 import { countedAmount, highestAmount, letterAmount } from '../../../src/engine/rental/outcome';
 import type { MoveOut } from '../../../src/engine/rental/types';
-import { contract } from './fixtures';
+import { contract, readingOf } from './fixtures';
 
 const DEPS = { norms: NORMS, legalInterest: LEGAL_INTEREST };
 const TODAY = f('2026-10-07');
@@ -375,6 +375,257 @@ describe('a deposit taken as at least what came back and was kept', () => {
     });
     expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
     expect(lastKey(interest)).toBe('deposit.returned_after_month');
+  });
+});
+
+describe('how each deposit reading is worded and sourced', () => {
+  const eur = (euros: number) => ({ euros });
+  const pending = (deposit: number, returned: number, deducted: number, left: number) => ({
+    key: 'deposit.pending',
+    vars: {
+      deposit: eur(deposit),
+      returned: eur(returned),
+      deducted: eur(deducted),
+      pending: eur(left),
+    },
+  });
+  const stretch = (amount: number, from: string, to: string, days: number, interest: number) => ({
+    key: 'deposit.interest_stretch',
+    vars: {
+      amount: eur(amount),
+      from: { date: from },
+      to: { date: to },
+      days: { days },
+      rate: { percent: 3.25 },
+      yearDays: { integer: 365 },
+      interest: eur(interest),
+    },
+  });
+  const total = (n: number) => ({ key: 'deposit.interest_total', vars: { total: eur(n) } });
+  const DAY_COUNT = { key: 'deposit.interest_day_count' };
+  const above = { key: 'deposit.interest_deposit_only', vars: { rent: eur(1000) } };
+  const from = (key: string, date: string) => ({ key, vars: { from: { date } } });
+  const RETURN_RULES = ['deposit_interest'];
+  const INTEREST_RULES = ['deposit_interest', 'legal_interest_rate'];
+  const moveOut = (
+    keys: string,
+    returns: readonly [string, number][] = [],
+    deductions: MoveOut['deductions'] = [],
+  ): MoveOut => ({
+    keysReturnedOn: f(keys),
+    returns: returns.map(([on, amount]) => ({ on: f(on), amount })),
+    deductions,
+  });
+  // The lower reading of the interest, the one counted.
+  const lowOf = (r: ItemResult) => {
+    if (r.outcome.kind === 'single') return readingOf(r);
+    const { status, amount, calculation, rules } = r.outcome.low;
+    return { status, amount, calculation, rules };
+  };
+
+  type Case = [string, number | null, () => MoveOut, string, object, object];
+  it.each<Case>([
+    [
+      'a balance still inside its month',
+      1000,
+      () => moveOut('2026-09-20'),
+      '2026-10-07',
+      {
+        status: 'not_yet_due',
+        amount: null,
+        calculation: [
+          pending(1000, 0, 0, 1000),
+          { key: 'deposit.not_yet_due', vars: { due: { date: '2026-10-20' } } },
+        ],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [from('deposit.interest_not_yet', '2026-10-21')],
+        rules: INTEREST_RULES,
+      },
+    ],
+    [
+      'two late returns share the part above the month, the latest first',
+      3000,
+      () =>
+        moveOut('2025-01-10', [
+          ['2025-03-01', 1500],
+          ['2025-06-01', 1500],
+        ]),
+      '2026-01-01',
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [pending(3000, 3000, 0, 0), { key: 'deposit.returned_in_full' }],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'owed',
+        amount: 1.6,
+        calculation: [
+          above,
+          stretch(1000, '2025-02-11', '2025-02-28', 18, 1.6),
+          DAY_COUNT,
+          total(1.6),
+        ],
+        rules: INTEREST_RULES,
+      },
+    ],
+    [
+      'the part above the month is used up before a late return',
+      3000,
+      () => moveOut('2025-01-10', [['2025-06-01', 500]]),
+      '2026-01-01',
+      {
+        status: 'owed',
+        amount: 2500,
+        calculation: [
+          pending(3000, 500, 0, 2500),
+          { key: 'deposit.owed', vars: { amount: eur(2500) } },
+        ],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'owed',
+        amount: 19.32,
+        calculation: [
+          above,
+          stretch(500, '2025-02-11', '2025-12-31', 324, 14.42),
+          stretch(500, '2025-02-11', '2025-05-31', 110, 4.9),
+          DAY_COUNT,
+          total(19.32),
+        ],
+        rules: INTEREST_RULES,
+      },
+    ],
+    [
+      'a balance that is all above the month accrues nothing',
+      2000,
+      () => moveOut('2026-01-10', [], [{ kind: 'damage', amount: 999.99 }]),
+      '2026-10-07',
+      {
+        status: 'owed',
+        amount: 1000.01,
+        calculation: [
+          pending(2000, 0, 999.99, 1000.01),
+          { key: 'deposit.deduction.damage', vars: { amount: eur(999.99) } },
+          { key: 'deposit.deductions_not_judged' },
+          { key: 'deposit.owed', vars: { amount: eur(1000.01) } },
+        ],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [above, { key: 'deposit.late_part_above_month', vars: { rent: eur(1000) } }],
+        rules: INTEREST_RULES,
+      },
+    ],
+    [
+      'a cent above the month is not named',
+      1000.01,
+      () => moveOut('2026-01-10', [['2026-03-10', 1000.01]]),
+      '2026-10-07',
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [pending(1000.01, 1000.01, 0, 0), { key: 'deposit.returned_in_full' }],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'owed',
+        amount: 2.4,
+        calculation: [stretch(1000, '2026-02-11', '2026-03-09', 27, 2.4), DAY_COUNT, total(2.4)],
+        rules: INTEREST_RULES,
+      },
+    ],
+    [
+      'interest under a cent is not owed',
+      0.1,
+      () => moveOut('2026-01-10', [['2026-02-12', 0.1]]),
+      '2026-10-07',
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [pending(0.1, 0.1, 0, 0), { key: 'deposit.returned_in_full' }],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [stretch(0.1, '2026-02-11', '2026-02-11', 1, 0), DAY_COUNT, total(0)],
+        rules: INTEREST_RULES,
+      },
+    ],
+    [
+      'a cent short of the deposit inside the month',
+      1000,
+      () => moveOut('2026-09-20', [['2026-09-25', 999.99]]),
+      '2026-10-07',
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [pending(1000, 999.99, 0, 0.01), { key: 'deposit.returned_in_full' }],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [from('deposit.returned_on_time', '2026-10-21')],
+        rules: INTEREST_RULES,
+      },
+    ],
+    [
+      'a cent of interest up to the last rate loaded is owed and says the rest is missing',
+      5,
+      () => moveOut('2026-11-10'),
+      '2027-03-01',
+      {
+        status: 'owed',
+        amount: 5,
+        calculation: [pending(5, 0, 0, 5), { key: 'deposit.owed', vars: { amount: eur(5) } }],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'owed',
+        amount: 0.01,
+        calculation: [
+          stretch(5, '2026-12-11', '2026-12-31', 21, 0.01),
+          DAY_COUNT,
+          total(0.01),
+          { key: 'deposit.interest_rate_not_loaded', vars: { year: { integer: 2027 } } },
+        ],
+        rules: INTEREST_RULES,
+      },
+    ],
+    [
+      'one return on time and one the day after the month',
+      1000,
+      () =>
+        moveOut('2026-01-10', [
+          ['2026-02-10', 400],
+          ['2026-02-11', 600],
+        ]),
+      '2026-10-07',
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [pending(1000, 1000, 0, 0), { key: 'deposit.returned_in_full' }],
+        rules: RETURN_RULES,
+      },
+      {
+        status: 'within_limit',
+        amount: null,
+        calculation: [from('deposit.returned_after_month', '2026-02-11')],
+        rules: INTEREST_RULES,
+      },
+    ],
+  ])('%s', (_, deposit, out, today, expectedReturn, expectedInterest) => {
+    const { returned, interest } = check(deposit, out(), f(today));
+    expect(readingOf(returned)).toEqual(expectedReturn);
+    expect(lowOf(interest)).toEqual(expectedInterest);
   });
 });
 
