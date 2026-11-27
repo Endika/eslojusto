@@ -30,11 +30,13 @@ const isLegalCause = (c: DesistimientoCause): c is keyof typeof LEGAL_CAUSE_PHRA
 
 // The severance made available is below the one the counted reading requires: an error in the
 // figure, whose difference is owed but which does not by itself bring the dismissal regime.
-function severanceShort(input: HouseholdInput, minimumWage: MinimumWageTable): boolean {
-  const t = input.termination;
+function severanceShort(
+  input: HouseholdInput,
+  t: HouseholdTermination,
+  minimumWage: MinimumWageTable,
+): boolean {
   const base = basePay(input, minimumWage);
-  if (t === null || base === null || t.severanceAvailable !== true || t.severanceOffered === null)
-    return false;
+  if (base === null || t.severanceAvailable !== true || t.severanceOffered === null) return false;
   return (
     t.severanceOffered <
     severanceFigures(input.startDate, t.effectiveOn, base.annual).completeYearsOnly.amount
@@ -110,7 +112,7 @@ export function assessTermination(
   out.push(dismissalPresumed(input, t, norms, minimumWage));
 
   // Art. 11.4.
-  if (input.liveIn) out.push(nightNotice(input, one));
+  if (input.liveIn) out.push(nightNotice(t, one));
   return out;
 }
 
@@ -124,7 +126,7 @@ function dismissalPresumed(
   const days = severanceDays(input.startDate, t.effectiveOn);
   const differences: HouseholdPhrase[] = [
     ...(noticeShort(input) ? [phrase('dismissal.short_notice')] : []),
-    ...(severanceShort(input, minimumWage) ? [phrase('dismissal.figure_difference')] : []),
+    ...(severanceShort(input, t, minimumWage) ? [phrase('dismissal.figure_difference')] : []),
   ];
   const verdict = (world: ReadingCode<'incomplete_year'>): Verdict => {
     const owed =
@@ -151,7 +153,7 @@ function dismissalPresumed(
         basedOnYourAnswer: true,
       };
     return {
-      status: severanceShort(input, minimumWage) ? 'review_it' : 'within_limit',
+      status: severanceShort(input, t, minimumWage) ? 'review_it' : 'within_limit',
       calculation: [
         phrase(owed ? 'dismissal.none_of_the_two' : 'dismissal.none_of_the_two_no_severance_due'),
         ...differences,
@@ -159,40 +161,36 @@ function dismissalPresumed(
       basedOnYourAnswer: true,
     };
   };
-  const readings = assessAcross(
-    'incomplete_year',
-    ['complete_years_only', 'prorated_by_months'],
-    (world) => make('dismissal_presumed', verdict(world), norms),
+  return assessAcross('incomplete_year', ['complete_years_only', 'prorated_by_months'], (world) =>
+    make('dismissal_presumed', verdict(world), norms),
   );
-  return readings.kind === 'single' ? single(readings.finding) : readings;
 }
 
 // The notice time against the 17:00 to 08:00 stretch. Right on 17:00 or 08:00 the text does not
 // say whether the hour itself is inside, so it is shown to review and never counted.
 function nightNotice(
-  input: HouseholdInput,
+  t: HouseholdTermination,
   one: (id: 'live_in_night_notice', verdict: Verdict) => Assessed,
 ): Assessed {
-  const time = input.termination?.noticeTime ?? null;
-  const minutes = time === null ? null : minutesOf(time);
-  if (time === null || minutes === null)
-    return one('live_in_night_notice', { status: 'not_entered' });
+  // Stryker disable next-line StringLiteral: any text that is not a time reads as not given
+  const time = t.noticeTime ?? '';
+  const minutes = minutesOf(time);
+  if (minutes === null) return one('live_in_night_notice', { status: 'not_entered' });
   const calculation = [phrase('night.notice_time', { time })];
-  const inside = minutes > NIGHT_FROM || minutes < NIGHT_UNTIL;
-  const onEdge = minutes === NIGHT_FROM || minutes === NIGHT_UNTIL;
-  if (!inside && !onEdge)
-    return one('live_in_night_notice', {
-      status: 'within_limit',
-      calculation,
-      basedOnYourAnswer: true,
-    });
-  if (onEdge)
+  if (minutes === NIGHT_FROM || minutes === NIGHT_UNTIL)
     return one('live_in_night_notice', {
       status: 'review_it',
       calculation: [...calculation, phrase('night.on_the_hour')],
       basedOnYourAnswer: true,
     });
-  if (input.termination?.seriousBreachAlleged === true)
+  // Stryker disable next-line EqualityOperator: the two edges returned above
+  if (minutes >= NIGHT_UNTIL && minutes <= NIGHT_FROM)
+    return one('live_in_night_notice', {
+      status: 'within_limit',
+      calculation,
+      basedOnYourAnswer: true,
+    });
+  if (t.seriousBreachAlleged === true)
     return one('live_in_night_notice', {
       status: 'review_it',
       calculation: [...calculation, phrase('night.serious_breach_alleged')],

@@ -41,6 +41,7 @@ export function assessFinalPay(input: HouseholdInput, norms: NormTable): Househo
   const apart = extras !== null && !extras.prorated && extras.count > 0;
   const extraPayAmountMissing = apart && extras.amount === null;
   const e: FinalPayInput = {
+    // Stryker disable next-line StringLiteral: only the named causes change the items, any other string reads as unknown
     cause: 'unknown',
     startDate: input.startDate,
     endDate: t.effectiveOn,
@@ -48,6 +49,7 @@ export function assessFinalPay(input: HouseholdInput, norms: NormTable): Househo
     extraPayProrated: extras === null || extras.prorated,
     extraPayCount: extras?.count ?? 0,
     extraPayAmount: extras?.amount ?? 0,
+    // Stryker disable next-line StringLiteral: without extra payments the accrual is never read
     extraPayAccrual: extras?.accrual ?? 'semiannual',
     holidayUnit: 'calendar',
     annualHolidayDays: input.holidays?.days ?? FULL_YEAR_HOLIDAYS,

@@ -14,6 +14,9 @@ export interface Verdict {
   readonly alsoCites?: readonly HouseholdRuleId[];
 }
 
+// A verdict that works its figures out, so it always shows its calculation.
+export type CalculatedVerdict = Verdict & { readonly calculation: HouseholdCalculation };
+
 // Builds a finding named after its rule.
 function findingOf(id: HouseholdRuleId, item: ItemId, norms: NormTable, verdict: Verdict): Finding {
   const cites = new Set<HouseholdRuleId>([id, ...(verdict.alsoCites ?? [])]);

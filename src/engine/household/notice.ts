@@ -33,29 +33,22 @@ export function noticeDaysGiven(noticeOn: CivilDate, lastDay: CivilDate): number
 const euros = (n: number) => ({ euros: round2(n) });
 
 // What the notice owes in one reading of the date the service is measured on.
-function verdictOf(
-  required: number,
-  given: number,
-  input: HouseholdInput,
-  base: BasePay | null,
-): Verdict {
+function verdictOf(required: number, given: number, paid: number, base: BasePay | null): Verdict {
   const missing = Math.max(0, required - given);
   const calculation: HouseholdPhrase[] = [phrase('notice.days', { required, given, missing })];
-  const t = input.termination;
   if (missing === 0)
     return { status: 'within_limit', calculation, alsoCites: ['notice_calendar_days'] };
-  const daily = base === null ? null : dailySalary(base.annual);
-  if (daily === null)
+  if (base === null)
     return {
       status: 'missing_requirement',
       calculation: [...calculation, phrase('notice.salary_unknown')],
       alsoCites: ['notice_calendar_days'],
     };
+  const daily = dailySalary(base.annual);
   const worth = missing * daily;
-  const paid = t?.substitutePaid ?? 0;
   const owed = round2(worth - paid);
   calculation.push(
-    ...(base?.raisedToMinimum === true ? [phrase('base.minimum_wage')] : []),
+    ...(base.raisedToMinimum ? [phrase('base.minimum_wage')] : []),
     phrase('notice.substitute', { missing, daily: euros(daily), amount: euros(worth) }),
   );
   if (owed <= 0)
@@ -112,7 +105,7 @@ export function assessNotice(
           world === 'measured_at_notice' ? noticeOn : t.effectiveOn,
         ),
         given,
-        input,
+        t.substitutePaid ?? 0,
         base,
       ),
       norms,
@@ -123,7 +116,7 @@ export function assessNotice(
     finding,
   );
   const leave =
-    input.weeklyHours !== null && input.weeklyHours >= FULL_TIME_HOURS && given > 0
+    (input.weeklyHours ?? 0) >= FULL_TIME_HOURS && given > 0
       ? [
           single(
             make(
