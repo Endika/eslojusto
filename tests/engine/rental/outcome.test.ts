@@ -4,6 +4,7 @@ import {
   evaluateAcross,
   highestAmount,
   letterAmount,
+  outcomeFrom,
   worldsFor,
   type Doubt,
   type DoubtReason,
@@ -36,6 +37,30 @@ describe('worlds', () => {
     const worlds = worldsFor([PENDING, LANDLORD, PENDING]);
     expect(worlds).toHaveLength(4);
     expect(new Set(worlds.map((w) => JSON.stringify(w))).size).toBe(4);
+  });
+
+  it('are opened for up to 20 doubts and refused beyond that', () => {
+    const doubts = (n: number): Doubt[] =>
+      Array.from({ length: n }, (_, i) => ({ id: `d${i}`, reason: 'pending_validation' }));
+    expect(worldsFor(doubts(20))).toHaveLength(2 ** 20);
+    expect(() => worldsFor(doubts(21))).toThrow(new RangeError('Too many open doubts: 21'));
+  });
+});
+
+describe('grouping results into readings', () => {
+  const by: Measure<{ name: string; euros: number }> = {
+    amount: (v) => v.euros,
+    same: (a, b) => a.name === b.name,
+  };
+  const result = (name: string, euros: number) => ({ world: {}, value: { name, euros } });
+
+  it('refuses to group nothing', () => {
+    expect(() => outcomeFrom([], new Set(), euros)).toThrow(new RangeError('No readings'));
+  });
+
+  it('takes the first of several readings tied at the highest amount as the high one', () => {
+    const outcome = outcomeFrom([result('a', 1), result('b', 5), result('c', 5)], new Set(), by);
+    expect(outcome).toMatchObject({ low: { name: 'a' }, high: { name: 'b' } });
   });
 });
 

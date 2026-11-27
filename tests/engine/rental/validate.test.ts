@@ -223,3 +223,137 @@ describe('rental input validation', () => {
     ]);
   });
 });
+
+describe('what each bad entry is reported as', () => {
+  const BAD_DATE = { y: 2022, m: 2, d: 30 };
+  const charge = (change: Partial<RentalInput['charges'][number]>) => ({
+    kind: 'community' as const,
+    inContract: true,
+    annualAgreed: 600,
+    charged: [],
+    ...change,
+  });
+  const moveOut = (change: Partial<NonNullable<RentalInput['moveOut']>>) => ({
+    keysReturnedOn: f('2026-09-30'),
+    returns: [],
+    deductions: [],
+    ...change,
+  });
+  const dated = (y: number, m = 1, d = 1) => ({ signedOn: { y, m, d }, startDate: { y, m, d } });
+
+  it.each<[string, () => RentalInput, unknown[]]>([
+    [
+      'an advance of 601 months',
+      () => contract({ advanceMonths: 601 }),
+      [['advanceMonths', 'months_out_of_range']],
+    ],
+    ['an advance of no months', () => contract({ advanceMonths: 0 }), []],
+    [
+      'a negative fixed percentage',
+      () => contract({ fixedPercent: -1 }),
+      [['fixedPercent', 'percent_out_of_range']],
+    ],
+    ['a fixed percentage of 100', () => contract({ fixedPercent: 100 }), []],
+    [
+      'the year 1899',
+      () => contract(dated(1899, 12, 31)),
+      [
+        ['signedOn', 'invalid_date'],
+        ['startDate', 'invalid_date'],
+      ],
+    ],
+    ['the year 1900', () => contract(dated(1900)), []],
+    ['a start in the year 2200', () => contract({ startDate: f('2200-12-31') }), []],
+    [
+      'a start in the year 2201',
+      () => contract({ startDate: f('2201-01-01') }),
+      [['startDate', 'invalid_date']],
+    ],
+    [
+      'a rent of nothing before a rise',
+      () => contract({ updates: [update('2022-03-20', 0, 1020)] }),
+      [['updates', 0, 'amount_out_of_range']],
+    ],
+    [
+      'a new rent of nothing',
+      () => contract({ updates: [update('2022-03-20', 1000, 0)] }),
+      [['updates', 0, 'amount_out_of_range']],
+    ],
+    [
+      'a rise on an impossible anniversary',
+      () => contract({ updates: [update('2022-03-20', 1000, 1020, { anniversary: BAD_DATE })] }),
+      [['updates', 0, 'invalid_date']],
+    ],
+    [
+      'a notice dated on an impossible day',
+      () => contract({ updates: [update('2022-03-20', 1000, 1020, { noticeOn: BAD_DATE })] }),
+      [['updates', 0, 'invalid_date']],
+    ],
+    [
+      'a notice given today',
+      () => contract({ updates: [update('2022-03-20', 1000, 1020, { noticeOn: TODAY })] }),
+      [],
+    ],
+    [
+      'a rise applied today',
+      () => contract({ updates: [update('2026-03-20', 1000, 1020, { effectiveOn: TODAY })] }),
+      [],
+    ],
+    [
+      'a rise charged from an earlier month of a later year',
+      () =>
+        contract({ updates: [update('2022-03-20', 1000, 1020, { chargedFrom: f('2022-02-01') })] }),
+      [],
+    ],
+    [
+      'a start that does not exist, with a rise',
+      () => contract({ startDate: BAD_DATE, updates: [update('2022-03-20', 1000, 1020)] }),
+      [['startDate', 'invalid_date']],
+    ],
+    [
+      'a yearly amount of nothing',
+      () => contract({ charges: [charge({ annualAgreed: 0 })] }),
+      [['charges', 0, 'amount_out_of_range']],
+    ],
+    [
+      'a charged amount of nothing',
+      () => contract({ charges: [charge({ charged: [{ year: 2022, amount: 0 }] })] }),
+      [['charges', 0, 'amount_out_of_range']],
+    ],
+    [
+      'keys returned on an impossible day',
+      () => contract({ moveOut: moveOut({ keysReturnedOn: BAD_DATE }) }),
+      [['moveOut', 'invalid_date']],
+    ],
+    [
+      'keys returned on the start day',
+      () => contract({ moveOut: moveOut({ keysReturnedOn: f('2021-03-20') }) }),
+      [],
+    ],
+    ['keys returned today', () => contract({ moveOut: moveOut({ keysReturnedOn: TODAY }) }), []],
+    [
+      'a return on an impossible day',
+      () => contract({ moveOut: moveOut({ returns: [{ on: BAD_DATE, amount: 500 }] }) }),
+      [['moveOut', 0, 'invalid_date']],
+    ],
+    [
+      'a return of nothing',
+      () => contract({ moveOut: moveOut({ returns: [{ on: f('2026-10-01'), amount: 0 }] }) }),
+      [['moveOut', 0, 'amount_out_of_range']],
+    ],
+    [
+      'a deduction of nothing',
+      () => contract({ moveOut: moveOut({ deductions: [{ kind: 'cleaning', amount: 0 }] }) }),
+      [['moveOut', 0, 'amount_out_of_range']],
+    ],
+  ])('%s', (_, input, expected) => {
+    expect(codes(input())).toEqual(expected);
+  });
+
+  it('leaves out the index of an error that has none', () => {
+    expect(validateRental(contract({ initialRent: 0, deposit: 0 }), TODAY)).toStrictEqual([
+      { field: 'initialRent', code: 'amount_out_of_range' },
+      { field: 'deposit', code: 'amount_out_of_range' },
+    ]);
+  });
+});
