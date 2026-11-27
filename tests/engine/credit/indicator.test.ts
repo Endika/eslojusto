@@ -228,6 +228,10 @@ describe('the indicator against the Bank of Spain average rate', () => {
     expect(indicator().calculation).toStrictEqual([...calculation, ...CLOSING]);
   });
 
+  it('has no data for a month before the series starts', () => {
+    expect(indicate('personal_loan', '2002-12-10', declared(10)).status).toBe('no_data');
+  });
+
   it('always closes with the judge and the official channels, and carries no amount', () => {
     for (const i of [
       indicate('personal_loan', '2019-02-15', declared(16.61)),

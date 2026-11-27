@@ -274,6 +274,16 @@ describe('credit validation', () => {
       ['drawnOn:invalid_date'],
     ],
     [
+      'a balloon the schedule holds, next to an earlier error',
+      {
+        principal: 0,
+        netDisbursed: null,
+        instalments: { kind: 'schedule', rows: [row('2019-03-15', 3_300)] },
+        balloon: { amount: 3_000, dueOn: null },
+      },
+      ['principal:amount_range', 'balloon:in_schedule'],
+    ],
+    [
       'a balloon with no instalments',
       { instalments: null, balloon: { amount: 3_000, dueOn: null } },
       [],

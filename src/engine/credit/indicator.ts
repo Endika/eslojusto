@@ -161,9 +161,7 @@ export function averageRateIndicator(
       ? creditPhrase(revolving ? 'indicator.reference_revolving' : 'indicator.reference_loan', {
           month: { month },
           rate: { percent: reference.value },
-          ...(revolving || variable || termMonths === null
-            ? {}
-            : { term: { integer: termMonths } }),
+          ...(revolving || variable ? {} : { term: { integer: termMonths as number } }),
         })
       : creditPhrase('indicator.reference_2010', { rate: { percent: reference.value } });
   const fixation = variable ? [creditPhrase('indicator.variable_rate_series')] : [];
