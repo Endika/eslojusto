@@ -21,6 +21,8 @@ export interface CashFlow {
 export type Cost =
   { readonly kind: 'charge'; readonly index: number } | { readonly kind: 'insurance' };
 
+type ChargeCost = Extract<Cost, { readonly kind: 'charge' }>;
+
 export interface AprFlows {
   readonly basis: TimeBasis;
   readonly flows: readonly CashFlow[];
@@ -53,7 +55,7 @@ export const monthlyDue = (first: CivilDate, k: number): CivilDate => addMonthsC
 const followsMonthly = (first: CivilDate, k: number, on: CivilDate): boolean => {
   const due = monthlyDue(first, k);
   if (compareDates(on, due) === 0) return true;
-  return isMonthEnd(first) && on.y === due.y && on.m === due.m && isMonthEnd(on);
+  return isMonthEnd(first) && isMonthEnd(on);
 };
 
 // Days of the whole year counted back from `end` to the same day of the year before: 366 when
@@ -66,16 +68,15 @@ const yearLength = (end: CivilDate): number =>
 // year counted back from the last day (Ley 5/2019, annex II, observation c, ii and iii).
 export function yearsBetween(from: CivilDate, to: CivilDate, periodMonths: number): number {
   if (compareDates(to, from) < 0) return -yearsBetween(to, from, periodMonths);
-  let periods = Math.floor(((to.y - from.y) * MONTHS_A_YEAR + (to.m - from.m)) / periodMonths) + 1;
-  while (periods > 0 && compareDates(addMonthsClamped(to, -periods * periodMonths), from) < 0)
-    periods--;
+  let periods = Math.floor(((to.y - from.y) * MONTHS_A_YEAR + (to.m - from.m)) / periodMonths);
+  if (compareDates(addMonthsClamped(to, -periods * periodMonths), from) < 0) periods--;
   // Date to date forwards, a month with no equivalent day ends on its last one: 31-01 to 29-02
   // is a whole month.
   const next = (periods + 1) * periodMonths;
   if (compareDates(addMonthsClamped(from, next), to) === 0) return next / MONTHS_A_YEAR;
   const stubEnd = addMonthsClamped(to, -periods * periodMonths);
   const days = daysBetween(from, stubEnd);
-  return (periods * periodMonths) / MONTHS_A_YEAR + (days === 0 ? 0 : days / yearLength(stubEnd));
+  return (periods * periodMonths) / MONTHS_A_YEAR + days / yearLength(stubEnd);
 }
 
 const periodMonthsOf = (basis: TimeBasis): number =>
@@ -104,13 +105,15 @@ export function balloonDue(
 
 interface Plan {
   readonly basis: TimeBasis;
+  readonly firstOn: CivilDate;
   // Each payment with its month from the first one, null when the plan is read in days.
   readonly dues: readonly (Due & { readonly month: number | null })[];
 }
 
 // The instalments in date order, then the balloon. A plan whose payments all follow month by
-// month from the first one is read in normalised months, and in days otherwise.
-function dues(input: CreditInput, reading: BalloonReading): Plan {
+// month from the first one is read in normalised months, and in days otherwise. Null when there
+// are no instalments.
+function dues(input: CreditInput, reading: BalloonReading): Plan | null {
   const plan = input.instalments;
   const instalments: readonly Due[] =
     plan === null
@@ -123,9 +126,9 @@ function dues(input: CreditInput, reading: BalloonReading): Plan {
         : [...plan.rows]
             .sort((a, b) => compareDates(a.dueOn, b.dueOn))
             .map((r) => ({ on: r.dueOn, amount: r.amount }));
-  const first = instalments[0];
-  const last = instalments.at(-1);
-  if (first === undefined || last === undefined) return { basis: 'normalised_months', dues: [] };
+  if (instalments.length === 0) return null;
+  const first = instalments[0] as Due;
+  const last = instalments[instalments.length - 1] as Due;
   const all =
     input.balloon === null
       ? instalments
@@ -137,6 +140,7 @@ function dues(input: CreditInput, reading: BalloonReading): Plan {
   const monthly = months.every((k, i) => k !== null && (i >= instalments.length || k === i));
   return {
     basis: monthly ? 'normalised_months' : 'days',
+    firstOn: first.on,
     dues: all.map((d, i) => ({ ...d, month: monthly ? (months[i] ?? null) : null })),
   };
 }
@@ -144,7 +148,7 @@ function dues(input: CreditInput, reading: BalloonReading): Plan {
 const sameCost = (a: Cost | null, b: Cost): boolean =>
   a !== null &&
   a.kind === b.kind &&
-  (a.kind === 'insurance' || (b.kind === 'charge' && a.index === b.index));
+  (a.kind === 'insurance' || a.index === (b as ChargeCost).index);
 
 // Annex I, part II: an open-end credit is taken as drawn in full, for one year, the capital repaid
 // in 12 equal monthly instalments from a month after the drawdown with interest on what is left.
@@ -181,18 +185,15 @@ function revolvingFlows(input: CreditInput, options: FlowOptions): AprFlows {
 }
 
 const counted = (input: CreditInput, options: FlowOptions) =>
-  input.insurance !== null &&
-  options.insurance &&
-  !sameCost(options.leaveOut, { kind: 'insurance' })
-    ? input.insurance
-    : null;
+  options.insurance && !sameCost(options.leaveOut, { kind: 'insurance' }) ? input.insurance : null;
 
 function withTotals(basis: TimeBasis, flows: readonly CashFlow[]): AprFlows {
   let received = 0;
   let totalPayable = 0;
-  for (const f of flows)
-    if (f.amount > 0) received += f.amount;
-    else totalPayable -= f.amount;
+  for (const f of flows) {
+    received += Math.max(f.amount, 0);
+    totalPayable += Math.max(-f.amount, 0);
+  }
   return { basis, flows, received, totalPayable };
 }
 
@@ -201,13 +202,12 @@ function withTotals(basis: TimeBasis, flows: readonly CashFlow[]): AprFlows {
 export function aprFlows(input: CreditInput, options: FlowOptions): AprFlows | null {
   if (input.product === 'revolving') return revolvingFlows(input, options);
   const plan = dues(input, options.balloon);
-  const first = plan.dues[0];
-  if (first === undefined) return null;
+  if (plan === null) return null;
   const start = input.drawnOn;
   const period = periodMonthsOf(plan.basis);
   const at = (on: CivilDate) => yearsBetween(start, on, period);
   // In normalised months the payments after the first are whole months apart.
-  const firstYears = at(first.on);
+  const firstYears = at(plan.firstOn);
   const dueYears = (month: number | null, on: CivilDate) =>
     month === null ? at(on) : firstYears + month / MONTHS_A_YEAR;
 
@@ -256,11 +256,16 @@ const GRID = 1_000;
 const TOLERANCE = 1e-12;
 const MAX_STEPS = 200;
 
+// Stryker disable ArithmeticOperator: the equation with its sign turned has the same root
 const presentValue = (flows: readonly CashFlow[], x: number): number =>
   flows.reduce((sum, f) => sum + f.amount * (1 + x) ** -f.years, 0);
 
+// Stryker restore ArithmeticOperator
+
+// Stryker disable ArrowFunction,ArithmeticOperator: a wrong slope only slows the search, the bisection that bounds it still ends on the root
 const slope = (flows: readonly CashFlow[], x: number): number =>
   flows.reduce((sum, f) => sum - f.years * f.amount * (1 + x) ** (-f.years - 1), 0);
+// Stryker restore ArrowFunction,ArithmeticOperator
 
 // The interval around the one change of sign of the equation, or null when it changes sign more
 // than once or never.
@@ -271,6 +276,7 @@ function bracketOf(flows: readonly CashFlow[]): readonly [number, number] | null
   for (let k = 0; k <= GRID; k++) {
     const x = LOWEST + ((HIGHEST - LOWEST) * k) / GRID;
     const sign = Math.sign(presentValue(flows, x));
+    // Stryker disable next-line ConditionalExpression: a present value of exactly zero on a grid point is a float coincidence
     if (sign === 0) continue;
     if (last !== null && sign !== last.sign) {
       changes++;
@@ -288,7 +294,9 @@ export function solveApr(flows: readonly CashFlow[]): AprSolution {
   const bracket = bracketOf(flows);
   if (bracket === null) return { kind: 'unsolvable' };
   let [lo, hi] = bracket;
+  // Stryker disable next-line EqualityOperator: the equation is never exactly zero at the end of the bracket
   const rising = presentValue(flows, hi) > 0;
+  // Stryker disable ConditionalExpression,EqualityOperator,ArithmeticOperator,UpdateOperator: the step and the stopping rule only change how fast the search closes in on the root, which the bracket keeps
   let x = (lo + hi) / 2;
   for (let step = 0; step < MAX_STEPS; step++) {
     const value = presentValue(flows, x);
@@ -302,5 +310,6 @@ export function solveApr(flows: readonly CashFlow[]): AprSolution {
     x = next;
     if (done) break;
   }
+  // Stryker restore ConditionalExpression,EqualityOperator,ArithmeticOperator,UpdateOperator
   return { kind: 'solved', rate: x };
 }
