@@ -103,55 +103,78 @@ type Allocation =
       readonly rules: Rules;
     };
 
-const statute = (...ids: StatuteRuleId[]): Rules => ({ statute: ids, caseLaw: [] });
-const caseLaw = (...ids: CaseLawRuleId[]): Rules => ({ statute: [], caseLaw: ids });
-const NO_RULES: Rules = { statute: [], caseLaw: [] };
+function statute(...ids: StatuteRuleId[]): Rules {
+  return { statute: ids, caseLaw: [] };
+}
 
-const none = (
+function caseLaw(...ids: CaseLawRuleId[]): Rules {
+  return { statute: [], caseLaw: ids };
+}
+
+function none(
   status: Extract<Allocation, { kind: 'none' }>['status'],
   basis: Basis | null,
   phrase: MortgagePhraseKey,
-  rules: Rules = NO_RULES,
-): Allocation => ({ kind: 'none', status, basis, phrase, rules });
+  rules: Rules = statute(),
+): Allocation {
+  return { kind: 'none', status, basis, phrase, rules };
+}
 
 // Art. 14.1.e LCCI: the lender pays the notary of the loan, its copy, the registry and the agency;
 // the valuation is the borrower's and each copy is paid by whoever asks for it. Art. 15.8 says the
 // notary's record of the advice carries no fee at all: charged to nobody, not put on the lender.
-const LCCI_SHARES: Partial<Record<InvoiceKind, number>> = {
-  notary_loan: 100,
-  notary_copy_bank: 100,
-  notary_copy_borrower: 0,
-  registry_mortgage: 100,
-  agency: 100,
-  valuation: 0,
-  transparency_deed: 100,
-};
+function lcciShare(kind: InvoiceKind): number {
+  switch (kind) {
+    case 'notary_loan':
+    case 'notary_copy_bank':
+    case 'registry_mortgage':
+    case 'agency':
+    case 'transparency_deed':
+      return 100;
+    default:
+      return 0;
+  }
+}
 
 // The Supreme Court's split for consumers before the LCCI: the notary by halves, the registry, the
 // agency and the valuation to the lender. Each copy is paid by whoever asks for it, by the notarial
 // fees (Real Decreto 1426/1989, annex II, general rule 6.ª), not by the split.
-const SPLIT_SHARES: Partial<Record<InvoiceKind, number>> = {
-  notary_loan: 50,
-  notary_copy_bank: 100,
-  notary_copy_borrower: 0,
-  registry_mortgage: 100,
-  agency: 100,
-  valuation: 100,
-};
+function splitShare(kind: InvoiceKind): number {
+  switch (kind) {
+    case 'notary_loan':
+      return 50;
+    case 'notary_copy_bank':
+    case 'registry_mortgage':
+    case 'agency':
+    case 'valuation':
+      return 100;
+    default:
+      return 0;
+  }
+}
 
-const PURCHASE: ReadonlySet<InvoiceKind> = new Set([
-  'notary_purchase',
-  'registry_purchase',
-  'ajd_purchase',
-]);
+function isPurchase(kind: InvoiceKind): boolean {
+  return kind === 'notary_purchase' || kind === 'registry_purchase' || kind === 'ajd_purchase';
+}
 
-const BORROWER_PHRASE: Partial<Record<InvoiceKind, MortgagePhraseKey>> = {
-  valuation: 'expenses.valuation_borrower',
-  notary_copy_borrower: 'expenses.copy_borrower',
-};
+function borrowerPhrase(kind: InvoiceKind): MortgagePhraseKey {
+  return kind === 'valuation' ? 'expenses.valuation_borrower' : 'expenses.copy_borrower';
+}
 
-const standing = (id: StatuteRuleId, deed: CivilDate, deps: MortgageDeps) =>
-  ruleStanding(id, deed, deps.norms);
+function shares(
+  basis: Basis,
+  share: number,
+  counts: boolean,
+  binding: boolean,
+  rules: Rules,
+): Allocation {
+  // Stryker disable next-line StringLiteral: only `none` is ever compared, so the other tag is never read
+  return { kind: 'share', basis, share, counts, binding, rules };
+}
+
+function standing(id: StatuteRuleId, deed: CivilDate, deps: MortgageDeps) {
+  return ruleStanding(id, deed, deps.norms);
+}
 
 function allocate(
   kind: InvoiceKind,
@@ -160,7 +183,7 @@ function allocate(
   deps: MortgageDeps,
 ): Allocation {
   const deed = input.deedOn;
-  if (PURCHASE.has(kind)) return none('not_applicable', null, 'expenses.purchase');
+  if (isPurchase(kind)) return none('not_applicable', null, 'expenses.purchase');
   if (kind === 'notary_cancellation') return none('not_applicable', null, 'expenses.cancellation');
   // Who bears the registry's entry of the cancellation has not been settled.
   if (kind === 'registry_cancellation')
@@ -169,14 +192,13 @@ function allocate(
   if (kind === 'ajd_loan') {
     const ajd = standing('ajd_lender', deed, deps);
     if (ajd === 'applies')
-      return {
-        kind: 'share',
-        basis: 'statute',
-        share: 100,
-        counts: true,
-        binding: standing('expenses_lcci', deed, deps) === 'applies',
-        rules: statute('ajd_lender'),
-      };
+      return shares(
+        'statute',
+        100,
+        true,
+        standing('expenses_lcci', deed, deps) === 'applies',
+        statute('ajd_lender'),
+      );
     if (ajd === 'doubt')
       return none('review_it', 'statute', 'expenses.doubtful_norm', statute('ajd_lender'));
     return none(
@@ -192,14 +214,7 @@ function allocate(
     return none('review_it', 'statute', 'expenses.doubtful_norm', statute('expenses_lcci'));
   if (lcci === 'applies') {
     const id = kind === 'transparency_deed' ? 'transparency_act_free' : 'expenses_lcci';
-    return {
-      kind: 'share',
-      basis: 'statute',
-      share: LCCI_SHARES[kind] ?? 0,
-      counts: true,
-      binding: true,
-      rules: statute(id),
-    };
+    return shares('statute', lcciShare(kind), true, true, statute(id));
   }
 
   const split = caseLaw('expenses_ts_split');
@@ -214,18 +229,18 @@ function allocate(
     return none('review_it', 'case_law', 'expenses.no_clause', split);
   if (input.expensesClause === 'unknown')
     return none('review_it', 'case_law', 'expenses.clause_unknown', split);
-  return {
-    kind: 'share',
-    basis: 'case_law',
-    share: SPLIT_SHARES[kind] ?? 0,
-    counts: criterionCounts(deps.criteria.expenses_ts_split, deps.sources),
-    binding: false,
-    rules: split,
-  };
+  return shares(
+    'case_law',
+    splitShare(kind),
+    criterionCounts(deps.criteria.expenses_ts_split, deps.sources),
+    false,
+    split,
+  );
 }
 
-const sameAllocation = (a: Allocation, b: Allocation): boolean =>
-  JSON.stringify(a) === JSON.stringify(b);
+function sameAllocation(a: Allocation, b: Allocation): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
 
 // «No lo sé» on being a consumer: both answers are worked out, and only one that does not change
 // anything stands.
@@ -240,7 +255,9 @@ function allocation(kind: InvoiceKind, input: MortgageInput, deps: MortgageDeps)
 // Two amounts within this many euros are the same payment written twice.
 const SAME_PAYMENT = 0.05;
 
-const DUPLICABLE: ReadonlySet<InvoiceKind> = new Set(['ajd_loan', 'registry_mortgage']);
+function isDuplicable(kind: InvoiceKind): boolean {
+  return kind === 'ajd_loan' || kind === 'registry_mortgage';
+}
 
 // An agency's own fee: its total less the outlays it passed on. An outlay that matches the tax or
 // the registry entered on their own goes on that invoice's line, whatever that line counts; any
@@ -251,14 +268,16 @@ function agencyFee(
   total: number,
   invoices: readonly Invoice[],
 ): { readonly fee: number; readonly phrases: readonly MortgagePhrase[] } {
+  // Stryker disable next-line ConditionalExpression: with nothing supplied the general path gives the same fee and no phrase
   if (invoice.supplied.length === 0) return { fee: total, phrases: [] };
   const sum = (xs: readonly number[]) => round2(xs.reduce((s, x) => s + x, 0));
   const all = sum(invoice.supplied);
   if (all > total)
     return { fee: total, phrases: [p('expenses.supplied_apart', { euros: { euros: all } })] };
-  const entered = invoices.flatMap((i) =>
-    DUPLICABLE.has(i.kind) && i.total !== null ? [i.total] : [],
-  );
+  const entered = invoices
+    .filter((i) => isDuplicable(i.kind))
+    .map((i) => i.total)
+    .filter((t) => t !== null);
   const matches = (x: number) => entered.some((t) => Math.abs(t - x) <= SAME_PAYMENT);
   const apart = sum(invoice.supplied.filter(matches));
   const left = sum(invoice.supplied.filter((x) => !matches(x)));
@@ -281,12 +300,10 @@ function interestOn(
   today: CivilDate,
   deps: MortgageDeps,
 ): { readonly interest: ExpenseInterest | null; readonly phrases: readonly MortgagePhrase[] } {
-  // A deed the criterion does not reach gets no word on interest at all.
-  if (!criterionReaches('expenses_interest', input.deedOn)) return { interest: null, phrases: [] };
   if (!criterionCounts(deps.criteria.expenses_interest, deps.sources))
     return { interest: null, phrases: [p('interest.explained')] };
   // What came back and when is not known, so no interest is worked out on top of it.
-  if (input.alreadyReturned !== null && input.alreadyReturned > 0)
+  if ((input.alreadyReturned ?? 0) > 0)
     return { interest: null, phrases: [p('interest.returned')] };
   const from = invoice.paidOn ?? input.deedOn;
   const estimated = invoice.paidOn === null;
@@ -310,8 +327,6 @@ function interestOn(
     ],
   };
 }
-
-const INTEREST_RULES: Rules = { statute: ['restitution'], caseLaw: ['expenses_interest'] };
 
 function sourcesOf(rules: readonly Rules[], deps: MortgageDeps): readonly MortgageSource[] {
   const statuteIds = [...new Set(rules.flatMap((r) => r.statute))];
@@ -352,12 +367,7 @@ function expenseItem(
   if (a.kind === 'none') return item(a.status, [p(a.phrase)], [a.rules]);
   const { share, rules } = a;
   if (share === 0)
-    return item(
-      'borrower_bears',
-      [p(BORROWER_PHRASE[invoice.kind] ?? 'expenses.copy_borrower')],
-      [rules],
-      { share },
-    );
+    return item('borrower_bears', [p(borrowerPhrase(invoice.kind))], [rules], { share });
   // What was paid, and by whom, comes before any share: half of an invoice that also holds the
   // purchase, or a share of what the lender paid itself, would read as a figure.
   if (invoice.paidBy === 'bank')
@@ -433,7 +443,7 @@ function expenseItem(
       ...phrases,
       ...interest.phrases,
     ],
-    [rules, ...(interest.phrases.length > 0 ? [INTEREST_RULES] : [])],
+    [rules, statute('restitution'), caseLaw('expenses_interest')],
     { share, amount, interest: interest.interest },
   );
 }

@@ -33,6 +33,7 @@ function interestTotal(interests: readonly (ExpenseInterest | null)[]): Interest
     if (i === null) return null;
     total = {
       amount: total.amount + i.amount,
+      // Stryker disable next-line EqualityOperator: on a tie both days are the same
       until: i.until < total.until ? i.until : total.until,
       estimated: total.estimated || i.estimated,
       missingYear: total.missingYear ?? i.missingYear,

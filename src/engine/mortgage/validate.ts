@@ -1,4 +1,4 @@
-import { addDays, compareDates, daysInMonth, parseDate, type CivilDate } from '../date';
+import { addDays, compareDates, isRealDate, parseDate, type CivilDate } from '../date';
 import type { Clause, MortgageInput } from './types';
 
 export type MortgageField =
@@ -47,15 +47,6 @@ const MAX_MONTHS = 600;
 const FIRST_DEED = parseDate('1995-01-01');
 // A provision of funds paid to the notary or the agency may come a little before the deed.
 const PAID_BEFORE_DEED_DAYS = 90;
-
-const isRealDate = ({ y, m, d }: CivilDate): boolean =>
-  Number.isInteger(y) &&
-  Number.isInteger(m) &&
-  Number.isInteger(d) &&
-  m >= 1 &&
-  m <= 12 &&
-  d >= 1 &&
-  d <= daysInMonth(y, m);
 
 const isAmount = (v: number): boolean => Number.isFinite(v) && v > 0 && v <= MAX_AMOUNT;
 // An amount that may be zero, such as a fee not charged.

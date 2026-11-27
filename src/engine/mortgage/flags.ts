@@ -62,17 +62,19 @@ const LH114_TIMES = 3;
 // Art. 24 LCCI: arrears of at least twelve monthly instalments in the first half of the term.
 const LCCI_MIN_INSTALMENTS = 12;
 
-const statutePart = (
+function statutePart(
   rule: StatuteRuleId,
   keys: readonly MortgagePhrase[],
   deps: MortgageDeps,
-): FlagPart => ({
-  basis: 'statute',
-  rule,
-  calculation: keys,
-  sources: [ruleSource(rule, deps.norms)],
-  statusAsOf: null,
-});
+): FlagPart {
+  return {
+    basis: 'statute',
+    rule,
+    calculation: keys,
+    sources: [ruleSource(rule, deps.norms)],
+    statusAsOf: null,
+  };
+}
 
 // A court's criterion, shown with the rulings already read at their source; none read, no part.
 function caseLawPart(
@@ -87,10 +89,13 @@ function caseLawPart(
   ];
 }
 
-const applies = (id: StatuteRuleId, date: CivilDate, deps: MortgageDeps): boolean =>
-  ruleApplies(id, date, deps.norms);
+function applies(id: StatuteRuleId, date: CivilDate, deps: MortgageDeps): boolean {
+  return ruleApplies(id, date, deps.norms);
+}
 
-const percent = (value: number) => ({ percent: round2(value) });
+function percent(value: number) {
+  return { percent: round2(value) };
+}
 
 function floorParts(clause: Clause, input: MortgageInput, deps: MortgageDeps) {
   const vars =
@@ -157,6 +162,7 @@ function defaultInterestParts(
   if (applies('default_interest_lh114', deed, deps)) {
     const highest = highestLegalRate(deed, today, deps);
     const limit = highest === null ? null : round2(highest * LH114_TIMES);
+    // Stryker disable next-line ConditionalExpression: undefined > n is false, so the first test only narrows the type
     const above = defaultRate !== undefined && limit !== null && defaultRate > limit;
     parts.push(
       statutePart(
@@ -189,26 +195,20 @@ function defaultInterestParts(
       ),
     );
   if (criterionReaches('default_interest_case_law', deed)) {
-    const reference = known ? round2(ordinaryRate + CASE_LAW_DEFAULT_POINTS) : null;
-    const above = known && reference !== null && defaultRate > reference;
-    parts.push(
-      ...caseLawPart(
-        'default_interest_case_law',
-        [
-          p('flags.default_interest_case_law'),
-          ...(above
-            ? [
-                p('flags.default_interest_case_law_above', {
-                  default: percent(defaultRate),
-                  ordinary: percent(ordinaryRate),
-                  reference: percent(reference),
-                }),
-              ]
-            : []),
-        ],
-        deps,
-      ),
-    );
+    const phrases = [p('flags.default_interest_case_law')];
+    // Stryker disable next-line ConditionalExpression: comparing with the NaN of a missing rate is false, so the guard only narrows the types
+    if (known) {
+      const reference = round2(ordinaryRate + CASE_LAW_DEFAULT_POINTS);
+      if (defaultRate > reference)
+        phrases.push(
+          p('flags.default_interest_case_law_above', {
+            default: percent(defaultRate),
+            ordinary: percent(ordinaryRate),
+            reference: percent(reference),
+          }),
+        );
+    }
+    parts.push(...caseLawPart('default_interest_case_law', phrases, deps));
   }
   return parts;
 }
@@ -222,6 +222,7 @@ function earlyTerminationParts(
 ): readonly FlagPart[] {
   const earlier = !applies('early_termination', input.deedOn, deps);
   const missed = clause.missedInstalments;
+  // Stryker disable next-line ConditionalExpression: undefined < 12 is false, so the first test only narrows the type
   const fewer = missed !== undefined && missed < LCCI_MIN_INSTALMENTS;
   const statute = statutePart(
     'early_termination',
@@ -269,7 +270,9 @@ interface Reading {
   readonly parts: readonly FlagPart[];
 }
 
-const only = (key: MortgagePhraseKey): Reading => ({ calculation: [p(key)], parts: [] });
+function only(key: MortgagePhraseKey): Reading {
+  return { calculation: [p(key)], parts: [] };
+}
 
 function readClause(
   label: FlagLabel,
@@ -305,15 +308,19 @@ function readClause(
   }
 }
 
-const isFlagLabel = (label: ClauseLabel): label is FlagLabel =>
-  (FLAG_LABELS as readonly ClauseLabel[]).includes(label);
+function isFlagLabel(label: ClauseLabel): label is FlagLabel {
+  return (FLAG_LABELS as readonly ClauseLabel[]).includes(label);
+}
 
 // A floor of 0 % only keeps the rate from going below zero, as art. 21.4 LCCI requires of deeds
 // from 16-06-2019: no floor there. In an earlier deed it is read as any other floor.
-const zeroFloor = (clause: Clause, input: MortgageInput, deps: MortgageDeps): boolean =>
-  clause.label === 'floor_clause' &&
-  clause.floorPercent === 0 &&
-  applies('floor_statute', input.deedOn, deps);
+function zeroFloor(clause: Clause, input: MortgageInput, deps: MortgageDeps): boolean {
+  return (
+    clause.label === 'floor_clause' &&
+    clause.floorPercent === 0 &&
+    applies('floor_statute', input.deedOn, deps)
+  );
+}
 
 // One flag per clause the person confirmed or the reading found, in the order they came. What the
 // law or a court says is given beside it, with its source, and never as a verdict on the clause.

@@ -211,14 +211,13 @@ function prepaymentCap(
   // Art. 9: a rate fixed for more than twelve months may add the compensation the deed agreed for
   // the interest rate risk, which the review cannot weigh. A variable rate revised at most every
   // twelve months has art. 8 alone: 0,5 % in the first five years, 0,25 % after.
-  const revision =
-    world.revision ??
-    ((input.rateRevisionMonths ?? Infinity) <= YEARLY_REVISION_MONTHS
-      ? 'revised_yearly'
-      : 'revised_less_often');
+  const revisedLessOften =
+    world.revision === null
+      ? (input.rateRevisionMonths ?? Infinity) > YEARLY_REVISION_MONTHS
+      : world.revision === 'revised_less_often';
   if (world.rate === 'fixed')
     return none('not_checkable', 'fees.law41_fixed', ['prepayment_law41']);
-  if (revision === 'revised_less_often')
+  if (revisedLessOften)
     return none('not_checkable', 'fees.law41_revised_less_often', ['prepayment_law41']);
   const first = withinYears(deed, on, 5);
   return cap(
@@ -357,9 +356,7 @@ function worlds(operation: Operation, input: MortgageInput, deps: MortgageDeps):
             : ['option_a', 'option_b'];
       return options.map((o) => ({ rate, option: o, reach: null, revision: null, stretch: null }));
     }
-    const reaches =
-      windowOn(operation, rate, deps.norms) !== undefined ||
-      (!prepayment && conversionWording(operation.on, deps.norms) !== undefined);
+    const reaches = windowOn(operation, rate, deps.norms) !== undefined || !prepayment;
     const reachReadings: readonly (ReachReading | null)[] = reaches
       ? ['deed_regime', 'lcci_reach']
       : [null];
@@ -410,7 +407,7 @@ export function reviewFees(input: MortgageInput, deps: MortgageDeps): readonly F
 export const feeFindings = (item: FeeItem): readonly FeeFinding[] =>
   item.kind === 'single' ? [item.finding] : item.readings.map((r) => r.finding);
 
-const overCap = (f: FeeFinding): number => (f.status === 'above_cap' ? (f.amount ?? 0) : 0);
+const overCap = (f: FeeFinding): number => f.amount ?? 0;
 
 export function feeTotal(items: readonly FeeItem[]): FeeTotal {
   let counted = 0;
@@ -445,17 +442,20 @@ export type TodayItem = Across<FeeQuestion, FeeReading, TodayCap>;
 // the first 10 of a fixed one, and both ends of the window without compensation.
 const CHANGE_YEARS = [3, 5, FIXED_FIRST_YEARS] as const;
 const WINDOW = STATUTE_RULES.fee_free_window;
-const WINDOW_DAYS: readonly CivilDate[] = [
-  parseDate(WINDOW.from),
-  ...(WINDOW.until === null ? [] : [addDays(parseDate(WINDOW.until), 1)]),
-];
 
-// Whether a reading of a later day is the same as today's on every point today's leaves fixed.
+function windowDays(): readonly CivilDate[] {
+  // Stryker disable next-line ArrayDeclaration,ConditionalExpression: the window has an end, so the open-ended branch never runs
+  const after = WINDOW.until === null ? [] : [addDays(parseDate(WINDOW.until), 1)];
+  return [parseDate(WINDOW.from), ...after];
+}
+
+// Whether a reading of a later day is the same as today's. A day outside the window has no reach,
+// so it matches a later day on either side of it.
 const sameReading = (today: World, later: World): boolean =>
   later.rate === today.rate &&
-  (today.option === null || later.option === today.option) &&
+  later.option === today.option &&
   (today.reach === null || later.reach === today.reach) &&
-  (today.revision === null || later.revision === today.revision);
+  later.revision === today.revision;
 
 // The next day the law's cap changes, only when every reading of that day agrees on it: a mixed
 // rate past its tenth year may count them from the day the fixed rate applies, a day not asked.
@@ -466,21 +466,24 @@ function nextChange(
   deps: MortgageDeps,
   percent: number,
 ): TodayCap['next'] {
+  // Stryker disable next-line EqualityOperator: a change day equal to today gives today's own cap, which is skipped as no change
+  const isLater = (on: CivilDate) => compareDates(on, operation.on) > 0;
   const days = [
     ...CHANGE_YEARS.map((years) => addMonthsClamped(input.deedOn, years * 12)),
-    ...WINDOW_DAYS,
+    ...windowDays(),
   ]
-    .filter((on) => compareDates(on, operation.on) > 0)
+    .filter(isLater)
     .sort(compareDates);
   for (const on of days) {
     const later = { ...operation, on };
     const caps = worlds(later, input, deps)
       .filter((w) => sameReading(world, w))
       .map((w) => capFor(later, input, w, deps));
+    // Stryker disable next-line ConditionalExpression: a cap with nothing to give reads as undefined here, and undefined ends the search just as null does
     const percents = new Set(caps.map((c) => (c.kind === 'cap' ? c.percent : null)));
-    if (percents.has(null) || percents.size !== 1) return null;
-    const [next] = percents;
-    if (next !== undefined && next !== null && next !== percent) return { on, percent: next };
+    const [next, ...others] = percents;
+    if (next === undefined || next === null || others.length > 0) return null;
+    if (next !== percent) return { on, percent: next };
   }
   return null;
 }
@@ -507,7 +510,7 @@ function todayCap(
       sources: sourcesOf(c.rules, deps.norms),
     };
   const own = world.rate === 'fixed' ? input.deedPercents.fixed : input.deedPercents.variable;
-  const deedPercent = own !== undefined && own < c.percent ? own : null;
+  const deedPercent = own === undefined || own >= c.percent ? null : own;
   const percent = deedPercent ?? c.percent;
   // 23.8: within the cap, the compensation may still exceed the lender's loss, unknown here.
   const loss = c.lossBound && percent > 0;
