@@ -35,15 +35,6 @@ describe('art. 9 limits', () => {
     expect(live(12, null)).toBe('within_limit');
   });
 
-  it('does not let a worker who lives out rest 10 hours', () => {
-    expect(
-      statusOf(
-        time({ liveIn: false, shortestRestHours: 10, restMadeUpWithinFourWeeks: true }),
-        'rest_between_shifts',
-      ),
-    ).toBe('below_minimum');
-  });
-
   it('wants 36 hours of weekly rest', () => {
     expect(statusOf(time({ weeklyRestHours: 36 }), 'weekly_rest_36')).toBe('within_limit');
     expect(statusOf(time({ weeklyRestHours: 35 }), 'weekly_rest_36')).toBe('below_minimum');

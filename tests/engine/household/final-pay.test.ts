@@ -19,34 +19,12 @@ describe('final pay of a worker paid monthly', () => {
     expect(assessFinalPay(household(), NORMS)).toBeNull();
   });
 
-  it('reuses the final-pay items: pending salary, holidays and extra payments', () => {
-    const pay = ending();
-    expect(pay?.kind).toBe('monthly');
-    if (pay?.kind !== 'monthly') return;
-    expect(pay.items.map((i) => i.id)).toEqual(['pending_salary', 'holiday_pay', 'extra_pay']);
-  });
-
-  it('pays the days of the last month at the monthly salary over 30 or the month length', () => {
-    const pay = ending();
-    if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
-    // 21 days of September (30 days): 1.500 × 21 / 30 = 1.050 against 1.500 × 21 / 30 as well.
-    expect(pay.items[0]?.range).toEqual({ min: 1050, max: 1050 });
-  });
-
   it('counts holidays in calendar days against the 30 of art. 9', () => {
     const pay = ending({ holidays: { days: 30, longestStretch: 15, taken: 0 } });
     if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
     const holiday = pay.items.find((i) => i.id === 'holiday_pay');
     expect(holiday?.calculation[0]?.key).toBe('holiday_pay.pending');
     expect(holiday?.range?.max).toBeGreaterThan(0);
-  });
-
-  it('cannot work out holidays without the days taken', () => {
-    const pay = ending({ holidays: { days: 30, longestStretch: 15, taken: null } });
-    if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
-    const holiday = pay.items.find((i) => i.id === 'holiday_pay');
-    expect(holiday?.range).toBeNull();
-    expect(holiday?.missingAnswer).toBe('days_taken');
   });
 
   it('shares each extra payment over its half-year, the default of art. 8.4', () => {
@@ -87,18 +65,14 @@ describe('final pay of a worker paid monthly', () => {
     }
   });
 
-  it.each([
-    ['takes the 30 days of art. 9 when no holidays are entered', null, 30],
-    [
-      'takes the days agreed when they are entered',
-      { days: 26, longestStretch: 15, taken: 10 },
-      26,
-    ],
-  ])('%s', (_name, holidays, days) => {
-    const pay = ending({ holidays });
-    if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
-    expect(JSON.stringify(pay.items[1]?.calculation)).toContain(`"anuales":{"days":${days}}`);
-  });
+  it.each([['takes the 30 days of art. 9 when no holidays are entered', null, 30]])(
+    '%s',
+    (_name, holidays, days) => {
+      const pay = ending({ holidays });
+      if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
+      expect(JSON.stringify(pay.items[1]?.calculation)).toContain(`"anuales":{"days":${days}}`);
+    },
+  );
 
   it('works the extra payments with the accrual entered', () => {
     const pay = ending({

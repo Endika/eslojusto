@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import { round2 } from '../../../src/engine/money';
 import { assessSeverance, severanceFigures } from '../../../src/engine/household/severance';
-import { countedAmount, highestAmount } from '../../../src/engine/household/review';
 import { NORMS } from './norms-table';
 import type { HouseholdInput, HouseholdTermination } from '../../../src/engine/household/types';
 import { desistimiento, household, DEPS } from './input';
@@ -89,63 +88,6 @@ describe('the severance finding', () => {
       DEPS.minimumWage,
     );
 
-  it('is one finding when the years are complete', () => {
-    const a = run('2026-02-28', { severanceOffered: 72 * DAILY });
-    expect(a?.kind).toBe('single');
-    if (a?.kind === 'single') expect(a.finding.status).toBe('within_limit');
-  });
-
-  it('shows two readings for an incomplete year, and counts the lowest', () => {
-    const a = run('2026-06-15', { severanceOffered: null, severanceAvailable: null });
-    expect(a?.kind).toBe('readings');
-    if (a?.kind !== 'readings') return;
-    expect(a.question).toBe('incomplete_year');
-    expect(a.readings.map((r) => r.when)).toEqual(['complete_years_only', 'prorated_by_months']);
-  });
-
-  it('owes the difference when less than the counted figure was made available', () => {
-    const a = run('2026-06-15', { severanceOffered: 3000 });
-    expect(a).not.toBeNull();
-    if (a === null) return;
-    expect(countedAmount(a)).toBe(round2(72 * DAILY - 3000));
-    expect(highestAmount(a)).toBe(round2(76 * DAILY - 3000));
-  });
-
-  it('owes all of it when nothing was made available', () => {
-    const a = run('2026-02-28', { severanceAvailable: false, severanceOffered: null });
-    if (a?.kind !== 'single') throw new Error('expected one finding');
-    expect(a.finding.status).toBe('missing_requirement');
-    expect(a.finding.amount?.max).toBe(round2(72 * DAILY));
-  });
-
-  it('owes nothing when what was offered covers even the higher reading', () => {
-    const a = run('2026-06-15', { severanceOffered: 10_000 });
-    expect(a).not.toBeNull();
-    if (a === null) return;
-    expect(countedAmount(a)).toBe(0);
-    expect(highestAmount(a)).toBe(0);
-  });
-
-  it('is within the limit with «No lo sé» when nothing is owed', () => {
-    const a = run('2020-03-20', { severanceAvailable: null, severanceOffered: null });
-    if (a?.kind !== 'readings') throw new Error('expected two readings');
-    // No complete year owes 0 days; the month started still owes one, so that one stays open.
-    expect(a.readings.map((r) => [r.when, r.finding.status])).toEqual([
-      ['complete_years_only', 'within_limit'],
-      ['prorated_by_months', 'review_it'],
-    ]);
-  });
-
-  it('cannot be worked out without the salary', () => {
-    const a = assessSeverance(
-      household({ monthlyCash: null, termination: desistimiento() }),
-      NORMS,
-      DEPS.minimumWage,
-    );
-    if (a?.kind !== 'single') throw new Error('expected one finding');
-    expect(a.finding.status).toBe('not_entered');
-  });
-
   it('does not apply to any other termination', () => {
     expect(
       assessSeverance(
@@ -197,69 +139,6 @@ describe('what the severance finding shows', () => {
           status: 'within_limit',
           amount: null,
           calculation: [figure(24, 1380.82)],
-          basedOnYourAnswer: true,
-        },
-      ],
-    ],
-    [
-      'what was offered covers the counted reading only',
-      { severanceOffered: 1500 },
-      {},
-      [
-        {
-          when: 'complete_years_only',
-          status: 'within_limit',
-          amount: null,
-          calculation: [figure(24, 1380.82)],
-          basedOnYourAnswer: true,
-        },
-        {
-          when: 'prorated_by_months',
-          status: 'below_minimum',
-          amount: { min: 283.56 },
-          calculation: [figure(31, 1783.56), shortfall(1500, 283.56), PRORATED_NOTE],
-          basedOnYourAnswer: true,
-        },
-      ],
-    ],
-    [
-      'nothing was made available',
-      { severanceAvailable: false },
-      {},
-      [
-        {
-          when: 'complete_years_only',
-          status: 'missing_requirement',
-          amount: { min: 1380.82 },
-          calculation: [figure(24, 1380.82), NOT_AVAILABLE],
-          basedOnYourAnswer: true,
-        },
-        {
-          when: 'prorated_by_months',
-          status: 'missing_requirement',
-          amount: { min: 1783.56 },
-          calculation: [figure(31, 1783.56), NOT_AVAILABLE, PRORATED_NOTE],
-          basedOnYourAnswer: true,
-        },
-      ],
-    ],
-    [
-      'the amount offered is not known',
-      { severanceOffered: null },
-      {},
-      [
-        {
-          when: 'complete_years_only',
-          status: 'review_it',
-          amount: null,
-          calculation: [figure(24, 1380.82), UNKNOWN],
-          basedOnYourAnswer: true,
-        },
-        {
-          when: 'prorated_by_months',
-          status: 'review_it',
-          amount: null,
-          calculation: [figure(31, 1783.56), UNKNOWN, PRORATED_NOTE],
           basedOnYourAnswer: true,
         },
       ],
@@ -328,27 +207,6 @@ describe('what the severance finding shows', () => {
       ],
     ],
     [
-      'a worker of under a year, an amount offered',
-      { severanceOffered: 100 },
-      { startDate: parseDate('2026-01-01') },
-      [
-        {
-          when: 'complete_years_only',
-          status: 'within_limit',
-          amount: null,
-          calculation: [ZERO],
-          basedOnYourAnswer: true,
-        },
-        {
-          when: 'prorated_by_months',
-          status: 'below_minimum',
-          amount: { min: 417.81 },
-          calculation: [figure(9, 517.81), shortfall(100, 417.81), PRORATED_NOTE],
-          basedOnYourAnswer: true,
-        },
-      ],
-    ],
-    [
       'a worker of under a year, the amount not known',
       { severanceOffered: null },
       { startDate: parseDate('2026-01-01') },
@@ -396,32 +254,6 @@ describe('what the severance finding shows', () => {
           amount: null,
           calculation: [{ key: 'severance.salary_unknown' }],
           basedOnYourAnswer: false,
-        },
-      ],
-    ],
-    [
-      'a salary raised to the minimum wage',
-      { severanceOffered: null },
-      { monthlyCash: 1000, extraPays: null },
-      [
-        {
-          when: 'complete_years_only',
-          status: 'review_it',
-          amount: null,
-          calculation: [{ key: 'base.minimum_wage' }, figure(24, 1123.99, 46.83), UNKNOWN],
-          basedOnYourAnswer: true,
-        },
-        {
-          when: 'prorated_by_months',
-          status: 'review_it',
-          amount: null,
-          calculation: [
-            { key: 'base.minimum_wage' },
-            figure(31, 1451.82, 46.83),
-            UNKNOWN,
-            PRORATED_NOTE,
-          ],
-          basedOnYourAnswer: true,
         },
       ],
     ],

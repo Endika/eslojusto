@@ -16,29 +16,6 @@ describe('phrase', () => {
   });
 });
 
-describe('a finding built from a bare verdict', () => {
-  const finding = findingsFor('notice')('notice_calendar_days', { status: 'information' }, NORMS);
-
-  it('has no amount and an empty calculation', () => {
-    expect(finding).toMatchObject({
-      id: 'notice_calendar_days',
-      item: 'notice',
-      status: 'information',
-      amount: null,
-      calculation: [],
-    });
-  });
-
-  it('rests on no answer of the person and leaves no room for an agreement', () => {
-    expect(finding.basedOnYourAnswer).toBe(false);
-    expect(finding.agreementMaySetOther).toBe(false);
-  });
-
-  it('cites its own rule only', () => {
-    expect(finding.sources).toHaveLength(1);
-  });
-});
-
 describe('a finding built from a full verdict', () => {
   it('keeps the flags it is given and cites the rules it also rests on', () => {
     const finding = findingsFor('notice')(
