@@ -12,7 +12,7 @@ import {
   statusText,
   summaryKind,
 } from '../../src/bills/result';
-import { renderTelecomResult } from '../../src/bills/telecom/render';
+import { renderTelecomResult, telecomLabels } from '../../src/bills/telecom/render';
 import { BILLS_SOURCES } from '../../src/engine/bills/data/sources';
 import { BILLS_TABLES } from '../../src/engine/bills/data/tables';
 import {
@@ -341,6 +341,36 @@ describe('the telecom result', () => {
     expect(cardText(root, 'Penalización por permanencia')).toContain(
       'Penalización pactada 180,00 € × 184 días que faltaban / 549 días de permanencia = 60,33 €.',
     );
+  });
+
+  it('leads with the verdict, hides the yearly line, brings the gate back and lists what it does not look at', () => {
+    const root = result();
+    const gate = root.querySelector<HTMLElement>('[data-out-of-scope]');
+    if (gate) gate.hidden = false;
+    for (const part of root.querySelectorAll<HTMLElement>('[data-in-scope]')) part.hidden = true;
+    const recurring = root.querySelector<HTMLElement>('[data-recurring]');
+    if (recurring) recurring.hidden = false;
+    const review = exit(telecom({ penaltyCharged: 120 }));
+    renderTelecomResult(root, review, NORMS_BEFORE_FIGURE, false, tr);
+    expect(text(root, '[data-lead]')).toBe(tr('client.bills.result.telecom_lead_over'));
+    expect(gate?.hidden).toBe(true);
+    expect([...root.querySelectorAll<HTMLElement>('[data-in-scope]')].map((p) => p.hidden)).toEqual(
+      [false, false],
+    );
+    expect(recurring?.hidden).toBe(true);
+    const unchecked = [...root.querySelectorAll('[data-unchecked] li')].map((li) => li.textContent);
+    expect(unchecked).toEqual(
+      review.unchecked.map((code) => tr(`client.bills.unchecked.telecom.${code}`)),
+    );
+    expect(unchecked.length).toBeGreaterThan(0);
+  });
+
+  it('puts each line in the tab that asks for its figures, the others with the charges', () => {
+    const labels = telecomLabels(tr);
+    expect(labels.tone('commitment_length')).toEqual({ tone: 'cause', number: '01' });
+    expect(labels.tone('change_exit')).toEqual({ tone: 'salary', number: '02' });
+    expect(labels.tone('charge_after_exit')).toEqual({ tone: 'settlement', number: '03' });
+    expect(labels.tone('total')).toEqual({ tone: 'settlement', number: '03' });
   });
 
   it('says so when there is nothing to check', () => {

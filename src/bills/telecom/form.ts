@@ -109,10 +109,11 @@ function read(form: HTMLFormElement): Reading {
   const lineTo = chargedAfter === 'yes' ? date('lineTo', true) : null;
   const lineAmount = chargedAfter === 'yes' ? figure('lineAmount', true) : null;
 
-  if (errors.length > 0 || exitRequestedOn === null)
-    return { errors, exitRequestedOn, input: null };
+  if (errors.length > 0) return { errors, exitRequestedOn, input: null };
+  // Stryker disable ConditionalExpression,LogicalOperator: each pair of answers below is null together, and a missing one is an error, which leaves no input; the checks only narrow the types
+  if (exitRequestedOn === null) return { errors, exitRequestedOn, input: null };
   const changeNotice: ChangeNotice | null =
-    changed && changeKind !== null && priceIndex !== null
+    changeKind !== null && priceIndex !== null
       ? { sentOn, appliesOn, change: changeKind, index: priceIndex }
       : null;
   const input: TelecomInput = {
@@ -129,6 +130,7 @@ function read(form: HTMLFormElement): Reading {
         ? []
         : [{ from: lineFrom, to: lineTo, amount: lineAmount }],
   };
+  // Stryker restore ConditionalExpression,LogicalOperator
   return { errors, exitRequestedOn, input };
 }
 
@@ -148,15 +150,8 @@ export function sheetErrors(
 ): TelecomFieldError[] {
   const r = read(form);
   const fields: readonly TelecomFormField[] = SHEET_FIELDS[sheet];
-  const own = r.errors.filter((e) => fields.includes(e.field));
-  const withError = new Set(r.errors.map((e) => e.field));
-  const fromEngine =
-    r.input === null
-      ? []
-      : engineErrors(r.input, today).filter(
-          (e) => fields.includes(e.field) && !withError.has(e.field),
-        );
-  return [...own, ...fromEngine];
+  const errors = r.input === null ? r.errors : engineErrors(r.input, today);
+  return errors.filter((e) => fields.includes(e.field));
 }
 
 export function readTelecomForm(
@@ -164,8 +159,7 @@ export function readTelecomForm(
   today: CivilDate,
 ): { readonly input: TelecomInput } | { readonly errors: readonly TelecomFieldError[] } {
   const r = read(form);
-  if (r.errors.length > 0) return { errors: r.errors };
-  if (r.input === null) return { errors: [{ field: 'exitRequestedOn', code: 'missing_value' }] };
+  if (r.input === null) return { errors: r.errors };
   const errors = engineErrors(r.input, today);
   return errors.length > 0 ? { errors } : { input: r.input };
 }

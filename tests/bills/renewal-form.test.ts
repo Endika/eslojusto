@@ -212,6 +212,93 @@ describe('the renewal form', () => {
   });
 });
 
+describe('what the renewal form requires', () => {
+  const periods: Values = {
+    currentEnergyPricing: 'periods',
+    nextEnergyPricing: 'periods',
+    currentEnergy: null,
+    nextEnergy: null,
+    currentEnergyP1: '0,2',
+    currentEnergyP2: '0,15',
+    currentEnergyP3: '0,1',
+    nextEnergyP1: '0,22',
+    nextEnergyP2: '0,17',
+    nextEnergyP3: '0,12',
+  };
+
+  it.each([
+    'letterDate',
+    'renewalDate',
+    'powerKwP1',
+    'powerKwP2',
+    'currentPowerP1',
+    'currentPowerP2',
+    'nextPowerP1',
+    'nextPowerP2',
+    'currentEnergy',
+    'nextEnergy',
+  ])('asks for %s', (field) => {
+    expect(readRenewalForm(form({ [field]: '' }), TODAY)).toEqual({
+      errors: [{ field, code: 'missing_value' }],
+    });
+  });
+
+  it.each([
+    'currentEnergyP1',
+    'currentEnergyP2',
+    'currentEnergyP3',
+    'nextEnergyP1',
+    'nextEnergyP2',
+    'nextEnergyP3',
+  ])('asks for %s when the letter prices by period', (field) => {
+    expect(readRenewalForm(form({ ...periods, [field]: '' }), TODAY)).toEqual({
+      errors: [{ field, code: 'missing_value' }],
+    });
+  });
+
+  it('asks the power unit, and whether the letter came apart from the bill', () => {
+    expect(readRenewalForm(form({ powerUnit: null }), TODAY)).toEqual({
+      errors: [{ field: 'powerUnit', code: 'missing_choice' }],
+    });
+    expect(readRenewalForm(form({ separateFromBill: null }), TODAY)).toEqual({
+      errors: [{ field: 'separateFromBill', code: 'missing_choice' }],
+    });
+  });
+
+  it.each([
+    ['yes', true],
+    ['no', false],
+    ['unknown', null],
+  ] as const)('reads %s to whether the letter came apart as %s', (answer, expected) => {
+    expect(readRenewalForm(form({ separateFromBill: answer }), TODAY)).toMatchObject({
+      input: { separateFromBill: expected },
+    });
+  });
+
+  it('gives an answer that cannot be read where it was asked, for the sheet it is on', () => {
+    expect(readRenewalForm(form({ annualKwh: 'mucho' }), TODAY)).toEqual({
+      errors: [{ field: 'annualKwh', code: 'invalid_number' }],
+    });
+    expect(sheetErrors(form({ annualKwh: 'mucho' }), 'consumo', TODAY)).toEqual([
+      { field: 'annualKwh', code: 'invalid_number' },
+    ]);
+  });
+
+  it('checks a sheet with what the engine bounds only on that sheet', () => {
+    const f = form({ renewalDate: '2026-10-01', annualKwh: '900000' });
+    expect(sheetErrors(f, 'fechas', TODAY)).toEqual([
+      { field: 'renewalDate', code: 'not_after_start' },
+    ]);
+    expect(sheetErrors(f, 'consumo', TODAY)).toEqual([{ field: 'annualKwh', code: 'kwh_range' }]);
+    expect(sheetErrors(f, 'envio', TODAY)).toEqual([]);
+    expect(sheetErrors(form(), 'fechas', TODAY)).toEqual([]);
+  });
+
+  it('puts a question that is on no sheet on the first', () => {
+    expect(sheetOfField('nope' as never)).toBe('fechas');
+  });
+});
+
 describe('the sheets', () => {
   it('ask every question once, and each question is a trackable field', () => {
     const asked = SHEETS.flatMap((sheet) => SHEET_FIELDS[sheet]);

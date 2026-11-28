@@ -116,10 +116,12 @@ function read(form: HTMLFormElement): Reading {
   };
   const separate = known(choice('separateFromBill', KNOWNS));
 
+  // Stryker disable next-line ConditionalExpression,LogicalOperator,MethodExpression: see the check below
   const numbers = (o: object | null): o is Record<string, number> =>
     o !== null && Object.values(o).every((v) => v !== null);
+  if (errors.length > 0) return { errors, input: null };
+  // Stryker disable ConditionalExpression,LogicalOperator,MethodExpression: a missing or unreadable required answer is an error, which leaves no input; these checks only narrow the types
   if (
-    errors.length > 0 ||
     letterDate === null ||
     renewalDate === null ||
     powerUnit === null ||
@@ -133,6 +135,7 @@ function read(form: HTMLFormElement): Reading {
     separate === undefined
   )
     return { errors, input: null };
+  // Stryker restore ConditionalExpression,LogicalOperator,MethodExpression
   const prices = (power: { p1: number; p2: number }, e: Record<string, number>): RenewalPrices => ({
     power,
     energy:
@@ -166,15 +169,8 @@ export function sheetErrors(
 ): RenewalFieldError[] {
   const r = read(form);
   const fields: readonly RenewalFormField[] = SHEET_FIELDS[sheet];
-  const own = r.errors.filter((e) => fields.includes(e.field));
-  const withError = new Set(r.errors.map((e) => e.field));
-  const fromEngine =
-    r.input === null
-      ? []
-      : engineErrors(r.input, today).filter(
-          (e) => fields.includes(e.field) && !withError.has(e.field),
-        );
-  return [...own, ...fromEngine];
+  const errors = r.input === null ? r.errors : engineErrors(r.input, today);
+  return errors.filter((e) => fields.includes(e.field));
 }
 
 export function readRenewalForm(
@@ -182,8 +178,7 @@ export function readRenewalForm(
   today: CivilDate,
 ): { readonly input: RenewalInput } | { readonly errors: readonly RenewalFieldError[] } {
   const r = read(form);
-  if (r.errors.length > 0) return { errors: r.errors };
-  if (r.input === null) return { errors: [{ field: 'letterDate', code: 'missing_value' }] };
+  if (r.input === null) return { errors: r.errors };
   const errors = engineErrors(r.input, today);
   return errors.length > 0 ? { errors } : { input: r.input };
 }
