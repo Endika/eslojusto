@@ -219,15 +219,30 @@ describe('the bill against its own figures', () => {
     ]);
   });
 
-  it('words a price per year with its figures', () => {
-    expect(statusOf(juneBill(), 'power', 1)?.calculation[0]).toEqual(
+  it('words a price per year with its figures, and shares it by 365 days alone out of a leap year', () => {
+    expect(statusOf(juneBill(), 'power', 1)?.calculation).toEqual([
       say('arithmetic.power_per_year', {
         kw: { kw: 4.6 },
         price: { price: 0.725423, unit: 'per_kw_year' },
         days: { days: 30 },
         euros: { euros: 0.27 },
       }),
-    );
+      say('arithmetic.billed', { euros: { euros: 0.27 } }),
+      say('tolerance.line'),
+    ]);
+  });
+
+  it('adds an excess of power and an exit penalty to the total', () => {
+    const input = juneBill({
+      excessPower: { amount: 3, maximeter: true },
+      exitPenalty: { amount: 7, priceType: 'variable', firstRenewalPassed: false },
+      total: 70.77,
+    });
+    expect(statusOf(input, 'total')?.status).toBe('matches');
+  });
+
+  it('takes a bill with no billed days as matching its days', () => {
+    expect(statusOf(juneBill({ billedDays: null }), 'days')?.status).toBe('matches');
   });
 
   it.each([

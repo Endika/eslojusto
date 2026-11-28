@@ -151,6 +151,7 @@ function freeMarketFunding(billed: number, official: OfficialFigure, norms: Norm
       billsPhrase('funding.days', { euros: { euros: round2(expected[0] ?? 0) } }),
       billedPhrase(billed),
     ];
+    // Stryker disable next-line EqualityOperator: a difference never lands on the tolerance plus 1e-9 exactly
     const above = Math.min(...expected.map((e) => billed - e)) > LINE_TOLERANCE + 1e-9;
     return above
       ? billFinding(

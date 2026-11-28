@@ -218,7 +218,11 @@ describe('the social bonus funding, by day', () => {
     expect(only(funding(freeBill({ socialBonusFunding: 0.6 }))).status).toBe('matches');
     expect(only(funding(freeBill({ socialBonusFunding: 0.4 }))).status).toBe('matches');
     const above = only(funding(freeBill({ socialBonusFunding: 0.9 })));
-    expect(above).toMatchObject({ status: 'review_it', amount: null });
+    expect(above).toMatchObject({ id: 'social_bonus_funding', status: 'review_it', amount: null });
+    expect(only(funding(freeBill({ socialBonusFunding: 0.6 })))).toMatchObject({
+      id: 'social_bonus_funding',
+      status: 'matches',
+    });
     expect(above.calculation).toEqual([
       say('funding.days', { euros: { euros: 0.6 } }),
       say('arithmetic.billed', { euros: { euros: 0.9 } }),
