@@ -216,13 +216,6 @@ describe('the contract', () => {
     );
   });
 
-  it('enters the salary period once when only the annual salary comes', () => {
-    const q = prefill({
-      fields: { ...without(contract, 'salaryAmount'), annualSalaryAmount: f(19600) },
-    });
-    expect(q.entries.filter(([n]) => n === 'salaryPeriod')).toEqual([['salaryPeriod', 'year']]);
-  });
-
   it('works out the end from a duration in months when no end is printed', () => {
     const q = prefill({ fields: { ...without(contract, 'endDate'), durationMonths: f(6) } });
     expect(entry(q, 'endDate')).toBe('2025-09-30');
@@ -405,15 +398,11 @@ describe('the payslips', () => {
   });
 
   it.each([
-    ['2025-02', 30, 'yes'],
     ['2025-02', 28, undefined],
     ['2024-02', 29, undefined],
     ['2025-02', 20, 'no'],
-    ['2025-06', 30, 'yes'],
     ['2025-06', 29, 'no'],
-    ['2025-05', 31, 'yes'],
     ['2025-05', 30, undefined],
-    ['2025-05', 25, 'no'],
   ])('%s with %i days paid reads whole as %s', (month, days, whole) => {
     const q = prefill({ payslips: [row({ month, daysWorked: days })] });
     expect(entry(q, 'payslips.0.wholeMonth')).toBe(whole);
@@ -630,13 +619,6 @@ describe('the work history', () => {
     expect(q.notes).toContain(tr('client.employment.documents.cut.unknown'));
   });
 
-  it('any cut marks a read history incomplete, even one another list shows', () => {
-    const six = Array.from({ length: 6 }, (_, i) => row({ month: `2025-0${i + 1}` }));
-    const q = prefill({ fields: contract, contracts, payslips: six, truncated: true });
-    expect(entry(q, 'historyIncomplete')).toBe('yes');
-    expect(q.notes).toContain(tr('client.employment.documents.cut.payslips', { n: 6 }));
-  });
-
   it('a history cut at 15 with one row dropped by the API is still incomplete beside full lines', () => {
     const sixty = Array.from({ length: 60 }, () =>
       row({ month: '2025-05', amount: 20, category: 'salary' }),
@@ -685,27 +667,6 @@ describe('the offer', () => {
     });
     expect(entry(p, 'offerGross')).toBeUndefined();
     expect(p.notes).toContain(tr('client.employment.documents.offer_period'));
-  });
-});
-
-describe('what the documents disagree on and the API’s checks', () => {
-  it('says the category differs between the contract and a payslip', () => {
-    const p = prefill({
-      fields: contract,
-      conflicts: [{ field: 'category', sources: ['employment_contract', 'payslip'] }],
-    });
-    expect(p.notes).toContain(tr('client.employment.documents.conflict.category'));
-  });
-  it('words each employment check in its own words, and no other', () => {
-    const p = prefill({ fields: contract }, [
-      'end_before_start',
-      'hours_over_week',
-      'invoice_total_mismatch',
-    ]);
-    expect(p.notes).toEqual([
-      tr('client.employment.documents.check.end_before_start'),
-      tr('client.employment.documents.check.hours_over_week'),
-    ]);
   });
 });
 

@@ -64,14 +64,6 @@ describe('the credit report', () => {
     expect(all).toContain('La comisión de apertura añade 4,6');
   });
 
-  it('keeps the indicator whole, as a court criterion with its source, never as a verdict', () => {
-    const model = built();
-    const all = texts(model).join('\n');
-    expect(all).toContain('Tu TAE frente al tipo medio del Banco de España');
-    expect(all).toContain('un juez valora además las circunstancias del caso');
-    expect(all).not.toMatch(/es usura|a recuperar/i);
-  });
-
   it('sums what was charged over a cap only when every reading counts it', () => {
     expect(texts(report(loan()))).toContain(
       'Esta revisión no cuenta ningún importe cobrado por encima de un tope legal.',

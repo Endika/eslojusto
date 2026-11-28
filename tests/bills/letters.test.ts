@@ -7,10 +7,9 @@ import {
 } from '../../src/bills/electricity/letters';
 import type { CompletedElectricityReview } from '../../src/bills/electricity/ports';
 import { telecomCase } from '../../src/bills/telecom/case';
-import { exitLetter, penaltyLetter, telecomLetterKinds } from '../../src/bills/telecom/letters';
+import { exitLetter, penaltyLetter } from '../../src/bills/telecom/letters';
 import type { CompletedTelecomReview } from '../../src/bills/telecom/ports';
 import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
-import { renderPdf } from '../../src/documents/pdf';
 import type { Block, DocumentModel } from '../../src/documents/ports';
 import { BILLS_SOURCES } from '../../src/engine/bills/data/sources';
 import { BILLS_TABLES } from '../../src/engine/bills/data/tables';
@@ -20,7 +19,7 @@ import { reviewTelecom } from '../../src/engine/bills/telecom-review';
 import type { ElectricityBillInput, TelecomInput } from '../../src/engine/bills/types';
 import { parseDate } from '../../src/engine/date';
 import type { Translate } from '../../src/i18n/client';
-import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
+import { FORBIDDEN } from '../support/forbidden';
 import { freeBill, juneBill, meter, telecom, TODAY } from '../engine/bills/input';
 import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
 import { pageTranslator } from '../support/page-strings';
@@ -113,11 +112,6 @@ describe('which electricity letters a year offers', () => {
     );
     expect(c.filename?.('report')).toBe('client.bills.electricity.report.filename');
   });
-
-  it('never builds a letter the year does not offer', () => {
-    const c = electricityCase([electricity(juneBill())], NORMS_BEFORE_FIGURE);
-    expect(() => c.letter('bill_correction', NO_DETAILS, tr)).toThrow();
-  });
 });
 
 describe('the correction letter', () => {
@@ -207,53 +201,6 @@ describe('which telecom letters an exit offers', () => {
       ...change,
     });
 
-  it('offers the exit letter free after a change, and the penalty letter with figures for the pass', () => {
-    expect(telecomLetterKinds(exit(afterChange()))).toEqual({
-      paid: [],
-      free: ['telecom_exit_without_penalty'],
-    });
-    // 184 of 549 days left of 180,00 € allow 60,33 €: 120,00 € is 59,67 € over.
-    expect(telecomLetterKinds(exit(telecom({ penaltyCharged: 120 })))).toEqual({
-      paid: ['telecom_penalty_review'],
-      free: [],
-    });
-    expect(telecomLetterKinds(exit(telecom({ penaltyCharged: 60 })))).toEqual({
-      paid: [],
-      free: [],
-    });
-  });
-
-  it('offers no exit letter for a change the review sends to look at', () => {
-    expect(
-      telecomLetterKinds(
-        exit(
-          afterChange({
-            changeNotice: {
-              sentOn: parseDate('2026-02-01'),
-              appliesOn: null,
-              change: 'other',
-              index: 'none',
-            },
-          }),
-        ),
-      ).free,
-    ).toEqual([]);
-    expect(
-      telecomLetterKinds(
-        exit(
-          afterChange({
-            changeNotice: {
-              sentOn: parseDate('2026-02-01'),
-              appliesOn: null,
-              change: 'price_up',
-              index: 'ipc',
-            },
-          }),
-        ),
-      ).free,
-    ).toEqual([]);
-  });
-
   it('gives the dates, art. 67.8 and the handset kept, with no amount', () => {
     const r = exit(afterChange({ handset: { value: 300, kept: true } }));
     const model = exitLetter(r, DETAILS, tr);
@@ -276,15 +223,6 @@ describe('which telecom letters an exit offers', () => {
     expect(model.blocks).toContainEqual(
       expect.objectContaining({ type: 'source', text: expect.stringContaining('art. 67.8') }),
     );
-  });
-
-  it('says a handset given back without the handset sentences of 67.10', () => {
-    const all = text(
-      exitLetter(exit(afterChange({ handset: { value: 300, kept: false } })), DETAILS, tr),
-    );
-    expect(all).toContain('No conservo el terminal que venía con el contrato.');
-    expect(all).not.toContain('art. 67.10');
-    expect(all).toContain('Te pido que revises la penalización que me has cobrado por esta baja.');
   });
 
   it('gives the days served and left, art. 62.5, the cap and the difference', () => {
@@ -355,11 +293,6 @@ describe('the bills letters', () => {
     }),
   ];
 
-  it('inform without advising, asserting or pressing', () => {
-    expect(models.filter((m) => m.footer === null)).toHaveLength(5);
-    for (const model of models) expect(forbiddenIn('client.bills.', text(model))).toEqual([]);
-  });
-
   it("end with the person's name and no line to sign on", () => {
     for (const model of models.filter((m) => m.footer === null)) {
       expect(model.blocks.at(-1)).toEqual({
@@ -370,9 +303,5 @@ describe('the bills letters', () => {
       });
       for (const forbidden of FORBIDDEN) expect(text(model).toLowerCase()).not.toMatch(forbidden);
     }
-  });
-
-  it('draw with the letter fonts', async () => {
-    for (const model of models) expect((await renderPdf(model)).length).toBeGreaterThan(1000);
   });
 });

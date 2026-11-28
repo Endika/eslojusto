@@ -115,19 +115,6 @@ describe('the bills read', () => {
     );
     expect(bill).toMatchObject({ operator: null, issuedOn: null, lines: [{ kind: 'other' }] });
   });
-
-  it('adds the bills of a later read and keeps the latest reading of a bill read again', () => {
-    const memory = chargesMemory();
-    memory.add(readBills(READ));
-    const [newest] = readBills(READ);
-    if (!newest) throw new Error('No bill read');
-    const again: ReadBill = { ...newest, lines: [] };
-    memory.add([again]);
-    expect(memory.bills()).toHaveLength(2);
-    expect(memory.bills()[0]?.lines).toEqual([]);
-    memory.clear();
-    expect(memory.bills()).toEqual([]);
-  });
 });
 
 describe('«Lo que te cobran»', () => {

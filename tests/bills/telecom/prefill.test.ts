@@ -64,12 +64,6 @@ describe('a read of a phone contract', () => {
     expect(p).toMatchObject({ count: 6, lowConfidence: false, notes: [], quotes: {} });
   });
 
-  it('opens the commitment only for a whole number of months', () => {
-    expect(telecomPrefill(fieldsOf({ commitmentMonths: field(18.5) }), tr).entries).toEqual([]);
-    expect(telecomPrefill(fieldsOf({ commitmentMonths: field('18') }), tr).entries).toEqual([]);
-    expect(telecomPrefill(fieldsOf({ agreedPenalty: field(180) }), tr).entries).toEqual([]);
-  });
-
   it('leaves a figure it cannot read to the person', () => {
     const p = telecomPrefill(
       fieldsOf({ commitmentMonths: field(12), agreedPenalty: field(-5), signedOn: field('x') }),

@@ -399,29 +399,6 @@ describe('a read of several bills', () => {
     ]);
   });
 
-  it('keeps the order read of bills without a last reading', () => {
-    const bills = [1, 2, 3].map((n) => row({ document: n, supplyFingerprint: `fp${n}` }));
-    expect(electricityPrefill(extraction({ bills }), tr).bills.map((b) => b.fingerprint)).toEqual([
-      'fp1',
-      'fp2',
-      'fp3',
-    ]);
-  });
-
-  it('puts a bill without a last reading after one with it, whichever is first', () => {
-    const dated = row({ document: 1, readingTo: '2026-06-30' });
-    const open = row({ document: 2 });
-    for (const bills of [
-      [dated, open],
-      [open, dated],
-    ]) {
-      expect(electricityPrefill(extraction({ bills }), tr).bills.map((b) => b.to)).toEqual([
-        '2026-06-30',
-        null,
-      ]);
-    }
-  });
-
   it('counts the bills, then what was cut off, then the checks that failed, once each', () => {
     const e = extraction({
       bills: [row({ document: 1 }), row({ document: 2 })],

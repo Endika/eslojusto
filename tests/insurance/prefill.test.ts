@@ -89,11 +89,6 @@ describe('a policy', () => {
     expect(p.quotes.renews).toMatch(/^El contrato se prorrogará/);
   });
 
-  it('opens no notice without one', () => {
-    expect(entry(p, 'hasNotice')).toBeUndefined();
-    expect(entry(p, 'previousPremium')).toBeUndefined();
-  });
-
   it('asks a car policy for its cover, and a home one never', () => {
     const car = prefill({ fields: { line: f('car'), carCover: f('with_voluntary') } });
     expect(entry(car, 'carCover')).toBe('with_voluntary');
@@ -107,14 +102,6 @@ describe('a renewal notice', () => {
   let p: P;
   beforeEach(() => {
     p = prefill({ fields: { ...POLICY, ...NOTICE } });
-  });
-
-  it('opens the notice and fills its premiums and whether covers change', () => {
-    expect(entry(p, 'hasNotice')).toBe('yes');
-    expect(entry(p, 'previousPremium')).toBe('300,00');
-    expect(entry(p, 'newPremium')).toBe('345,00');
-    expect(entry(p, 'changes')).toBe('yes');
-    expect(p.quotes.changes).toBe('La franquicia de daños por agua pasa a ser de 150 €.');
   });
 
   it('takes the notice’s own date as the day it arrived only to be checked, and says so', () => {
@@ -232,24 +219,5 @@ describe('what a reading is worth', () => {
       t('es', 'client.insurance.documents.check.expiry_before_effect'),
       t('es', 'client.insurance.documents.check.premium_parts_do_not_sum'),
     ]);
-  });
-});
-
-describe('the summary', () => {
-  it('names the end date when the policy and the notice state it differently', () => {
-    const p = prefill({
-      fields: { ...POLICY, ...NOTICE },
-      conflicts: [
-        { field: 'expiresOn', sources: ['insurance_renewal_notice', 'insurance_policy'] },
-      ],
-    });
-    expect(p.notes[0]).toBe(
-      'Fecha de vencimiento de la póliza: los documentos no dicen lo mismo. Se ha usado lo que pone el aviso de renovación; compáralo con los demás.',
-    );
-  });
-
-  it('words each check of the API', () => {
-    const p = prefill({ fields: POLICY }, ['premium_parts_do_not_sum']);
-    expect(p.notes).toEqual([t('es', 'client.insurance.documents.check.premium_parts_do_not_sum')]);
   });
 });

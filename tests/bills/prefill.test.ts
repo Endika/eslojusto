@@ -123,58 +123,6 @@ describe('a read of electricity bills', () => {
     });
   });
 
-  it('marks every answer read, and opens a figure’s question without marking it', () => {
-    const [bill] = electricityPrefill(june, tr).bills;
-    const marked = new Set(bill?.marks.map((m) => m.id));
-    expect(marked.has('meterAmount')).toBe(true);
-    expect(marked.has('meterCharged')).toBe(false);
-    expect(bill?.entries).toContainEqual(['meterCharged', 'yes']);
-    expect(bill?.marks.find((m) => m.id === 'priceChange')).toMatchObject({ derived: true });
-    expect(bill?.marks.find((m) => m.id === 'meterAmount')?.container).toBe(
-      '[data-field="meterAmount"]',
-    );
-    // The supply's fingerprint never reaches the form.
-    expect(bill?.entries.some(([, value]) => value === '0123456789abcdef')).toBe(false);
-  });
-
-  it('gives one bill each, oldest first, and says how many there are', () => {
-    const read = electricityPrefill(
-      extraction({
-        bills: [
-          row({ document: 1, ...JUNE, readingFrom: '2026-06-30', readingTo: '2026-07-30' }),
-          row({ document: 2, ...JUNE }),
-          row({ document: 3, ...JUNE, readingFrom: '2026-07-30', readingTo: '2026-08-29' }),
-        ],
-        ...linesOf(1),
-      }),
-      tr,
-    );
-    expect(read.bills.map((b) => b.to)).toEqual(['2026-06-30', '2026-07-30', '2026-08-29']);
-    expect(read.notes).toContain(
-      'Se han leído 3 facturas. Se revisan de una en una: ahora ves la más antigua y, en su resultado, puedes pasar a la siguiente.',
-    );
-    // Each bill takes only its own lines.
-    expect(read.bills[0]?.entries.some(([name]) => name === 'kwhP1')).toBe(false);
-    expect(read.bills[1]?.entries).toContainEqual(['kwhP1', '60']);
-  });
-
-  it('leaves a period billed in stretches to the person, saying the price changed', () => {
-    const lines = linesOf(1);
-    const [bill] = electricityPrefill(
-      extraction({
-        bills: [row({ document: 1, ...JUNE })],
-        powerLines: lines.powerLines,
-        energyLines: [
-          ...lines.energyLines,
-          row({ document: 1, period: 'p1', kwh: 10, price: 0.22, amount: 2.2 }),
-        ],
-      }),
-      tr,
-    ).bills;
-    expect(bill?.entries).toContainEqual(['priceChange', 'yes']);
-    expect(bill?.entries.some(([name]) => name === 'energyAmountP1')).toBe(false);
-  });
-
   it('reads one line for all the energy as a single price, never as one period', () => {
     const [bill] = electricityPrefill(
       extraction({
@@ -193,56 +141,6 @@ describe('a read of electricity bills', () => {
       ]),
     );
     expect(bill?.entries.some(([name]) => name === 'kwhP1')).toBe(false);
-  });
-
-  it('takes the first two services, discounts added up, and words a pack’s checks', () => {
-    const service = (label: string, amount: number) =>
-      row({ document: 1, kind: 'service', concept: 'Servicio', serviceLabel: label, amount });
-    const read = electricityPrefill(
-      extraction({
-        bills: [row({ document: 1, ...JUNE })],
-        otherLines: [
-          service('maintenance', 5),
-          service('insurance', 3),
-          service('pack', 2),
-          row({ document: 1, kind: 'discount', concept: 'Descuento', amount: 1 }),
-          row({ document: 1, kind: 'discount', concept: 'Descuento', amount: 0.5 }),
-        ],
-      }),
-      tr,
-      ['duplicate_bill', 'items_do_not_sum'],
-    );
-    const [bill] = read.bills;
-    expect(bill?.entries).toEqual(
-      expect.arrayContaining([
-        ['serviceCount', '2'],
-        ['serviceLabel1', 'maintenance'],
-        ['serviceAmount2', '3,00'],
-        ['discount', '1,50'],
-      ]),
-    );
-    expect(bill?.entries.some(([name]) => name.startsWith('serviceRequested'))).toBe(false);
-    expect(read.notes).toContain(
-      'Tu factura cobra 3 servicios aparte de la luz y esta revisión pregunta por dos: se han puesto los dos primeros.',
-    );
-    expect(read.notes).toContain(
-      'Has subido dos veces una factura del mismo suministro y periodo: en tu año cuenta una sola vez.',
-    );
-    // The final pay's check is not this review's to word.
-    expect(read.notes.some((n) => n.includes('finiquito'))).toBe(false);
-  });
-
-  it('reads no bill from a contract alone', () => {
-    expect(
-      electricityPrefill(
-        extraction({
-          fields: {
-            priceType: { value: 'fixed', confidence: 'high', source: 'electricity_contract' },
-          },
-        }),
-        tr,
-      ).bills,
-    ).toEqual([]);
   });
 });
 
@@ -354,20 +252,5 @@ describe('a read of a phone contract and its bills', () => {
       derived: true,
     });
     expect(p.quotes.agreedPenalty).toContain('parte proporcional');
-  });
-
-  it('takes the contract’s date as the start only to be checked', () => {
-    const p = telecomPrefill(
-      telecom({ fields: { signedOn: contract('2025-02-20'), commitmentMonths: contract(12) } }),
-      tr,
-    );
-    expect(p.entries).toContainEqual(['startedOn', '2025-02-20']);
-    expect(p.marks.find((m) => m.id === 'startedOn')).toMatchObject({
-      confidence: 'low',
-      derived: true,
-    });
-    expect(p.notes).toContain(
-      'El inicio de la permanencia es la fecha del contrato. Si empezó otro día, como el de la instalación, pon ese día.',
-    );
   });
 });

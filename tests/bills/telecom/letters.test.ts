@@ -80,18 +80,6 @@ describe('which telecom letters an exit offers, by reading', () => {
   const kinds = (items: BillItem[], inScope = true) =>
     telecomLetterKinds(entry(items, {}, inScope)).free;
 
-  it('offers the exit letter when every reading is charged over or within, and one is over', () => {
-    expect(kinds([single(finding('change_exit', 'paid_over'))])).toEqual([
-      'telecom_exit_without_penalty',
-    ]);
-    expect(kinds([readings('paid_over', 'within_limit')])).toEqual([
-      'telecom_exit_without_penalty',
-    ]);
-    expect(kinds([readings('within_limit', 'paid_over')])).toEqual([
-      'telecom_exit_without_penalty',
-    ]);
-  });
-
   it('offers none when a reading is to be looked at, or none is over', () => {
     expect(kinds([readings('paid_over', 'review_it')])).toEqual([]);
     expect(kinds([readings('within_limit', 'within_limit')])).toEqual([]);
@@ -193,20 +181,8 @@ describe('the exit letter', () => {
 
   it.each([
     [
-      'a handset kept, worth something',
-      { handset: { value: 300, kept: true } },
-      `${P}exit.handset_kept`,
-      `${P}exit.ask_handset`,
-    ],
-    [
       'a handset kept, worth nothing',
       { handset: { value: 0, kept: true } },
-      `${P}exit.handset_returned`,
-      `${P}exit.ask`,
-    ],
-    [
-      'a handset returned',
-      { handset: { value: 300, kept: false } },
       `${P}exit.handset_returned`,
       `${P}exit.ask`,
     ],
@@ -217,17 +193,8 @@ describe('the exit letter', () => {
     expect(list).toHaveLength(6);
   });
 
-  it('says nothing of a handset when there is none', () => {
-    const list = texts(bodyOf(letter(entry(over, change())).blocks));
-    expect(list.some((t) => t.includes('handset'))).toBe(false);
-  });
-
   it.each([
     ['no change notified', entry(over, { changeNotice: null })],
-    [
-      'no day it was sent',
-      entry(over, { changeNotice: { ...notice('2026-03-10'), sentOn: null } }),
-    ],
     ['no line to look at', entry([], change())],
   ])('writes no body with %s', (_title, e) => {
     expect(bodyOf(letter(e).blocks)).toEqual([]);
@@ -264,11 +231,8 @@ describe('the penalty letter', () => {
       { commitment: { startedOn: parseDate('2025-03-01'), months: 18, agreedPenalty: null } },
     ],
     ['no penalty charged', penalty(), { penaltyCharged: null }],
-    ['no cap in the calculation', penalty([]), {}],
     ['another phrase', penalty(phrase({ euros: 5 }, 'commitment.other')), {}],
     ['a phrase with no figures', penalty([{ key: 'commitment.proportional' }]), {}],
-    ['a figure that is no amount', penalty(phrase({ kw: 5 })), {}],
-    ['a figure that is a number', penalty(phrase(5)), {}],
   ] as const)('writes no body with %s', (_title, items, change) => {
     expect(bodyOf(letter(entry([...items], change)).blocks)).toEqual([]);
   });

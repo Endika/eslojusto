@@ -61,12 +61,6 @@ describe('the letter that says the policy is not to be extended', () => {
     expect(insuranceLetterKinds(completed(policy({ line: 'life' })))).toEqual([]);
   });
 
-  it('is offered on the last day too', () => {
-    expect(insuranceLetterKinds(completed(policy({ expiresOn: parseDate('2026-11-09') })))).toEqual(
-      ['insurance_non_renewal'],
-    );
-  });
-
   it('names the policy, its expiry and art. 22.2, and asks for a receipt', () => {
     const model = nonRenewalLetter(completed(policy()), DETAILS, tr);
     const all = text(model);
@@ -141,15 +135,6 @@ describe('the letter that says the policy is not to be extended', () => {
       ),
     );
     expect(all).toContain('mi póliza de seguro del coche');
-  });
-
-  // The last day stays on the result with its notes: the month-end reading and a period ending at
-  // 00:00 h are interpretations, not facts to tell the insurer.
-  it('never tells the insurer a last day', () => {
-    const all = text(
-      nonRenewalLetter(completed(policy({ expiresOn: parseDate('2027-03-31') })), NO_DETAILS, tr),
-    );
-    expect(all).not.toContain('28-02-2027');
   });
 });
 

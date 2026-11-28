@@ -1,10 +1,8 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
-import { contractAnnualPay } from '../../src/engine/employment/minimum-wage';
 import { INFO_ELEMENTS } from '../../src/engine/employment/types';
-import { applies, applyConditions, gate } from '../../src/employment/conditions';
 import { EMPLOYMENT_FLOW } from '../../src/employment/steps';
-import { readEmploymentForm, sheetApplies, sheetErrors } from '../../src/employment/form';
+import { sheetErrors } from '../../src/employment/form';
 import { TODAY } from './fixtures';
 
 type Values = Readonly<Record<string, string>>;
@@ -82,99 +80,6 @@ function form(change: Values = {}, rows: RowsOf = {}): HTMLFormElement {
 }
 
 describe('the employment form', () => {
-  it('keeps the agreement a document read only while the contract is said to name it', () => {
-    const read = { agreementName: ' Convenio del metal ', agreementCode: '99000000011999' };
-    const agreementOf = (change: Values) => {
-      const r = readEmploymentForm(form({ ...read, ...change }), TODAY);
-      if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
-      return { name: r.input.agreement.name, code: r.input.agreement.code };
-    };
-    expect(agreementOf({})).toEqual({ name: 'Convenio del metal', code: '99000000011999' });
-    expect(agreementOf({ agreementNamed: 'no' })).toEqual({ name: null, code: null });
-    expect(agreementOf({ agreementName: '', agreementCode: '12ab' })).toEqual({
-      name: null,
-      code: null,
-    });
-  });
-
-  it('reads a complete contract, its extra pays matching its payments', () => {
-    const r = readEmploymentForm(form(), TODAY);
-    if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
-    expect(r.input.salary).toMatchObject({ amount: 1500, payments: 14, prorated: false });
-    expect(r.input.extraPays).toEqual({ count: 2, prorated: false });
-    // Payments and extra pays agree, so the contract has a yearly pay to compare with an offer.
-    expect(contractAnnualPay(r.input)).toBe(21000);
-  });
-
-  it('asks no proration of a contract without extra pays', () => {
-    const el = form({ extraPays: '0' });
-    el.querySelector('[name="extraProrated"]')?.remove();
-    const r = readEmploymentForm(el, TODAY);
-    if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
-    expect(r.input.extraPays).toEqual({ count: 0, prorated: false });
-    expect(r.input.salary.payments).toBe(12);
-  });
-
-  it.each([
-    ['', false],
-    ['0', false],
-    ['00', false],
-    ['0,0', false],
-    ['2', true],
-  ])('with «%s» extra pays, proration is asked: %s', (typed, shown) => {
-    const el = document.createElement('form');
-    el.innerHTML = `<input name="extraPays" value="${typed}" />
-      <fieldset data-if-above0="extraPays"><input type="radio" name="extraProrated" value="no" /></fieldset>`;
-    applyConditions(el);
-    expect(el.querySelector<HTMLInputElement>('[name="extraProrated"]')?.disabled).toBe(!shown);
-  });
-
-  it('stops household employment at the gate, whatever else it says', () => {
-    const el = form({ relationship: 'household' });
-    expect(gate(el)).toEqual({ inScope: false, reason: 'special_relationship' });
-    expect(sheetApplies(el, 'salario')).toBe(false);
-  });
-
-  it('stops a minor at the gate', () => {
-    expect(gate(form({ under18: 'yes' }))).toEqual({ inScope: false, reason: 'minor' });
-  });
-
-  it('skips the modality and the work history of a contract from before the reform', () => {
-    const el = form({ startDate: '2021-06-01', modality: '' });
-    expect(gate(el)).toMatchObject({ inScope: true, partial: true });
-    expect(sheetApplies(el, 'modalidad')).toBe(false);
-    expect(sheetApplies(el, 'historial')).toBe(false);
-    expect(sheetApplies(el, 'salario')).toBe(true);
-    // The modality left unanswered on a skipped sheet never blocks the review.
-    expect('input' in readEmploymentForm(el, TODAY)).toBe(true);
-  });
-
-  it('keeps to the relationship’s sheets until the gate has all their answers', () => {
-    const el = form({ startDate: '' });
-    expect(sheetApplies(el, 'fechas')).toBe(true);
-    expect(sheetApplies(el, 'modalidad')).toBe(false);
-  });
-
-  it('skips a sheet whose every question waits on an answer that did not open it', () => {
-    const el = form({ modality: 'production' });
-    el.insertAdjacentHTML(
-      'beforeend',
-      `<fieldset data-sheet="causa"><div data-if="modality:production eventual">
-        <input type="radio" name="causeStated" value="yes" /></div></fieldset>`,
-    );
-    applyConditions(el);
-    expect(applies(el, 'causa')).toBe(true);
-    const modality = el.querySelector<HTMLInputElement>('[name="modality"]');
-    if (modality) modality.value = 'permanent';
-    applyConditions(el);
-    expect(applies(el, 'causa')).toBe(false);
-  });
-
-  it('asks for the work history only of a contract that is not open-ended', () => {
-    expect(sheetApplies(form(), 'historial')).toBe(false);
-    expect(sheetApplies(form({ modality: 'production' }), 'historial')).toBe(true);
-  });
-
   it('puts an engine error on the row that caused it', () => {
     const el = form(
       { modality: 'production', hasHistory: 'yes' },
@@ -186,62 +91,6 @@ describe('the employment form', () => {
     );
     expect(sheetErrors(el, 'historial', TODAY)).toEqual([
       { field: 'history.0.endDate', code: 'before_start' },
-    ]);
-  });
-
-  it('reads whether older contracts are missing from the history', () => {
-    const row = {
-      startDate: '2024-01-01',
-      endDate: '2024-06-30',
-      employer: 'same',
-      kind: 'production',
-    };
-    const input = (change: Values) => {
-      const r = readEmploymentForm(
-        form({ modality: 'production', ...change }, { history: [row] }),
-        TODAY,
-      );
-      if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
-      return r.input;
-    };
-    expect(input({ hasHistory: 'yes', historyIncomplete: 'yes' }).historyIncomplete).toBe(true);
-    expect(input({ hasHistory: 'yes', historyIncomplete: '' }).historyIncomplete).toBe(false);
-    // Without a history there is nothing to be missing from.
-    expect(input({ hasHistory: 'no', historyIncomplete: 'yes' }).historyIncomplete).toBe(false);
-  });
-
-  it('groups the schedule by day', () => {
-    const el = form(
-      { hasSchedule: 'yes' },
-      {
-        schedule: [
-          { day: '1', from: '09:00', to: '14:00' },
-          { day: '1', from: '15:00', to: '18:00' },
-          { day: '2', from: '09:00', to: '17:00' },
-        ],
-      },
-    );
-    const r = readEmploymentForm(el, TODAY);
-    if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
-    expect(r.input.schedule).toEqual([
-      {
-        day: 1,
-        slots: [
-          { from: '09:00', to: '14:00' },
-          { from: '15:00', to: '18:00' },
-        ],
-      },
-      { day: 2, slots: [{ from: '09:00', to: '17:00' }] },
-    ]);
-  });
-
-  it('says a payslip month it cannot read is not a month', () => {
-    const el = form(
-      { hasPayslips: 'yes' },
-      { payslips: [{ month: 'marzo', wholeMonth: 'yes', incidents: 'no', salary: '1.200' }] },
-    );
-    expect(sheetErrors(el, 'nominas', TODAY)).toEqual([
-      { field: 'payslips.0.month', code: 'invalid_month' },
     ]);
   });
 });

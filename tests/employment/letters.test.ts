@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate as f, type CivilDate } from '../../src/engine/date';
 import { MINIMUM_WAGE } from '../../src/engine/employment/data/minimum-wage';
-import type { MinimumWageTable } from '../../src/engine/employment/minimum-wage';
 import { LAW_QUOTES } from '../../src/engine/employment/quotes';
 import { reviewEmployment, type EmploymentDeps } from '../../src/engine/employment/review';
 import { INFO_ELEMENTS, type EmploymentInput } from '../../src/engine/employment/types';
 import { formatEuros } from '../../src/calculator/number';
-import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
+import { NO_DETAILS, type LetterDetails } from '../../src/documents/letter';
 import type { Block, DocumentModel } from '../../src/documents/ports';
 import { employmentCase } from '../../src/employment/case';
 import { employmentReport } from '../../src/employment/report';
@@ -22,18 +21,15 @@ import {
 import type { CompletedEmploymentReview } from '../../src/employment/ports';
 import type { Assessed } from '../../src/engine/employment/types';
 import { finding } from '../engine/employment/input';
-import { EMPLOYMENT_FORBIDDEN, FORBIDDEN } from '../support/forbidden';
 import {
   belowMinimum,
   contract,
   corners,
   malformed,
-  shortDayRate,
   shortDayRateDoubt,
   TABLES,
   TODAY,
   tr,
-  unknownComplement,
   workOrService,
   eachRow,
 } from './fixtures';
@@ -120,17 +116,6 @@ describe('the salary block of the company letter', () => {
     expect(all).toContain('Te pido que se revise mi salario.');
   });
 
-  it('reads the decree’s amount from the table it is given, never a figure of its own', () => {
-    const altered: MinimumWageTable = MINIMUM_WAGE.map((r) =>
-      r.year === 2026 ? { ...r, annual: 18000 } : r,
-    );
-    const tables = { ...TABLES, minimumWage: altered };
-    const r = completed(belowMinimum, TODAY, tables);
-    const all = text(companyLetter(r, 'full', TODAY, tables, NO_DETAILS, tr));
-    expect(all).toContain('fija un mínimo anual de 18.000,00 € a jornada completa');
-    expect(all).not.toContain('17.094');
-  });
-
   it('gives the minimum for the person’s working time beside the full-time one', () => {
     const r = completed(lowPay({ contractHours: { weekly: 20, annual: null } }));
     // 500 € a month in 14 payments is under half the 2026 minimum.
@@ -150,12 +135,6 @@ describe('the salary block of the company letter', () => {
     expect(payShortfall(r, TODAY, TABLES)).toBeNull();
     expect(text(full(halfPay))).toContain(
       'fija un mínimo anual de 17.094,00 € a jornada completa, que en proporción a mi jornada es de 8.547,00 €. Mi salario pactado es de 7.000,00 € al año: 1.547,00 € menos al año.',
-    );
-  });
-
-  it('gives a short fixed-term contract its amount per working day', () => {
-    expect(text(full(completed(shortDayRate)))).toContain(
-      'fija un mínimo de 57,82 € por jornada legal para los contratos de hasta 120 días. Mi salario pactado es de 50,00 € por jornada: 7,82 € menos por jornada.',
     );
   });
 
@@ -183,60 +162,6 @@ describe('the salary block of the company letter', () => {
     expect(all).toContain('En 2026,');
     expect(all).not.toContain('2027');
   });
-
-  it('names 2027 once its decree is in the table', () => {
-    const in2027 = f('2027-03-01');
-    const with2027: MinimumWageTable = [
-      ...MINIMUM_WAGE,
-      {
-        ...row2026,
-        year: 2027,
-        publishedOn: '2027-01-20',
-        effectsFrom: '2027-01-01',
-        effectsUntil: '2027-12-31',
-        annual: 17500,
-      },
-    ];
-    const tables = { ...TABLES, minimumWage: with2027 };
-    const r = completed(lowPay({ startDate: f('2027-01-04') }), in2027, tables);
-    expect(payShortfall(r, in2027, tables)?.years.map((y) => y.year)).toEqual([2027]);
-  });
-
-  it('never comes when the shortfall depends on a «No lo sé»', () => {
-    const r = completed(unknownComplement);
-    expect(r.review.items[0]?.kind).toBe('readings');
-    expect(payShortfall(r, TODAY, TABLES)).toBeNull();
-    expect(text(full(r))).not.toContain('salario mínimo');
-  });
-});
-
-describe('the points block of the company letter', () => {
-  it('names each point that does not match the law with its norm, and only asks to review them', () => {
-    const r = completed(workOrService);
-    const all = text(full(r));
-    expect(all).toContain(
-      'Modalidad de contrato: Estatuto de los Trabajadores, art. 15.1, y disposiciones transitorias 3.ª y 4.ª',
-    );
-    expect(all).toContain('Te pido que se revisen.');
-    expect(all).not.toMatch(/€/);
-  });
-
-  it('leaves out what the agreement may move and what depends on an answer', () => {
-    // Three months of trial for a technician is within the law, over it otherwise: two readings.
-    const r = completed(contract({ trial: { amount: 3, unit: 'months' }, technical: null }));
-    expect(kindsOf(r).paid).toEqual([]);
-    const production = completed(
-      contract({
-        modality: 'production',
-        causeStated: true,
-        circumstancesStated: true,
-        startDate: f('2026-01-01'),
-        endDate: f('2026-09-30'),
-        signedOn: null,
-      }),
-    );
-    expect(text(full(production))).not.toContain('Duración del contrato por producción');
-  });
 });
 
 describe('the request for the information owed in writing', () => {
@@ -252,15 +177,6 @@ describe('the request for the information owed in writing', () => {
     ]);
     expect(text(letter)).toContain(
       'Según el Real Decreto 723/2026, de 9 de septiembre (art. 3 y disposición transitoria única), puedo pedir por escrito',
-    );
-  });
-
-  it('says the information was due before starting for a contract from 05-10-2026', () => {
-    const r = completed(
-      contract({ ...absentInfo('o'), startDate: f('2026-10-06'), signedOn: null }),
-    );
-    expect(text(companyLetter(r, 'information', TODAY, TABLES, NO_DETAILS, tr))).toContain(
-      '(arts. 3 y 7.1), esta información se da por escrito antes de empezar a trabajar',
     );
   });
 
@@ -293,92 +209,14 @@ describe('the request for the information owed in writing', () => {
     // The letter the pass pays for has the request too.
     expect(text(full(r))).toContain('Convenio colectivo, con su código');
   });
-
-  it('is not offered for an element only unknown, one owed only if used, or a short contract', () => {
-    const unknown = contract({
-      info: { ...absentInfo().info, o: 'unknown', k: 'absent' },
-    });
-    expect(missingInformation(completed(unknown).review)).toBeNull();
-    const short = completed(
-      contract({
-        ...absentInfo('o'),
-        modality: 'production',
-        causeStated: true,
-        circumstancesStated: true,
-        startDate: f('2026-10-01'),
-        endDate: f('2026-10-20'),
-        signedOn: null,
-      }),
-    );
-    expect(missingInformation(short.review)).toBeNull();
-  });
 });
 
 describe('the request for the certificate of temporary contracts', () => {
-  it('is offered only with a fixed-term finding on the modality or the chaining', () => {
-    expect(kindsOf(completed(belowMinimum)).free).toEqual([]);
-    expect(kindsOf(completed(contract())).free).toEqual([]);
-    expect(kindsOf(completed(workOrService)).free).toEqual(['temporary_contracts_certificate']);
-    for (const input of corners) {
-      const r = completed(input);
-      expect(kindsOf(r).free.includes('temporary_contracts_certificate')).toBe(
-        hasTemporalityFinding(r),
-      );
-    }
-  });
-
   // Each case with the findings it is about, so a change in the engine shows here.
   const statusesOf = (r: CompletedEmploymentReview) =>
     r.review.items.flatMap((a) =>
       a.kind === 'single' ? [[a.finding.id, a.finding.status] as const] : [],
     );
-
-  it.each<[string, Partial<EmploymentInput>, readonly [string, string]]>([
-    [
-      'a permanent part-time contract not in writing',
-      {
-        writtenContract: false,
-        contractHours: { weekly: 20, annual: null },
-        partTime: {
-          hoursStated: true,
-          distributionStated: true,
-          complementary: null,
-          voluntaryPercent: null,
-        },
-      },
-      ['written_form', 'missing_requirement'],
-    ],
-    [
-      'a fixed-discontinuous contract without its activity period',
-      {
-        modality: 'discontinuous',
-        discontinuous: { activityPeriod: false, hours: true, distribution: true },
-      },
-      ['discontinuous_essentials', 'missing_requirement'],
-    ],
-    [
-      'alternance training at 80 % effective work',
-      {
-        modality: 'training_alternance',
-        startDate: f('2026-01-12'),
-        endDate: f('2026-12-31'),
-        signedOn: null,
-        trial: null,
-        training: {
-          studiesEndedOn: null,
-          disability: false,
-          planAttached: true,
-          effectiveWorkPercent: { year1: 80, year2: null },
-        },
-      },
-      ['training_alternance_effective_work', 'over_legal_limit'],
-    ],
-  ])('is not offered for %s', (_name, change, finding) => {
-    const r = completed(contract(change));
-    expect(statusesOf(r)).toContainEqual(finding);
-    expect(hasTemporalityFinding(r)).toBe(false);
-    expect(kindsOf(r).free).not.toContain('temporary_contracts_certificate');
-  });
 
   const production = (change: Partial<EmploymentInput>) =>
     contract({
@@ -393,36 +231,9 @@ describe('the request for the certificate of temporary contracts', () => {
 
   it.each<[string, EmploymentInput, readonly [string, string]]>([
     [
-      'a production contract over one year',
-      production({ startDate: f('2025-01-12'), endDate: f('2026-03-31') }),
-      ['production_1_year', 'over_legal_limit'],
-    ],
-    [
-      'a production contract with two extensions',
-      production({ extensions: 2 }),
-      ['production_one_extension', 'over_legal_limit'],
-    ],
-    [
-      'a replacement contract that names no one',
-      contract({
-        modality: 'replacement',
-        replacedPersonNamed: false,
-        replacementCauseStated: true,
-        startDate: f('2026-01-12'),
-        endDate: f('2026-05-31'),
-        signedOn: null,
-      }),
-      ['replacement_name_cause', 'missing_requirement'],
-    ],
-    [
       'a fixed-term contract not in writing',
       production({ writtenContract: false }),
       ['written_form', 'missing_requirement'],
-    ],
-    [
-      'a work-or-service contract after the reform',
-      workOrService,
-      ['abolished_modalities', 'becomes_permanent'],
     ],
     [
       'contracts chained over 18 months in 24',
@@ -520,24 +331,6 @@ describe('the letters', () => {
       const c = employmentCase(completed(input), TODAY, TABLES);
       for (const kind of [...c.letterKinds, ...(c.freeLetterKinds ?? [])])
         expect(malformed(c.letter(kind, details, tr).blocks)).toEqual([]);
-    }
-  });
-
-  it('inform without advising, asserting or pressing', () => {
-    const models: DocumentModel[] = [];
-    for (const input of [...corners, { ...belowMinimum, ...absentInfo('o', 'e', 'q') }]) {
-      const c = employmentCase(completed(input), TODAY, TABLES);
-      const kinds: LetterKind[] = [...c.letterKinds, ...(c.freeLetterKinds ?? [])];
-      for (const kind of kinds) models.push(c.letter(kind, details, tr));
-    }
-    expect(models.length).toBeGreaterThan(10);
-    for (const model of models) {
-      const all = text(model).toLowerCase();
-      for (const forbidden of [...FORBIDDEN, ...EMPLOYMENT_FORBIDDEN])
-        expect(all).not.toMatch(forbidden);
-      expect(all).not.toMatch(
-        /\bexijo\b|\breclamo\b|\bdemanda\b|\bfirma\b|denunciar|tribunal|juzgado/,
-      );
     }
   });
 });

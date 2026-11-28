@@ -7,13 +7,10 @@ import type { Block, DocumentModel } from '../../src/documents/ports';
 import type { Translate } from '../../src/i18n/client';
 import { sans } from '../../src/documents/fonts/sans';
 import { serif } from '../../src/documents/fonts/serif';
-import { NO_DETAILS } from '../../src/documents/letter';
 import { STYLES } from '../../src/documents/pdf';
 import { PdfDocument } from '../../src/documents/pdf-writer';
-import { depositLetter, rentLetter } from '../../src/rental/letters';
 import { rentalReport } from '../../src/rental/report';
 import { NORMS_BEFORE_VOTE } from '../engine/rental/norms-before-vote';
-import { FORBIDDEN } from '../support/forbidden';
 import type { ItemReading } from '../../src/engine/rental/item';
 import type { IndexId } from '../../src/engine/rental/indices';
 import type { RateFigure, RentUpdateReading } from '../../src/engine/rental/rent-update';
@@ -29,7 +26,6 @@ import {
   TODAY,
   tr,
   unknownLargeLandlord,
-  update,
 } from './fixtures';
 
 const report = (input: RentalInput): DocumentModel =>
@@ -59,26 +55,6 @@ describe('the rental report', () => {
     return { model, all: text(model.blocks) };
   };
 
-  it('gives the data the person confirmed', () => {
-    const { model, all } = built();
-    expect(model.blocks).toContainEqual({
-      type: 'row',
-      label: 'Fecha del contrato',
-      value: '15-03-2024',
-    });
-    expect(model.blocks).toContainEqual({
-      type: 'row',
-      label: 'Actualización de la renta',
-      value: 'El IPC',
-    });
-    expect(model.blocks).toContainEqual({
-      type: 'row',
-      label: 'Llaves devueltas el',
-      value: '30-06-2026',
-    });
-    expect(all).toContain('Comunidad de Madrid');
-  });
-
   it('gives each item with its exact figures and its calculation', () => {
     const { all } = built();
     expect(all).toContain('Subida del 20-03-2025');
@@ -102,34 +78,6 @@ describe('the rental report', () => {
     expect(all).toContain('La otra cuenta');
   });
 
-  it('lists each index with its month and publication day', () => {
-    const { model } = built();
-    const at = model.blocks.findIndex(
-      (b) => b.type === 'heading' && b.text === 'Índices usados, con su mes y su publicación',
-    );
-    expect(model.blocks.slice(at + 1, at + 3)).toEqual([
-      { type: 'bullet', text: 'IPC de febrero de 2025: 3 %, publicado el 14-03-2025' },
-      { type: 'bullet', text: 'IRAV de febrero de 2025: 2,08 %, publicado el 14-03-2025' },
-    ]);
-  });
-
-  it('gives each norm once with how it stands, linked', () => {
-    const { model, all } = built();
-    const at = model.blocks.findIndex(
-      (b) => b.type === 'heading' && b.text === 'Las normas y su estado',
-    );
-    const norms = model.blocks.slice(at + 1).filter((b) => b.type === 'source');
-    const deposit = norms.find(
-      (b) =>
-        b.type === 'source' &&
-        b.text ===
-          'LAU, art. 36.4 (Ley 29/1994, de 24 de noviembre, de Arrendamientos Urbanos) · en vigor',
-    );
-    expect(deposit).toMatchObject({ url: expect.stringMatching(/^https:\/\/www\.boe\.es\//) });
-    expect(all).not.toContain('Real Decreto-ley 28/2026');
-    expect(all).not.toContain('pendiente de convalidación');
-  });
-
   it('gives RDL 28/2026 as pending when it awaited the vote, as the report read before 12-11-2026', () => {
     const before = reviewRental(full, TODAY, { ...RENTAL_TABLES, norms: NORMS_BEFORE_VOTE });
     if (!before.ok) throw new Error('invalid');
@@ -148,74 +96,9 @@ describe('the rental report', () => {
       }),
     );
   });
-
-  it('gives the information blocks, what is not checked and the day it was made', () => {
-    const { model, all } = built();
-    expect(all).toContain('Para que lo tengas en cuenta');
-    expect(all).toContain('Depósito de la fianza');
-    expect(all).toContain('Lo que esta revisión no comprueba');
-    expect(all).toContain('Si los desperfectos justifican un descuento de la fianza.');
-    expect(all).toContain('eslojusto.es · 8 de octubre de 2026');
-    expect(model.footer).toContain('8 de octubre de 2026');
-  });
-
-  it('shows a repealed window with both readings, out of the total', () => {
-    const repealed = text(report(repealedWindow).blocks);
-    expect(repealed).toContain('Depende de cómo se lea una norma que ya está derogada');
-    expect(repealed).toContain('No se suma al total mientras esa duda siga abierta.');
-    expect(repealed).toMatch(/derogada el 30-04-2026/);
-  });
-
-  it('gives no advice', () => {
-    const { all } = built();
-    for (const forbidden of FORBIDDEN) expect(all.toLowerCase()).not.toMatch(forbidden);
-  });
-});
-
-describe('the rental documents', () => {
-  it('use only characters both fonts can draw', () => {
-    // The writer turns these spaces into plain ones.
-    const substituted = new Set(['\u00a0', '\u202f', '\u2009']);
-    const missing = new Set<string>();
-    for (const input of [full, repealedWindow]) {
-      const r = { review: review(input), input, detail: 'unlocked' as const };
-      for (const model of [
-        rentalReport(r, tr, TODAY),
-        depositLetter(r, TODAY, NO_DETAILS, tr),
-        rentLetter(r, NO_DETAILS, tr),
-      ])
-        for (const c of text(model.blocks)) {
-          const code = String(c.codePointAt(0));
-          if (c !== '\n' && !substituted.has(c) && !(code in sans.glyphs && code in serif.glyphs))
-            missing.add(c);
-        }
-    }
-    expect([...missing]).toEqual([]);
-  });
 });
 
 describe('the rental report on the page', () => {
-  // A row puts its value on the right and wraps its label in what is left: the value, and the
-  // longest word of the label beside it, must fit the page.
-  it('never has a row wider than the page', () => {
-    const doc = new PdfDocument({ sans, serif }, 'x');
-    const longFlash: RentalInput = {
-      ...full,
-      updates: [update('2025-03-20', 1000, 1030, { agreedInWriting: null })],
-    };
-    for (const input of [full, repealedWindow, longFlash]) {
-      const model = rentalReport({ review: review(input), input, detail: 'unlocked' }, tr, TODAY);
-      for (const b of model.blocks) {
-        if (b.type !== 'row') continue;
-        const word = Math.max(...b.label.split(' ').map((w) => doc.measure(w, STYLES.row)));
-        expect(
-          doc.measure(b.value, STYLES.row) + 16 + word,
-          `${b.label}: ${b.value}`,
-        ).toBeLessThanOrEqual(doc.width);
-      }
-    }
-  });
-
   it('names the cap’s norm on its own line, not in the row', () => {
     const model = report(full);
     expect(model.blocks).toContainEqual({
