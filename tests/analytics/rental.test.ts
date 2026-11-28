@@ -111,6 +111,48 @@ describe('rental events', () => {
     );
   });
 
+  it('names what each family of points came to, and why a reading depends', () => {
+    const everything = contract({
+      signedOn: f('2024-03-15'),
+      startDate: f('2024-03-20'),
+      largeLandlord: true,
+      fees: [{ kind: 'agency_fee', amount: 500, deductedLater: false, requestedInWriting: true }],
+      guarantees: [
+        { kind: 'cash', amount: 2000 },
+        { kind: 'bank_guarantee', amount: 5000 },
+      ],
+      updates: [
+        update('2025-03-20', 1000, 1030, { agreedInWriting: null }),
+        update('2026-03-20', 1030, 1100, { agreedInWriting: null }),
+      ],
+      charges: [
+        {
+          kind: 'community',
+          inContract: false,
+          annualAgreed: null,
+          charged: [{ year: 2025, amount: 300 }],
+        },
+      ],
+      moveOut: {
+        keysReturnedOn: f('2026-06-01'),
+        returns: [{ on: f('2026-08-01'), amount: 900 }],
+        deductions: [{ amount: 100, kind: 'wear' }],
+      },
+    });
+    expect(props(everything)).toMatchObject({
+      large_landlord: 'yes',
+      updates: '2',
+      fees: 'paid_over',
+      guarantees: 'review_it',
+      rent_update: 'not_checkable',
+      rent_unchecked: ['agreed_in_writing'],
+      charges: 'review_it',
+      deposit_return: 'owed',
+      depends: ['agreement_unknown', 'interest_day_count'],
+      difference: '500-2000',
+    });
+  });
+
   it('names the doubts, each once, and counts a repealed window out of the difference', () => {
     expect(props(unknownLargeLandlord).large_landlord).toBe('unknown');
     const repealed = props(repealedWindow);

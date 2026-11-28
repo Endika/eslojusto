@@ -19,20 +19,14 @@ const findingsOf = (a: Assessed): readonly Finding[] =>
   a.kind === 'single' ? [a.finding] : a.readings.map((r) => r.finding);
 
 // The family of a point: its item; the paid-for leave and the unemployment information have none.
-function familyOf(f: Finding): Family | null {
-  switch (f.item) {
-    case 'minimum_wage':
-      return 'pay';
-    case 'working_time':
-    case 'holidays':
-    case 'termination':
-    case 'severance':
-    case 'notice':
-      return f.item;
-    case 'unemployment':
-      return null;
-  }
-}
+const FAMILY: Readonly<Partial<Record<Finding['item'], Family>>> = {
+  minimum_wage: 'pay',
+  working_time: 'working_time',
+  holidays: 'holidays',
+  termination: 'termination',
+  severance: 'severance',
+  notice: 'notice',
+};
 
 // A point's status, or `readings` when its verdict changes with a «No lo sé».
 const pointStatus = (a: Assessed): PointResult =>
@@ -43,7 +37,9 @@ function familyStatus(points: readonly Assessed[], family: Family): PointResult 
   const statuses = points
     .filter((a) => {
       const first = findingsOf(a)[0];
-      return first !== undefined && familyOf(first) === family;
+      // Stryker disable next-line ConditionalExpression: a point always holds a finding, so the guard only narrows the type
+      if (first === undefined) return false;
+      return FAMILY[first.item] === family;
     })
     .map(pointStatus);
   return HOUSEHOLD_STATUSES.find((s) => statuses.includes(s)) ?? 'none';

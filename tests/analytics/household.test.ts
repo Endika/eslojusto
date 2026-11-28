@@ -76,21 +76,91 @@ describe('household events', () => {
   it('a whole review leaves as codes and buckets', () => {
     const p = props(hardCase, 'desistimiento');
     expect(isValidEvent('household_review_completed', p)).toBe(true);
-    expect(p).toMatchObject({
+    expect(p).toEqual({
       work: 'live_in',
       pay_period: '2026+',
       ending: 'desistimiento',
       extra_pays: 'apart',
       in_kind: false,
+      pay: 'within_limit',
+      working_time: 'within_limit',
+      holidays: 'within_limit',
+      termination: 'dismissal_regime_presumed',
+      severance: 'readings',
+      notice: 'missing_requirement',
       written: 'no',
       severance_available: 'no',
-      termination: 'dismissal_regime_presumed',
+      difference: '>2000',
       attempt: '1',
       seconds: '60-180',
     });
     expect(Object.keys(p).toSorted()).toEqual(
       Object.keys(CATALOGUE.household_review_completed).toSorted(),
     );
+  });
+
+  it.each([
+    [
+      'an external worker paid by the hour below the minimum, with a payment in kind',
+      household({
+        regime: 'hourly_external',
+        hourlyRate: 6,
+        monthlyCash: null,
+        extraPays: null,
+        inKindMonthly: 100,
+        weeklyHours: 20,
+      }),
+      {
+        work: 'hourly_external',
+        extra_pays: 'not_applicable',
+        in_kind: true,
+        pay: 'below_minimum',
+        termination: 'none',
+        difference: '0',
+      },
+    ],
+    [
+      'a monthly worker with no extra payments and a payment in kind of nothing',
+      household({ extraPays: null, inKindMonthly: 0 }),
+      { work: 'monthly', extra_pays: 'none', in_kind: false, pay: 'within_limit' },
+    ],
+    [
+      'a monthly worker short of the minimum, the hours, the rests and the holidays',
+      household({
+        monthlyCash: 600,
+        holidays: { days: 20, longestStretch: 5, taken: null },
+        shortestRestHours: 8,
+        weeklyRestHours: 20,
+      }),
+      {
+        pay: 'below_minimum',
+        working_time: 'below_minimum',
+        holidays: 'below_minimum',
+        difference: '>2000',
+      },
+    ],
+    [
+      'a desistimiento with its answers left open',
+      household({
+        liveIn: true,
+        termination: desistimiento({ inWriting: null, severanceAvailable: null, noticeTime: null }),
+      }),
+      {
+        work: 'live_in',
+        termination: 'review_it',
+        severance: 'readings',
+        notice: 'within_limit',
+        written: 'unknown',
+        severance_available: 'unknown',
+      },
+    ],
+    [
+      'a desistimiento done by the book',
+      household({ termination: desistimiento() }),
+      { written: 'yes', severance_available: 'yes' },
+    ],
+  ])('names what each point of %s came to', (_, input, expected) => {
+    expect(props(input)).toMatchObject(expected);
   });
 
   it('reads a running relationship with nothing wrong as within the limits', () => {
