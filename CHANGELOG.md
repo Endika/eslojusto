@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.6](https://github.com/Endika/eslojusto/compare/v1.118.5...v1.118.6) (2026-11-28)
+
+
+### Bug Fixes
+
+* **credit:** keep the decimals a contract gives its rates ([0d6839b](https://github.com/Endika/eslojusto/commit/0d6839b0aa54630a0cd0787e67e57fef8d72647d))
+
 ## [1.118.5](https://github.com/Endika/eslojusto/compare/v1.118.4...v1.118.5) (2026-11-25)
 
 
