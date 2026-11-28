@@ -85,6 +85,11 @@ function asExpected(review: EmploymentReview): ExpectedEmploymentReview {
 const DEPS = { norms: EMPLOYMENT_NORMS, minimumWage: MINIMUM_WAGE };
 
 describe('the synthetic bank of employment packs', () => {
+  it('holds 30 to 40 cases', () => {
+    expect(CASES.length).toBeGreaterThanOrEqual(30);
+    expect(CASES.length).toBeLessThanOrEqual(40);
+  });
+
   it.each(CASES.map((c) => [c.id, c] as const))('%s', (_, c) => {
     const result = reviewEmployment(toInput(c.expected.input), f(c.today), DEPS);
     if (!result.ok) throw new Error(`invalid input: ${JSON.stringify(result.errors)}`);
