@@ -1,4 +1,4 @@
-import { daysInMonth, parseDate, type CivilDate } from '../engine/date';
+import { daysInMonth, parseDate, toIso, type CivilDate } from '../engine/date';
 import { formatAmountInput } from '../calculator/number';
 import type { Confidence, Extraction, ExtractedField } from './contract';
 
@@ -36,14 +36,24 @@ const HOLIDAY_FIELDS = ['annualHolidayDays', 'holidayDaysTaken'] as const;
 
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
 const lowest = (...cs: Confidence[]): Confidence =>
+  // Stryker disable next-line EqualityOperator: equal ranks are the same confidence, so which one stays does not matter
   cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
 
-const num = (f: ExtractedField | undefined): number | null =>
-  f && typeof f.value === 'number' ? f.value : null;
-const text = (f: ExtractedField | undefined): string | null =>
-  f && typeof f.value === 'string' ? f.value : null;
+// A field read as one kind of value, or nothing when the reading gave another.
+interface Typed<T> {
+  readonly value: T;
+  readonly confidence: Confidence;
+}
+const typed =
+  <T extends string | number | boolean>(kind: 'string' | 'number' | 'boolean') =>
+  (f: ExtractedField | undefined): Typed<T> | null =>
+    f && typeof f.value === kind ? { value: f.value as T, confidence: f.confidence } : null;
+const num = typed<number>('number');
+const text = typed<string>('string');
+const bool = typed<boolean>('boolean');
 
 function safeDate(iso: string | null): CivilDate | null {
+  // Stryker disable next-line ConditionalExpression: parseDate(null) throws, and the catch below answers the same null
   if (iso === null) return null;
   try {
     return parseDate(iso);
@@ -71,46 +81,28 @@ type Fields = Extraction['fields'];
 // The values the documents state as such.
 function stated(fields: Fields): PrefilledField[] {
   const out: PrefilledField[] = [];
+  const push = (name: string, f: Typed<unknown>, value: string, confidence = f.confidence) =>
+    out.push({ name, value, confidence });
   for (const name of ['startDate', 'endDate', 'cause'] as const) {
-    const f = fields[name];
-    const v = text(f);
-    if (f && v !== null) out.push({ name, value: v, confidence: f.confidence });
+    const f = text(fields[name]);
+    if (f) push(name, f, f.value);
   }
-  const fixedTerm = fields.fixedTermType;
-  if (fixedTerm && text(fixedTerm) !== null && text(fields.cause) === 'fixed_term_end')
-    out.push({
-      name: 'fixedTermType',
-      value: String(fixedTerm.value),
-      confidence: fixedTerm.confidence,
-    });
-  const salary = fields.monthlySalary;
-  const salaryAmount = num(salary);
-  if (salary && salaryAmount !== null)
-    out.push({
-      name: 'monthlySalary',
-      value: formatAmountInput(salaryAmount),
-      confidence: salary.confidence,
-    });
+  const fixedTerm = text(fields.fixedTermType);
+  if (fixedTerm && text(fields.cause)?.value === 'fixed_term_end')
+    push('fixedTermType', fixedTerm, fixedTerm.value);
+  const salary = num(fields.monthlySalary);
+  if (salary) push('monthlySalary', salary, formatAmountInput(salary.value));
   for (const name of HOLIDAY_FIELDS) {
-    const f = fields[name];
-    const v = num(f);
+    const f = num(fields[name]);
     // The reading gives no unit, and the form's one may not be the document's: always checked.
-    if (f && v !== null && Number.isInteger(v))
-      out.push({ name, value: String(v), confidence: 'low' });
+    if (f && Number.isInteger(f.value)) push(name, f, String(f.value), 'low');
   }
-  const notice = fields.noticeDaysReceived;
-  const noticeDays = num(notice);
-  if (notice && noticeDays !== null && Number.isInteger(noticeDays))
-    out.push({
-      name: 'noticeDaysReceived',
-      value: String(noticeDays),
-      confidence: notice.confidence,
-    });
+  const notice = num(fields.noticeDaysReceived);
+  if (notice && Number.isInteger(notice.value))
+    push('noticeDaysReceived', notice, String(notice.value));
   for (const id of ITEM_IDS) {
-    const f = fields[id];
-    const v = num(f);
-    if (f && v !== null)
-      out.push({ name: `figure_${id}`, value: formatAmountInput(v), confidence: f.confidence });
+    const f = num(fields[id]);
+    if (f) push(`figure_${id}`, f, formatAmountInput(f.value));
   }
   return out;
 }
@@ -118,20 +110,18 @@ function stated(fields: Fields): PrefilledField[] {
 // What the latest ordinary payslip says about extra pay, and the salary worked out from it.
 function payslip(fields: Fields, salaryStated: boolean): PrefilledField[] {
   const out: PrefilledField[] = [];
-  const prorated = fields.extraPayProrated;
-  const isProrated = prorated && typeof prorated.value === 'boolean' ? prorated.value : null;
-  if (prorated && isProrated !== null)
+  const prorated = bool(fields.extraPayProrated);
+  if (prorated)
     out.push({
       name: 'extraPayProrated',
-      value: isProrated ? 'yes' : 'no',
+      value: prorated.value ? 'yes' : 'no',
       confidence: prorated.confidence,
     });
-  const extra = fields.extraPayAmount;
-  const extraAmount = num(extra);
-  if (extra && extraAmount !== null && isProrated === false)
+  const extra = num(fields.extraPayAmount);
+  if (extra && prorated?.value === false)
     out.push({
       name: 'extraPayAmount',
-      value: formatAmountInput(extraAmount),
+      value: formatAmountInput(extra.value),
       confidence: extra.confidence,
     });
   if (salaryStated) return out;
@@ -140,35 +130,27 @@ function payslip(fields: Fields, salaryStated: boolean): PrefilledField[] {
   // month's total; without it, the total less the full extra payment when one was paid that
   // month, and the total otherwise. Without the proration answer the total can't be read either
   // way, so no salary is proposed. The person sees it as worked out and confirms it.
-  const total = fields.payslipTotalAccrued;
-  const totalAmount = num(total);
-  const paid = fields.extraPayPaid;
-  const extraPaid = paid && typeof paid.value === 'boolean' ? paid.value : false;
+  const total = num(fields.payslipTotalAccrued);
+  const paid = bool(fields.extraPayPaid);
   const period = [text(fields.payslipPeriodStart), text(fields.payslipPeriodEnd)] as const;
-  const known = isProrated === true || !extraPaid || extraAmount !== null;
-  if (
-    total &&
-    totalAmount !== null &&
-    prorated &&
-    isProrated !== null &&
-    known &&
-    wholeMonth(...period)
-  ) {
-    const minus = !isProrated && extraPaid ? (extraAmount ?? 0) : 0;
-    const salary = Math.round((totalAmount - minus) * 100) / 100;
-    if (salary > 0)
-      out.push({
-        name: 'monthlySalary',
-        value: formatAmountInput(salary),
-        confidence: lowest(
-          total.confidence,
-          prorated.confidence,
-          ...(!isProrated && paid ? [paid.confidence] : []),
-          ...(minus > 0 && extra ? [extra.confidence] : []),
-        ),
-        derived: true,
-      });
-  }
+  if (!total || !prorated || !wholeMonth(period[0]?.value ?? null, period[1]?.value ?? null))
+    return out;
+  const takesExtra = !prorated.value && paid?.value === true;
+  if (takesExtra && !extra) return out;
+  const taken = takesExtra ? extra : null;
+  const salary = Math.round((total.value - (taken?.value ?? 0)) * 100) / 100;
+  if (salary > 0)
+    out.push({
+      name: 'monthlySalary',
+      value: formatAmountInput(salary),
+      confidence: lowest(
+        total.confidence,
+        prorated.confidence,
+        ...(!prorated.value && paid ? [paid.confidence] : []),
+        ...(taken && taken.value > 0 ? [taken.confidence] : []),
+      ),
+      derived: true,
+    });
   return out;
 }
 
@@ -178,7 +160,7 @@ function workHistory(
   current: { startDate?: string; endDate?: string },
 ) {
   const end = safeDate(current.endDate ?? null);
-  const since = end ? `${String(end.y - 6).padStart(4, '0')}${current.endDate?.slice(4)}` : null;
+  const since = end ? toIso({ ...end, y: end.y - 6 }) : null;
   return rows.flatMap((row): PrefilledContract[] => {
     const { startDate, endDate } = row.values;
     if (typeof startDate !== 'string' || typeof endDate !== 'string') return [];
@@ -204,10 +186,12 @@ export function prefillFrom(
       own.some((f) => f.name === 'monthlySalary'),
     ),
   ];
+  const startDate = text(e.fields.startDate);
+  const endDate = text(e.fields.endDate);
   const dates = {
     ...current,
-    ...(text(e.fields.startDate) !== null && { startDate: text(e.fields.startDate) as string }),
-    ...(text(e.fields.endDate) !== null && { endDate: text(e.fields.endDate) as string }),
+    ...(startDate && { startDate: startDate.value }),
+    ...(endDate && { endDate: endDate.value }),
   };
   return {
     fields,
