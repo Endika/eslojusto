@@ -187,13 +187,10 @@ export function createApi<F extends string, L extends string>(
             : 'unexpected_response',
       );
     let json: unknown;
-    try {
-      json = await response.json();
-      // Stryker disable BlockStatement: with no JSON read, the check just below answers the same
-    } catch {
-      return withoutCode();
-    }
-    // Stryker restore BlockStatement
+    // prettier-ignore
+    try { json = await response.json(); }
+    // Stryker disable next-line BlockStatement: with no JSON read, the check just below answers the same
+    catch { return withoutCode(); }
     if (!isRecord(json)) return withoutCode();
     if (json['code'] === 'ok' || json['code'] === 'nothing_read') return json;
     return isApiError(json['code']) ? fail(json['code']) : withoutCode();

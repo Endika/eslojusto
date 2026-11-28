@@ -277,6 +277,8 @@ describe('a refusal', () => {
     }
     const free = setUp();
     free.passes.saveQuota(QUOTA);
+    await settleRefusal('daily_limit_reached', null, free.deps);
+    expect(free.passes.quota()).toBe(QUOTA);
     await settleRefusal('invalid_request', null, free.deps);
     expect(free.store.data.has(STORAGE_KEYS.quota)).toBe(false);
 
