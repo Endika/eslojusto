@@ -309,6 +309,16 @@ describe('counting what was filled', () => {
     );
     expect(prefilledCount(filled)).toBe(2);
   });
+  it('is unsure of several other jobs when only one is, and not when nothing is', () => {
+    const row = (confidence: 'high' | 'low') => ({
+      values: { startDate: '2020-01-01', endDate: '2022-01-01' },
+      confidence,
+    });
+    const jobs = (rows: Extraction['contracts']) =>
+      hasLowConfidence(prefillFrom(extraction({ startDate: f('2016-03-01') }, rows)));
+    expect(jobs([row('high'), row('low')])).toBe(true);
+    expect(jobs([])).toBe(false);
+  });
   it('is unsure when a field or a row of another job is', () => {
     const row = (confidence: 'high' | 'low') => ({
       values: { startDate: '2020-01-01', endDate: '2022-01-01' },

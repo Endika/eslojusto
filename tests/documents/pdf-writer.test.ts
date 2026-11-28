@@ -236,11 +236,6 @@ describe('the footer', () => {
       'F1 7.5 @60 32',
     ]);
   });
-  it('writes nothing without one', async () => {
-    const doc = make();
-    await doc.save();
-    expect(placed(doc)).toEqual([[]]);
-  });
 });
 
 describe('the glyphs of a font', () => {

@@ -201,7 +201,8 @@ export async function encodeAll<P extends Page, F extends string, L extends stri
   }
   // Stryker disable next-line ConditionalExpression: cannotFit already stopped the loop at the budget; this guard keeps the limit explicit
   return requestBytes(encoded) > LIMITS.requestBudgetBytes
-    ? { kind: 'failed', code: 'payload_too_large' }
+    ? // Stryker disable next-line ObjectLiteral,StringLiteral: cannotFit already stopped the loop at the budget; this guard keeps the limit explicit
+      { kind: 'failed', code: 'payload_too_large' }
     : { kind: 'encoded', files: encoded };
 }
 

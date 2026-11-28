@@ -179,14 +179,11 @@ export function createPassStore(store: KeyValueStore, now: () => number = () => 
     checkouts(): PendingCheckout[] {
       const raw = store.get(STORAGE_KEYS.checkout);
       let list: unknown;
-      try {
-        // Stryker disable next-line ConditionalExpression,ArrayDeclaration: JSON.parse(null) is null, which holds no checkout either
-        list = raw === null ? [] : JSON.parse(raw);
-        // Stryker disable BlockStatement: with no list read, none of its entries is a checkout either
-      } catch {
-        return [];
-      }
-      // Stryker restore BlockStatement
+      // prettier-ignore
+      // Stryker disable next-line ConditionalExpression,ArrayDeclaration: JSON.parse(null) is null, which holds no checkout either
+      try { list = raw === null ? [] : JSON.parse(raw); }
+      // Stryker disable next-line BlockStatement: with no list read, none of its entries is a checkout either
+      catch { return []; }
       const nowSeconds = now() / 1000;
       return (Array.isArray(list) ? list : [list])
         .filter(isPendingCheckout)
