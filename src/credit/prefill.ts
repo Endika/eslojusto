@@ -1,4 +1,5 @@
 import { formatAmountInput } from '../calculator/number';
+import { tryDate } from '../calculator/review-form';
 import {
   CREDIT_CHECKS,
   type Confidence,
@@ -10,7 +11,7 @@ import {
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
 import { conflictLines } from '../documents/summary';
-import { compareDates, parseDate, toIso, type CivilDate } from '../engine/date';
+import { compareDates, toIso, type CivilDate } from '../engine/date';
 import type { ChargeKind, ChargePayment } from '../engine/credit/types';
 import type { Translate } from '../i18n/client';
 import { CHARGE_PAYMENTS, RATE_TYPES, type CreditFormField } from './form';
@@ -39,33 +40,23 @@ const CREDIT_CONFLICT_FIELDS = [
 const LOANS = ['personal_loan', 'car_loan'] as const;
 const PRODUCTS = [...LOANS, 'revolving'] as const;
 
-const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
 const lowest = (...cs: Confidence[]): Confidence =>
-  cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
+  (['low', 'medium'] as const).find((c) => cs.includes(c)) ?? 'high';
 
-const isNumber = (v: ExtractedValue | undefined): v is number =>
-  typeof v === 'number' && Number.isFinite(v);
+const isNumber = (v: ExtractedValue | undefined): v is number => Number.isFinite(v);
 const amountOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
 const positiveOf = (v: ExtractedValue | undefined): number | null => {
   const n = amountOf(v);
-  return n !== null && n > 0 ? n : null;
+  return n === 0 ? null : n;
 };
-const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' && v.trim() !== '' ? v.trim() : null;
+const textOf = (v: ExtractedValue | undefined): string => (typeof v === 'string' ? v.trim() : '');
 const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
-  typeof v === 'string' && (options as readonly string[]).includes(v) ? (v as T) : null;
+  options.find((o) => o === v) ?? null;
 const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
   v === true ? 'yes' : v === false ? 'no' : null;
 
-function dateOf(v: ExtractedValue | undefined): CivilDate | null {
-  if (typeof v !== 'string') return null;
-  try {
-    return parseDate(v);
-  } catch {
-    return null;
-  }
-}
+const dateOf = (v: ExtractedValue | undefined): CivilDate | null => tryDate(String(v));
 
 const cents = (n: number): number => Math.round(n * 100);
 const sum = (ns: readonly number[]): number => cents(ns.reduce((s, n) => s + n, 0)) / 100;
@@ -166,14 +157,19 @@ function scheduleRows(rows: readonly ExtractedRow[]) {
     .sort((x, y) => compareDates(x.on, y.on));
 }
 
+// A count the contract states as a whole number, even one that makes no sense.
+const wholeCount = (f: SourcedField | undefined): { n: number; confidence: Confidence } | null =>
+  f !== undefined && isNumber(f.value) && Number.isInteger(f.value)
+    ? { n: f.value, confidence: f.confidence }
+    : null;
+
 // The instalments the contract states; what it leaves out, worked out from a whole schedule: how
 // many rows, the first one's day and, when every row but the last is the same, their amount. A
 // last row larger than the rest is the final instalment.
 function instalments(a: Answers, e: CreditExtraction, tr: Translate) {
   const { fields } = e;
-  const count = fields.instalmentCount;
-  const n = count && isNumber(count.value) && Number.isInteger(count.value) ? count.value : null;
-  if (count && n !== null && n > 0) a.read('instalmentCount', String(n), count.confidence);
+  const count = wholeCount(fields.instalmentCount);
+  if (count && count.n > 0) a.read('instalmentCount', String(count.n), count.confidence);
   const amount = positiveOf(fields.instalmentAmount?.value);
   if (fields.instalmentAmount && amount !== null)
     a.read('instalmentAmount', amountText(amount), fields.instalmentAmount.confidence);
@@ -194,7 +190,7 @@ function instalments(a: Answers, e: CreditExtraction, tr: Translate) {
   if (!head || e.truncated) return;
   const sure = lowest(...rows.map((r) => r.row.confidence));
   let worked = false;
-  if (n === null) {
+  if (count === null) {
     a.read('instalmentCount', String(rows.length), sure, true);
     worked = true;
   }
@@ -204,14 +200,11 @@ function instalments(a: Answers, e: CreditExtraction, tr: Translate) {
   }
   if (amount === null) {
     const amounts = rows.map((r) => positiveOf(r.row.values['amount']));
-    const regular = amounts.slice(0, -1);
-    const last = amounts.at(-1) ?? null;
-    const usual = regular[0] ?? last;
+    const [usual = null] = amounts;
     const even =
       usual !== null &&
-      regular.every((x) => x !== null && cents(x) === cents(usual)) &&
-      last !== null &&
-      cents(last) >= cents(usual);
+      amounts.slice(0, -1).every((x) => x === usual) &&
+      (amounts.at(-1) ?? 0) >= usual;
     if (even) {
       a.read('instalmentAmount', amountText(usual), sure, true);
       worked = true;
@@ -314,7 +307,7 @@ function repayment(a: Answers, e: CreditExtraction, product: string | null, tr: 
   const charged = amountOf(fields.compensationCharged?.value);
   if (!on && repaid === null && charged === null) return;
   a.open('repaid', 'yes');
-  if (fields.repaidOn && on) a.read('repaidOn', toIso(on), fields.repaidOn.confidence);
+  a.field('repaidOn', fields.repaidOn, map(on, toIso));
   a.field('principalRepaid', fields.principalRepaid, map(repaid, amountText));
   a.field('compensation', fields.compensationCharged, map(charged, amountText));
   a.field(
@@ -322,8 +315,7 @@ function repayment(a: Answers, e: CreditExtraction, product: string | null, tr: 
     fields.interestSettled,
     map(amountOf(fields.interestSettled?.value), amountText),
   );
-  const end = dateOf(fields.agreedEndOn?.value);
-  if (fields.agreedEndOn && end) a.read('agreedEndOn', toIso(end), fields.agreedEndOn.confidence);
+  a.field('agreedEndOn', fields.agreedEndOn, map(dateOf(fields.agreedEndOn?.value), toIso));
   a.field('paidByInsurance', fields.paidByInsurance, yesNo(fields.paidByInsurance?.value));
   if (product === 'car_loan')
     a.field('discountLost', fields.discountLost, yesNo(fields.discountLost?.value));
@@ -347,6 +339,7 @@ function repayment(a: Answers, e: CreditExtraction, product: string | null, tr: 
 export function creditPrefill(
   e: CreditExtraction,
   tr: Translate,
+  // Stryker disable next-line ArrayDeclaration: the default only matters when empty; any entry that names no check words nothing
   checks: readonly FailedCheck[] = [],
 ): CreditPrefill {
   const a = new Answers();
