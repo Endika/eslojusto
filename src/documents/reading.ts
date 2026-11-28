@@ -91,6 +91,7 @@ export const canLocate = (
 // The allowance a request carries: a valid pass, or the free quota.
 export function allowanceFor(passes: PassStore, nowMs: number) {
   const stored = passes.pass();
+  // Stryker disable next-line ConditionalExpression: passState reads no pass as 'none'; the check narrows the type
   return stored !== null && passState(stored, nowMs) === 'valid'
     ? { stored, fields: { pass: stored.token } }
     : { stored: null, fields: { quota: passes.quota() } };
@@ -199,9 +200,7 @@ export async function encodeAll<P extends Page, F extends string, L extends stri
   } catch {
     return deps.current() ? { kind: 'failed', code: 'image_unreadable' } : STOPPED;
   }
-  return requestBytes(encoded) > LIMITS.requestBudgetBytes
-    ? { kind: 'failed', code: 'payload_too_large' }
-    : { kind: 'encoded', files: encoded };
+  return { kind: 'encoded', files: encoded };
 }
 
 // The photos that look like they will read badly, each with the one thing to say about it.
