@@ -13,5 +13,8 @@
     "break": 100
   },
   "disableTypeChecks": false,
-  "ignoreStatic": true
+  "ignoreStatic": true,
+  "vitest": {
+    "configFile": "stryker/vitest.config.ts"
+  }
 }
