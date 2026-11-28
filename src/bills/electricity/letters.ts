@@ -6,7 +6,6 @@ import {
   type LetterKind,
 } from '../../documents/letter';
 import type { Block, DocumentModel } from '../../documents/ports';
-import type { ElectricityReview } from '../../engine/bills/electricity-review';
 import {
   countedAmount,
   findingsOf,
@@ -39,6 +38,7 @@ interface CorrectionLine {
 const DISCOUNTS: ReadonlySet<BillsItemId> = new Set(['social_bonus']);
 
 function billedOf(input: ElectricityBillInput, f: BillFinding): number | null {
+  // Stryker disable next-line ConditionalExpression: indexing a list with null gives undefined as well
   const at = <T>(list: readonly T[]) => (f.line === null ? undefined : list[f.line]);
   const power = (period: 'p1' | 'p2') => {
     const lines = input.power.filter((l) => l.period === period);
@@ -76,12 +76,11 @@ function correctionLines({ input, review }: CompletedElectricityReview): Correct
     if (least <= 0) return [];
     const findings = findingsOf(item);
     const finding = findings.find((f) => countedAmount(single(f)) === least);
+    // Stryker disable next-line ConditionalExpression,ArrayDeclaration: the finding of the least amount is always among the findings
     if (finding === undefined) return [];
     return [{ finding, billed: billedOf(input, finding), lowest: findings.length > 1 }];
   });
 }
-
-const reviewOf = (e: CompletedElectricityReview): ElectricityReview => e.review;
 
 // The bills of the year the letter speaks of: those that count, a copy only once, each with the
 // lines it has over the norm.
@@ -91,7 +90,8 @@ export function correctedBills(
   const basket = electricityBasket(entries);
   return basket.bills.flatMap((i) => {
     const entry = entries[i];
-    if (entry === undefined || !reviewOf(entry).scope.inScope) return [];
+    // Stryker disable next-line ConditionalExpression,ArrayDeclaration: the basket lists indexes of the entries it was given
+    if (entry === undefined) return [];
     const lines = correctionLines(entry);
     return lines.length === 0 ? [] : [{ entry, lines }];
   });

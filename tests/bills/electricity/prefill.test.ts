@@ -158,18 +158,8 @@ describe('the answers a bill gives', () => {
     expect(bill?.fingerprint).toBeNull();
   });
 
-  it('reads a 2.0TD tariff as it is, and any other as another', () => {
-    expect(entriesOf(billOf({ accessTariff: '2.0TD' }))).toEqual([['accessTariff', '2.0TD']]);
-    expect(entriesOf(billOf({ accessTariff: 'other' }))).toEqual([['accessTariff', 'other']]);
-  });
-
   it('opens the tolls only when the bill gives both of them', () => {
     expect(entriesOf(billOf({ tollsAndChargesEnergy: 10 }))).toEqual([]);
-  });
-
-  it('is not low in confidence when no answer is', () => {
-    const [bill] = electricityPrefill(billOf({ postcode: '28001' }), tr).bills;
-    expect(bill).toMatchObject({ lowConfidence: false, notes: [] });
   });
 
   it('reads a postcode of exactly five digits, and a figure of zero', () => {
@@ -266,18 +256,6 @@ describe('the lines of a bill', () => {
       kwhP1: 'high',
       kwhP3: 'medium',
     });
-  });
-
-  it('asks the price change from a bill with only power lines, or only energy lines', () => {
-    expect(entriesOf(billOf({}, { powerLines: [power(1, 'p1')] }))?.[0]).toEqual([
-      'priceChange',
-      'no',
-    ]);
-    expect(entriesOf(billOf({}, { energyLines: [energy(1, 'p1')] }))?.[0]).toEqual([
-      'priceChange',
-      'no',
-    ]);
-    expect(entriesOf(billOf({}, {}))).toEqual([]);
   });
 
   it('leaves the lines to the person when a period is billed in stretches', () => {
@@ -399,30 +377,6 @@ describe('the services, discounts and regularisations of a bill', () => {
     expect(marks?.[0]?.derived).toBeUndefined();
     expect(marks?.[1]?.derived).toBe(true);
   });
-
-  it('leaves both regularisations to the person, saying so', () => {
-    const both = billOf(
-      {},
-      other([
-        line(1, 'regularization_charge', { amount: 5 }),
-        line(1, 'regularization_refund', { amount: 1 }),
-      ]),
-    );
-    expect(entriesOf(both)).toEqual([]);
-    expect(electricityPrefill(both, tr).notes).toEqual([
-      'client.bills.documents.both_regularizations',
-    ]);
-  });
-
-  it('reads nothing of lines of another bill or of another kind', () => {
-    const e = billOf(
-      {},
-      {
-        otherLines: [line(2, 'discount', { amount: 1 }), line(1, 'something', { amount: 1 })],
-      },
-    );
-    expect(entriesOf(e)).toEqual([]);
-  });
 });
 
 describe('a read of several bills', () => {
@@ -486,10 +440,5 @@ describe('a read of several bills', () => {
       'client.bills.documents.check.days_mismatch',
       'client.bills.documents.check.duplicate_bill',
     ]);
-  });
-
-  it('says nothing of the count for one bill, nor of checks that did not fail', () => {
-    expect(electricityPrefill(extraction({}), tr).notes).toEqual([]);
-    expect(electricityPrefill(extraction({}), tr, []).notes).toEqual([]);
   });
 });

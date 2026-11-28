@@ -273,7 +273,7 @@ function billPrefill(
 
 // Oldest first; a bill without its last reading goes last, in the order read.
 const byLastReading = (a: BillRead, b: BillRead): number =>
-  a.to === null ? (b.to === null ? 0 : 1) : b.to === null ? -1 : a.to.localeCompare(b.to);
+  Number(a.to === null) - Number(b.to === null) || (a.to ?? '').localeCompare(b.to ?? '');
 
 // What a read puts into the electricity review, bill by bill. Nothing here reviews anything: each
 // bill fills the form on its own, every answer marked as read and how surely, and the person

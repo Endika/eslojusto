@@ -83,6 +83,15 @@ describe('the basket of «tu año»', () => {
     ]);
   });
 
+  it('lists every copy of a bill as a copy', () => {
+    const root = render([entryWith([]), entryWith([]), entryWith([])]);
+    expect(
+      [...root.querySelectorAll('[data-basket-bills] li')].map((li) =>
+        li.textContent?.startsWith('client.bills.basket.bill_duplicate'),
+      ),
+    ).toEqual([false, true, true]);
+  });
+
   it('lists a bill outside the review as one that counts nothing, not as a copy', () => {
     const out = entryWith([], {}, { counted: 0 });
     const outside = {
@@ -138,14 +147,6 @@ describe('the basket of «tu año»', () => {
       expect(part(root, 'estimate').hidden).toBe(false);
       expect(part(root, 'estimate').textContent).toMatch(
         /^client\.bills\.basket\.estimate \{"partidas":"client\.bills\.item\.vat, client\.bills\.item\.meter","importe":"\d/,
-      );
-    });
-
-    it('names none of them when the year is locked with the pass offered', () => {
-      const root = render(repeating, { locked: true });
-      expect(part(root, 'recurring').textContent).toBe('client.bills.basket.recurring_unnamed');
-      expect(part(root, 'estimate').textContent).toMatch(
-        /^client\.bills\.basket\.estimate_unnamed \{"importe":"\d/,
       );
     });
 

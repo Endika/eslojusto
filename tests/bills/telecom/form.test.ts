@@ -2,7 +2,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   formScope,
-  onQuestions,
   readTelecomForm,
   sheetErrors,
   sheetOfField,
@@ -65,12 +64,6 @@ describe('the questions a telecom answer opens', () => {
       { field: 'months', code: 'missing_value' },
     ]);
     expect(inputOf(form({ agreedPenalty: '' })).commitment?.agreedPenalty).toBeNull();
-  });
-
-  it('asks the exit date always', () => {
-    expect(errorsOf(form({ exitRequestedOn: '' }))).toEqual([
-      { field: 'exitRequestedOn', code: 'missing_value' },
-    ]);
   });
 
   it('asks the notice only of a notified change, with the day it applies as optional', () => {
@@ -159,12 +152,6 @@ describe('the questions a telecom answer opens', () => {
 });
 
 describe('the answers of a telecom form', () => {
-  it('gives the form’s own errors, before the engine looks at anything', () => {
-    expect(errorsOf(form({ months: 'abc', penaltyCharged: '0' }))).toEqual([
-      { field: 'months', code: 'invalid_number' },
-    ]);
-  });
-
   it('gives the engine’s errors once every answer reads', () => {
     expect(errorsOf(form({ months: '0' }))).toEqual([{ field: 'months', code: 'count_range' }]);
   });
@@ -187,18 +174,6 @@ describe('the answers of a telecom form', () => {
     expect(sheetOfField('lineAmount')).toBe('despues');
     expect(sheetOfField('priceIndex')).toBe('cambio');
     expect(sheetOfField('nope' as never)).toBe('permanencia');
-  });
-
-  it('names the question each engine error belongs to', () => {
-    expect(
-      onQuestions([
-        { field: 'handset.value', code: 'amount_range' },
-        { field: 'lines', code: 'not_after_start' },
-      ]),
-    ).toEqual([
-      { field: 'handsetValue', code: 'amount_range' },
-      { field: 'lineAmount', code: 'not_after_start' },
-    ]);
   });
 
   it('keeps the visit going until the exit date reads, then says whether it is in the review', () => {

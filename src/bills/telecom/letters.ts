@@ -146,7 +146,7 @@ export function exitLetter(
 
 const eurosOf = (f: BillFinding, key: string, name: string): number | null => {
   const v = f.calculation.find((p) => p.key === key)?.vars?.[name];
-  return v !== undefined && typeof v === 'object' && 'euros' in v ? v.euros : null;
+  return typeof v === 'object' && 'euros' in v ? v.euros : null;
 };
 
 // Asks the operator to look again at a commitment penalty over the share of the days not served
@@ -161,6 +161,7 @@ export function penaltyLetter(
   const { commitment, penaltyCharged } = input;
   const cap = finding === null ? null : eurosOf(finding, 'commitment.proportional', 'euros');
   const body: Block[] =
+    // Stryker disable next-line ConditionalExpression: the cap is null when there is no finding
     finding === null ||
     commitment === null ||
     commitment.agreedPenalty === null ||

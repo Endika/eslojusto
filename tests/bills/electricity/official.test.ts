@@ -106,7 +106,7 @@ describe('the energy against the PVPC', () => {
       {
         type: 'bullet',
         text: expect.stringMatching(
-          /^client\.bills\.electricity\.report\.official\.energy_single \{.*"kwh":"client\.bills\.unit\.kwh \{\\"n\\":\\"100\\"\}"/,
+          /^client\.bills\.electricity\.report\.official\.energy_single \{.*"kwh":"client\.bills\.unit\.kwh \{\\"n\\":\\"100\\"\}".*"tuPrecio":"client\.bills\.unit\.per_kwh \{\\"n\\":\\"0,1000\\"\}"/,
         ),
       },
       { type: 'note', text: `${PREFIX}single_note` },
@@ -178,7 +178,7 @@ describe('the power against the use', () => {
   it('words a period with its price, the unused power and what it costs', () => {
     expect(bullets([used()])[0]).toMatchObject({
       text: expect.stringMatching(
-        /^client\.bills\.electricity\.report\.official\.power_period \{.*"porKw".*"sobrantes".*"coste"/,
+        /^client\.bills\.electricity\.report\.official\.power_period \{.*"contratada":"client\.bills\.unit\.kw \{\\"n\\":\\"4,6\\"\}".*"porKw".*"sobrantes".*"coste"/,
       ),
     });
   });

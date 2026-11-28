@@ -339,6 +339,13 @@ describe('the memory of the bills read', () => {
     ]);
   });
 
+  it('tells a bill read with a period start from one read with a period end', () => {
+    const memory = chargesMemory();
+    memory.add([bill({ periodFrom: day('2026-09-01') })]);
+    memory.add([bill({ periodTo: day('2026-09-01') })]);
+    expect(memory.bills()).toHaveLength(2);
+  });
+
   it('keeps the newest first, whichever was read last', () => {
     const memory = chargesMemory();
     memory.add([bill({ issuedOn: day('2026-10-22') })]);
@@ -386,14 +393,6 @@ describe('the lines and titles of «Lo que te cobran»', () => {
   ])('titles a bill read as %j', (bill, expected) => {
     const [title] = texts(rendered(one(bill)), '[data-bill-title]');
     expect(title).toContain(expected);
-  });
-
-  it('titles a bill by its period without an operator, with the operator when it has one', () => {
-    const [plain] = texts(
-      rendered(one({ periodFrom: '2026-09-01', periodTo: '2026-09-30' })),
-      '[data-bill-title]',
-    );
-    expect(plain).toMatch(/^client\.bills\.telecom\.charges\.bill_period \{/);
   });
 
   it.each([

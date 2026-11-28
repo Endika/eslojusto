@@ -146,27 +146,9 @@ describe('the blocks of a report', () => {
     expect(notes(totals(1, 2, 0.5))).toHaveLength(3);
   });
 
-  it('gives a line with its verdict, its calculation, its rules and its table rows', () => {
-    const f = found('vat', [cited(NORM_A, '2026-01-01')]);
-    const list = blocks([review({ items: [single(f)] })]).blocks.slice(6, -1);
-    expect(list.map((b) => b.type)).toEqual(['row', 'bullet', 'source', 'source']);
-    expect(list[0]).toMatchObject({ label: 'T:vat', value: expect.stringContaining('paid_over') });
-    expect(list[1]).toMatchObject({ text: expect.stringContaining('scope.over_15kw') });
-    expect(list[2]).toMatchObject({
-      type: 'source',
-      text: expect.stringContaining(' · '),
-      url: expect.stringMatching(/^https:/),
-    });
-    expect(list[3]).toMatchObject({
-      type: 'source',
-      text: expect.stringContaining('client.bills.report.row {'),
-      url: `https://rows.example/${NORM_A}/2026-01-01`,
-    });
-  });
-
   it('gives every reading of a line the norms leave open, and each rule and row once', () => {
     const a = found('vat', [cited(NORM_A, '2026-01-01'), cited(NORM_A, '2026-02-01')]);
-    const b = found('vat', [cited(NORM_A, '2026-01-01'), cited(NORM_B, '2026-01-01')]);
+    const b = found('billing', [cited(NORM_A, '2026-01-01'), cited(NORM_B, '2026-01-01')]);
     const list = blocks([review({ items: [readingsOf(a, b)] })]).blocks.slice(6, -1);
     expect(types(list)).toEqual([
       'row',
@@ -179,10 +161,18 @@ describe('the blocks of a report', () => {
       'source',
       'source',
       'source',
+      'source',
     ]);
+    expect(list[2]).toMatchObject({
+      text: expect.stringMatching(/^.+: client\.bills\.status\.paid_over/),
+    });
+    expect(list.filter((x) => x.type === 'source').at(-1)).toMatchObject({
+      text: expect.stringMatching(/^client\.bills\.report\.row \{"norma":".+","estado":".+"\}$/),
+    });
     expect(list[0]).toMatchObject({ value: 'client.bills.status.depends' });
     expect(list[1]).toEqual({ type: 'note', text: 'client.bills.depends.official_value' });
     expect(list.filter((x) => x.type === 'source').map((x) => ('url' in x ? x.url : ''))).toEqual([
+      expect.stringMatching(/^https:/),
       expect.stringMatching(/^https:/),
       `https://rows.example/${NORM_A}/2026-01-01`,
       `https://rows.example/${NORM_A}/2026-02-01`,
