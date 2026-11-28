@@ -146,11 +146,6 @@ export function amounts(base: number, children: 0 | 1 | 2): { c1: number; c2: nu
   };
 }
 
-// Approximate gross total over the minimum duration; secondary data, always «al menos» (at least).
-export const approximateTotal = (c1: number, c2: number, duration: number): number =>
-  (c1 * Math.min(duration, P.firstStretchDays)) / 30 +
-  (c2 * Math.max(duration - P.firstStretchDays, 0)) / 30;
-
 function figures(base: number, children: Children): BenefitFigures {
   if (children !== null) {
     const { c1, c2, ss } = amounts(base, children);
