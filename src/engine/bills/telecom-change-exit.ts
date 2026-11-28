@@ -41,8 +41,9 @@ export function changeExitDeadline(input: TelecomInput): CivilDate | null {
 // difference counts. A rise under an index clause, and a change notified less than a month ahead
 // or not at all, are shown without a figure.
 export function checkChangeExit(input: TelecomInput, deps: ChangeExitDeps): BillItem | null {
-  const { changeNotice: notice, penaltyCharged: charged, exitRequestedOn: exit } = input;
-  if (notice === null || charged === null || charged <= 0) return null;
+  const { changeNotice: notice, exitRequestedOn: exit } = input;
+  const charged = input.penaltyCharged ?? 0;
+  if (notice === null || charged <= 0) return null;
   const { norms } = deps;
   const finding = (
     status: BillsStatus,

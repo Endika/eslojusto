@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
-import { countedAmount } from '../../../src/engine/bills/finding';
+import { billsPhrase as say } from '../../../src/engine/bills/calculation';
+import { countedAmount, type BillItem } from '../../../src/engine/bills/finding';
 import { checkChargesAfterExit } from '../../../src/engine/bills/telecom-after-exit';
 import type { TelecomLine } from '../../../src/engine/bills/types';
 import { parseDate } from '../../../src/engine/date';
@@ -46,6 +47,7 @@ describe('charges after the exit', () => {
         vars: { from: { date: '2026-04-09' }, to: { date: '2026-04-30' }, euros: { euros: 22 } },
       },
     ]);
+    expect(only(items[0] as (typeof items)[number]).id).toBe('charge_after_exit');
     expect(only(items[0] as (typeof items)[number]).sources.map((s) => s.citation)).toEqual([
       `Real Decreto 899/2009, art. 7 (${BILLS_NORMS.rd899_2009.citation})`,
     ]);
@@ -54,6 +56,22 @@ describe('charges after the exit', () => {
   it('sends a charge on the day right after to review, never counted', () => {
     expect(check('2026-04-02', [line('2026-03-08', '2026-04-08', 32)])).toEqual([
       { status: 'review_it', line: 0, amount: 1, counted: 0 },
+    ]);
+    const [item] = checkChargesAfterExit(
+      telecom({
+        exitRequestedOn: parseDate('2026-04-02'),
+        lines: [line('2026-03-08', '2026-04-08', 32)],
+      }),
+      deps,
+    );
+    const f = only(item as BillItem);
+    expect(f).toMatchObject({ id: 'charge_after_exit', direction: 'over' });
+    expect(f.calculation).toEqual([
+      say('after_exit.effective', {
+        requested: { date: '2026-04-02' },
+        effective: { date: '2026-04-07' },
+      }),
+      say('after_exit.margin_day', { day: { date: '2026-04-08' } }),
     ]);
   });
 
@@ -69,5 +87,23 @@ describe('charges after the exit', () => {
     expect(check('2026-12-30', [line('2027-01-01', '2027-01-31', 30)])).toEqual([
       { status: 'not_checkable', line: null, amount: null, counted: 0 },
     ]);
+    const [item] = checkChargesAfterExit(
+      telecom({
+        exitRequestedOn: parseDate('2026-12-30'),
+        lines: [line('2027-01-01', '2027-01-31', 30)],
+      }),
+      deps,
+    );
+    expect(only(item as BillItem)).toMatchObject({ id: 'charge_after_exit' });
+    expect(only(item as BillItem).calculation).toEqual([
+      say('after_exit.calendar_missing', { year: { integer: 2027 } }),
+    ]);
+  });
+
+  it.each([
+    ['refunds', -30],
+    ['lines with no charge', 0],
+  ])('says nothing, even with no holidays loaded, of a bill with only %s', (_, amount) => {
+    expect(check('2026-12-30', [line('2027-01-01', '2027-01-31', amount)])).toEqual([]);
   });
 });

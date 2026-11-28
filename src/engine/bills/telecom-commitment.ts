@@ -49,8 +49,9 @@ function lengthItem(commitment: Commitment, norms: NormTable): readonly BillItem
 // Art. 62.5 TRLGDCU: leaving a commitment early costs at most the agreed penalty in proportion to
 // the days left. Without the agreed penalty nothing is worked out.
 export function checkCommitmentPenalty(input: TelecomInput, norms: NormTable): BillItem | null {
-  const { commitment, penaltyCharged: charged } = input;
-  if (commitment === null || charged === null || charged <= 0) return null;
+  const { commitment } = input;
+  const charged = input.penaltyCharged ?? 0;
+  if (commitment === null || charged <= 0) return null;
   const finding = (status: BillsStatus, calculation: BillsCalculation, amount?: number) =>
     billFinding('commitment_penalty', status, calculation, ['commitment_proportional'], norms, {
       amount: amount ?? null,
@@ -60,7 +61,7 @@ export function checkCommitmentPenalty(input: TelecomInput, norms: NormTable): B
   if (agreed === null)
     return single(finding('not_checkable', [billsPhrase('commitment.agreed_unknown')]));
   const days = commitmentDays(commitment, input.exitRequestedOn);
-  const highest = days.left === 0 ? 0 : round2((agreed * days.left) / days.total);
+  const highest = round2((agreed * days.left) / days.total);
   const calculation =
     days.left === 0
       ? [billsPhrase('commitment.ended', { end: { date: toIso(days.endsOn) } })]
