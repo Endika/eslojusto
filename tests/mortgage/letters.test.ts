@@ -6,6 +6,7 @@ import { feeFindings, type FeeFinding, type FeeItem } from '../../src/engine/mor
 import { reviewMortgage } from '../../src/engine/mortgage/review';
 import type { MortgageDeps, MortgageInput, Operation } from '../../src/engine/mortgage/types';
 import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
+import { renderPdf } from '../../src/documents/pdf';
 import type { Block, DocumentModel } from '../../src/documents/ports';
 import type { Translate } from '../../src/i18n/client';
 import { mortgageCase } from '../../src/mortgage/case';
@@ -17,7 +18,7 @@ import {
 } from '../../src/mortgage/letters';
 import type { CompletedMortgageReview } from '../../src/mortgage/ports';
 import { mortgageReport } from '../../src/mortgage/report';
-import { FORBIDDEN } from '../support/forbidden';
+import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
 import { DEPS, invoice, mortgage, TODAY } from '../engine/mortgage/input';
 import { pageTranslator } from '../support/page-strings';
 
@@ -91,8 +92,58 @@ const DETAILS: LetterDetails = {
 };
 
 describe('which mortgage letters a review offers', () => {
+  it('always offers the free request for documents on a mortgage the review covers', () => {
+    expect(mortgageLetterKinds(completed({}))).toEqual({ paid: [], free: ['mortgage_documents'] });
+    expect(mortgageLetterKinds(completed({ invoices: [] }))).toEqual({
+      paid: [],
+      free: ['mortgage_documents'],
+    });
+  });
+
   it('offers no letter for a mortgage outside the review', () => {
     expect(mortgageLetterKinds(completed({ borrower: 'company' }))).toEqual({ paid: [], free: [] });
+  });
+
+  it('offers the amounts letter only with some item a law settles with euros', () => {
+    expect(mortgageLetterKinds(completed(LCCI_DEED)).paid).toEqual(['mortgage_amounts']);
+    expect(mortgageLetterKinds(completed(SPLIT_DEED)).paid).toEqual(['mortgage_amounts']);
+    expect(
+      mortgageLetterKinds(
+        completed({ deedOn: d('2021-03-10'), rateType: 'variable', operations: [prepayment()] }),
+      ).paid,
+    ).toEqual(['mortgage_amounts']);
+  });
+
+  it('does not offer it when only the Supreme Court split carries euros, though the pass is', () => {
+    const r = completed(
+      { invoices: [invoice('notary_loan', 800), invoice('registry_mortgage', 400)] },
+      DEPS,
+    );
+    expect(r.review.totals.caseLaw.principal).toBe(800);
+    expect(r.review.offerPass).toBe(true);
+    expect(mortgageLetterKinds(r).paid).toEqual([]);
+  });
+
+  it('does not offer it for a fee over its cap in only some readings', () => {
+    // 35 € is over the 30 € cap of option a and within the 50 € of option b.
+    const r = completed({
+      deedOn: d('2021-03-10'),
+      operations: [prepayment({ feeCharged: 35 })],
+    });
+    expect(r.review.totals.fees).toEqual({ counted: 0, upTo: 5 });
+    expect(mortgageLetterKinds(r).paid).toEqual([]);
+  });
+
+  it('leaves out the costs by law once what the lender gave back covers them', () => {
+    const covered = completed({ ...LCCI_DEED, alreadyReturned: 1_300 });
+    expect(amountLines(covered).expenses.map((l) => l.item.kind)).toEqual(['transparency_deed']);
+    const noRecord = { ...LCCI_DEED, invoices: LCCI_DEED.invoices.slice(0, 4) };
+    expect(mortgageLetterKinds(completed({ ...noRecord, alreadyReturned: 1_300 })).paid).toEqual(
+      [],
+    );
+    expect(mortgageLetterKinds(completed({ ...noRecord, alreadyReturned: 1_000 })).paid).toEqual([
+      'mortgage_amounts',
+    ]);
   });
 });
 
@@ -193,6 +244,42 @@ describe('the lines of the amounts letter when the review is read differently', 
 });
 
 describe('the amounts letter', () => {
+  it('gives the deed day, each cost with its norm and amount, and asks to review and reply', () => {
+    const model = amountsLetter(completed(LCCI_DEED), DETAILS, tr);
+    const all = text(model);
+    expect(model.title).toBe('Revisión de los importes de mi hipoteca que fija la ley');
+    expect(all).toContain(
+      'Te escribo por mi préstamo hipotecario, formalizado en la escritura del 10-03-2021.',
+    );
+    expect(all).toContain(
+      'Notaría del préstamo: pagué 600,00 €. La ley pone este gasto a cargo del banco.',
+    );
+    expect(all).toContain('Gestoría: pagué 300,00 €.');
+    expect(all).toContain(
+      'Acta notarial previa: pagué 50,00 €. La ley dice que esta acta no se cobra a quien pide el préstamo.',
+    );
+    expect(all).not.toContain('Tasación');
+    expect(all).toContain('Te pido que lo revises y me respondas.');
+    expect(model.blocks).toContainEqual({
+      type: 'source',
+      text: 'Ley de contratos de crédito inmobiliario, art. 14.1.e (Ley 5/2019, de 15 de marzo, reguladora de los contratos de crédito inmobiliario)',
+      url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2019-3814#ar-14',
+    });
+    expect(model.blocks).toContainEqual({
+      type: 'blank',
+      label: 'Número de préstamo',
+      value: 'PH-0000-TEST',
+      wrap: true,
+    });
+  });
+
+  it('takes off what the lender already gave back', () => {
+    const all = text(amountsLetter(completed({ ...LCCI_DEED, alreadyReturned: 300 }), DETAILS, tr));
+    expect(all).toContain(
+      'De los gastos de la constitución ya me diste 300,00 €, sin indicar de cuáles: descontados enteros de los que la ley pone a cargo del banco, quedan 1.000,00 €.',
+    );
+  });
+
   it('gives a fee over its cap with the cap, the difference and the reading it takes', () => {
     const all = text(
       amountsLetter(
@@ -206,6 +293,26 @@ describe('the amounts letter', () => {
     );
     expect(all).toContain('estas cifras son las de la que da menos diferencia');
     expect(all).toContain('Ley de contratos de crédito inmobiliario, art. 23.5');
+  });
+});
+
+describe('the request for documents', () => {
+  it('asks for the deed, the invoices, the tax, the FEIN and FiAE and the prepayment settlement', () => {
+    const model = documentsLetter(completed({ invoices: [] }), DETAILS, tr);
+    const all = text(model);
+    expect(model.title).toBe('Petición de documentación de mi hipoteca');
+    expect(all).toContain('escritura del 10-05-2012');
+    for (const asked of [
+      'La escritura del préstamo hipotecario.',
+      'Las facturas de notaría, registro, gestoría y tasación',
+      'impuesto de actos jurídicos documentados (AJD)',
+      '(FEIN) y la Ficha de Advertencias Estandarizadas (FiAE)',
+      'La liquidación de cada amortización anticipada',
+    ])
+      expect(all).toContain(asked);
+    // It only asks: no norm, no figure.
+    expect(model.blocks.some((b) => b.type === 'source')).toBe(false);
+    expect(all).not.toMatch(/€|ley/i);
   });
 });
 
@@ -307,6 +414,14 @@ describe('the letters', () => {
       return [...kinds.map((kind) => c.letter(kind, DETAILS, tr)), c.report(tr, TODAY)];
     });
 
+  it('inform without advising, asserting or pressing', () => {
+    expect(models().length).toBeGreaterThan(12);
+    for (const model of models()) expect(forbiddenIn('client.mortgage.', text(model))).toEqual([]);
+    // A letter never speaks of courts, lawyers or the Supreme Court's split.
+    for (const model of models().filter((m) => m.footer === null))
+      expect(text(model).toLowerCase()).not.toMatch(/tribunal|juzgado|juez|abogad|servicio de/);
+  });
+
   it("end with the person's name and no line to sign on", () => {
     for (const model of models().filter((m) => m.footer === null)) {
       expect(model.blocks.at(-1)).toEqual({
@@ -317,6 +432,10 @@ describe('the letters', () => {
       });
       for (const forbidden of FORBIDDEN) expect(text(model).toLowerCase()).not.toMatch(forbidden);
     }
+  });
+
+  it('draw with the letter fonts', async () => {
+    for (const model of models()) expect((await renderPdf(model)).length).toBeGreaterThan(1000);
   });
 });
 
