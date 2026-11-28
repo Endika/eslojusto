@@ -77,6 +77,12 @@ describe('the questions a telecom answer opens', () => {
     expect(errorsOf(form({ ...NOTICE, sentOn: '' }))).toEqual([
       { field: 'sentOn', code: 'missing_value' },
     ]);
+    expect(inputOf(form(NOTICE)).changeNotice).toEqual({
+      sentOn: parseDate('2026-02-01'),
+      appliesOn: parseDate('2026-03-10'),
+      change: 'price_up',
+      index: 'ipc',
+    });
     expect(inputOf(form({ ...NOTICE, appliesOn: '' })).changeNotice).toMatchObject({
       appliesOn: null,
     });

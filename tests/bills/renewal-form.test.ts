@@ -256,6 +256,32 @@ describe('what the renewal form requires', () => {
     });
   });
 
+  it.each([
+    'powerKwP1',
+    'powerKwP2',
+    'currentPowerP1',
+    'currentPowerP2',
+    'nextPowerP1',
+    'nextPowerP2',
+    'currentEnergy',
+    'nextEnergy',
+  ])('reads a comma and three digits as a decimal one in %s', (field) => {
+    const r = readRenewalForm(form({ [field]: '1,234' }), TODAY);
+    expect('errors' in r ? r.errors : []).toEqual([]);
+  });
+
+  it.each([
+    'currentEnergyP1',
+    'currentEnergyP2',
+    'currentEnergyP3',
+    'nextEnergyP1',
+    'nextEnergyP2',
+    'nextEnergyP3',
+  ])('reads a comma and three digits as a decimal one in %s', (field) => {
+    const r = readRenewalForm(form({ ...periods, [field]: '1,234' }), TODAY);
+    expect('errors' in r ? r.errors : []).toEqual([]);
+  });
+
   it('asks the power unit, and whether the letter came apart from the bill', () => {
     expect(readRenewalForm(form({ powerUnit: null }), TODAY)).toEqual({
       errors: [{ field: 'powerUnit', code: 'missing_choice' }],

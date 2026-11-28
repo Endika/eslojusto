@@ -74,8 +74,8 @@ export const onQuestions = (
   errors: readonly ValidationError<RenewalField>[],
 ): RenewalFieldError[] => errors.map(({ field, code }) => ({ field: FIELD_OF[field], code }));
 
-const known = (v: (typeof KNOWNS)[number] | null): boolean | null | undefined =>
-  v === 'yes' ? true : v === 'no' ? false : v === 'unknown' ? null : undefined;
+const known = (v: (typeof KNOWNS)[number] | null): boolean | null =>
+  v === 'yes' ? true : v === 'no' ? false : null;
 
 interface Reading {
   readonly errors: RenewalFieldError[];
@@ -116,10 +116,11 @@ function read(form: HTMLFormElement): Reading {
   };
   const separate = known(choice('separateFromBill', KNOWNS));
 
-  // Stryker disable next-line ConditionalExpression,LogicalOperator,MethodExpression: see the check below
   const numbers = (o: object | null): o is Record<string, number> =>
+    // Stryker disable next-line ConditionalExpression,LogicalOperator,MethodExpression: see the check below
     o !== null && Object.values(o).every((v) => v !== null);
-  if (errors.length > 0) return { errors, input: null };
+  const unread = { errors, input: null };
+  if (errors.length > 0) return unread;
   // Stryker disable ConditionalExpression,LogicalOperator,MethodExpression: a missing or unreadable required answer is an error, which leaves no input; these checks only narrow the types
   if (
     letterDate === null ||
@@ -131,10 +132,9 @@ function read(form: HTMLFormElement): Reading {
     !numbers(currentPower) ||
     !numbers(nextPower) ||
     !numbers(currentEnergy) ||
-    !numbers(nextEnergy) ||
-    separate === undefined
+    !numbers(nextEnergy)
   )
-    return { errors, input: null };
+    return unread;
   // Stryker restore ConditionalExpression,LogicalOperator,MethodExpression
   const prices = (power: { p1: number; p2: number }, e: Record<string, number>): RenewalPrices => ({
     power,
