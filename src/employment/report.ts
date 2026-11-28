@@ -191,6 +191,7 @@ function assessedBlocks(assessed: Assessed, tr: Translate, labels: Labels): Bloc
 
 function itemBlocks(assessed: Assessed, tr: Translate): Block[] {
   const first = findingsOf(assessed)[0];
+  // Stryker disable next-line ConditionalExpression,ArrayDeclaration: a point always holds a finding; the guard narrows the type
   if (first === undefined) return [];
   return [
     { type: 'subheading', text: tr(`client.employment.finding.${first.id}`) },
@@ -199,6 +200,7 @@ function itemBlocks(assessed: Assessed, tr: Translate): Block[] {
 }
 
 function clauseBlocks(clause: ClauseAssessment, input: EmploymentInput, tr: Translate): Block[] {
+  // Stryker disable next-line OptionalChaining,StringLiteral: a clause assessed is one of the input's; the guard narrows the type
   const words = input.clauses[clause.index]?.literal.text ?? '';
   return [
     { type: 'subheading', text: tr(`client.employment.clause.${clause.label}`) },
@@ -368,7 +370,7 @@ export function employmentReport(
         type: 'bullet',
         text: tr(`client.employment.warning.${w.code}`),
       })),
-      ...(review.items.length + review.clauses.length > 0
+      ...(review.items.length > 0 || review.clauses.length > 0
         ? [{ type: 'heading', text: tr('client.employment.report.points') } as const]
         : []),
       ...review.items.flatMap((a) => itemBlocks(a, tr)),

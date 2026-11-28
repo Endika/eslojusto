@@ -70,12 +70,12 @@ export interface EurosRange {
 
 export function rangeOf(a: Assessed): EurosRange | null {
   if (a.kind !== 'readings') return null;
-  const figures = a.readings.map((r) =>
-    r.finding.status === 'below_minimum' ? figureOf(r.finding) : null,
-  );
-  const [first] = figures;
-  if (!first || figures.some((x) => x === null || x.per !== first.per)) return null;
-  const amounts = figures.flatMap((x) => (x === null ? [] : [x.amount]));
+  const figures = a.readings.map((r) => figureOf(r.finding));
+  const known = figures.filter((x): x is Euros => x !== null);
+  const [first] = known;
+  if (!first || known.length < figures.length || known.some((x) => x.per !== first.per))
+    return null;
+  const amounts = known.map((x) => x.amount);
   return { per: first.per, low: Math.min(...amounts), high: Math.max(...amounts) };
 }
 
@@ -100,8 +100,8 @@ export function sinceOf(f: Finding): { readonly from: number; readonly amount: n
   if (shortfallOf(f)?.per !== 'year') return null;
   const amount = amountOf(f);
   if (amount === null || f.calculation.some((p) => GAPS.has(p.key))) return null;
-  const first = f.calculation.find((p) => YEAR_PHRASE.test(p.key));
-  const from = first === undefined ? null : integer(first.vars, 'year');
+  // Stryker disable next-line OptionalChaining: shortfallOf found a year phrase, so there is a first one
+  const from = integer(f.calculation.find((p) => YEAR_PHRASE.test(p.key))?.vars, 'year');
   return from === null ? null : { from, amount };
 }
 
