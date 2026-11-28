@@ -30,6 +30,7 @@ import {
   type Track,
 } from './events';
 import { sectionAnalytics } from './section';
+import { soleStatus } from './status';
 
 type TelecomCompleted = Props<'telecom_review_completed'>;
 type PointResult = TelecomCompleted['commitment'];
@@ -78,9 +79,7 @@ function pointStatus(items: readonly BillItem[], ids: readonly BillsItemId[]): P
   const statuses = items
     .filter((item) => findingsOf(item).some((f) => ids.includes(f.id)))
     .map((item) => {
-      const own = new Set(findingsOf(item).map((f) => f.status));
-      const [only] = own;
-      return own.size === 1 && only !== undefined ? only : 'readings';
+      return soleStatus(new Set(findingsOf(item).map((f) => f.status)));
     });
   return BILLS_STATUSES.find((s) => statuses.includes(s)) ?? 'none';
 }

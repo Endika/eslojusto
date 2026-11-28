@@ -92,6 +92,14 @@ describe('insurance events', () => {
     );
   });
 
+  it('says «unknown» of a distance sale left open, and how a notice stands', () => {
+    expect(props(policy({ distance: null })).distance).toBe('unknown');
+    expect(props(policy({ notice: notice() })).notice).toBe('on_time');
+    expect(props(policy({ expiresOn: parseDate('2026-11-20'), notice: notice() })).notice).toBe(
+      'late',
+    );
+  });
+
   it('reads a motor policy bought online by its voluntary covers', () => {
     expect(props(carOnline)).toMatchObject({
       line: 'car',

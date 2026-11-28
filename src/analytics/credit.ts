@@ -6,6 +6,7 @@ import type { CompletedCreditReview, CreditEvents, Step } from '../credit/ports'
 import type { PassMode } from '../documents/ports';
 import { attemptBucket, reviewSecondsBucket, type Props, type Track } from './events';
 import { sectionAnalytics } from './section';
+import { soleStatus } from './status';
 
 type Completed = Props<'credit_review_completed'>;
 type PointResult = Completed['apr'];
@@ -13,11 +14,10 @@ type PointResult = Completed['apr'];
 // A point's status: the one every reading gives, `readings` when a «No lo sé» splits them, or
 // none when the review did not reach it.
 function pointStatus(items: readonly CreditItem[], id: FindingId): PointResult {
+  // Stryker disable next-line OptionalChaining: a point always holds a finding
   const item = items.find((i) => findingsOf(i)[0]?.id === id);
   if (item === undefined) return 'none';
-  const statuses = new Set(findingsOf(item).map((f) => f.status));
-  const [only] = statuses;
-  return statuses.size === 1 && only !== undefined ? only : 'readings';
+  return soleStatus(new Set(findingsOf(item).map((f) => f.status)));
 }
 
 // A card concluded before the 2011 law gets only the indicator; the rest go by blocks of years.

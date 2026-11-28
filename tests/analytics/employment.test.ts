@@ -16,10 +16,12 @@ import {
 } from '../../src/analytics/employment';
 import { EMPLOYMENT_FAQ_TOPICS } from '../../src/content/employment-faq-topics';
 import { parseDate as f } from '../../src/engine/date';
-import type { EmploymentPeriod } from '../../src/engine/employment/types';
+import { phrase } from '../../src/engine/employment/calculation';
+import type { Assessed, EmploymentPeriod, Finding } from '../../src/engine/employment/types';
 import type { EmploymentInput } from '../../src/engine/employment/types';
 import { SHEET_FIELDS, SHEETS } from '../../src/employment/form';
 import { STEPS } from '../../src/employment/steps';
+import { finding } from '../engine/employment/input';
 import {
   TODAY,
   belowMinimum,
@@ -325,6 +327,73 @@ describe('employment events', () => {
     expect(isValidEvent('employment_review_completed', { ...p, agreement: 'oficinas' })).toBe(
       false,
     );
+  });
+
+  describe('reading the minimum wage points of a review', () => {
+    const alone = (change: Partial<Finding>): Assessed => ({
+      kind: 'single',
+      finding: finding({ item: 'minimum_wage', id: 'smi_annual', ...change }),
+    });
+    const withItems = (...items: Assessed[]) => {
+      const base = review(contract());
+      return employmentReviewProps({
+        review: { ...base, items, clauses: [], informationDuty: null },
+        input: contract(),
+        attempt: 1,
+        seconds: 95,
+        detail: 'unlocked',
+        pass: 'none',
+      });
+    };
+    const yearBelow = [phrase('minimum_wage.year.below', {})];
+
+    it('counts a shortfall and its years only from a finding below the minimum', () => {
+      expect(
+        withItems(
+          alone({
+            status: 'below_minimum',
+            amount: { min: 700, max: 700 },
+            calculation: yearBelow,
+          }),
+        ),
+      ).toMatchObject({
+        difference: '500-2000',
+        smi_years_below: '1',
+      });
+      expect(
+        withItems(
+          alone({ status: 'within_limit', amount: { min: 700, max: 700 }, calculation: yearBelow }),
+        ),
+      ).toMatchObject({
+        difference: '0',
+        smi_years_below: '0',
+      });
+      expect(withItems(alone({ status: 'below_minimum', amount: null }))).toMatchObject({
+        difference: '0',
+      });
+    });
+
+    it('leaves the shortfall of any other point out of the difference', () => {
+      const other = alone({
+        item: 'holidays_pay',
+        id: 'extra_pays',
+        status: 'below_minimum',
+        amount: { min: 5000, max: 5000 },
+        calculation: yearBelow,
+      });
+      expect(withItems(other)).toMatchObject({ difference: '0', smi_years_below: '0' });
+    });
+
+    it('says a year is not out yet by its status or by its phrase, whichever the finding gives', () => {
+      const notOut = [phrase('minimum_wage.not_published', {})];
+      expect(withItems(alone({ status: 'not_published' })).smi_not_published).toBe(true);
+      expect(withItems(alone({ status: 'review_it', calculation: notOut })).smi_not_published).toBe(
+        true,
+      );
+      expect(
+        withItems(alone({ status: 'review_it', calculation: yearBelow })).smi_not_published,
+      ).toBe(false);
+    });
   });
 
   it('counts payslips of any number in a bucket', () => {

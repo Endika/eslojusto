@@ -58,6 +58,7 @@ describe('the calculator events', () => {
       () => 'none',
       reveal,
     ).reviewCompleted(completed());
+    expect(sent[0]?.[0]).toBe('review_completed');
     expect(sent[0]?.[1]).toMatchObject({ reveal: expected });
   });
 });

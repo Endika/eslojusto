@@ -141,4 +141,25 @@ describe('only the listed properties leave', () => {
     });
     expect(cleanEvent(null)).toBeNull();
   });
+
+  it('$set_once keeps what the list allows', () => {
+    const event = {
+      uuid: 'u',
+      event: '$pageview',
+      properties: {},
+      $set_once: { $initial_gclid: 'ABC123', $browser: 'Chrome' },
+    } satisfies CaptureResult;
+    expect(cleanEvent(event)).toEqual({
+      uuid: 'u',
+      event: '$pageview',
+      properties: {},
+      $set_once: { $browser: 'Chrome' },
+    });
+  });
+
+  it('a property with no value does not leave', () => {
+    expect(cleanProperties({ $os: null, $browser: undefined, $device_type: 'Desktop' })).toEqual({
+      $device_type: 'Desktop',
+    });
+  });
 });
