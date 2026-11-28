@@ -1,6 +1,11 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
-import { renderSummary, roundToTens, summaryHeadline } from '../../src/calculator/render';
+import {
+  renderResult,
+  renderSummary,
+  roundToTens,
+  summaryHeadline,
+} from '../../src/calculator/render';
 import { completed, tr, unfairDismissal } from '../documents/fixtures';
 
 function result(): HTMLElement {
@@ -44,6 +49,21 @@ describe('the amount in the summary', () => {
 });
 
 describe('the summary before the pass', () => {
+  it('with a shortfall: how many items and roughly how much, never which, a range or a method', () => {
+    const s = summaryOf(completed());
+    expect(summaryHeadline(completed().review)).toBe('shortfall');
+    expect(s.headline).toBe(
+      'Con las cifras que has metido, a tu finiquito le podría faltar dinero:',
+    );
+    expect(s.lines).toEqual(['Una partida podría quedarse corta: unos 440 €.']);
+    const all = s.div.querySelector('[data-summary]')?.textContent ?? '';
+    for (const p of completed().review.items)
+      expect(all).not.toContain(tr(`client.item.${p.item.id}`));
+    expect(all).not.toMatch(/entre .* y /);
+    expect(all).not.toContain('en vigor desde');
+    expect(all).not.toContain('Cómo se calcula');
+  });
+
   it('two items short: one line with how many and their sum, rounded once', () => {
     const one = completed(unfairDismissal, { severance: 100, holiday_pay: 1500 }).review;
     const two = completed(unfairDismissal, { severance: 100, holiday_pay: 1 }).review;
@@ -74,6 +94,22 @@ describe('the summary before the pass', () => {
     expect(s.lines).toEqual(['Una partida podría quedarse corta, en menos de 10 €.']);
   });
 
+  it('a deduction above its maximum counts as short, unnamed', () => {
+    const s = summaryOf(
+      completed(
+        { ...unfairDismissal, cause: 'resignation', agreementNoticeDays: 15, noticeDaysGiven: 0 },
+        { notice_deduction: 5000 },
+      ),
+    );
+    expect(
+      s.lines.some((l) =>
+        /^(Una partida podría quedarse corta: unos|\d+ partidas podrían quedarse cortas: unos) [\d.]+0 €( en total)?\.$/.test(
+          l,
+        ),
+      ),
+    ).toBe(true);
+  });
+
   it('with every item at its minimum: it matches, with no line and no offer to buy', () => {
     const minimums = Object.fromEntries(
       completed(unfairDismissal, {}).review.items.map((p) => [p.item.id, p.item.range?.min ?? 0]),
@@ -87,6 +123,15 @@ describe('the summary before the pass', () => {
     expect(s.lines).toEqual([]);
   });
 
+  it('without the employer figures there is nothing to compare', () => {
+    expect(summaryOf(completed(unfairDismissal, {})).headline).toMatch(
+      /^Sin las cifras de tu finiquito no hay nada que comparar/,
+    );
+    expect(summaryHeadline(completed(unfairDismissal, { severance: 50000 }).review)).toBe(
+      'nothing_short',
+    );
+  });
+
   it('keeps the holiday days it counted, and one line on the benefit', () => {
     const s = summaryOf(completed());
     expect(s.counted).toBe('Hemos contado 0 días naturales disfrutados de 30 al año.');
@@ -97,6 +142,85 @@ describe('the summary before the pass', () => {
       'Una baja voluntaria no da derecho a paro, salvo excepciones como un traslado, una modificación sustancial de tus condiciones que te perjudique, un incumplimiento grave de la empresa o la violencia de género o sexual (art. 267.1.a.5.º LGSS).',
     );
   });
+
+  it('a benefit that lasts 6 months or less never reads «los primeros 6 meses»', () => {
+    const short = completed({ ...unfairDismissal, startDate: { y: 2025, m: 6, d: 1 } });
+    expect(short.benefit.entitled === 'yes' && short.benefit.duration.days).toBe(120);
+    expect(summaryOf(short).benefit).toMatch(
+      /^Esta causa da derecho a paro: unos 1\.225 € al mes en bruto, (todo el tiempo que dure|como mucho los primeros 6 meses),/,
+    );
+  });
+
+  it('only the benefit pages show how long it lasts', () => {
+    const r = completed();
+    expect(summaryOf(r).benefit).not.toMatch(/días \(/);
+    const div = result();
+    div.setAttribute('data-review', '');
+    div.setAttribute('data-benefit-first', '');
+    const wrapper = document.createElement('div');
+    wrapper.append(div);
+    renderSummary(wrapper, r.review, r.benefit, r.input.cause, tr);
+    expect(div.querySelector('[data-summary-benefit]')?.textContent).toMatch(
+      /los primeros 6 meses, si sumas al menos 360 días cotizados en los últimos 6 años\. .*\d+ días \(\d+ meses\)/,
+    );
+  });
+});
+
+// The result as FinalPayResult.astro lays it out: the detail only in its templates.
+function page(): HTMLElement {
+  const root = document.createElement('section');
+  root.innerHTML = `
+    <p data-lead>Una hoja por partida</p>
+    <div data-review>
+      <section data-summary hidden>
+        <p data-summary-headline></p><ul data-summary-lines></ul>
+        <p data-summary-counted hidden></p><p data-summary-benefit></p>
+        <div data-summary-deadlines></div>
+      </section>
+      <div data-items></div>
+      <div data-slot="benefit"></div>
+      <ul data-unchecked></ul>
+      <div data-slot="proposal"></div>
+      <template data-template="benefit">
+        <section data-benefit>
+          <p><svg data-benefit-mark><use></use></svg><span data-benefit-status-text></span></p>
+          <p data-benefit-reason></p><p data-benefit-no>just cause</p>
+          <div data-benefit-yes>
+            <p data-benefit-amount></p><p data-benefit-full-time>full time</p>
+            <p data-benefit-children-unknown hidden></p><p data-benefit-deduction></p>
+            <p data-benefit-duration></p><p data-benefit-duration-note></p>
+            <p data-benefit-qualifying></p>
+          </div>
+          <details><summary>Cómo se calcula</summary><ul data-benefit-sources></ul></details>
+        </section>
+      </template>
+      <template data-template="proposal">
+        <section><a href="https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430#a49">art. 49</a></section>
+      </template>
+      <template data-template="item">
+        <section data-item>
+          <span data-tab-number></span><h3 data-title></h3>
+          <p><svg data-mark><use></use></svg><span data-status-text></span></p>
+          <p data-citation hidden></p>
+          <dl data-figures><dt data-range-label></dt><dd data-range></dd><dd data-employer></dd></dl>
+          <p data-counted hidden></p><p data-based-on hidden></p>
+          <p data-agreement hidden>agreement</p><p data-reference hidden></p>
+          <details data-detail><summary>Cómo se calcula</summary>
+            <p data-calculation></p><ul data-sources></ul></details>
+        </section>
+      </template>
+      <template data-template="source">
+        <li><a></a><span data-in-force hidden></span></li>
+      </template>
+    </div>`;
+  return root;
+}
+
+const data = (r: ReturnType<typeof completed>) => ({
+  review: r.review,
+  benefit: r.benefit,
+  cause: r.input.cause,
+  children: 0 as const,
 });
 
 describe('the deadlines in the summary', () => {
@@ -123,5 +247,43 @@ describe('the deadlines in the summary', () => {
     expect(summaryOf(unknown).deadlines[0]).toBe(
       'Si fue un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.4 ET).',
     );
+  });
+});
+
+describe('locked and unlocked result', () => {
+  it('locked, the page holds no detail at all: no calculation, no source, no range', () => {
+    const root = page();
+    const r = completed({ ...unfairDismissal, cause: 'objective_dismissal' }, { severance: 100 });
+    renderResult(root, data(r), true, tr);
+    const text = root.textContent ?? '';
+    expect(text).toContain('Una partida podría quedarse corta');
+    expect(text).not.toContain('Indemnización');
+    for (const detail of [
+      'Cómo se calcula',
+      'días devengados',
+      'meses ×',
+      'Mínimo legal',
+      'Referencia',
+      'en vigor desde',
+      'Estatuto de los Trabajadores',
+      'entre ',
+    ])
+      expect(text).not.toContain(detail);
+    expect(root.querySelectorAll('a[href*="boe.es"]')).toHaveLength(0);
+    expect(root.querySelectorAll('[data-item], [data-benefit], [data-range]')).toHaveLength(0);
+    expect(root.querySelector<HTMLElement>('[data-lead]')?.hidden).toBe(true);
+  });
+
+  it('unlocked, the detail is cloned in and filled; locked again, it is taken out', () => {
+    const root = page();
+    const d = data(completed());
+    renderResult(root, d, false, tr);
+    expect(root.querySelector<HTMLElement>('[data-summary]')?.hidden).toBe(true);
+    expect(root.querySelectorAll('[data-item]').length).toBeGreaterThan(2);
+    expect(root.textContent).toContain('Cómo se calcula');
+    expect(root.querySelector('a[href*="boe.es"]')).not.toBeNull();
+    expect(root.querySelector('[data-benefit-status-text]')?.textContent).not.toBe('');
+    renderResult(root, d, true, tr);
+    expect(root.querySelectorAll('[data-item], [data-benefit], a[href*="boe.es"]')).toHaveLength(0);
   });
 });

@@ -87,6 +87,19 @@ describe('the report of a year of bills', () => {
       true,
     );
   });
+
+  it('adds up what is counted, with what is charged short and the estimate apart', () => {
+    const year = all.slice(
+      all.indexOf('Lo que suman tus facturas'),
+      all.indexOf('Línea por línea'),
+    );
+    expect(year).toContain('Por encima de la norma: 0,40 €');
+    expect(year.some((l) => l.startsWith('Y hasta '))).toBe(true);
+    expect(year.some((l) => /^Cobrado de menos: .* Va aparte/.test(l))).toBe(true);
+    expect(year).toContain(
+      'Estimación, no una cifra de tus facturas, y no se suma a ningún total: si lo que se repite (Alquiler del contador) siguiera igual, en un año serían unos 2 €.',
+    );
+  });
 });
 
 describe('the report of a phone exit', () => {
@@ -172,6 +185,22 @@ describe('«Tus cifras frente a las oficiales» in the electricity report', () =
     ).toBe(true);
   });
 
+  it('sets the power beside the power used, says when it went above, and cites every source', () => {
+    expect(section).toContain(
+      'Punta: 5,75 kW contratados; la potencia máxima que usaste en el último año, 4,868 kW. Cada kW contratado cuesta 36,50 € al año con tus precios; los 0,882 kW por encima de la máxima que usaste, 32,19 € al año.',
+    );
+    expect(section).toContain(
+      'En valle, la potencia máxima que usaste (6 kW) pasa de la contratada (5,75 kW).',
+    );
+    expect(section).toContain(
+      'La potencia contratada solo se puede cambiar una vez cada 12 meses.',
+    );
+    expect(section.some((l) => l === 'Precios del PVPC: REData de prueba')).toBe(true);
+    expect(section.some((l) => l.startsWith('Circular 3/2020'))).toBe(true);
+    expect(section.some((l) => l.startsWith('Real Decreto 216/2014, art. 5.3'))).toBe(true);
+    expect(section.some((l) => l.startsWith('Real Decreto 88/2026, art. 38'))).toBe(true);
+  });
+
   it('says a PVPC bill is already on the PVPC, and that the section is missing without prices', () => {
     const pvpcBill = lines(
       electricityCase([meterOver()], NORMS_BEFORE_FIGURE, official).report(tr, TODAY).blocks,
@@ -183,5 +212,19 @@ describe('«Tus cifras frente a las oficiales» in the electricity report', () =
     expect(none.some((l) => l.startsWith('No se han podido cargar los precios oficiales'))).toBe(
       true,
     );
+  });
+
+  it('leaves the phone report as it was', () => {
+    const r = reviewTelecom(telecom(), TODAY, {
+      norms: NORMS_BEFORE_FIGURE,
+      sources: BILLS_SOURCES,
+      tables: { holidays: BILLS_TABLES.holidays },
+    });
+    if (!r.ok) throw new Error('invalid');
+    const phone = lines(
+      telecomCase({ input: telecom(), review: r.review }, NORMS_BEFORE_FIGURE).report(tr, TODAY)
+        .blocks,
+    );
+    expect(phone).not.toContain('Tus cifras frente a las oficiales');
   });
 });
