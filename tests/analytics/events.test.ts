@@ -415,6 +415,7 @@ describe('document and pass events', () => {
     events.checkoutStarted('quiet');
     events.passIssued('return');
     events.passFailed('price_mismatch');
+    events.passVerified('ok');
     events.downloaded('report');
     events.downloaded('letter', 'all', 'items');
     expect(sent.slice(-2).map(([, p]) => p)).toEqual([
@@ -433,6 +434,7 @@ describe('document and pass events', () => {
       'checkout_started',
       'pass_issued',
       'pass_failed',
+      'pass_verified',
       'report_downloaded',
       'report_downloaded',
     ]);
@@ -450,6 +452,7 @@ describe('document and pass events', () => {
     expect(sent[5]?.[1]).toEqual({ reasons: ['dark', 'no_data'], files_bucket: '1', pdfs: 0 });
     expect(sent[6]?.[1]).toEqual({ kind: 'blurry' });
     expect(sent[7]?.[1]).toEqual({});
+    expect(sent[11]).toEqual(['pass_verified', { result: 'ok' }]);
   });
 });
 

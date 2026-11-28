@@ -37,7 +37,7 @@ function familyStatus(points: readonly Assessed[], family: Family): PointResult 
   const statuses = points
     .filter((a) => {
       const first = findingsOf(a)[0];
-      // Stryker disable next-line ConditionalExpression: a point always holds a finding, so the guard only narrows the type
+      // Stryker disable next-line ConditionalExpression,BooleanLiteral: a point always holds a finding, so the guard only narrows the type
       if (first === undefined) return false;
       return FAMILY[first.item] === family;
     })

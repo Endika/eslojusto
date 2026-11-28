@@ -129,6 +129,27 @@ describe('credit events', () => {
     ).toBe('above_general_cap');
   });
 
+  it('names the car dealer discount a repayment loses', () => {
+    expect(
+      props(loan({ product: 'car_loan', earlyRepayment: repayment({ discountLost: true }) }))
+        .dealer_discount,
+    ).toBe('review_it');
+  });
+
+  it('names no indicator when the review has none', () => {
+    const { review, input } = completed(loan());
+    expect(
+      creditReviewProps({
+        review: { ...review, indicator: null },
+        input,
+        attempt: 1,
+        seconds: 95,
+        detail: 'locked',
+        pass: 'claim',
+      }),
+    ).toMatchObject({ indicator: 'none', compared_apr: 'none' });
+  });
+
   it('puts a card from before the law in its own period, with only the indicator', () => {
     expect(props(oldCard)).toMatchObject({
       product: 'revolving',
@@ -144,6 +165,7 @@ describe('credit events', () => {
       props(loan({ agreedOn: parseDate(day), drawnOn: parseDate(day) })).period;
     expect(period('2015-12-31')).toBe('2011-2015');
     expect(period('2016-01-01')).toBe('2016-2020');
+    expect(period('2020-12-31')).toBe('2016-2020');
     expect(period('2021-01-01')).toBe('2021+');
   });
 

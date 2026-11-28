@@ -17,6 +17,7 @@ import {
   type Track,
 } from './events';
 import { sectionAnalytics } from './section';
+import { soleStatus } from './status';
 
 type Completed = Props<'mortgage_review_completed'>;
 
@@ -38,11 +39,7 @@ function expensesStatus(items: readonly ExpenseItem[], basis: Basis): ExpenseSta
 
 // An operation whose readings disagree counts as `readings`; of several, the one that weighs most.
 function feesStatus(items: readonly FeeItem[]): FeeStatus | 'readings' | 'none' {
-  const statuses = items.map((item) => {
-    const own = new Set(feeFindings(item).map((f) => f.status));
-    const [only] = own;
-    return own.size === 1 && only !== undefined ? only : 'readings';
-  });
+  const statuses = items.map((item) => soleStatus(new Set(feeFindings(item).map((f) => f.status))));
   return MORTGAGE_FEE_STATUSES.find((s) => statuses.includes(s)) ?? 'none';
 }
 

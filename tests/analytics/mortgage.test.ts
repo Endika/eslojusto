@@ -12,7 +12,7 @@ import type { PassMode } from '../../src/documents/ports';
 import { MORTGAGE_FAQ_TOPICS } from '../../src/content/mortgage-faq-topics';
 import { parseDate } from '../../src/engine/date';
 import { reviewMortgage } from '../../src/engine/mortgage/review';
-import type { MortgageInput, Operation } from '../../src/engine/mortgage/types';
+import type { Clause, MortgageInput, Operation } from '../../src/engine/mortgage/types';
 import { SHEET_FIELDS, SHEETS } from '../../src/mortgage/form';
 import { STEPS } from '../../src/mortgage/steps';
 import { DEPS, TODAY, invoice, mortgage } from '../engine/mortgage/input';
@@ -132,6 +132,26 @@ describe('mortgage events', () => {
       expenses_case_law: 'lender_bears',
       offered: true,
     });
+  });
+
+  it.each([
+    [0, '0'],
+    [1, '1-2'],
+    [2, '1-2'],
+    [3, '3+'],
+  ])('counts %i invoices as «%s»', (n, expected) => {
+    const invoices = Array.from({ length: n }, () => invoice('notary_loan', 800));
+    expect(props(mortgage({ invoices })).invoices).toBe(expected);
+  });
+
+  it('says whether the borrower is a consumer, and names only the clauses found in the deed', () => {
+    expect(props(mortgage({ consumer: false })).consumer).toBe('no');
+    const clauses: Clause[] = [
+      { label: 'floor_clause', present: true, floorPercent: 1 },
+      { label: 'default_interest', present: false },
+      { label: 'early_termination', present: null },
+    ];
+    expect(props(mortgage({ clauses })).flags).toEqual(['floor_clause']);
   });
 
   it('sorts the deed by the days that change the review', () => {

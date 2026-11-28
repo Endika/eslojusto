@@ -56,14 +56,13 @@ export function rentalReviewProps(data: {
   pass: PassMode;
 }): Props<'rental_review_completed'> {
   const { review, input } = data;
-  const reasons = new Set(
-    review.items.flatMap((i) => (i.outcome.kind === 'depends' ? i.outcome.reasons : [])),
-  );
   const unchecked = new Set(
     review.items.flatMap((i) => {
+      // Stryker disable next-line ConditionalExpression,ArrayDeclaration: rent_unchecked keeps only the codes RENT_UNCHECKED lists, so what another kind of item added would never leave
       if (i.kind !== 'rent_update') return [];
       const readings =
         i.outcome.kind === 'single' ? [i.outcome.value] : i.outcome.readings.map((r) => r.value);
+      // Stryker disable next-line ConditionalExpression,ArrayDeclaration: the same list keeps out a null or a stray code
       return readings.flatMap((r) => (r.unchecked === null ? [] : [r.unchecked]));
     }),
   );
@@ -80,7 +79,9 @@ export function rentalReviewProps(data: {
     rent_unchecked: RENT_UNCHECKED.filter((r) => unchecked.has(r)),
     charges: familyStatus(review.items, 'charges'),
     deposit_return: familyStatus(review.items, 'deposit_return'),
-    depends: DOUBT_REASONS.filter((r) => reasons.has(r)),
+    depends: DOUBT_REASONS.filter((r) =>
+      review.items.some((i) => i.outcome.kind === 'depends' && i.outcome.reasons.includes(r)),
+    ),
     difference: differenceBucket(review.totals.paidOver.counted + review.totals.owed.counted),
     offered: review.offerPass,
     detail: data.detail,
