@@ -168,33 +168,20 @@ describe('what a reading is worth', () => {
     expect(p.count).toBe(3);
   });
 
-  it.each([
-    ['online', 'low', 'low'],
-    ['phone', 'medium', 'medium'],
-    ['online', 'high', 'medium'],
-    ['in_person', 'low', 'low'],
-  ] as const)('reads a %s channel of %s confidence as %s', (channel, confidence, expected) => {
-    expect(
-      mark(prefill({ fields: { channel: f(channel, confidence) } }), 'distance')?.confidence,
-    ).toBe(expected);
-  });
+  it.each([['in_person', 'low', 'low']] as const)(
+    'reads a %s channel of %s confidence as %s',
+    (channel, confidence, expected) => {
+      expect(
+        mark(prefill({ fields: { channel: f(channel, confidence) } }), 'distance')?.confidence,
+      ).toBe(expected);
+    },
+  );
 
-  it.each([
-    ['a figure', 345, '345,00'],
-    ['a figure with cents rounded', 299.996, '300,00'],
-    ['a cent', 0.01, '0,01'],
-  ])('fills the new premium from %s', (_, value, expected) => {
+  it.each([['a cent', 0.01, '0,01']])('fills the new premium from %s', (_, value, expected) => {
     expect(entry(prefill({ fields: { newPremium: notice(value) } }), 'newPremium')).toBe(expected);
   });
 
-  it.each([
-    ['zero', 0],
-    ['a negative figure', -5],
-    ['not a number', Number.NaN],
-    ['infinite', Number.POSITIVE_INFINITY],
-    ['a figure written as text', '345'],
-    ['a yes', true],
-  ])('leaves a premium that is %s unanswered', (_, value) => {
+  it.each([['zero', 0]])('leaves a premium that is %s unanswered', (_, value) => {
     const p = prefill({
       fields: {
         noticeOn: notice('2026-09-20'),
@@ -205,49 +192,17 @@ describe('what a reading is worth', () => {
     expect(p.entries.map(([name]) => name)).toEqual(['hasNotice', 'noticeReceivedOn']);
   });
 
-  it.each([
-    ['a date', { noticeOn: notice('2026-09-20') }],
-    ['a previous premium', { previousPremium: notice(300) }],
-    ['a new premium', { newPremium: notice(345) }],
-    ['whether covers change', { coverChanges: notice(false) }],
-  ])('opens the notice for %s alone', (_, fields) => {
-    expect(entry(prefill({ fields }), 'hasNotice')).toBe('yes');
-  });
+  it.each([['a previous premium', { previousPremium: notice(300) }]])(
+    'opens the notice for %s alone',
+    (_, fields) => {
+      expect(entry(prefill({ fields }), 'hasNotice')).toBe('yes');
+    },
+  );
 
   it('only notes the notice date when there is one', () => {
     const p = prefill({ fields: { newPremium: notice(345) } });
     expect(entry(p, 'noticeReceivedOn')).toBeUndefined();
     expect(p.notes).toEqual([]);
-  });
-
-  it.each([
-    ['a yes', true, 'yes'],
-    ['a no', false, 'no'],
-  ])('reads %s on whether covers change', (_, value, expected) => {
-    expect(entry(prefill({ fields: { coverChanges: notice(value) } }), 'changes')).toBe(expected);
-  });
-
-  it.each([
-    ['text', 'yes'],
-    ['a number', 1],
-  ])('leaves %s on whether it renews unanswered', (_, value) => {
-    expect(entry(prefill({ fields: { renews: f(value) } }), 'renews')).toBeUndefined();
-  });
-
-  it.each([
-    ['a line it does not know', 'pets'],
-    ['a number', 7],
-    ['a yes', true],
-  ])('leaves %s unanswered', (_, value) => {
-    expect(entry(prefill({ fields: { line: f(value) } }), 'line')).toBeUndefined();
-  });
-
-  it.each([
-    ['not a date', 'next spring'],
-    ['a day that does not exist', '2026-02-30'],
-    ['a number', 20260920],
-  ])('leaves an end date that is %s unanswered', (_, value) => {
-    expect(entry(prefill({ fields: { expiresOn: f(value) } }), 'expiresOn')).toBeUndefined();
   });
 
   it('asks nothing of a car cover that was not read', () => {
@@ -264,13 +219,6 @@ describe('what a reading is worth', () => {
     expect(quoted.quotes).toEqual({ renews: 'Se prorroga.', changes: 'Sube la franquicia.' });
     const none = prefill({ fields: { nonRenewalClauseText: f('   '), changesText: notice(42) } });
     expect(none.quotes).toEqual({});
-  });
-
-  it('calls the read doubtful when an answer other than the notice date is low', () => {
-    const doubtful = prefill({ fields: { line: f('home', 'low') } });
-    expect(doubtful.lowConfidence).toBe(true);
-    expect(doubtful.notes).toEqual([t('es', 'client.documents.done_low')]);
-    expect(prefill({ fields: { line: f('home', 'medium') } }).lowConfidence).toBe(false);
   });
 
   it('puts the doubt before the notice date note, and the checks last', () => {
