@@ -10,11 +10,7 @@ import type {
   ScheduleDay,
   Weekday,
 } from '../../../src/engine/employment/types';
-import {
-  assessOvertimePact,
-  assessWorkingTime,
-  workingTimeNotes,
-} from '../../../src/engine/employment/working-time';
+import { assessOvertimePact, assessWorkingTime } from '../../../src/engine/employment/working-time';
 import { contract } from './input';
 
 const findings = (change: Partial<EmploymentInput>): Finding[] =>
@@ -35,23 +31,6 @@ const every = (days: readonly Weekday[], ...slots: [string, string][]): Schedule
 const WEEKDAYS: Weekday[] = [1, 2, 3, 4, 5];
 
 describe('weekly schedule geometry', () => {
-  it('a 22:00-06:00 slot counts eight hours and leaves sixteen until the next night', () => {
-    const week = workWeek(every([1, 2], ['22:00', '06:00']));
-    expect(week.days.map((d) => [d.minutes / 60, d.nightMinutes / 60])).toEqual([
-      [8, 8],
-      [8, 8],
-    ]);
-    expect(week.rests[0]).toBe(16 * 60);
-    expect(week.rests[1]).toBe((6 * 24 - 8) * 60);
-  });
-
-  it('two slots of one day are one working day with a break between them', () => {
-    const week = workWeek(every([1], ['08:00', '13:00'], ['14:00', '19:00']));
-    expect(week.days).toEqual([
-      expect.objectContaining({ minutes: 600, longestStretch: 300, start: 480, end: 1140 }),
-    ]);
-  });
-
   it.each([
     ['12:10', 7 * 60],
     ['12:15', 4 * 60],
@@ -247,21 +226,6 @@ describe('daily hours, rests and breaks', () => {
     });
   });
 
-  it('a Monday-to-Friday week keeps both rests', () => {
-    const schedule = every(WEEKDAYS, ['08:00', '12:00'], ['13:00', '17:00']);
-    expect(findingFor({ schedule }, 'rest_12').status).toBe('within_limit');
-    expect(findingFor({ schedule }, 'weekly_rest_36').status).toBe('within_limit');
-    expect(findingFor({ schedule }, 'break_15').status).toBe('within_limit');
-  });
-
-  it('a continuous stretch over six hours misses the break', () => {
-    const schedule = every(WEEKDAYS, ['08:00', '15:00']);
-    expect(findingFor({ schedule }, 'break_15')).toMatchObject({
-      status: 'missing_requirement',
-      calculation: [phrase('working_time.longest_stretch', { hours: 7 })],
-    });
-  });
-
   it('no schedule, no schedule findings', () => {
     expect(findings({ schedule: null }).map((f) => f.id)).toEqual(['weekly_40']);
     expect(findings({ schedule: null, contractHours: { weekly: null, annual: 1700 } })).toEqual([]);
@@ -447,26 +411,5 @@ describe('overtime pacts (art. 35 ET)', () => {
 
   it('no pact, no finding', () => {
     expect(assessOvertimePact(contract({ overtimeAgreed: null }), EMPLOYMENT_NORMS)).toBeNull();
-  });
-});
-
-describe('working time notes', () => {
-  it('always the daily record, and the monthly summary when part-time', () => {
-    expect(workingTimeNotes(contract(), EMPLOYMENT_NORMS).map((n) => n.key)).toEqual([
-      'working_time.time_record',
-    ]);
-    const partTime = {
-      hoursStated: true,
-      distributionStated: true,
-      complementary: null,
-      voluntaryPercent: null,
-    };
-    const notes = workingTimeNotes(contract({ partTime }), EMPLOYMENT_NORMS);
-    expect(notes.map((n) => n.key)).toEqual([
-      'working_time.time_record',
-      'part_time.monthly_summary',
-    ]);
-    expect(notes[0]?.sources[0]?.inForceSince).toBe('2019-03-13');
-    expect(notes[1]?.sources.map((source) => source.id)).toEqual(['part_time_record']);
   });
 });

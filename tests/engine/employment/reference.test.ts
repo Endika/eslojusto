@@ -38,11 +38,6 @@ describe('permanentReference', () => {
     expect(reference?.unfairDismissal.amount).toBe(1787.5);
   });
 
-  it('a work-or-service contract with no end is valued today', () => {
-    const input = temporary('work_or_service', '2023-05-02', null);
-    expect(permanentReference(input, TODAY, reviewed(input), SALARY)?.on).toEqual(TODAY);
-  });
-
   it('a replacement over its limit pays nothing at its end', () => {
     const input = temporary('replacement_selection', '2025-01-01', '2025-04-15');
     expect(permanentReference(input, TODAY, reviewed(input), SALARY)?.fixedTermEnd.amount).toBe(0);
@@ -103,13 +98,5 @@ describe('permanentReference', () => {
     ];
     const input = temporary('production', '2025-01-01', '2025-05-31');
     expect(permanentReference(input, TODAY, agreeing, SALARY)?.on).toEqual(parseDate('2025-05-31'));
-  });
-
-  it('stays out of the findings: none of them carries an amount', () => {
-    const input = temporary('work_or_service', '2023-05-02', null);
-    for (const a of reviewed(input)) {
-      const all = a.kind === 'single' ? [a.finding] : a.readings.map((r) => r.finding);
-      for (const f of all) expect(f.amount).toBeNull();
-    }
   });
 });

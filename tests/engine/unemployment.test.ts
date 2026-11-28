@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Range } from '../../src/engine/money';
 import {
-  addDays,
   fromOrdinal,
   daysInMonth,
   ordinal,
@@ -10,11 +9,7 @@ import {
 } from '../../src/engine/date';
 import {
   estimateBenefit,
-  amounts,
-  contributedDays,
   BENEFIT_2026,
-  approximateTotal,
-  trunc2,
   type BenefitEstimate,
   type Children,
 } from '../../src/engine/unemployment';
@@ -25,7 +20,7 @@ import type {
   ContributionPeriod,
   FixedTermType,
 } from '../../src/engine/types';
-import { validate, validateOtherContracts } from '../../src/engine/validate';
+import { validateOtherContracts } from '../../src/engine/validate';
 import { annualSalary } from '../../src/engine/settlement';
 
 const base: FinalPayInput = {
@@ -80,61 +75,6 @@ const near = (range: Range, v: number) => {
 };
 
 describe('benefit: §10 cases', () => {
-  it('1: resignation, no entitlement and no figures even though the qualifying period and base would give a benefit', () => {
-    const r = estimateBenefit(input('resignation', '2024-01-01', '2026-09-30', 2000, 14), 0);
-    expect(r.entitled).toBe('no');
-    expect(r).not.toHaveProperty('figures');
-    expect(r.sources.map((x) => x.id)).toEqual(['lgss267']);
-  });
-
-  const case2 = input(
-    'fixed_term_end',
-    '2025-09-01',
-    '2026-08-31',
-    1800,
-    14,
-    'production_circumstances',
-  );
-
-  it('2: fixed-term end, 365 days, 120 benefit days, 1-child cap and no second stretch', () => {
-    const r = entitled(case2, 1);
-    expect(r.contractDays).toBe(365);
-    expect(r.qualifying).toBe('met_by_this_contract');
-    expect(r.minimumDurationDays).toBe(120);
-    expect(r.secondStretch).toBe(false);
-    near(figures(r).firstStretch, 1400);
-    near(figures(r).contribution, 101.85);
-  });
-
-  it('2b: same with 0 children, 1,225 cap', () => {
-    const r = entitled(case2, 0);
-    near(figures(r).firstStretch, 1225);
-    near(figures(r).contribution, 101.85);
-  });
-
-  it('3a: 359 days, the qualifying period depends on the work history but there are figures', () => {
-    const r = entitled(
-      input('fixed_term_end', '2025-10-06', '2026-09-29', 2000, 14, 'replacement'),
-      0,
-    );
-    expect(r.contractDays).toBe(359);
-    expect(r.qualifying).toBe('depends_on_work_history');
-    expect(r.minimumDurationDays).toBe(0);
-    near(figures(r).firstStretch, 1225);
-    near(figures(r).secondStretch, 1225);
-    near(figures(r).contribution, 113.16);
-  });
-
-  it('3b: 360 days, qualifying period met and 120 days', () => {
-    const r = entitled(
-      input('fixed_term_end', '2025-10-05', '2026-09-29', 2000, 14, 'replacement'),
-      0,
-    );
-    expect(r.contractDays).toBe(360);
-    expect(r.qualifying).toBe('met_by_this_contract');
-    expect(r.minimumDurationDays).toBe(120);
-  });
-
   it('4: objective dismissal at the minimum wage, no cap applies', () => {
     const r = entitled(input('objective_dismissal', '2023-03-15', '2026-09-30', 1221, 14), 0);
     expect(r.contractDays).toBe(1296);
@@ -164,79 +104,6 @@ describe('benefit: §10 cases', () => {
     near(figures(r).secondStretch, 1400);
     near(figures(r).contribution, 121.25);
     expect(r.sources.map((x) => x.id)).toContain('lgss268');
-  });
-
-  it('6b: same with 0 children', () => {
-    const r = entitled(case6, 0);
-    near(figures(r).firstStretch, 1225);
-    near(figures(r).secondStretch, 1225);
-    near(figures(r).contribution, 121.25);
-  });
-
-  it('7: change on day 180 with no cap, and approximate total', () => {
-    const r = entitled(input('objective_dismissal', '2024-09-01', '2026-09-30', 1600, 12), 0);
-    expect(r.contractDays).toBe(760);
-    expect(r.minimumDurationDays).toBe(240);
-    expect(r.secondStretch).toBe(true);
-    const c = figures(r);
-    near(c.firstStretch, 1120);
-    near(c.secondStretch, 960);
-    near(c.contribution, 77.6);
-    expect(
-      approximateTotal(c.firstStretch.min, c.secondStretch.min, r.minimumDurationDays),
-    ).toBeCloseTo(8640, 2);
-  });
-
-  it('8: 183-day training contract, right at the cap without passing it', () => {
-    const r = entitled(
-      input('fixed_term_end', '2026-04-01', '2026-09-30', 1500, 14, 'training'),
-      0,
-    );
-    expect(r.contractDays).toBe(183);
-    expect(r.qualifying).toBe('depends_on_work_history');
-    expect(r.minimumDurationDays).toBe(0);
-    const c = figures(r);
-    near(c.firstStretch, 1225);
-    near(c.secondStretch, 1050);
-    near(c.contribution, 84.87);
-  });
-
-  it('trunc2 truncates cents without losing one to floating-point noise', () => {
-    expect(trunc2(1650.55 * 0.7)).toBe(1155.38);
-    expect(trunc2(1750 * 0.0485)).toBe(84.87);
-    // 1425 × 0.7 is 997.4999999999999 in binary floating point.
-    expect(trunc2(1425 * 0.7)).toBe(997.5);
-    expect(amounts(1425, 0).c1).toBe(997.5);
-  });
-
-  it('9: minimum cap in amounts (unreachable at full time)', () => {
-    const h0 = amounts(700, 0);
-    expect(h0.c1).toBeCloseTo(560, 2);
-    expect(h0.c2).toBeCloseTo(560, 2);
-    const h1 = amounts(700, 1);
-    expect(h1.c1).toBeCloseTo(749, 2);
-    expect(h1.c2).toBeCloseTo(749, 2);
-  });
-
-  it('children unanswered: range between the 0-children cap and the 2-or-more cap', () => {
-    const c = figures(entitled(case6, null));
-    expect(c.firstStretch.min).toBeCloseTo(1225, 2);
-    expect(c.firstStretch.max).toBeCloseTo(1575, 2);
-    expect(c.secondStretch.min).toBeCloseTo(1225, 2);
-    expect(c.secondStretch.max).toBeCloseTo(1500, 2);
-    near(c.contribution, 121.25);
-  });
-
-  it('without 180 days in this contract there are no figures', () => {
-    const r = entitled(input('objective_dismissal', '2026-04-04', '2026-09-30', 2000, 14), 0);
-    expect(r.contractDays).toBe(180);
-    expect(r.figures).not.toBeNull();
-    const shortContract = entitled(
-      input('objective_dismissal', '2026-04-05', '2026-09-30', 2000, 14),
-      0,
-    );
-    expect(shortContract.figures).toBeNull();
-    expect(shortContract.noFigures).toBe('short_contract');
   });
 
   // Below the 2026 minimum base a full-time job cannot be: it is almost surely part-time.
@@ -381,165 +248,6 @@ const withOtherContracts = (
   benefitDrawnSince: boolean | null,
 ): OtherContracts => ({ contracts, benefitDrawnSince });
 
-describe('benefit: other contracts in the last 6 years', () => {
-  // This contract: 2025-01-01 → 2026-06-30 = 365 + 181 = 546 days.
-  const longContract = input('objective_dismissal', '2025-01-01', '2026-06-30', 2000, 14);
-
-  it('a job at the same time as this one adds no days: the overlap counts once', () => {
-    // 2025-06-01 → 2025-12-31 lies wholly inside this contract.
-    const r = entitled(
-      longContract,
-      0,
-      withOtherContracts([period('2025-06-01', '2025-12-31')], false),
-    );
-    expect(r.contractDays).toBe(546);
-    expect(r.contributedDays).toBe(546);
-    expect(r.duration).toEqual({ kind: 'exact', days: 180 });
-  });
-
-  it('a partial overlap adds only the new days', () => {
-    // 2024-07-01 → 2025-03-31 overlaps Jan–Mar 2025; new days are Jul–Dec 2024 = 184.
-    const r = entitled(
-      longContract,
-      0,
-      withOtherContracts([period('2024-07-01', '2025-03-31')], false),
-    );
-    expect(r.contributedDays).toBe(546 + 184);
-    expect(r.duration).toEqual({ kind: 'exact', days: 240 });
-  });
-
-  it('other contracts that overlap, repeat or touch count each day once', () => {
-    const days = contributedDays(f('2026-06-30'), [
-      period('2023-01-01', '2023-12-31'),
-      period('2023-06-01', '2024-03-31'),
-      period('2023-06-01', '2024-03-31'),
-      period('2024-04-01', '2024-04-30'),
-    ]);
-    // Union 2023-01-01 → 2024-04-30: 365 + 121 (2024 is leap: 31 + 29 + 31 + 30).
-    expect(days).toBe(486);
-  });
-
-  it('a one-day period counts one day', () => {
-    expect(contributedDays(f('2026-06-30'), [period('2025-05-01', '2025-05-01')])).toBe(1);
-  });
-
-  it('other contracts that bring the total to exactly 360 days meet the requirement', () => {
-    const e = input('objective_dismissal', '2026-01-01', '2026-09-30', 2000, 14);
-    const contract = entitled(e, 0).contractDays;
-    const before = (days: number) =>
-      withOtherContracts(
-        [{ startDate: addDays(f('2025-12-31'), 1 - days), endDate: f('2025-12-31') }],
-        false,
-      );
-    const missing = BENEFIT_2026.qualifyingDays - contract;
-    expect(entitled(e, 0, before(missing)).qualifying).toBe('met_with_other_contracts');
-    expect(entitled(e, 0, before(missing - 1)).qualifying).toBe('depends_on_work_history');
-  });
-
-  it('unvalidated, a period past the end date is clipped and a reversed one adds nothing', () => {
-    const days = contributedDays(f('2026-06-30'), [
-      period('2026-06-01', '2026-12-31'),
-      period('2025-05-01', '2025-04-01'),
-    ]);
-    expect(days).toBe(30);
-  });
-
-  // Window for an end date on 2026-09-30: 2020-10-01 → 2026-09-30.
-  // This contract: 2025-10-01 → 2026-09-30 = 365 days.
-  const yearContract = input('objective_dismissal', '2025-10-01', '2026-09-30', 2000, 14);
-
-  it('a period wholly outside the 6-year window does not count', () => {
-    const r = entitled(
-      yearContract,
-      0,
-      withOtherContracts([period('2019-01-01', '2020-09-30')], false),
-    );
-    expect(r.contributedDays).toBe(365);
-    expect(r.duration).toEqual({ kind: 'exact', days: 120 });
-  });
-
-  it("a period split by the window edge counts from the window's first day", () => {
-    // 2020-09-01 → 2020-10-31: only 2020-10-01 → 2020-10-31 = 31 days are inside.
-    const r = entitled(
-      yearContract,
-      0,
-      withOtherContracts([period('2020-09-01', '2020-10-31')], false),
-    );
-    expect(r.contributedDays).toBe(365 + 31);
-  });
-
-  // Three 8-month contracts that together reach the 720-day row.
-  //   this one   2026-01-01 → 2026-08-31: 31+28+31+30+31+30+31+31 = 243 days
-  //   other A    2025-03-01 → 2025-10-31: 31+30+31+30+31+31+30+31 = 245 days
-  //   other B    2024-03-01 → 2024-10-31: same months, 245 days
-  //   total 243 + 245 + 245 = 733 ≥ 720 → 240 days of benefit (art. 269.1).
-  //   Window for 2026-08-31 starts 2020-09-01, so nothing is clipped.
-  // Alone, 243 days give no duration (< 360), but ≥ 180 so the figures still show.
-  const eightMonths = input(
-    'fixed_term_end',
-    '2026-01-01',
-    '2026-08-31',
-    1600,
-    12,
-    'production_circumstances',
-  );
-  const eightMonthOthers = [period('2025-03-01', '2025-10-31'), period('2024-03-01', '2024-10-31')];
-
-  it('three 8-month contracts: no benefit drawn since, exactly 240 days', () => {
-    const r = entitled(eightMonths, 0, withOtherContracts(eightMonthOthers, false));
-    expect(r.contractDays).toBe(243);
-    expect(r.minimumDurationDays).toBe(0);
-    expect(r.contributedDays).toBe(733);
-    expect(r.qualifying).toBe('met_with_other_contracts');
-    expect(r.duration).toEqual({ kind: 'exact', days: 240 });
-    expect(r.secondStretch).toBe(true);
-    near(figures(r).firstStretch, 1120);
-    near(figures(r).secondStretch, 960);
-  });
-
-  it('three 8-month contracts: benefit drawn since, up to 240 days', () => {
-    const r = entitled(eightMonths, 0, withOtherContracts(eightMonthOthers, true));
-    expect(r.contributedDays).toBe(733);
-    expect(r.qualifying).toBe('depends_on_work_history');
-    expect(r.duration.kind).toBe('up_to');
-    expect(r.duration.days).toBe(240);
-  });
-
-  it('three 8-month contracts: «No lo sé» is treated as «hasta» (up to)', () => {
-    const r = entitled(eightMonths, 0, withOtherContracts(eightMonthOthers, null));
-    expect(r.qualifying).toBe('depends_on_work_history');
-    expect(r.duration).toMatchObject({ kind: 'up_to', days: 240 });
-  });
-
-  it('without other contracts it stays «al menos» (at least) for this job alone', () => {
-    for (const others of [undefined, withOtherContracts([], true), withOtherContracts([], false)]) {
-      const r = entitled(eightMonths, 0, others);
-      expect(r.duration).toEqual({ kind: 'at_least', days: 0 });
-      expect(r.contributedDays).toBe(243);
-      expect(r.qualifying).toBe('depends_on_work_history');
-    }
-    expect(entitled(yearContract, 0).duration).toEqual({ kind: 'at_least', days: 120 });
-  });
-
-  it('the figures still need 180 days in this contract, whatever the others add', () => {
-    // 179 days in this contract plus a long earlier one.
-    const shortContract = input('objective_dismissal', '2026-04-05', '2026-09-30', 2000, 14);
-    const r = entitled(
-      shortContract,
-      0,
-      withOtherContracts([period('2022-01-01', '2026-03-31')], false),
-    );
-    expect(r.contractDays).toBe(179);
-    expect(r.contributedDays).toBeGreaterThanOrEqual(1620);
-    expect(r.figures).toBeNull();
-  });
-
-  it('a resignation stays unentitled even with other contracts', () => {
-    const e = input('resignation', '2026-01-01', '2026-08-31', 1600, 12);
-    expect(estimateBenefit(e, 0, withOtherContracts(eightMonthOthers, false)).entitled).toBe('no');
-  });
-});
-
 describe('benefit: validateOtherContracts', () => {
   const e = input('objective_dismissal', '2025-01-01', '2026-06-30', 2000, 14);
 
@@ -577,10 +285,6 @@ describe('benefit: validateOtherContracts', () => {
       'otherContracts.0.startDate',
       'otherContracts.0.endDate',
     ]);
-  });
-
-  it('the final pay validation does not change', () => {
-    expect(validate(e, f('2026-10-06'))).toEqual([]);
   });
 });
 

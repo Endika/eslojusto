@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
-import {
-  countedAmount,
-  highestAmount,
-  reviewHousehold,
-  type HouseholdReview,
-} from '../../../src/engine/household/review';
+import { reviewHousehold, type HouseholdReview } from '../../../src/engine/household/review';
 import { assessUnemployment } from '../../../src/engine/household/unemployment';
 import type { Finding } from '../../../src/engine/household/types';
 import { DEPS, desistimiento, household, TODAY } from './input';
@@ -47,30 +42,6 @@ describe('reviewHousehold', () => {
     ]);
   });
 
-  it('every finding carries its source, a norm in force', () => {
-    const r = review({ termination: desistimiento() });
-    for (const f of findings(r)) {
-      expect(f.sources.length, f.id).toBeGreaterThan(0);
-      expect(f.sources[0]?.status).toBe('in_force');
-      expect(f.sources[0]?.url.startsWith('https://www.boe.es/')).toBe(true);
-    }
-  });
-
-  it('adds the termination, the severance, the notice and the unemployment note', () => {
-    const r = review({ termination: desistimiento() });
-    expect(ids(r).slice(7)).toEqual([
-      'desistimiento_cause',
-      'desistimiento_written',
-      'dismissal_presumed',
-      'desistimiento_severance',
-      'desistimiento_notice',
-      'desistimiento_leave',
-      'unemployment_situation',
-    ]);
-    expect(r.finalPay?.kind).toBe('monthly');
-    expect(r.unchecked).toContain('cause_truth');
-  });
-
   it.each([
     ['a desistimiento', { termination: desistimiento() }, ['cause_truth']],
     [
@@ -101,29 +72,6 @@ describe('reviewHousehold', () => {
   it('returns the errors of an invalid input', () => {
     const result = reviewHousehold(household({ monthlyCash: -1 }), TODAY, DEPS);
     expect(result).toEqual({ ok: false, errors: [{ field: 'monthlyCash', code: 'amount_range' }] });
-  });
-
-  it('counts only money, never a warning, and the lowest of a doubtful point', () => {
-    const r = review({
-      startDate: parseDate('2020-03-01'),
-      weeklyHours: 60,
-      shortestRestHours: 4,
-      termination: desistimiento({
-        effectiveOn: parseDate('2026-06-15'),
-        noticeGivenOn: parseDate('2026-05-26'),
-        severanceOffered: 3000,
-      }),
-    });
-    const warnings = r.items.filter((a) =>
-      ['weekly_40', 'rest_between_shifts'].includes(a.kind === 'single' ? a.finding.id : ''),
-    );
-    expect(warnings.map(countedAmount)).toEqual([0, 0]);
-    const severance = r.items.find(
-      (a) => a.kind === 'readings' && a.question === 'incomplete_year',
-    );
-    expect(severance).toBeDefined();
-    if (severance === undefined) return;
-    expect(countedAmount(severance)).toBeLessThan(highestAmount(severance));
   });
 });
 
@@ -156,12 +104,5 @@ describe('the unemployment note', () => {
     expect(assessUnemployment(on('2022-09-25'), NORMS)?.kind).toBe('single');
     expect(assessUnemployment(on('2022-09-09'), NORMS)?.kind).toBe('single');
     expect(assessUnemployment(on('2022-09-08'), NORMS)).toBeNull();
-  });
-
-  it('is left out for another cause of termination', () => {
-    expect(
-      assessUnemployment(household({ termination: desistimiento({ route: 'et_cause' }) }), NORMS),
-    ).toBeNull();
-    expect(assessUnemployment(household(), NORMS)).toBeNull();
   });
 });

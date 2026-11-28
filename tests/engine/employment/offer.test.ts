@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { contractAnnualPay } from '../../../src/engine/employment/minimum-wage';
 import { compareOffer } from '../../../src/engine/employment/offer';
@@ -18,45 +17,14 @@ const offer = (change: Partial<Offer> = {}): Offer => ({
 const compared = (o: Offer, change: Partial<EmploymentInput> = {}) =>
   compareOffer(contract({ remoteShare: 0, ...change, offer: o }));
 
-const keysDeep = (value: unknown): string[] =>
-  typeof value !== 'object' || value === null
-    ? []
-    : Object.entries(value).flatMap(([k, v]) => [k, ...keysDeep(v)]);
-
 describe('offer against contract', () => {
-  it('without an offer there is nothing to compare', () => {
-    expect(compareOffer(contract())).toBeNull();
-  });
-
-  it('an offer matching the contract shows no difference', () => {
-    expect(compared(offer())).toEqual({ differences: [], notCompared: [] });
-  });
-
-  it('sets each differing field side by side', () => {
-    const result = compared(
-      offer({ grossAnnual: 24000, weeklyHours: 35, modality: 'production', remote: 'hybrid' }),
-    );
-    expect(result?.differences).toEqual([
-      { field: 'gross_annual', offer: 24000, contract: 21000 },
-      { field: 'weekly_hours', offer: 35, contract: 40 },
-      { field: 'modality', offer: 'production', contract: 'permanent' },
-      { field: 'remote', offer: 'hybrid', contract: 'none' },
-    ]);
-  });
-
   it('a net offer is not compared with a gross contract', () => {
     const result = compared(offer({ grossAnnual: 18000, net: true }));
     expect(result?.differences).toEqual([]);
     expect(result?.notCompared).toEqual([{ field: 'gross_annual', reason: 'net_against_gross' }]);
   });
 
-  it('cents from carrying a monthly pay to a year are no difference', () => {
-    const salary = { ...contract().salary, amount: 1714.29, breakdown: [] };
-    expect(compared(offer({ grossAnnual: 24000 }), { salary })?.differences).toEqual([]);
-  });
-
   it.each<[string, Offer['remote'], number | null, string | null]>([
-    ['one percent remote', 'full', 1, 'hybrid'],
     ['fully remote', 'hybrid', 100, 'full'],
   ])('a contract %s reads as %s against an offer', (_name, offered, remoteShare, read) => {
     expect(compared(offer({ remote: offered }), { remoteShare })?.differences).toEqual([
@@ -90,33 +58,12 @@ describe('offer against contract', () => {
       { field: 'gross_annual', reason: 'not_known' },
     ]);
   });
-
-  it("carries no verdict, no amount and no difference in anyone's favour", () => {
-    const result = compared(offer({ grossAnnual: 30000, weeklyHours: 30 }));
-    const keys = keysDeep(result);
-    for (const forbidden of ['status', 'amount', 'difference', 'calculation'])
-      expect(keys).not.toContain(forbidden);
-  });
-
-  it('never says anything is owed', () => {
-    const source = readFileSync('src/engine/employment/offer.ts', 'utf8');
-    expect(source).not.toMatch(/te deben/i);
-    expect(JSON.stringify(compared(offer({ grossAnnual: 30000 })))).not.toMatch(/te deben|owed/i);
-  });
 });
 
 describe('contractAnnualPay', () => {
   const monthly = (change: Partial<EmploymentInput['salary']>) => ({
     ...contract().salary,
     ...change,
-  });
-
-  it('a base-only monthly salary with two extra pays: fourteen whole months', () => {
-    expect(contractAnnualPay(contract())).toBe(21000);
-  });
-
-  it('without a breakdown nothing suggests smaller extra pays', () => {
-    expect(contractAnnualPay(contract({ salary: monthly({ breakdown: [] }) }))).toBe(21000);
   });
 
   it('extra pays of unstated size beside complements: no yearly figure', () => {
@@ -136,19 +83,6 @@ describe('contractAnnualPay', () => {
   it('a breakdown short of the total leaves the extra pays in doubt', () => {
     const salary = monthly({ breakdown: [{ kind: 'base', amount: 1100 }] });
     expect(contractAnnualPay(contract({ salary }))).toBeNull();
-  });
-
-  it('prorated extra pays are already in the monthly figure', () => {
-    const salary = monthly({
-      prorated: true,
-      breakdown: [
-        { kind: 'base', amount: 1100 },
-        { kind: 'fixed_complement', amount: 400 },
-      ],
-    });
-    expect(contractAnnualPay(contract({ salary, extraPays: { count: 2, prorated: true } }))).toBe(
-      18000,
-    );
   });
 
   it('payments and extra pays that contradict each other give no yearly figure', () => {

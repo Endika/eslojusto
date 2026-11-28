@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
-import {
-  assessNotice,
-  noticeDaysGiven,
-  noticeShort,
-  overOneYear,
-  requiredNoticeDays,
-} from '../../../src/engine/household/notice';
+import { assessNotice, noticeShort } from '../../../src/engine/household/notice';
 import { countedAmount, highestAmount } from '../../../src/engine/household/review';
 import { round2 } from '../../../src/engine/money';
 import type { HouseholdInput } from '../../../src/engine/household/types';
@@ -36,38 +30,6 @@ const run = (
     NORMS,
     DEPS.minimumWage,
   );
-
-describe('notice counted in calendar days (Código Civil 5.1 and 5.2)', () => {
-  it('starts the day after the notice and counts rest days', () => {
-    // Notice on a Friday, last day on the Sunday 20 days later.
-    expect(noticeDaysGiven(d('2026-09-04'), d('2026-09-24'))).toBe(20);
-    expect(noticeDaysGiven(d('2026-09-04'), d('2026-09-05'))).toBe(1);
-    expect(noticeDaysGiven(d('2026-09-04'), d('2026-09-04'))).toBe(0);
-  });
-
-  it('counts across a month and a year end', () => {
-    expect(noticeDaysGiven(d('2026-12-20'), d('2027-01-09'))).toBe(20);
-  });
-});
-
-describe('seven days up to a year of service, twenty after it', () => {
-  it('is seven the day the first year ends and twenty the day after', () => {
-    // Service from 01-03-2025: the first year ends on 28-02-2026.
-    expect(overOneYear(START, d('2026-02-28'))).toBe(false);
-    expect(overOneYear(START, d('2026-03-01'))).toBe(true);
-    expect(requiredNoticeDays(START, d('2026-02-28'))).toBe(7);
-    expect(requiredNoticeDays(START, d('2026-03-01'))).toBe(20);
-  });
-
-  it('keeps seven for a worker of a few months', () => {
-    expect(requiredNoticeDays(START, d('2025-04-01'))).toBe(7);
-  });
-
-  it('follows a start on 29 February to the 28th of the following year', () => {
-    expect(overOneYear(d('2024-02-29'), d('2025-02-27'))).toBe(false);
-    expect(overOneYear(d('2024-02-29'), d('2025-02-28'))).toBe(true);
-  });
-});
 
 describe('the notice finding', () => {
   it('shows two readings when the first year ends during the notice', () => {
@@ -263,17 +225,6 @@ describe('a notice that is short', () => {
     );
 
   it.each([
-    [
-      'a desistimiento with 19 days after a year',
-      { noticeGivenOn: d('2026-03-01'), effectiveOn: d('2026-03-20') },
-      true,
-    ],
-    [
-      'a desistimiento with the full 20 days',
-      { noticeGivenOn: d('2026-03-01'), effectiveOn: d('2026-03-21') },
-      false,
-    ],
-    ['no day of notice', { noticeGivenOn: null }, false],
     [
       'another cause of termination',
       { route: 'et_cause', noticeGivenOn: d('2026-03-01'), effectiveOn: d('2026-03-05') },

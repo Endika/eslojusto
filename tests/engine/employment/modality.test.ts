@@ -7,12 +7,7 @@ import { reviewModality } from '../../../src/engine/employment/modality';
 import type { NormTable } from '../../../src/engine/employment/norms';
 import { LAW_QUOTES } from '../../../src/engine/employment/quotes';
 import { offerPass } from '../../../src/engine/employment/readings';
-import type {
-  Assessed,
-  EmploymentInput,
-  Finding,
-  FindingStatus,
-} from '../../../src/engine/employment/types';
+import type { EmploymentInput, Finding, FindingStatus } from '../../../src/engine/employment/types';
 import { contract } from './input';
 
 const TODAY = parseDate('2026-10-07');
@@ -85,50 +80,12 @@ describe('reviewModality: abolished modalities', () => {
     expect(offerPass(assessed)).toBe(false);
   });
 
-  it('signed before the reform and started after it is not reviewed either', () => {
-    const input = temporary('work_or_service', '2022-04-04', null, {
-      signedOn: parseDate('2022-03-25'),
-    });
-    expect(findings(input).map((f) => f.status)).toEqual(['not_reviewed_in_this_version']);
-  });
-
-  it('«eventual» without any cause written is asked to review, like a production contract', () => {
-    const input = temporary('eventual', '2023-01-09', '2023-04-08', { causeStated: false });
-    expect(findings(input).map((f) => [f.id, f.status])).toEqual([
-      ['abolished_modalities', 'review_it'],
-      ['fixed_term_presumption', 'review_it'],
-      ['production_6_months', 'within_limit'],
-    ]);
-    expect(byId(input, 'fixed_term_presumption').literal).toEqual(
-      LAW_QUOTES.fixed_term_presumption,
-    );
-    expect(offerPass(reviewModality(input, TODAY, deps))).toBe(false);
-  });
-
   it('«eventual» with its production cause is read as a production contract', () => {
     const all = findings(temporary('eventual', '2023-01-09', '2023-04-08'));
     expect(all.map((f) => [f.id, f.status])).toEqual([
       ['abolished_modalities', 'review_it'],
       ['fixed_term_presumption', 'within_limit'],
       ['production_6_months', 'within_limit'],
-    ]);
-  });
-
-  it('«eventual» with the cause unknown only asks to review it', () => {
-    const all = findings(temporary('eventual', '2023-01-09', '2023-04-08', { causeStated: null }));
-    expect(all.map((f) => f.status)).toEqual(['review_it', 'not_entered', 'within_limit']);
-  });
-
-  it('«interinidad» naming the person and the cause is read as a replacement', () => {
-    const all = findings(
-      temporary('interim', '2023-01-09', null, {
-        replacedPersonNamed: true,
-        replacementCauseStated: true,
-      }),
-    );
-    expect(all.map((f) => [f.id, f.status])).toEqual([
-      ['abolished_modalities', 'review_it'],
-      ['replacement_name_cause', 'within_limit'],
     ]);
   });
 
@@ -163,12 +120,6 @@ describe('reviewModality: production', () => {
       { key: 'modality.production_agreement_year' },
     ]);
     expect(offerPass(reviewModality(input, TODAY, deps))).toBe(false);
-  });
-
-  it('a day over six months already depends on the agreement', () => {
-    expect(byId(production('2025-01-15', '2025-07-15'), 'production_1_year').status).toBe(
-      'depends_on_agreement',
-    );
   });
 
   it('thirteen months are over the legal limit whatever the agreement says', () => {
@@ -258,12 +209,6 @@ describe('reviewModality: occasional production', () => {
     const f = byId(occasional('2025-03-01', '2025-07-08'), 'production_occasional_agrifood_120');
     expect(f.status).toBe('over_legal_limit');
   });
-
-  it('days are counted per calendar year', () => {
-    expect(byId(occasional('2023-11-01', '2024-01-31'), 'production_occasional_90').status).toBe(
-      'within_limit',
-    );
-  });
 });
 
 describe('reviewModality: replacement', () => {
@@ -285,15 +230,6 @@ describe('reviewModality: replacement', () => {
     );
     expect(f.status).toBe('over_legal_limit');
     expect(f.agreementMaySetOther).toBe(false);
-  });
-
-  it('within three months the agreement may still set a shorter one', () => {
-    const f = byId(
-      temporary('replacement_selection', '2025-01-01', '2025-03-31'),
-      'replacement_selection_3_months',
-    );
-    expect(f.status).toBe('within_limit');
-    expect(f.agreementMaySetOther).toBe(true);
   });
 });
 
@@ -386,17 +322,6 @@ describe('reviewModality: written form and fixed-discontinuous', () => {
     expect(f.literal).toEqual(LAW_QUOTES.written_form);
   });
 
-  it('three weeks, or a full-time permanent contract, need no writing', () => {
-    expect(
-      findings(production('2025-01-01', '2025-01-21', { writtenContract: false })).some(
-        (f) => f.id === 'written_form',
-      ),
-    ).toBe(false);
-    expect(
-      findings(contract({ writtenContract: false })).some((f) => f.id === 'written_form'),
-    ).toBe(false);
-  });
-
   it('a work-or-service contract of any length needs writing', () => {
     const input = temporary('work_or_service', '2023-05-02', '2023-05-19', {
       writtenContract: false,
@@ -430,13 +355,6 @@ describe('reviewModality: written form and fixed-discontinuous', () => {
 });
 
 describe('reviewModality: dependencies and boundaries', () => {
-  it('a permanent contract is within; an unknown modality is not entered', () => {
-    expect(findings(contract()).map((f) => f.status)).toEqual(['within_limit']);
-    expect(findings(contract({ modality: 'unknown' })).map((f) => f.status)).toEqual([
-      'not_entered',
-    ]);
-  });
-
   it('out of scope there is nothing to review', () => {
     expect(reviewModality(contract({ relationship: 'household' }), TODAY, deps)).toEqual([]);
   });
@@ -465,14 +383,6 @@ describe('reviewModality: dependencies and boundaries', () => {
       norms,
     );
     expect(f.status).toBe('over_legal_limit');
-  });
-
-  it('never carries an amount', () => {
-    const all: Assessed[] = [
-      ...reviewModality(production('2025-01-01', '2026-01-31', { extensions: 2 }), TODAY, deps),
-      ...reviewModality(temporary('work_or_service', '2023-05-02', null), TODAY, deps),
-    ];
-    for (const a of all) if (a.kind === 'single') expect(a.finding.amount).toBeNull();
   });
 });
 

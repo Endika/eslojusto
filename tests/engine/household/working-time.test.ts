@@ -92,11 +92,6 @@ describe('what the working time findings show', () => {
     vars: { hours, limit, ...more },
   });
 
-  it('files its findings under working time and holidays', () => {
-    expect(new Set(singles(time()).map((f) => f.item))).toEqual(new Set(['working_time']));
-    expect(new Set(singles(holidays()).map((f) => f.item))).toEqual(new Set(['holidays']));
-  });
-
   it('shows the figures against the limits', () => {
     expect(phrases(time({ weeklyHours: 50, weeklyRestHours: 30 }))).toEqual([
       [

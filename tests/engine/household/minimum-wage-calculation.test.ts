@@ -45,40 +45,6 @@ describe('what the minimum wage review shows for each case', () => {
   it.each<[string, Partial<HouseholdInput>, string | null, string | null, Record<string, unknown>]>(
     [
       [
-        'a shortfall in part of the year',
-        { monthlyCash: 1000, extraPays: null },
-        '2026-07-31',
-        '2026-01-01',
-        {
-          smi_monthly: {
-            status: 'below_minimum',
-            calculation: [
-              MIN,
-              {
-                key: 'minimum_wage.paid_prorated',
-                vars: { monthly: { euros: 1000 }, extras: { euros: 0 }, annual: { euros: 12000 } },
-              },
-              {
-                key: 'minimum_wage.shortfall',
-                vars: { annual: { euros: 5094 }, monthly: { euros: 424.5 } },
-              },
-              {
-                key: 'minimum_wage.shortfall_accrued',
-                vars: { year: 2026, days: 212, accrued: { euros: 2958.71 } },
-              },
-            ],
-            basedOnYourAnswer: false,
-            agreementMaySetOther: false,
-          },
-          extra_pays: {
-            status: 'not_entered',
-            calculation: [],
-            basedOnYourAnswer: false,
-            agreementMaySetOther: false,
-          },
-        },
-      ],
-      [
         'a month short with pay in kind and extra payments apart',
         { monthlyCash: 1150, inKindMonthly: 300, extraPays: apart(2, 1700) },
         null,

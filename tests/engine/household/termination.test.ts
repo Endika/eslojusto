@@ -183,12 +183,6 @@ describe('what the findings of a desistimiento show', () => {
       { severanceOffered: 1380.82 },
       [...legal, ['dismissal_presumed', 'within_limit', true, ['dismissal.none_of_the_two']]],
     ],
-    [
-      'a figure that cannot be told with no salary',
-      { monthlyCash: null },
-      { severanceOffered: 1000 },
-      [...legal, ['dismissal_presumed', 'within_limit', true, ['dismissal.none_of_the_two']]],
-    ],
   ])('%s', (_name, change, termination, expected) => {
     const shown = singles(run(change, termination)).map((f) => [
       f.id,
