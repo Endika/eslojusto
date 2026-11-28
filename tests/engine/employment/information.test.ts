@@ -32,13 +32,36 @@ describe('information blocks', () => {
     ]);
   });
 
-  it('each block cites its source, and the agreement links the public register', () => {
-    for (const b of blocks) expect(b.sources.length).toBeGreaterThan(0);
-    const agreement = blocks.find((b) => b.id === 'agreement');
-    expect(agreement?.links.map((l) => l.url)).toEqual([
-      'https://expinterweb.mites.gob.es/regcon/',
+  it('each block says its own phrases and cites its own sources', () => {
+    expect(
+      blocks.map((b) => [b.id, b.calculation.map((p) => p.key), b.sources.map((s) => s.id)]),
+    ).toEqual([
+      [
+        'agreement',
+        [
+          'information.agreement.not_named',
+          'information.agreement.where',
+          'information.agreement.sector_salary_amount_priority',
+        ],
+        ['agreement_salary'],
+      ],
+      ['public_holidays', ['information.public_holidays'], ['public_holidays']],
+      ['time_record', ['working_time.time_record'], ['time_record']],
+      ['late_payment_interest', ['information.late_payment_interest'], ['late_payment_interest']],
+      ['limitation', ['information.limitation'], ['limitation']],
+      ['information_model', ['information.model'], ['info_model']],
     ]);
-    expect(agreement?.sources.map((s) => s.id)).toEqual(['agreement_salary']);
+  });
+
+  it('only the agreement links the public register', () => {
+    expect(blocks.map((b) => b.links.map((l) => l.url))).toEqual([
+      ['https://expinterweb.mites.gob.es/regcon/'],
+      [],
+      [],
+      [],
+      [],
+      [],
+    ]);
   });
 
   it('says whether the contract names its agreement, without looking up its tables', () => {

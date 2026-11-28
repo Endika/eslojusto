@@ -84,9 +84,25 @@ describe('permanentReference', () => {
     expect(permanentReference(input, TODAY, split, SALARY)).toBeNull();
   });
 
-  it('needs the yearly salary', () => {
+  it.each([null, 0, -1])('needs a yearly salary above zero, not %s', (salary) => {
     const input = temporary('work_or_service', '2023-05-02', null);
-    expect(permanentReference(input, TODAY, reviewed(input), null)).toBeNull();
+    expect(permanentReference(input, TODAY, reviewed(input), salary)).toBeNull();
+  });
+
+  it('appears when every reading holds', () => {
+    const holding = (when: 'cutoff_2021_12_31' | 'cutoff_2022_03_30') => ({
+      when,
+      finding: finding({ id: 'chaining_18_in_24', item: 'chaining', status: 'becomes_permanent' }),
+    });
+    const agreeing: Assessed[] = [
+      {
+        kind: 'readings',
+        question: 'chaining_cutoff',
+        readings: [holding('cutoff_2021_12_31'), holding('cutoff_2022_03_30')],
+      },
+    ];
+    const input = temporary('production', '2025-01-01', '2025-05-31');
+    expect(permanentReference(input, TODAY, agreeing, SALARY)?.on).toEqual(parseDate('2025-05-31'));
   });
 
   it('stays out of the findings: none of them carries an amount', () => {

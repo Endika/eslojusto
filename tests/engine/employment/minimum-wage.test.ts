@@ -6,6 +6,8 @@ import {
   assessMinimumWage,
   compareByYear,
   comparePayslips,
+  contractAgainstMinimum,
+  contractAnnualPay,
   type MinimumWageDeps,
   type MinimumWageRow,
   type MinimumWageTable,
@@ -18,6 +20,7 @@ import type {
   Payslip,
   Salary,
 } from '../../../src/engine/employment/types';
+import { phrase } from '../../../src/engine/employment/calculation';
 import { contract } from './input';
 
 const DEPS: MinimumWageDeps = { norms: EMPLOYMENT_NORMS, minimumWage: MINIMUM_WAGE };
@@ -617,6 +620,14 @@ describe('payslips', () => {
     expect(c).toMatchObject({ verdict: 'not_published', shortfall: 0, row: MINIMUM_WAGE.at(-1) });
   });
 
+  it('a short month with hours of no known fraction is only to review', () => {
+    const input = {
+      ...withPayslips(payslip({ salaryInMoney: 900 })),
+      contractHours: { weekly: null, annual: 1000 },
+    };
+    expect(comparePayslips(input, MINIMUM_WAGE)[0]?.verdict).toBe('hours_unknown');
+  });
+
   it('is not entered without payslips', () => {
     expect(single(byId(review(withPayslips(), '2026-10-31'), 'smi_monthly')).status).toBe(
       'not_entered',
@@ -883,5 +894,900 @@ describe('special pay rules', () => {
     const f = contractFinding(input, '2026-12-31');
     expect(f).toMatchObject({ status: 'below_minimum', amount: null });
     expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.discontinuous_periods');
+  });
+});
+
+describe('how each pay is carried to a year', () => {
+  const start2026 = { startDate: day('2026-01-01'), signedOn: day('2026-01-01') };
+  const howOf = (change: Partial<EmploymentInput>) =>
+    contractFinding(contract({ ...start2026, ...change }), '2026-12-31').calculation[0];
+  const euros = (n: number) => ({ euros: n });
+
+  it('says a yearly salary', () => {
+    expect(howOf({ salary: yearly(20000) })).toEqual(
+      phrase('minimum_wage.pay.year', { annual: euros(20000) }),
+    );
+  });
+
+  it('says a monthly salary and how many payments it carries', () => {
+    expect(howOf({ salary: salary({ amount: 1500, payments: 14 }) })).toEqual(
+      phrase('minimum_wage.pay.month', {
+        monthly: euros(1500),
+        payments: { integer: 14 },
+        annual: euros(21000),
+      }),
+    );
+  });
+
+  it('says a monthly salary with the extra pays prorated', () => {
+    expect(howOf({ salary: salary({ amount: 1500, payments: 14, prorated: true }) })).toEqual(
+      phrase('minimum_wage.pay.month_prorated', { monthly: euros(1500), annual: euros(18000) }),
+    );
+  });
+
+  it('says a day rate', () => {
+    expect(howOf({ salary: salary({ amount: 60, period: 'day', payments: 12 }) })).toEqual(
+      phrase('minimum_wage.pay.day', {
+        daily: euros(60),
+        days: { days: 365 },
+        annual: euros(21900),
+      }),
+    );
+  });
+
+  it('says an hour rate over the week', () => {
+    expect(
+      howOf({
+        salary: salary({ amount: 10, period: 'hour', payments: 12 }),
+        contractHours: { weekly: 20, annual: null },
+      }),
+    ).toEqual(
+      phrase('minimum_wage.pay.hour_weekly', {
+        hourly: euros(10),
+        weekly: 20,
+        annual: euros(10428.57),
+      }),
+    );
+  });
+
+  it('says an hour rate over yearly hours, with and without the paid rest', () => {
+    const assessed = review(
+      contract({
+        ...start2026,
+        salary: salary({ amount: 8, period: 'hour', payments: 12 }),
+        contractHours: { weekly: null, annual: 1800 },
+      }),
+      '2026-12-31',
+    )[0];
+    expect(assessed?.kind).toBe('readings');
+    if (assessed?.kind !== 'readings') return;
+    expect(assessed.question).toBe('paid_hours');
+    const howOfReading = (when: string) =>
+      assessed.readings.find((r) => r.when === when)?.finding.calculation[0];
+    expect(howOfReading('effective_hours')).toEqual(
+      phrase('minimum_wage.pay.hour', { hourly: euros(8), hours: 1800, annual: euros(14400) }),
+    );
+    expect(howOfReading('with_paid_rest')).toEqual(
+      phrase('minimum_wage.pay.hour_with_paid_rest', {
+        hourly: euros(8),
+        hours: 1800,
+        restDays: { days: 36 },
+        paidHours: 2089.29,
+        annual: euros(16714.32),
+      }),
+    );
+  });
+
+  it('opens the hours readings with a breakdown that is all base pay', () => {
+    const assessed = review(
+      contract({
+        ...start2026,
+        salary: salary({
+          amount: 8,
+          period: 'hour',
+          payments: 12,
+          breakdown: [{ kind: 'base', amount: 8 }],
+        }),
+        contractHours: { weekly: null, annual: 1800 },
+      }),
+      '2026-12-31',
+    )[0];
+    expect(assessed?.kind === 'readings' && assessed.question).toBe('paid_hours');
+  });
+
+  it('shows what a variable complement leaves out in the reading that leaves it out', () => {
+    const assessed = review(
+      contract({
+        ...start2026,
+        salary: salary({
+          amount: 18000,
+          period: 'year',
+          breakdown: [
+            { kind: 'base', amount: 15000 },
+            { kind: 'variable', amount: 3000 },
+          ],
+        }),
+      }),
+      '2026-12-31',
+    )[0];
+    expect(assessed?.kind === 'readings' && assessed.question).toBe('complement_kind');
+    if (assessed?.kind !== 'readings') return;
+    const calc = (when: string) =>
+      assessed.readings.find((r) => r.when === when)?.finding.calculation;
+    expect(calc('complement_variable')).toContainEqual(
+      phrase('minimum_wage.excluded', { excluded: euros(3000) }),
+    );
+    expect(calc('complement_fixed')?.map((p) => p.key)).not.toContain('minimum_wage.excluded');
+  });
+});
+
+describe('the contract year from its pay', () => {
+  const start2026 = { startDate: day('2026-01-01'), signedOn: day('2026-01-01') };
+  const fixedComplement = [
+    { kind: 'base' as const, amount: 1000 },
+    { kind: 'fixed_complement' as const, amount: 500 },
+  ];
+
+  it.each([
+    [
+      'an hour rate with only yearly hours',
+      salary({ period: 'hour', amount: 10 }),
+      { weekly: null, annual: 1800 },
+      null,
+    ],
+    [
+      'an hour rate with its week',
+      salary({ period: 'hour', amount: 10, payments: 12 }),
+      { weekly: 20, annual: 1800 },
+      10428.57,
+    ],
+    [
+      'a day rate with only yearly hours',
+      salary({ period: 'day', amount: 60, payments: 12 }),
+      { weekly: null, annual: 1800 },
+      21900,
+    ],
+    [
+      'a yearly salary with a complement and 14 payments',
+      salary({ period: 'year', amount: 20000, breakdown: fixedComplement }),
+      { weekly: 40, annual: null },
+      20000,
+    ],
+    [
+      'a monthly salary of 12 payments with a complement',
+      salary({ amount: 1500, payments: 12, breakdown: fixedComplement }),
+      { weekly: 40, annual: null },
+      18000,
+    ],
+    [
+      'a prorated monthly salary with a complement',
+      salary({ amount: 1500, prorated: true, breakdown: fixedComplement }),
+      { weekly: 40, annual: null },
+      18000,
+    ],
+    [
+      'a monthly salary of 14 payments with a complement',
+      salary({ amount: 1500, breakdown: fixedComplement }),
+      { weekly: 40, annual: null },
+      null,
+    ],
+    [
+      'a monthly salary of 14 payments of base pay',
+      salary({ amount: 1500, breakdown: [{ kind: 'base', amount: 1500 }] }),
+      { weekly: 40, annual: null },
+      21000,
+    ],
+  ])('%s: its yearly pay is %s', (_name, theSalary, contractHours, annual) => {
+    expect(contractAnnualPay(contract({ salary: theSalary, contractHours, extraPays: null }))).toBe(
+      annual,
+    );
+  });
+
+  it('is unknown when the extra pays entered contradict the salary', () => {
+    const base = { salary: salary({ amount: 1500 }) };
+    expect(contractAnnualPay(contract({ ...base, extraPays: { count: 2, prorated: false } }))).toBe(
+      21000,
+    );
+    expect(
+      contractAnnualPay(contract({ ...base, extraPays: { count: 1, prorated: false } })),
+    ).toBeNull();
+    expect(
+      contractAnnualPay(contract({ ...base, extraPays: { count: 2, prorated: true } })),
+    ).toBeNull();
+  });
+
+  it.each([
+    [
+      'an hour rate without its hours',
+      {
+        salary: salary({ period: 'hour', amount: 10 }),
+        contractHours: { weekly: null, annual: null },
+      },
+    ],
+    ['hours of no known fraction', { contractHours: { weekly: null, annual: 1000 } }],
+    [
+      'hours of no known fraction, from the agreement alone',
+      {
+        contractHours: { weekly: null, annual: null },
+        agreement: { ...contract().agreement, annualHours: 1800 },
+      },
+    ],
+    ['a year not published', { startDate: day('2030-01-01'), signedOn: day('2030-01-01') }],
+  ])('has no minimum to compare for %s', (_name, change) => {
+    expect(contractAgainstMinimum(contract({ ...start2026, ...change }), MINIMUM_WAGE)).toBeNull();
+  });
+
+  it('compares with the minimum of the year the pay is known to apply, in proportion to the hours', () => {
+    expect(
+      contractAgainstMinimum(contract({ ...start2026, salary: yearly(20000) }), MINIMUM_WAGE),
+    ).toEqual({
+      year: 2026,
+      annual: 20000,
+      minimum: 17094,
+    });
+    expect(
+      contractAgainstMinimum(
+        contract({
+          ...start2026,
+          salary: yearly(20000),
+          contractHours: { weekly: 20, annual: null },
+        }),
+        MINIMUM_WAGE,
+      )?.minimum,
+    ).toBe(8547);
+  });
+
+  it('a shortfall with hours of no known fraction is only to review', () => {
+    const f = contractFinding(
+      contract({
+        ...start2026,
+        salary: yearly(10000),
+        contractHours: { weekly: null, annual: 1000 },
+      }),
+      '2026-12-31',
+    );
+    expect(f.status).toBe('review_it');
+    expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.year.hours_unknown');
+  });
+});
+
+describe('the part-time proportion, in words', () => {
+  const start2026 = { startDate: day('2026-01-01'), signedOn: day('2026-01-01') };
+  const keysFor = (change: Partial<EmploymentInput>) =>
+    contractFinding(contract({ ...start2026, salary: yearly(20000), ...change }), '2026-12-31')
+      .calculation;
+
+  it('says nothing at full time', () => {
+    expect(
+      keysFor({ contractHours: { weekly: 40, annual: null } }).map((p) => p.key),
+    ).not.toContain('minimum_wage.prorata');
+  });
+
+  it('says the week against the legal one, and that an agreement week may raise it', () => {
+    expect(keysFor({ contractHours: { weekly: 20, annual: null } }).slice(1, 3)).toEqual([
+      phrase('minimum_wage.prorata', { hours: 20, fullTime: 40, coefficient: 0.5 }),
+      phrase('minimum_wage.legal_week'),
+    ]);
+  });
+
+  it('says the week against the agreement week without that reminder', () => {
+    const calc = keysFor({ fullTimeHours: 38, contractHours: { weekly: 19, annual: null } });
+    expect(calc[1]).toEqual(
+      phrase('minimum_wage.prorata', { hours: 19, fullTime: 38, coefficient: 0.5 }),
+    );
+    expect(calc.map((p) => p.key)).not.toContain('minimum_wage.legal_week');
+  });
+
+  it('says the year against the agreement year', () => {
+    const calc = keysFor({
+      contractHours: { weekly: null, annual: 900 },
+      agreement: { ...contract().agreement, annualHours: 1800 },
+    });
+    expect(calc[1]).toEqual(
+      phrase('minimum_wage.prorata_annual', { hours: 900, fullTime: 1800, coefficient: 0.5 }),
+    );
+  });
+});
+
+describe('the years of a contract, by days', () => {
+  const rate = salary({ amount: 60, period: 'day', payments: 12 });
+
+  it('counts a single day, and none for a contract yet to start', () => {
+    const oneDay = contract({
+      startDate: day('2026-12-31'),
+      signedOn: day('2026-12-31'),
+      salary: yearly(20000),
+    });
+    expect(compareByYear(oneDay, day('2026-12-31'), MINIMUM_WAGE)).toMatchObject([
+      { year: 2026, days: 1 },
+    ]);
+    const future = contract({
+      startDate: day('2026-12-01'),
+      signedOn: day('2026-12-01'),
+      salary: yearly(20000),
+    });
+    expect(compareByYear(future, day('2026-10-07'), MINIMUM_WAGE)).toMatchObject([
+      { year: 2026, days: 0 },
+    ]);
+  });
+
+  it('counts a short contract up to its end, even when that is before today', () => {
+    const short = contract({
+      modality: 'production',
+      startDate: day('2026-01-01'),
+      signedOn: day('2026-01-01'),
+      endDate: day('2026-02-28'),
+      salary: rate,
+    });
+    expect(compareByYear(short, day('2026-12-31'), MINIMUM_WAGE)).toMatchObject([
+      { year: 2026, days: 59 },
+    ]);
+  });
+
+  it.each(['permanent', 'discontinuous'] as const)(
+    'a %s contract is never a short temporary one, whatever its end date',
+    (modality) => {
+      const input = contract({
+        modality,
+        startDate: day('2026-01-01'),
+        signedOn: day('2026-01-01'),
+        endDate: day('2026-02-28'),
+        salary: rate,
+      });
+      expect(compareByYear(input, day('2026-12-31'), MINIMUM_WAGE)[0]).toMatchObject({
+        minimum: 17094,
+      });
+    },
+  );
+});
+
+describe('payslip extra pays prorated, by what the contract says', () => {
+  const withPayslip = (change: Partial<EmploymentInput>, p: Partial<Payslip>) =>
+    contract({ startDate: day('2026-01-01'), payslips: [payslip(p)], ...change });
+  const verdictOf = (input: EmploymentInput) => {
+    const [c] = comparePayslips(input, MINIMUM_WAGE);
+    return [c?.verdict, c?.minimum];
+  };
+
+  it.each([
+    [
+      'one extra pay prorated by the answer, with the salary not prorated',
+      { salary: salary({ amount: 1500 }), extraPays: { count: 1, prorated: true } },
+      { salaryInMoney: 1221, proratedExtraPay: 101.75 },
+      ['within', 1322.75],
+    ],
+    [
+      'one extra pay prorated by a salary of 13 payments, with no answer',
+      { salary: salary({ amount: 1500, payments: 13, prorated: true }), extraPays: null },
+      { salaryInMoney: 1221, proratedExtraPay: 101.75 },
+      ['within', 1322.75],
+    ],
+    [
+      'no extra pay prorated by the answer',
+      {
+        salary: salary({ amount: 1500, payments: 14, prorated: true }),
+        extraPays: { count: 0, prorated: false },
+      },
+      { salaryInMoney: 1221, proratedExtraPay: 101.75 },
+      ['prorated_count_unknown', 1424.5],
+    ],
+    [
+      'a salary not prorated',
+      { salary: salary({ amount: 1500, payments: 14 }), extraPays: null },
+      { salaryInMoney: 1100, proratedExtraPay: 183.33 },
+      ['prorated_count_unknown', 1424.5],
+    ],
+    [
+      'exactly the twelfths the count implies, less a cent',
+      { salary: salary({ amount: 1500, prorated: true }), extraPays: { count: 2, prorated: true } },
+      { salaryInMoney: 1200, proratedExtraPay: 199.99 },
+      ['below', 1424.5],
+    ],
+    [
+      'a cent under that',
+      { salary: salary({ amount: 1500, prorated: true }), extraPays: { count: 2, prorated: true } },
+      { salaryInMoney: 1200, proratedExtraPay: 199.98 },
+      ['prorated_count_unknown', 1424.5],
+    ],
+  ])('%s', (_name, change, p, expected) => {
+    expect(verdictOf(withPayslip(change, p))).toEqual(expected);
+  });
+
+  it('a month of a year before the table is not loaded', () => {
+    expect(comparePayslips(withPayslip({}, { month: '2022-05' }), MINIMUM_WAGE)).toEqual([
+      {
+        month: '2022-05',
+        verdict: 'not_loaded',
+        row: null,
+        minimum: null,
+        paid: null,
+        shortfall: 0,
+        prorated: false,
+      },
+    ]);
+  });
+});
+
+describe('the payslip finding, in words', () => {
+  const monthly = (...payslips: Payslip[]) => contract({ startDate: day('2026-01-01'), payslips });
+  const finding = (input: EmploymentInput, today = '2026-10-31') =>
+    single(byId(review(input, today), 'smi_monthly'));
+
+  it('says a month not published against the latest decree, in months or prorated', () => {
+    const f = finding(
+      monthly(
+        payslip({ month: '2027-01', salaryInMoney: 900 }),
+        payslip({ month: '2027-02', salaryInMoney: 900, proratedExtraPay: 100 }),
+      ),
+    );
+    expect(f.status).toBe('not_published');
+    expect(f.calculation).toEqual([
+      phrase('minimum_wage.payslip.not_published', {
+        year: { integer: 2027 },
+        month: { integer: 1 },
+        referenceYear: { integer: 2026 },
+        reference: { euros: 1221 },
+      }),
+      phrase('minimum_wage.payslip.not_published', {
+        year: { integer: 2027 },
+        month: { integer: 2 },
+        referenceYear: { integer: 2026 },
+        reference: { euros: 1424.5 },
+      }),
+    ]);
+  });
+
+  it('a month of a year not loaded gives no difference to apply', () => {
+    const f = finding(monthly(payslip({ month: '2022-05' })));
+    expect(f.status).toBe('not_applicable_to_date');
+    expect(f.calculation).toEqual([
+      phrase('minimum_wage.payslip.not_loaded', { year: { integer: 2022 }, month: { integer: 5 } }),
+    ]);
+  });
+
+  it('a month with an incident is left out, and says so', () => {
+    const f = finding(monthly(payslip({ incidents: true })));
+    expect(f.status).toBe('review_it');
+    expect(f.calculation).toEqual([
+      phrase('minimum_wage.payslip.not_compared', {
+        year: { integer: 2026 },
+        month: { integer: 10 },
+      }),
+    ]);
+  });
+
+  it('says what a month below and a month within come to', () => {
+    const f = finding(
+      monthly(
+        payslip({ month: '2026-08', salaryInMoney: 1200, proratedExtraPay: 200 }),
+        payslip({ month: '2026-09', salaryInMoney: 1300, proratedExtraPay: 200 }),
+      ),
+    );
+    expect(f.calculation).toEqual([
+      phrase('minimum_wage.payslip.prorated_count_unknown', {
+        year: { integer: 2026 },
+        month: { integer: 8 },
+        minimum: { euros: 1424.5 },
+        paid: { euros: 1400 },
+      }),
+      phrase('minimum_wage.payslip.within', {
+        year: { integer: 2026 },
+        month: { integer: 9 },
+        minimum: { euros: 1424.5 },
+        paid: { euros: 1500 },
+      }),
+    ]);
+  });
+
+  it('cites the monthly rule and the decree of each month it compared', () => {
+    const f = finding(monthly(payslip({})));
+    expect(f.sources.map((s) => s.id)).toEqual(['smi_monthly', 'rd126_2026']);
+    expect(f.sources[1]?.citation.startsWith('art. 1 (')).toBe(true);
+  });
+});
+
+describe('pay in kind and the agreement figure, in words', () => {
+  const start2026 = { startDate: day('2026-01-01'), signedOn: day('2026-01-01') };
+  const inKindOf = (change: Partial<EmploymentInput>) =>
+    single(byId(review(contract({ ...start2026, ...change }), '2026-10-07'), 'smi_in_kind_cap'));
+
+  it('says the share and cites its rule', () => {
+    const f = inKindOf({ salary: salary({ amount: 1300, inKind: 700 }) });
+    expect(f.calculation).toEqual([
+      phrase('minimum_wage.in_kind', {
+        inKind: { euros: 8400 },
+        money: { euros: 18200 },
+        percent: 31.58,
+      }),
+    ]);
+    expect(f.sources.map((s) => s.id)).toEqual(['smi_in_kind_cap']);
+  });
+
+  it('a day or hour rate has the pay in kind to review, with no share', () => {
+    const f = inKindOf({
+      salary: salary({ amount: 60, period: 'day', payments: 12, inKind: 400 }),
+    });
+    expect(f).toMatchObject({
+      status: 'review_it',
+      calculation: [phrase('minimum_wage.in_kind_rate', { inKind: { euros: 400 } })],
+    });
+    expect(f.sources.map((s) => s.id)).toEqual(['smi_in_kind_cap']);
+  });
+
+  const agreementOf = (change: Partial<EmploymentInput>) =>
+    single(byId(review(contract({ ...start2026, ...change }), '2026-10-07'), 'agreement_salary'));
+  const category = (categoryAnnualSalary: number) => ({
+    agreement: { ...contract().agreement, categoryAnnualSalary },
+  });
+
+  it.each([
+    ['at the figure', 21000, 'within_limit'],
+    ['a euro over it', 21001, 'depends_on_agreement'],
+  ])('a salary of 21.000 € %s', (_name, figure, status) => {
+    const f = agreementOf({ ...category(figure), salary: salary({ amount: 1500 }) });
+    expect(f.status).toBe(status);
+    expect(f.sources.map((s) => s.id)).toEqual(['agreement_salary']);
+  });
+
+  it('prorates the figure to the working hours', () => {
+    const f = agreementOf({
+      ...category(20000),
+      salary: yearly(9000),
+      contractHours: { weekly: 20, annual: null },
+    });
+    expect(f.calculation).toEqual([
+      phrase('minimum_wage.agreement.below', {
+        category: { euros: 20000 },
+        minimum: { euros: 10000 },
+        pay: { euros: 9000 },
+        difference: { euros: 1000 },
+      }),
+    ]);
+  });
+
+  it('keeps the whole figure when the hours are not known', () => {
+    const f = agreementOf({
+      ...category(20000),
+      salary: yearly(18000),
+      contractHours: { weekly: null, annual: 1000 },
+    });
+    expect(f.calculation[0]?.vars?.minimum).toEqual({ euros: 20000 });
+  });
+});
+
+describe('the contract finding, in words', () => {
+  const start2026 = { startDate: day('2026-01-01'), signedOn: day('2026-01-01') };
+  const keysOf = (change: Partial<EmploymentInput>, today = '2026-12-31') =>
+    contractFinding(contract({ ...start2026, ...change }), today).calculation.map((p) => p.key);
+
+  it('a plain contract says its pay, its year and that the agreement may pay more', () => {
+    const f = contractFinding(contract({ ...start2026, salary: yearly(20000) }), '2026-12-31');
+    expect(f.calculation.map((p) => p.key)).toEqual([
+      'minimum_wage.pay.year',
+      'minimum_wage.year.within',
+      'minimum_wage.agreement_may_pay_more',
+    ]);
+    expect(f.basedOnYourAnswer).toBe(false);
+    expect(f.id).toBe('smi_annual');
+    expect(f.sources.map((s) => s.id)).toEqual(['smi_annual', 'rd126_2026']);
+    expect(f.sources[1]?.citation.startsWith('art. 3.1 (')).toBe(true);
+  });
+
+  it('a breakdown that explains the whole, with no pay in kind, adds no note', () => {
+    expect(
+      keysOf({
+        salary: salary({ amount: 1500, breakdown: [{ kind: 'base', amount: 1500 }], inKind: 0 }),
+        extraPays: null,
+      }),
+    ).toEqual([
+      'minimum_wage.pay.month',
+      'minimum_wage.year.within',
+      'minimum_wage.agreement_may_pay_more',
+    ]);
+  });
+
+  it('a breakdown short of the total says the gap, and pay in kind says it is not counted', () => {
+    expect(
+      keysOf({
+        salary: salary({ amount: 1500, breakdown: [{ kind: 'base', amount: 1400 }], inKind: 50 }),
+        extraPays: null,
+      }).slice(1, 3),
+    ).toEqual(['minimum_wage.breakdown_gap', 'minimum_wage.in_kind_not_counted']);
+  });
+
+  it('a day rate with extra pays of unknown size says so', () => {
+    const keys = keysOf({ salary: salary({ amount: 60, period: 'day', payments: 14 }) });
+    expect(keys.slice(0, 2)).toEqual([
+      'minimum_wage.pay.day',
+      'minimum_wage.pay.extra_pays_unknown',
+    ]);
+    expect(keysOf({ salary: salary({ amount: 60, period: 'day', payments: 12 }) })).not.toContain(
+      'minimum_wage.pay.extra_pays_unknown',
+    );
+  });
+
+  it('an hour rate without hours says the hours are unknown', () => {
+    const f = contractFinding(
+      contract({
+        ...start2026,
+        salary: salary({ amount: 10, period: 'hour', payments: 12 }),
+        contractHours: { weekly: null, annual: null },
+      }),
+      '2026-12-31',
+    );
+    expect(f.calculation[0]).toEqual(phrase('minimum_wage.pay.hours_unknown'));
+    expect(f.id).toBe('smi_annual');
+  });
+
+  it('a short temporary contract says its days and not the yearly pay', () => {
+    const f = contractFinding(
+      contract({
+        modality: 'production',
+        startDate: day('2026-01-01'),
+        signedOn: day('2026-01-01'),
+        endDate: day('2026-02-28'),
+        salary: salary({ amount: 60, period: 'day', payments: 12 }),
+      }),
+      '2026-12-31',
+    );
+    expect(f.id).toBe('smi_temporary_120');
+    expect(f.calculation.map((p) => p.key)).toEqual([
+      'minimum_wage.temporary.within',
+      'minimum_wage.agreement_may_pay_more',
+    ]);
+    expect(f.sources.map((s) => s.id)).toEqual(['smi_temporary_120', 'rd126_2026']);
+    expect(f.sources[1]?.citation.startsWith('art. 4.1 (')).toBe(true);
+  });
+
+  it('a part-time contract cites the yearly rule beside the pro rata one', () => {
+    const f = contractFinding(
+      contract({
+        ...start2026,
+        salary: yearly(20000),
+        contractHours: { weekly: 20, annual: null },
+      }),
+      '2026-12-31',
+    );
+    expect(f.id).toBe('smi_prorata');
+    expect(f.sources.map((s) => s.id)).toEqual(['smi_prorata', 'smi_annual', 'rd126_2026']);
+  });
+
+  it('a year not published cites the decree it is referred to, for a contract that starts in it', () => {
+    const f = contractFinding(
+      contract({
+        startDate: day('2027-01-01'),
+        signedOn: day('2027-01-01'),
+        salary: yearly(20000),
+      }),
+      '2027-03-01',
+    );
+    expect(f.status).toBe('not_published');
+    expect(f.sources.map((s) => s.id)).toEqual(['smi_annual', 'rd126_2026']);
+  });
+
+  it('a single year short has no total, and a contract over four years short has one', () => {
+    const one = contractFinding(contract({ ...start2026, salary: yearly(16000) }), '2026-12-31');
+    expect(one.calculation.map((p) => p.key)).not.toContain('minimum_wage.total');
+    const four = contractFinding(
+      contract({
+        startDate: day('2023-01-01'),
+        signedOn: day('2026-01-01'),
+        salary: yearly(14000),
+      }),
+      '2026-12-31',
+    );
+    expect(four.calculation.map((p) => p.key)).toContain('minimum_wage.total');
+    expect(four.amount).not.toBeNull();
+  });
+
+  it('a fixed-discontinuous contract short says its idle periods and has no total', () => {
+    const input = (modality: EmploymentInput['modality']) =>
+      contract({
+        modality,
+        startDate: day('2025-01-01'),
+        signedOn: day('2026-01-01'),
+        salary: yearly(14000),
+      });
+    const f = contractFinding(input('discontinuous'), '2026-12-31');
+    expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.discontinuous_periods');
+    expect(f.calculation.map((p) => p.key)).not.toContain('minimum_wage.total');
+    expect(f.amount).toBeNull();
+    expect(
+      contractFinding(input('permanent'), '2026-12-31').calculation.map((p) => p.key),
+    ).not.toContain('minimum_wage.discontinuous_periods');
+  });
+
+  it('a fixed-discontinuous contract within the minimum says nothing of idle periods', () => {
+    const f = contractFinding(
+      contract({
+        modality: 'discontinuous',
+        startDate: day('2025-01-01'),
+        signedOn: day('2025-01-01'),
+        salary: yearly(20000),
+      }),
+      '2026-12-31',
+    );
+    expect(f.calculation.map((p) => p.key)).not.toContain('minimum_wage.discontinuous_periods');
+  });
+
+  it('the first year of a decree with its effects unverified has no year before to show', () => {
+    const table = changeYear(2023, { retroactiveVerified: false });
+    const f = contractFinding(
+      contract({
+        startDate: day('2023-01-01'),
+        signedOn: day('2023-01-01'),
+        salary: yearly(15000),
+      }),
+      '2023-12-31',
+      { ...DEPS, minimumWage: table },
+    );
+    expect(f.calculation).toContainEqual(
+      phrase('minimum_wage.year.effects_unverified', {
+        year: { integer: 2023 },
+        minimum: { euros: 15120 },
+        pay: { euros: 15000 },
+      }),
+    );
+  });
+});
+
+describe('a payslip short of the minimum against its year', () => {
+  const short = (month: string) => payslip({ month, salaryInMoney: 1200, proratedExtraPay: 200 });
+  const fine = (month: string) => payslip({ month, salaryInMoney: 1300, proratedExtraPay: 200 });
+  const monthsOf = (year: number, last: number) =>
+    Array.from({ length: last }, (_, i) => `${year}-${String(i + 1).padStart(2, '0')}`);
+  const verdicts = (
+    payslips: Payslip[],
+    today: string,
+    change: Partial<EmploymentInput> = {},
+  ): string[] => {
+    const input = contract({
+      startDate: day('2025-01-01'),
+      signedOn: day('2025-01-01'),
+      salary: salary({ amount: 1400, prorated: true }),
+      extraPays: { count: 2, prorated: true },
+      payslips,
+      ...change,
+    });
+    return single(byId(review(input, today), 'smi_monthly')).calculation.map((p) =>
+      p.key.replace('minimum_wage.payslip.', ''),
+    );
+  };
+
+  it('a later year is proven only by a short payslip in every whole month, December included', () => {
+    expect(verdicts(monthsOf(2026, 12).map(short), '2027-01-15')).toEqual([
+      ...Array<string>(12).fill('below'),
+      'minimum_wage.total',
+    ]);
+    expect(verdicts(monthsOf(2026, 11).map(short), '2027-01-15')).toEqual(
+      Array<string>(11).fill('annual_unproven'),
+    );
+  });
+
+  it('a month that ends today is a whole month of the contract', () => {
+    expect(verdicts([short('2026-01'), short('2026-02')], '2026-03-31')).toEqual([
+      'annual_unproven',
+      'annual_unproven',
+    ]);
+  });
+
+  it('a month fine in the year is not a short one', () => {
+    expect(verdicts([short('2026-01'), short('2026-02'), fine('2026-03')], '2026-03-31')).toEqual([
+      'annual_unproven',
+      'annual_unproven',
+      'within',
+    ]);
+  });
+
+  it('a year with no whole month yet is proven by nothing', () => {
+    expect(verdicts([short('2026-01')], '2026-01-15')).toEqual(['annual_unproven']);
+  });
+
+  it('a year of the contract that reaches the minimum clears a short month, proven or not', () => {
+    const input = {
+      startDate: day('2026-01-01'),
+      signedOn: day('2026-01-01'),
+      salary: salary({ amount: 1500, prorated: true }),
+    };
+    expect(
+      verdicts([short('2026-01'), short('2026-02'), short('2026-03')], '2026-03-31', input),
+    ).toEqual(['annual_within', 'annual_within', 'annual_within']);
+  });
+});
+
+describe('what the readings and the effects of a decree come to', () => {
+  const start2026 = { startDate: day('2026-01-01'), signedOn: day('2026-01-01') };
+
+  it('an hour rate over yearly hours that is within the minimum either way reads the effective hours', () => {
+    const f = contractFinding(
+      contract({
+        ...start2026,
+        salary: salary({ amount: 12, period: 'hour', payments: 12 }),
+        contractHours: { weekly: null, annual: 1800 },
+      }),
+      '2026-12-31',
+    );
+    expect(f.calculation[0]).toEqual(
+      phrase('minimum_wage.pay.hour', {
+        hourly: { euros: 12 },
+        hours: 1800,
+        annual: { euros: 21600 },
+      }),
+    );
+  });
+
+  it('a training contract short says why it is not a sure shortfall', () => {
+    const f = contractFinding(
+      contract({ modality: 'training_alternance', ...start2026, salary: yearly(12000) }),
+      '2026-12-31',
+    );
+    expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.year.training_effective_work');
+  });
+
+  describe('a decree that took effect on the day the contract starts', () => {
+    const table = changeYear(2026, { retroactiveVerified: false, publishedOn: '2026-03-01' });
+    const verdictFrom = (startDate: string) =>
+      compareByYear(
+        contract({ startDate: day(startDate), salary: yearly(16800) }),
+        day('2026-10-07'),
+        table,
+      )[0];
+
+    it('is verified for that day and not for the day before', () => {
+      expect(verdictFrom('2026-03-01')).toMatchObject({ verdict: 'below' });
+      expect(verdictFrom('2026-02-28')).toMatchObject({ verdict: 'effects_unverified' });
+    });
+
+    it('is verified for a payslip of the month it was published in', () => {
+      const short = (month: string) =>
+        payslip({ month, salaryInMoney: 1150, proratedExtraPay: 200 });
+      const input = contract({
+        startDate: day('2026-01-01'),
+        salary: salary({ prorated: true }),
+        payslips: [short('2026-02'), short('2026-03')],
+      });
+      expect(comparePayslips(input, table).map((c) => c.verdict)).toEqual([
+        'effects_unverified',
+        'below',
+      ]);
+    });
+  });
+
+  it('cites when a decree’s end is uncertain', () => {
+    const norms = {
+      ...EMPLOYMENT_NORMS,
+      rd126_2026: { ...EMPLOYMENT_NORMS.rd126_2026, endUncertainUntil: '2027-06-30' },
+    };
+    const sources = (deps: MinimumWageDeps) =>
+      contractFinding(contract({ ...start2026, salary: yearly(20000) }), '2026-12-31', deps)
+        .sources;
+    expect(sources({ ...DEPS, norms }).at(-1)?.endUncertainUntil).toBe('2027-06-30');
+    expect(sources(DEPS).at(-1)?.endUncertainUntil).toBeNull();
+  });
+
+  it('adds up the short months with their total, and only when there is more than one', () => {
+    const short = (month: string) => payslip({ month, salaryInMoney: 1200, proratedExtraPay: 200 });
+    const monthly = (...payslips: Payslip[]) =>
+      single(
+        byId(
+          review(
+            contract({
+              startDate: day('2026-01-01'),
+              signedOn: day('2026-01-01'),
+              salary: salary({ amount: 1400, prorated: true }),
+              extraPays: { count: 2, prorated: true },
+              payslips,
+            }),
+            '2026-03-31',
+          ),
+          'smi_monthly',
+        ),
+      );
+    expect(monthly(short('2026-01'), short('2026-02')).calculation.at(-1)).toEqual(
+      phrase('minimum_wage.total', { total: { euros: 49 } }),
+    );
+    expect(monthly(short('2026-01')).calculation.map((p) => p.key)).not.toContain(
+      'minimum_wage.total',
+    );
   });
 });

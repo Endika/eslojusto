@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate, type CivilDate } from '../../../src/engine/date';
 import { validate, validationWarnings } from '../../../src/engine/employment/validate';
-import type { EmploymentInput } from '../../../src/engine/employment/types';
+import type {
+  Clause,
+  EmploymentInput,
+  Offer,
+  PartTime,
+  ScheduleDay,
+} from '../../../src/engine/employment/types';
 import { contract } from './input';
 
 const TODAY = parseDate('2026-10-07');
@@ -93,16 +99,6 @@ describe('validate', () => {
   });
 
   it('checks each payslip on its own', () => {
-    const payslip = {
-      month: '2026-09',
-      wholeMonth: true,
-      incidents: false,
-      salaryInMoney: 1200,
-      inKind: 0,
-      proratedExtraPay: 0,
-      overtimeHours: null,
-      complementaryHours: null,
-    };
     expect(
       errorsOf({ payslips: [payslip, { ...payslip, month: '2026-13', salaryInMoney: 0 }] }),
     ).toEqual([
@@ -166,6 +162,12 @@ describe('validate', () => {
     ).toEqual([['signedOn', null, 'too_far_ahead']]);
   });
 
+  it('accepts the history period ending the day it starts', () => {
+    expect(
+      errorsOf({ history: [periodOf(parseDate('2023-01-01'), parseDate('2023-01-01'))] }),
+    ).toEqual([]);
+  });
+
   it('rejects a signing day more than a year after the start', () => {
     expect(errorsOf({ signedOn: parseDate('2025-03-01') })).toEqual([]);
     expect(errorsOf({ signedOn: parseDate('2025-03-02') })).toEqual([
@@ -190,6 +192,333 @@ describe('validate', () => {
       complementaryHours: null,
     };
     expect(errorsOf({ payslips: [payslip] }).length === 0).toBe(valid);
+  });
+});
+
+const base = contract();
+const payslip = {
+  month: '2026-09',
+  wholeMonth: true,
+  incidents: false,
+  salaryInMoney: 1200,
+  inKind: 0,
+  proratedExtraPay: 0,
+  overtimeHours: null,
+  complementaryHours: null,
+};
+const training = (change: Partial<NonNullable<EmploymentInput['training']>>) =>
+  ({
+    studiesEndedOn: null,
+    disability: null,
+    planAttached: null,
+    effectiveWorkPercent: { year1: 65, year2: 65 },
+    ...change,
+  }) as NonNullable<EmploymentInput['training']>;
+const periodOf = (startDate: CivilDate, endDate: CivilDate) => ({
+  startDate,
+  endDate,
+  employer: 'same' as const,
+  kind: 'production' as const,
+});
+const partTime = (change: Partial<PartTime>): PartTime => ({
+  hoursStated: true,
+  distributionStated: true,
+  complementary: null,
+  voluntaryPercent: null,
+  ...change,
+});
+const clauseOf = (months: number | null): Clause => ({
+  label: 'other',
+  months,
+  compensationStated: null,
+  trainingDescribed: null,
+  waivedRight: null,
+  costsOnWorker: null,
+  literal: { text: 'Cláusula sintética de prueba.' },
+});
+const offerOf = (change: Partial<Offer>): Offer => ({
+  grossAnnual: null,
+  net: false,
+  weeklyHours: null,
+  modality: null,
+  remote: null,
+  ...change,
+});
+const holidays = (workDaysPerWeek: number | null): EmploymentInput['holidays'] => ({
+  days: 30,
+  unit: 'calendar',
+  workDaysPerWeek,
+  includedInSalary: false,
+});
+const slot = (from: string, to: string): ScheduleDay => ({ day: 1, slots: [{ from, to }] });
+
+describe('validate reports each field with its own code', () => {
+  it.each<[string, Partial<EmploymentInput>, string, number | null, string]>([
+    [
+      'endDate that does not exist',
+      { endDate: unchecked(2026, 2, 30) },
+      'endDate',
+      null,
+      'invalid_date',
+    ],
+    [
+      'signedOn that does not exist',
+      { signedOn: unchecked(2026, 2, 30) },
+      'signedOn',
+      null,
+      'invalid_date',
+    ],
+    ['negative extensions', { extensions: -1 }, 'extensions', null, 'count_range'],
+    [
+      'studies ended on a day that does not exist',
+      { training: training({ studiesEndedOn: unchecked(2026, 13, 1) }) },
+      'training.studiesEndedOn',
+      null,
+      'invalid_date',
+    ],
+    [
+      'first-year effective work over 100',
+      { training: training({ effectiveWorkPercent: { year1: 101, year2: 65 } }) },
+      'training.effectiveWorkPercent',
+      null,
+      'percent_range',
+    ],
+    [
+      'no payments',
+      { salary: { ...base.salary, payments: 0 } },
+      'salary.payments',
+      null,
+      'payments_range',
+    ],
+    [
+      'second breakdown line out of range',
+      {
+        salary: {
+          ...base.salary,
+          breakdown: [
+            { kind: 'base', amount: 1500 },
+            { kind: 'base', amount: 0 },
+          ],
+        },
+      },
+      'salary.breakdown',
+      1,
+      'amount_range',
+    ],
+    [
+      'negative in-kind pay',
+      { salary: { ...base.salary, inKind: -1 } },
+      'salary.inKind',
+      null,
+      'amount_range',
+    ],
+    [
+      'no weekly hours',
+      { contractHours: { weekly: 0, annual: null } },
+      'contractHours.weekly',
+      null,
+      'hours_range',
+    ],
+    [
+      'no annual hours',
+      { contractHours: { weekly: null, annual: 0 } },
+      'contractHours.annual',
+      null,
+      'hours_range',
+    ],
+    ['no full-time hours', { fullTimeHours: 0 }, 'fullTimeHours', null, 'hours_range'],
+    [
+      'no agreement category salary',
+      { agreement: { ...base.agreement, categoryAnnualSalary: 0 } },
+      'agreement.categoryAnnualSalary',
+      null,
+      'amount_range',
+    ],
+    [
+      'no agreement annual hours',
+      { agreement: { ...base.agreement, annualHours: 0 } },
+      'agreement.annualHours',
+      null,
+      'hours_range',
+    ],
+    [
+      'negative agreement holidays',
+      { agreement: { ...base.agreement, holidayDays: -1 } },
+      'agreement.holidayDays',
+      null,
+      'count_range',
+    ],
+    [
+      'agreement trial of 13 months',
+      { agreement: { ...base.agreement, trialMonths: 13 } },
+      'agreement.trialMonths',
+      null,
+      'count_range',
+    ],
+    [
+      'negative in-kind on a payslip',
+      { payslips: [{ ...payslip, inKind: -1 }] },
+      'payslips.inKind',
+      0,
+      'amount_range',
+    ],
+    [
+      'negative extra pay on a payslip',
+      { payslips: [{ ...payslip, proratedExtraPay: -1 }] },
+      'payslips.proratedExtraPay',
+      0,
+      'amount_range',
+    ],
+    [
+      'negative overtime on a payslip',
+      { payslips: [{ ...payslip, overtimeHours: -1 }] },
+      'payslips.hours',
+      0,
+      'hours_range',
+    ],
+    [
+      'negative complementary hours on a payslip',
+      { payslips: [{ ...payslip, complementaryHours: -1 }] },
+      'payslips.hours',
+      0,
+      'hours_range',
+    ],
+    [
+      'a trial of no length',
+      { trial: { amount: 0, unit: 'months' } },
+      'trial.amount',
+      null,
+      'count_range',
+    ],
+    [
+      'a slot ending at 25:00',
+      { schedule: [slot('09:00', '25:00')] },
+      'schedule',
+      0,
+      'invalid_time',
+    ],
+    [
+      'negative agreed overtime',
+      { overtimeAgreed: { hoursPerYear: -1, paidInMoney: null } },
+      'overtimeAgreed.hoursPerYear',
+      null,
+      'hours_range',
+    ],
+    [
+      'complementary hours over 100 %',
+      { partTime: partTime({ complementary: { percent: 101, noticeDays: 3 } }) },
+      'partTime.complementary',
+      null,
+      'percent_range',
+    ],
+    [
+      'negative complementary notice',
+      { partTime: partTime({ complementary: { percent: 30, noticeDays: -1 } }) },
+      'partTime.complementary',
+      null,
+      'count_range',
+    ],
+    [
+      'voluntary percent over 100',
+      { partTime: partTime({ voluntaryPercent: 101 }) },
+      'partTime.voluntaryPercent',
+      null,
+      'percent_range',
+    ],
+    ['remote share over 100', { remoteShare: 101 }, 'remoteShare', null, 'percent_range'],
+    ['no real weekly hours', { realWeeklyHours: 0 }, 'realWeeklyHours', null, 'hours_range'],
+    [
+      'negative extra pays',
+      { extraPays: { count: -1, prorated: false } },
+      'extraPays.count',
+      null,
+      'count_range',
+    ],
+    [
+      'negative clause months',
+      { clauses: [clauseOf(3), clauseOf(-1)] },
+      'clauses.months',
+      1,
+      'count_range',
+    ],
+    [
+      'history period starting on a day that does not exist',
+      { history: [periodOf(unchecked(2026, 2, 30), parseDate('2026-03-01'))] },
+      'history',
+      0,
+      'invalid_date',
+    ],
+    [
+      'history period ending on a day that does not exist',
+      { history: [periodOf(parseDate('2026-01-01'), unchecked(2026, 2, 30))] },
+      'history',
+      0,
+      'invalid_date',
+    ],
+    [
+      'negative offer',
+      { offer: offerOf({ grossAnnual: -1 }) },
+      'offer.grossAnnual',
+      null,
+      'amount_range',
+    ],
+    [
+      'offer of no hours',
+      { offer: offerOf({ weeklyHours: 0 }) },
+      'offer.weeklyHours',
+      null,
+      'hours_range',
+    ],
+  ])('%s', (_name, change, field, index, code) => {
+    expect(errorsOf(change)).toEqual([[field, index, code]]);
+  });
+
+  it.each<[string, Partial<EmploymentInput>]>([
+    [
+      'a signing day exactly a year ahead of today',
+      { startDate: parseDate('2027-10-01'), signedOn: parseDate('2027-10-07') },
+    ],
+    ['no in-kind pay', { salary: { ...base.salary, inKind: 0 } }],
+    ['a week of 1 work day', { holidays: holidays(1) }],
+    ['a week of 7 work days', { holidays: holidays(7) }],
+    [
+      'a history period of one day',
+      { history: [periodOf(parseDate('2026-01-01'), parseDate('2026-01-01'))] },
+    ],
+    ['a short slot', { schedule: [slot('09:00', '09:30')] }],
+    ['the whole day', { schedule: [slot('00:00', '23:59')] }],
+    [
+      'a payslip with no hours',
+      { payslips: [{ ...payslip, overtimeHours: 0, complementaryHours: 0 }] },
+    ],
+    ['agreed overtime of 0', { overtimeAgreed: { hoursPerYear: 0, paidInMoney: null } }],
+  ])('accepts %s', (_name, change) => {
+    expect(errorsOf(change)).toEqual([]);
+  });
+
+  it.each([0, 8, 1.5])('rejects %s work days a week', (workDaysPerWeek) => {
+    expect(errorsOf({ holidays: holidays(workDaysPerWeek) })).toEqual([
+      ['holidays.workDaysPerWeek', null, 'count_range'],
+    ]);
+  });
+
+  it.each(['abc', 'x09:00', '09:00x', '24:00', '09:60', '9:00', '29:00'])(
+    'rejects a slot start of %s',
+    (from) => {
+      expect(errorsOf({ schedule: [slot(from, '10:00')] })).toEqual([
+        ['schedule', 0, 'invalid_time'],
+      ]);
+    },
+  );
+
+  it.each(['19:00', '20:00', '23:59', '12:59'])('accepts a slot start of %s', (from) => {
+    expect(errorsOf({ schedule: [slot(from, '00:01')] })).toEqual([]);
+  });
+
+  it.each(['abc', 'x2026-09', '2026-09x', '2026-9'])('rejects the payslip month %s', (month) => {
+    expect(errorsOf({ payslips: [{ ...payslip, month }] })).toEqual([
+      ['payslips.month', 0, 'invalid_month'],
+    ]);
   });
 });
 
@@ -223,5 +552,17 @@ describe('validationWarnings', () => {
 
   it('is quiet when the breakdown adds up', () => {
     expect(validationWarnings(withBreakdown(1300, 1300))).toEqual([]);
+  });
+
+  it('tolerates half a cent of rounding', () => {
+    expect(validationWarnings(withBreakdown(0.005, 0))).toEqual([]);
+  });
+
+  it('has nothing to compare without a breakdown', () => {
+    expect(
+      validationWarnings(
+        contract({ salary: { ...contract().salary, amount: 1300, breakdown: [] } }),
+      ),
+    ).toEqual([]);
   });
 });
