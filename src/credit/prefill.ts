@@ -46,6 +46,9 @@ const lowest = (...cs: Confidence[]): Confidence =>
 const isNumber = (v: ExtractedValue | undefined): v is number => Number.isFinite(v);
 const amountOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
+// A rate keeps up to the four decimals `rateText` shows.
+const rateOf = (v: ExtractedValue | undefined): number | null =>
+  isNumber(v) && v >= 0 ? Math.round(v * 10_000) / 10_000 : null;
 const positiveOf = (v: ExtractedValue | undefined): number | null => {
   const n = amountOf(v);
   return n === 0 ? null : n;
@@ -127,10 +130,10 @@ function terms(a: Answers, fields: Fields, revolving: boolean) {
       map(positiveOf(fields.creditLimit?.value), amountText),
     );
   else a.field('principal', fields.principal, map(positiveOf(fields.principal?.value), amountText));
-  a.field('nominalRate', fields.nominalRate, map(amountOf(fields.nominalRate?.value), rateText));
+  a.field('nominalRate', fields.nominalRate, map(rateOf(fields.nominalRate?.value), rateText));
   if (!revolving) a.field('rateType', fields.rateType, oneOf(fields.rateType?.value, RATE_TYPES));
   // A stated APR says the contract states one; one not read says nothing either way.
-  const apr = amountOf(fields.declaredApr?.value);
+  const apr = rateOf(fields.declaredApr?.value);
   if (fields.declaredApr && apr !== null) {
     a.open('aprStated', 'yes');
     a.read('declaredApr', rateText(apr), fields.declaredApr.confidence);
