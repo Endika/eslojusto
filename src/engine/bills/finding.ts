@@ -114,20 +114,22 @@ export function compare(
 ): Comparison {
   const differences = expected.map((e) => billed - round2(e));
   const nearest = differences.reduce((a, b) => (Math.abs(b) < Math.abs(a) ? b : a));
-  return {
-    matches: Math.abs(nearest) <= tolerance + EPSILON,
-    difference: round2(nearest),
-  };
+  // Stryker disable next-line EqualityOperator: a difference never lands on the tolerance plus EPSILON exactly
+  const matches = Math.abs(nearest) <= tolerance + EPSILON;
+  return { matches, difference: round2(nearest) };
 }
 
 // A charge up to a legal cap, within a cent of it, is within the limit.
 export function withinCap(charged: number, cap: number): boolean {
   const { matches, difference } = compare(charged, [cap], LINE_TOLERANCE);
+  // Stryker disable next-line EqualityOperator: a difference of zero is within the cent, so it matches already
   return matches || difference < 0;
 }
 
-export const directionOf = (difference: number): 'over' | 'under' =>
-  difference > 0 ? 'over' : 'under';
+export function directionOf(difference: number): 'over' | 'under' {
+  // Stryker disable next-line EqualityOperator: only a difference that does not match gets a direction, and none is zero
+  return difference > 0 ? 'over' : 'under';
+}
 
 interface FindingParts {
   readonly line?: number | null;
@@ -181,11 +183,8 @@ export const single = (finding: BillFinding): BillItem => ({ kind: 'single', fin
 export const findingsOf = (item: BillItem): readonly BillFinding[] =>
   item.kind === 'single' ? [item.finding] : item.readings.map((r) => r.finding);
 
-const sameValues = (a: readonly number[], b: readonly number[]): boolean =>
-  a.length === b.length && a.every((v, i) => v === b[i]);
-
-// One finding for each value the norms leave open, a single one when they agree, each with the
-// rows its figure rests on.
+// One finding for each value the norms leave open, a single one when they agree (assessAcross
+// collapses readings that come out the same), each with the rows its figure rests on.
 export function acrossOfficial(
   official: OfficialFigure,
   assess: (expected: readonly number[]) => BillFinding,
@@ -198,7 +197,6 @@ export function acrossOfficial(
     rows: official.rows,
     pendingOn: official.deciding,
   });
-  if (sameValues(low, high)) return single(withBasis(assess(low)));
   return assessAcross<OfficialQuestion, OfficialReading, BillFinding>(
     'official_value',
     ['lower_value', 'higher_value'],
@@ -218,15 +216,13 @@ const COUNTED: ReadonlySet<BillsStatus> = new Set([
   'charged_after_exit',
 ]);
 
+const overAmount = (f: BillFinding): number =>
+  COUNTED.has(f.status) && f.direction === 'over' && f.pendingOn.length === 0 ? (f.amount ?? 0) : 0;
+
 // What an item counts: only what holds in every reading, so the lowest; nothing charged under, and
 // nothing that is shown without a figure the norms back.
 export function countedAmount(item: BillItem): number {
-  const amounts = findingsOf(item).map((f) =>
-    COUNTED.has(f.status) && f.direction === 'over' && f.pendingOn.length === 0
-      ? (f.amount ?? 0)
-      : 0,
-  );
-  return round2(Math.min(...amounts));
+  return round2(Math.min(...findingsOf(item).map(overAmount)));
 }
 
 export interface BillTotals {
@@ -245,9 +241,6 @@ const NOT_UNDER: ReadonlySet<BillsItemId> = new Set([
   'tolls_and_charges_power',
   'tolls_and_charges_energy',
 ]);
-
-const overAmount = (f: BillFinding): number =>
-  COUNTED.has(f.status) && f.direction === 'over' && f.pendingOn.length === 0 ? (f.amount ?? 0) : 0;
 
 const underAmount = (f: BillFinding): number =>
   f.direction === 'under' && !NOT_UNDER.has(f.id) && f.pendingOn.length === 0 ? (f.amount ?? 0) : 0;
