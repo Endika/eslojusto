@@ -4,7 +4,7 @@ import { NORMS } from '../../src/engine/rental/data/norms';
 import { applies, applyConditions, gate } from '../../src/rental/conditions';
 import { fieldOfError, readRentalForm, sheetErrors } from '../../src/rental/form';
 import { ROW_LISTS, setUpRows } from '../../src/rental/rows';
-import { SECTION_OF_STEP, STEPS, TABS } from '../../src/rental/steps';
+import { rentalFlow, SECTION_OF_STEP, STEPS, TABS } from '../../src/rental/steps';
 import { contract, TODAY, tr, update } from './fixtures';
 
 const radios = (name: string, values: readonly string[], row = false) =>
@@ -301,5 +301,28 @@ describe('the tabs', () => {
       const sheets = STEPS.filter((s) => SECTION_OF_STEP[s] === tone).length;
       expect(weight).toBe(tone === 'result' ? 2 : sheets);
     }
+  });
+});
+
+describe('the flow', () => {
+  const flow = rentalFlow(NORMS);
+
+  it('walks the steps and their sections', () => {
+    expect(flow.steps).toBe(STEPS);
+    expect(flow.sectionOfStep).toBe(SECTION_OF_STEP);
+  });
+
+  it('leaves out what the gate leaves out', () => {
+    const f = answered([['contractType', 'seasonal']]);
+    expect(flow.applies(f, 'fechas')).toBe(true);
+    expect(flow.applies(f, 'casero')).toBe(false);
+  });
+
+  it('completes a sheet once it reads without errors, and the result always', () => {
+    const f = answered();
+    expect(flow.complete(f, 'fechas', TODAY)).toBe(true);
+    set(f, 'signedOn', '2027-01-01');
+    expect(flow.complete(f, 'fechas', TODAY)).toBe(false);
+    expect(flow.complete(f, 'resultado', TODAY)).toBe(true);
   });
 });
