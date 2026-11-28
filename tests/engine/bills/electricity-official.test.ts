@@ -143,12 +143,68 @@ describe('the official figures of the paid report', () => {
 });
 
 describe('the PVPC table as the report loads it', () => {
-  it('takes the table in the repo and refuses one that is off', () => {
+  it('takes the table in the repo', () => {
     expect(pvpcTable(raw)?.days['2026-03-29']).toHaveLength(23);
-    const ok = { source: 's', url: 'u', coveredUntil: '2026-10-13', days: { '2026-10-13': day } };
-    expect(pvpcTable(ok)).not.toBeNull();
-    expect(pvpcTable({ ...ok, days: { '2026-10-13': day.slice(0, 20) } })).toBeNull();
-    expect(pvpcTable({ ...ok, coveredUntil: 'ayer' })).toBeNull();
-    expect(pvpcTable(null)).toBeNull();
+  });
+
+  const table = (change: Record<string, unknown> = {}) => ({
+    source: 's',
+    url: 'u',
+    coveredUntil: '2026-10-13',
+    days: { '2026-10-13': day },
+    ...change,
+  });
+  const withHour = (hour: unknown) => table({ days: { '2026-10-13': [hour, ...day.slice(1)] } });
+  const withHours = (hours: unknown) => table({ days: { '2026-10-13': hours } });
+
+  it.each([
+    ['a whole day', table()],
+    ['no days at all', table({ days: {} })],
+    ['a day of 23 hours', withHours(day.slice(0, 23))],
+    ['a day of 25 hours', withHours([...day, [23, 100]])],
+    ['the last hour of the day', withHour([23, 100])],
+    ['the lowest price', withHour([0, -500])],
+    ['the highest price', withHour([0, 5000])],
+    [
+      'days not in order, covered to the last',
+      table({ coveredUntil: '2026-10-14', days: { '2026-10-14': day, '2026-10-13': day } }),
+    ],
+  ])('takes %s', (_, raw) => {
+    expect(pvpcTable(raw)).not.toBeNull();
+  });
+
+  it.each([
+    ['not an object', 'table'],
+    ['null', null],
+    ['a source that is no text', table({ source: 1 })],
+    ['a url that is no text', table({ url: 1 })],
+    ['a last day that is no text', table({ coveredUntil: 20261013 })],
+    ['a last day that is not a date', table({ coveredUntil: 'ayer' })],
+    ['a last day with text after it', table({ coveredUntil: '2026-10-13x' })],
+    ['a last day with text before it', table({ coveredUntil: 'x2026-10-13' })],
+    ['days that are no object', table({ days: 'days' })],
+    ['days that are null', table({ days: null })],
+    ['a day that is not a date', table({ days: { ayer: day } })],
+    ['a day with text after it', table({ days: { '2026-10-13x': day } })],
+    ['a day with text before it', table({ days: { 'x2026-10-13': day } })],
+    ['a day with no hours list', withHours('hours')],
+    ['a day of 22 hours', withHours(day.slice(0, 22))],
+    ['a day of 26 hours', withHours([...day, [23, 100], [23, 100]])],
+    ['an hour that is no pair', withHour(5)],
+    ['an hour with three values', withHour([0, 100, 1])],
+    ['an hour with one value', withHour([0])],
+    ['an hour that is no whole number', withHour([0.5, 100])],
+    ['an hour before the first', withHour([-1, 100])],
+    ['an hour after the last', withHour([24, 100])],
+    ['a price that is no number', withHour([0, '100'])],
+    ['a price below the lowest', withHour([0, -501])],
+    ['a price above the highest', withHour([0, 5001])],
+    ['a last day after the last one covered', table({ coveredUntil: '2026-10-14' })],
+    [
+      'a last day before the last one covered',
+      table({ days: { '2026-10-13': day, '2026-10-14': day } }),
+    ],
+  ])('refuses %s', (_, raw) => {
+    expect(pvpcTable(raw)).toBeNull();
   });
 });

@@ -1,4 +1,4 @@
-import { ordinal, toIso } from '../date';
+import { daysBetween, toIso } from '../date';
 import { round2 } from '../money';
 import type { ElectricityReview } from './electricity-review';
 import {
@@ -49,7 +49,7 @@ const sameBill = (a: BasketBill['input'], b: BasketBill['input']): boolean =>
   toIso(a.readingTo) === toIso(b.readingTo);
 
 const daysOf = (input: BasketBill['input']): number =>
-  ordinal(input.readingTo) - ordinal(input.readingFrom);
+  daysBetween(input.readingFrom, input.readingTo);
 
 const idsOf = (item: BillItem): readonly BillsItemId[] => findingsOf(item).map((f) => f.id);
 
@@ -85,6 +85,7 @@ export function reviewBasket(bills: readonly BasketBill[], deps: BasketDeps): Ba
   const days = reviews.reduce((total, { input }) => total + daysOf(input), 0);
   const recurringAmount = sum((r) =>
     r.items
+      // Stryker disable next-line MethodExpression: the readings of one item all carry its id, so some and every agree
       .filter((item) => idsOf(item).some((id) => recurring.includes(id)))
       .reduce((total, item) => total + countedAmount(item), 0),
   );

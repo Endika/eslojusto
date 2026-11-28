@@ -1,4 +1,4 @@
-import { compareDates, daysInMonth, ordinal, parseDate, type CivilDate } from '../date';
+import { compareDates, daysBetween, isRealDate, parseDate, type CivilDate } from '../date';
 import type { RenewalInput } from './renewal-types';
 import { MAX_POWER_KW } from './scope';
 import type { ElectricityBillInput, TelecomInput } from './types';
@@ -85,15 +85,6 @@ const MAX_AMOUNT = 100_000;
 const MAX_MEMBERS = 20;
 const MAX_COMMITMENT_MONTHS = 120;
 
-const isRealDate = ({ y, m, d }: CivilDate): boolean =>
-  Number.isInteger(y) &&
-  Number.isInteger(m) &&
-  Number.isInteger(d) &&
-  m >= 1 &&
-  m <= 12 &&
-  d >= 1 &&
-  d <= daysInMonth(y, m);
-
 const isAmount = (v: number): boolean => Number.isFinite(v) && v >= 0 && v <= MAX_AMOUNT;
 const isSignedAmount = (v: number): boolean => Number.isFinite(v) && Math.abs(v) <= MAX_AMOUNT;
 const isDays = (v: number): boolean => Number.isInteger(v) && v >= 1 && v <= MAX_DAYS;
@@ -138,7 +129,7 @@ export function validateElectricity(
   const from = date('readingFrom', input.readingFrom) ? input.readingFrom : null;
   const to = past('readingTo', input.readingTo) ? input.readingTo : null;
   if (from !== null && to !== null) {
-    const days = ordinal(to) - ordinal(from);
+    const days = daysBetween(from, to);
     if (days <= 0) check('readingTo', false, 'not_after_start');
     else check('readingTo', days <= MAX_DAYS, 'days_range');
   }

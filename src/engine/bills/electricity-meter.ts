@@ -26,6 +26,7 @@ const RULES: readonly BillsRuleId[] = ['meter_rent'];
 const monthly = (rent: MeterRent, phase: Phase): number =>
   phase === 'single' ? rent.singlePhase : rent.threePhase;
 
+// Stryker disable next-line EqualityOperator: the difference never lands on the tolerance plus 1e-9 exactly
 const above = (billed: number, cap: number): boolean => billed - cap > LINE_TOLERANCE + 1e-9;
 
 // No norm sets a daily rent: the monthly price is brought to the days billed as its yearly
@@ -43,9 +44,11 @@ export function checkMeter(
   const cap = (phase: Phase) =>
     proratedOver(tables.meter, period, norms, (rent) => monthly(rent, phase) * 12);
   const singlePhase = cap('single');
+  // Stryker disable next-line StringLiteral: the rent is the three-phase one for anything but 'single'
   const threePhase = cap('three');
   if (singlePhase.kind === 'missing')
     return pendingOfficial('meter', singlePhase.day, RULES, norms);
+  // Stryker disable next-line ConditionalExpression,StringLiteral: both caps read the same days of one table, so it is missing exactly when the single-phase one is
   if (threePhase.kind === 'missing') return pendingOfficial('meter', threePhase.day, RULES, norms);
 
   const billed = billsPhrase('arithmetic.billed', { euros: { euros: meter.amount } });

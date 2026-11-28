@@ -1,4 +1,4 @@
-import { addDays, daysInYear, ordinal, toIso, type CivilDate } from '../date';
+import { addDays, daysBetween, daysInYear, toIso, type CivilDate } from '../date';
 import type { BillsNormId, NormStatus, NormTable } from './norms';
 import { valueOn, type Table, type TableRow, type RowDoubt } from './tables';
 
@@ -8,7 +8,7 @@ export interface BillingPeriod {
   readonly to: CivilDate;
 }
 
-export const periodDays = ({ from, to }: BillingPeriod): number => ordinal(to) - ordinal(from);
+export const periodDays = ({ from, to }: BillingPeriod): number => daysBetween(from, to);
 
 // Some bills give the day of the first reading as the first day billed, and count one day more
 // than the days between the two dates: their period starts on that day.

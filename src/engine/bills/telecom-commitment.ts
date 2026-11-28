@@ -1,4 +1,4 @@
-import { addMonthsClamped, ordinal, toIso, type CivilDate } from '../date';
+import { addMonthsClamped, daysBetween, toIso, type CivilDate } from '../date';
 import { round2 } from '../money';
 import { billsPhrase, type BillsCalculation } from './calculation';
 import { billFinding, single, withinCap, type BillItem, type BillsStatus } from './finding';
@@ -21,8 +21,8 @@ export function commitmentDays(commitment: Commitment, exitOn: CivilDate): Commi
   const endsOn = addMonthsClamped(commitment.startedOn, commitment.months);
   return {
     endsOn,
-    total: ordinal(endsOn) - ordinal(commitment.startedOn),
-    left: Math.max(0, ordinal(endsOn) - ordinal(exitOn)),
+    total: daysBetween(commitment.startedOn, endsOn),
+    left: Math.max(0, daysBetween(exitOn, endsOn)),
   };
 }
 

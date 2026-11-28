@@ -1,4 +1,4 @@
-import { addDays, ordinal, toIso, type CivilDate } from '../date';
+import { addDays, daysBetween, toIso, type CivilDate } from '../date';
 import { round2 } from '../money';
 import { energyPeriodAt } from './electricity-hours';
 import { billingPeriod } from './period';
@@ -74,7 +74,7 @@ export function pvpcMeansBetween(
     p3: { total: 0, hours: 0 },
     all: { total: 0, hours: 0 },
   };
-  for (let i = 1; i <= ordinal(to) - ordinal(from); i++) {
+  for (let i = 1; i <= daysBetween(from, to); i++) {
     const day = addDays(from, i);
     const hours = pvpc.days[toIso(day)];
     if (hours === undefined) return null;
@@ -101,7 +101,7 @@ export function pvpcMeanAllBetween(
   pvpc: PvpcHourly,
 ): number | null {
   let [total, count] = [0, 0];
-  for (let i = 1; i <= ordinal(to) - ordinal(from); i++) {
+  for (let i = 1; i <= daysBetween(from, to); i++) {
     const hours = pvpc.days[toIso(addDays(from, i))];
     if (hours === undefined) return null;
     for (const [, price] of hours) {

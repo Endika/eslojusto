@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
+import { billsPhrase as say } from '../../../src/engine/bills/calculation';
 import { checkArithmetic, linesTotal } from '../../../src/engine/bills/electricity-arithmetic';
 import { countedAmount, findingsOf } from '../../../src/engine/bills/finding';
 import type { ElectricityBillInput } from '../../../src/engine/bills/types';
@@ -166,5 +167,123 @@ describe('the bill against its own figures', () => {
     expect(
       checkArithmetic(juneBill(), BILLS_NORMS).every((item) => findingsOf(item).length === 1),
     ).toBe(true);
+  });
+
+  it('words each line with the figures it was worked from', () => {
+    const euros = (e: number) => ({ euros: e });
+    const billed = (e: number) => say('arithmetic.billed', { euros: euros(e) });
+    const tolerance = say('tolerance.line');
+    const days = say('arithmetic.days', {
+      from: { date: '2026-05-31' },
+      to: { date: '2026-06-30' },
+      days: { days: 30 },
+    });
+    expect(check(freeBill({ total: 64.03 })).map((f) => f.calculation)).toEqual([
+      [days],
+      [
+        say('arithmetic.power_per_day', {
+          kw: { kw: 4.6 },
+          price: { price: 0.1, unit: 'per_kw_day' },
+          days: { days: 30 },
+          euros: euros(13.8),
+        }),
+        billed(13.8),
+        tolerance,
+      ],
+      [
+        say('arithmetic.power_per_day', {
+          kw: { kw: 4.6 },
+          price: { price: 0.01, unit: 'per_kw_day' },
+          days: { days: 30 },
+          euros: euros(1.38),
+        }),
+        billed(1.38),
+        tolerance,
+      ],
+      ...[
+        [60, 0.2, 12],
+        [70, 0.15, 10.5],
+        [120, 0.1, 12],
+      ].map(([kwh, price, amount]) => [
+        say('arithmetic.energy', {
+          kwh: { kwh },
+          price: { price, unit: 'per_kwh' },
+          euros: euros(amount),
+        }),
+        billed(amount),
+        tolerance,
+      ]),
+      [say('arithmetic.total', { euros: euros(64.03) }), billed(64.03), say('tolerance.total')],
+    ]);
+  });
+
+  it('words a price per year with its figures', () => {
+    expect(statusOf(juneBill(), 'power', 1)?.calculation[0]).toEqual(
+      say('arithmetic.power_per_year', {
+        kw: { kw: 4.6 },
+        price: { price: 0.725423, unit: 'per_kw_year' },
+        days: { days: 30 },
+        euros: { euros: 0.27 },
+      }),
+    );
+  });
+
+  it.each([
+    ['over', 32, 'arithmetic.refund_next_bill', 70, 'over'],
+    ['under', 28, 'arithmetic.under_settled_later', 50, 'under'],
+  ] as const)(
+    'a bill that counts %s its days and its total cites the billing rules and says so',
+    (_, billedDays, note, total, direction) => {
+      const findings = check(juneBill({ billedDays, total }));
+      const days = findings.find((f) => f.id === 'days');
+      const sum = findings.find((f) => f.id === 'total');
+      expect(days).toMatchObject({ status: 'does_not_add_up', direction, line: null });
+      expect(days?.sources.map((s) => s.id)).toEqual(['billing']);
+      expect(days?.calculation.at(-1)).toEqual(
+        say('arithmetic.days_mismatch', { billed: { days: billedDays } }),
+      );
+      expect(sum?.sources.map((s) => s.id)).toEqual(['billing']);
+      expect(sum?.calculation.slice(-4)).toEqual([
+        say('arithmetic.total', { euros: { euros: 60.77 } }),
+        say('arithmetic.billed', { euros: { euros: total } }),
+        say('tolerance.total'),
+        say(note),
+      ]);
+    },
+  );
+
+  it('cites no rule for what matches', () => {
+    expect(check(juneBill()).flatMap((f) => f.sources)).toEqual([]);
+  });
+
+  it('points to each line that cannot be checked', () => {
+    const findings = check(juneBill({ priceChange: 'without_segments' }));
+    expect(findings.filter((f) => f.id === 'power').map((f) => f.line)).toEqual([0, 1]);
+    expect(findings.filter((f) => f.id === 'energy').map((f) => f.line)).toEqual([0, 1, 2]);
+    expect(findings[1]?.calculation).toEqual([say('arithmetic.price_change_without_segments')]);
+  });
+
+  it('adds up a bill with no tax, meter or VAT line', () => {
+    const bare = juneBill({ electricityTax: null, meter: null, vat: null });
+    expect(linesTotal(bare)).toBeCloseTo(60.77 - 2.4 - 0.8 - 10.55, 10);
+  });
+
+  it('shares a per-year price by 365 and 366 when only one end of the period is a leap year', () => {
+    const power = [
+      { period: 'p1', kw: 4.6, price: 30.817413, unit: 'per_kw_year', days: null, amount: 11.62 },
+    ] as const;
+    const across = (readingFrom: string, readingTo: string) =>
+      statusOf(
+        juneBill({
+          readingFrom: parseDate(readingFrom),
+          readingTo: parseDate(readingTo),
+          billedDays: null,
+          power: [...power],
+        }),
+        'power',
+        0,
+      )?.calculation;
+    expect(across('2027-12-20', '2028-01-19')).toContainEqual(say('readings.both_bases'));
+    expect(across('2028-12-20', '2029-01-19')).toContainEqual(say('readings.both_bases'));
   });
 });

@@ -50,6 +50,7 @@ function lineResult(
 
 // A sum that does not add up is settled in the next bill; one charged short may be charged later.
 export const differenceNote = (difference: number): readonly BillsPhrase[] =>
+  // Stryker disable next-line EqualityOperator: a difference of zero is within tolerance, so no note is asked for it
   difference > 0
     ? [billsPhrase('arithmetic.refund_next_bill')]
     : [billsPhrase('arithmetic.under_settled_later')];

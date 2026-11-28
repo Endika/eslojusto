@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import { billsDue, uncoveredOn, type DueDeps, type DueItem } from '../../../src/engine/bills/due';
+import { TABLE_NAMES } from '../../../src/engine/bills/tables';
 import { parseDate, toIso, type CivilDate } from '../../../src/engine/date';
 import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 
@@ -94,9 +95,67 @@ describe('the bills due list', () => {
   });
 
   it('lists the tables by the day they run out, soonest first', () => {
-    const ends = billsDue(parseDate('2026-10-09'), deps).filter((i) => i.kind === 'table_ends');
-    expect(ends.map((i) => i.kind === 'table_ends' && i.table)).toHaveLength(8);
-    expect(ends.every((i) => i.kind === 'table_ends' && i.lastDay === '2026-12-31')).toBe(true);
+    const lastDay = { tolls: '2026-12-31', charges: '2026-06-30' };
+    const row = BILLS_TABLES.tolls[0];
+    if (row === undefined) throw new Error('no tolls row');
+    const items = billsDue(parseDate('2026-10-09'), {
+      ...deps,
+      tables: {
+        ...BILLS_TABLES,
+        // Rows out of order: the last day is the latest, not the last row.
+        tolls: [
+          { ...row, from: '2026-07-01', until: lastDay.tolls },
+          { ...row, until: '2026-06-30' },
+        ],
+        charges: BILLS_TABLES.charges.map((r) => ({ ...r, until: lastDay.charges })),
+      },
+    });
+    expect(items).toEqual([
+      { kind: 'table_ends', table: 'charges', lastDay: lastDay.charges },
+      ...TABLE_NAMES.filter((t) => t !== 'meter' && t !== 'charges').map((table) => ({
+        kind: 'table_ends',
+        table,
+        lastDay: '2026-12-31',
+      })),
+    ]);
+  });
+
+  it('lists nothing for a table with no end, with an open row or with no row', () => {
+    const row = BILLS_TABLES.tolls[0];
+    if (row === undefined) throw new Error('no tolls row');
+    const items = billsDue(parseDate('2026-10-09'), {
+      ...deps,
+      tables: {
+        ...BILLS_TABLES,
+        tolls: [row, { ...row, from: '2027-01-01', until: null }],
+        charges: [],
+      },
+    });
+    const tables = items.map((i) => i.kind === 'table_ends' && i.table);
+    expect(tables).not.toContain('tolls');
+    expect(tables).not.toContain('charges');
+    expect(tables).not.toContain('meter');
+    expect(tables).toContain('vat');
+  });
+
+  it('asks for the holidays of this year when the calendar holds other years too', () => {
+    const [holidays] = BILLS_TABLES.holidays;
+    const [tollHolidays] = BILLS_TABLES.tollHolidays;
+    if (holidays === undefined || tollHolidays === undefined) throw new Error('no holidays');
+    const years = (calendar: typeof holidays, ...ys: number[]) =>
+      ys.map((year) => ({ ...calendar, year }));
+    const tables = (a: number[], b: number[]) => ({
+      ...BILLS_TABLES,
+      holidays: years(holidays, ...a),
+      tollHolidays: years(tollHolidays, ...b),
+    });
+    const kinds = (a: number[], b: number[]) =>
+      billsDue(parseDate('2026-11-18'), { ...deps, tables: tables(a, b) })
+        .map((i) => i.kind)
+        .filter((k) => k.endsWith('holidays_missing'));
+    expect(kinds([2025, 2026], [2025, 2026])).toEqual([]);
+    expect(kinds([2025], [2026])).toEqual(['holidays_missing']);
+    expect(kinds([2026], [2025])).toEqual(['toll_holidays_missing']);
   });
 
   it('lists the decrees still to be validated, and the holidays of a year not loaded', () => {
@@ -129,13 +188,33 @@ describe('the bills due list', () => {
     expect(items.some((i) => i.kind === 'month_conditional')).toBe(false);
   });
 
-  it('a month without its rate is listed as missing', () => {
-    const vat = BILLS_TABLES.vat.filter((r) => r.from !== '2026-12-01');
-    const items = billsDue(parseDate('2026-10-09'), {
-      ...deps,
-      tables: { ...BILLS_TABLES, vat },
+  it.each([
+    ['without its rate', '2026-10-09', '2026-12-01', null, '2026-12'],
+    ['with some days without a rate', '2026-05-09', '2026-07-01', '2026-07-15', '2026-07'],
+  ])('a month %s is listed as missing', (_, today, from, until, month) => {
+    const vat = BILLS_TABLES.vat.flatMap((r) => {
+      if (r.from !== from) return [r];
+      return until === null ? [] : [{ ...r, until }];
     });
-    expect(items).toContainEqual({ kind: 'month_missing', month: '2026-12', table: 'vat' });
+    const items = billsDue(parseDate(today), { ...deps, tables: { ...BILLS_TABLES, vat } });
+    expect(items.filter((i) => i.kind === 'month_missing')).toEqual([
+      { kind: 'month_missing', month, table: 'vat' },
+    ]);
+  });
+
+  it('does not list a plain norm that carries an open condition', () => {
+    const settledNorm = Object.values(NORMS_BEFORE_FIGURE).find((n) => n.status === 'in_force');
+    if (settledNorm === undefined || settledNorm.condition !== undefined)
+      throw new Error('no plain norm');
+    const norms = {
+      ...NORMS_BEFORE_FIGURE,
+      [settledNorm.id]: {
+        ...settledNorm,
+        condition: { text: 't', decidesOn: '2026-10-14', met: null },
+      },
+    };
+    const items = billsDue(parseDate('2026-10-09'), { ...deps, norms });
+    expect(items.filter((i) => i.kind === 'condition_open')).toHaveLength(2);
   });
 });
 
@@ -144,6 +223,13 @@ describe('the tables a bill needs', () => {
     expect(uncoveredOn('2026-01-01', deps)).toEqual([]);
     expect(uncoveredOn('2026-06-12', deps)).toEqual([]);
     expect(uncoveredOn('2026-12-31', deps)).toEqual([]);
+  });
+
+  it('cover a day when the calendar holds other years too', () => {
+    const [holidays] = BILLS_TABLES.holidays;
+    if (holidays === undefined) throw new Error('no holidays');
+    const tables = { ...BILLS_TABLES, holidays: [{ ...holidays, year: 2025 }, holidays] };
+    expect(uncoveredOn('2026-06-12', { ...deps, tables })).toEqual([]);
   });
 
   it('are all missing on the first day of a year not loaded', () => {
