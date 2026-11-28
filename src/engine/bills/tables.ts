@@ -56,6 +56,7 @@ function allOf(ids: readonly BillsNormId[], day: string, norms: NormTable): Hold
     return fromStanding(normStanding(norm, day));
   });
   if (holds.includes('never')) return 'never';
+  // Stryker disable next-line StringLiteral: nothing reads 'open' but as what is neither 'holds' nor 'never'
   return holds.every((h) => h === 'holds') ? 'holds' : 'open';
 }
 
@@ -64,15 +65,20 @@ export const restsOn = (row: TableRow<unknown>): readonly BillsNormId[] => [
   ...(row.alsoRestsOn ?? []),
 ];
 
+const covers = (row: TableRow<unknown>, day: string): boolean =>
+  day >= row.from && (row.until === null || day <= row.until);
+
 // The value of `table` on `day` (ISO), following the status of the norms each row rests on.
 export function valueOn<V>(table: Table<V>, day: string, norms: NormTable): Lookup<V> {
   const firm: TableRow<V>[] = [];
   const open: TableRow<V>[] = [];
   const deciding = new Set<BillsNormId>();
   for (const row of table) {
-    if (day < row.from || (row.until !== null && day > row.until)) continue;
+    if (!covers(row, day)) continue;
     const since = norms[row.norm].inForceSince;
-    const own = allOf(restsOn(row), row.appliesBack === true && day < since ? since : day, norms);
+    // Stryker disable next-line EqualityOperator: on the day it came into force, the day and the day it came into force are one
+    const standingDay = row.appliesBack === true && day < since ? since : day;
+    const own = allOf(restsOn(row), standingDay, norms);
     const displaced = row.unless === undefined ? 'never' : allOf(row.unless, day, norms);
     if (own === 'never' || displaced === 'holds') continue;
     if (own === 'holds' && displaced === 'never') {
@@ -80,16 +86,15 @@ export function valueOn<V>(table: Table<V>, day: string, norms: NormTable): Look
       continue;
     }
     open.push(row);
-    const doubtful = [...(own === 'open' ? restsOn(row) : []), ...(row.unless ?? [])];
+    const doubtful = [...restsOn(row), ...(row.unless ?? [])];
     for (const id of doubtful)
       if (fromStanding(normStanding(norms[id], day)) === 'open') deciding.add(id);
   }
-  if (firm.length + open.length === 0) return { kind: 'missing' };
   if (open.length > 0)
     return { kind: 'conditional', rows: [...firm, ...open], norms: [...deciding] };
   const [row, ...more] = firm;
-  if (row === undefined || more.length > 0)
-    throw new RangeError(`${firm.length} rows cover ${day} in the same table`);
+  if (row === undefined) return { kind: 'missing' };
+  if (more.length > 0) throw new RangeError(`${firm.length} rows cover ${day} in the same table`);
   return { kind: 'ok', row };
 }
 
