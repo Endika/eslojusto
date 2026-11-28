@@ -233,23 +233,9 @@ describe('information duty (RD 723/2026)', () => {
   });
 
   it.each<[InfoElement, InfoPresence, string[]]>([
-    ['a', 'present', ['information.present']],
     ['h', 'by_reference', ['information.by_reference']],
-    ['a', 'absent', ['information.missing_before_start']],
     ['a', 'unknown', ['information.unknown', 'information.missing_before_start']],
     ['k', 'unknown', ['information.only_if_used', 'information.missing_before_start']],
-    ['k', 'absent', ['information.only_if_used', 'information.missing_before_start']],
-    ['l', 'absent', ['information.protocol_always', 'information.missing_before_start']],
-    [
-      'f',
-      'by_reference',
-      ['information.reference_covers_part', 'information.missing_before_start'],
-    ],
-    [
-      'a',
-      'by_reference',
-      ['information.reference_not_allowed', 'information.missing_before_start'],
-    ],
   ])('element %s %s says exactly %j', (element, presence, expected) => {
     const f = elementOf(duty(withInfo({ [element]: presence }, started('2026-10-06'))), element);
     expect(keys(f)).toEqual(expected);

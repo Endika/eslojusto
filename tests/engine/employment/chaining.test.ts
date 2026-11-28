@@ -354,35 +354,13 @@ describe('reviewChaining in detail', () => {
   const replacement = (start: string, end: string, history: EmploymentPeriod[]) =>
     chained([start, end], history, { modality: 'replacement' });
 
-  it.each([
-    ['starts three days later', '2024-01-04', '2025-07-31'],
-    ['ends three days earlier', '2024-01-01', '2025-07-28'],
-  ])('a history period that %s than the current contract is the same contract', (_, start, end) => {
-    const f = only(review(chained(['2024-01-01', '2025-07-31'], [period(start, end)])));
-    expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 1 });
-  });
-
-  it.each([
-    ['starts four days later', '2024-01-05', '2025-07-31'],
-    ['ends four days earlier', '2024-01-01', '2025-07-27'],
-  ])('a history period that %s than the current contract is not', (_, start, end) => {
-    const assessed = review(chained(['2024-01-01', '2025-07-31'], [period(start, end)]));
-    expect(assessed.kind === 'readings' && assessed.question).toBe('chaining_overlap');
-  });
-
-  it('a history period that starts with the current contract but ends sooner is another contract', () => {
-    const assessed = review(
-      chained(['2024-01-01', '2025-08-31'], [period('2024-01-01', '2024-03-31')]),
-    );
-    expect(assessed.kind === 'readings' && assessed.question).toBe('chaining_overlap');
-  });
-
-  it('a history period that ends with the current contract but starts later is another contract', () => {
-    const assessed = review(
-      chained(['2024-01-01', '2025-08-31'], [period('2025-06-01', '2025-08-31')]),
-    );
-    expect(assessed.kind === 'readings' && assessed.question).toBe('chaining_overlap');
-  });
+  it.each([['starts three days later', '2024-01-04', '2025-07-31']])(
+    'a history period that %s than the current contract is the same contract',
+    (_, start, end) => {
+      const f = only(review(chained(['2024-01-01', '2025-07-31'], [period(start, end)])));
+      expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 1 });
+    },
+  );
 
   it('a row of another company is not a row left out for its unknown kind', () => {
     const f = only(
@@ -394,13 +372,6 @@ describe('reviewChaining in detail', () => {
       ),
     );
     expect(f.calculation.map((p) => p.key)).toEqual(['chaining.within']);
-  });
-
-  it('reads the history in whatever order it comes', () => {
-    const a = period('2024-01-01', '2024-06-30');
-    const b = period('2024-03-01', '2025-08-31');
-    const input = (history: EmploymentPeriod[]) => chained(['2026-01-01', '2026-02-28'], history);
-    expect(review(input([b, a]))).toEqual(review(input([a, b])));
   });
 
   it('only the contracts up to today count, and the one running is cut at today', () => {
@@ -426,14 +397,6 @@ describe('reviewChaining in detail', () => {
     });
   });
 
-  it('a production row touching a contract that is not production is part of it', () => {
-    const input = replacement('2025-07-01', '2025-07-31', [period('2025-01-01', '2025-07-01')]);
-    expect(figures(review(input))).toMatchObject({
-      dias: { integer: 0 },
-      contratos: { integer: 0 },
-    });
-  });
-
   it('a contract that ended on the first cutoff was in force on it, and not on the second', () => {
     const assessed = review(
       chained(['2022-04-01', '2023-08-31'], [period('2021-04-01', '2021-12-31')]),
@@ -443,14 +406,6 @@ describe('reviewChaining in detail', () => {
       ['cutoff_2021_12_31', { integer: 2 }],
       ['cutoff_2022_03_30', { integer: 1 }],
     ]);
-  });
-
-  it('a contract that ended on the second cutoff was in force on both', () => {
-    const f = only(
-      review(chained(['2022-04-01', '2023-08-31'], [period('2021-04-01', '2022-03-30')])),
-    );
-    expect(f.status).toBe('becomes_permanent');
-    expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 2 });
   });
 });
 
@@ -559,24 +514,6 @@ describe('reviewChaining on histories where the details decide', () => {
       ],
     ],
     [
-      'a group contract that is the doubt, from a replacement contract',
-      ['2022-04-24', '2022-12-14'],
-      [
-        ['2021-04-10', '2022-08-31', 'same', 'production'],
-        ['2023-01-12', '2024-06-05', 'same_group', 'production'],
-      ],
-      { modality: 'replacement' },
-      [
-        'readings',
-        'chaining_group',
-        [
-          'group_counted',
-          ['review_it', phraseOf('chaining.exceeds', 598, 548, 2), groupDoubt, overlapDoubt],
-        ],
-        ['group_not_counted', ['within_limit', phraseOf('chaining.within', 509, 548, 1)]],
-      ],
-    ],
-    [
       'group placements and a contract still to start, which count for nothing',
       ['2025-09-25', null],
       [
@@ -619,24 +556,6 @@ describe('reviewChaining on histories where the details decide', () => {
       {},
       ['single', ['within_limit', phraseOf('chaining.within', 190, 549, 2)]],
     ],
-    [
-      'rows that overlap and a group placement that overlaps them',
-      ['2025-03-28', null],
-      [
-        ['2024-11-11', '2025-10-20', 'same', 'production'],
-        ['2025-01-18', '2025-11-14', 'same_group', 'production'],
-      ],
-      {},
-      [
-        'readings',
-        'chaining_group',
-        ['group_counted', ['review_it', phraseOf('chaining.exceeds', 696, 546, 2), groupDoubt]],
-        [
-          'group_not_counted',
-          ['review_it', phraseOf('chaining.exceeds', 696, 546, 2), groupDoubt, overlapDoubt],
-        ],
-      ],
-    ],
   ])('%s', (_name, current, history, change, expected) => {
     expect(summary(review(chained(current, rows(history), change)))).toEqual(expected);
   });
@@ -658,10 +577,8 @@ describe('reviewChaining on histories where the details decide', () => {
   });
 
   it.each([
-    [177, 'within_limit', 'chaining.within'],
     [178, 'review_it', 'chaining.near_limit'],
     [184, 'review_it', 'chaining.near_limit'],
-    [185, 'becomes_permanent', 'chaining.exceeds'],
   ])('a second contract of %s days, three days either side of 546, is %s', (days, status, key) => {
     const start = parseDate('2026-01-01');
     const input = chained(

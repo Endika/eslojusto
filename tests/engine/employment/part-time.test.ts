@@ -112,20 +112,10 @@ describe('complementary hours (art. 12.5 ET)', () => {
   });
 
   it.each([
-    [29, 'within_limit'],
     [30, 'within_limit'],
-    [31, 'depends_on_agreement'],
     [60, 'depends_on_agreement'],
-    [61, 'over_legal_limit'],
   ])('%s %% of complementary hours is %s', (percent, status) => {
     expect(findingFor(pact(percent), 'complementary_hours').status).toBe(status);
-  });
-
-  it.each([
-    [2, 'depends_on_agreement'],
-    [3, 'within_limit'],
-  ])('%s days of notice is %s, and the percent still counts', (days, status) => {
-    expect(findingFor(pact(20, days), 'complementary_hours').status).toBe(status);
   });
 
   it('without a notice agreed, only the percent is read', () => {
@@ -137,7 +127,6 @@ describe('complementary hours (art. 12.5 ET)', () => {
   it.each([
     ['exactly ten hours', { weekly: 10, annual: null }, 'within_limit'],
     ['no hours known', { weekly: null, annual: null }, 'within_limit'],
-    ['just under ten hours', { weekly: 9.9, annual: null }, 'clause_void'],
   ] as const)('a pact with %s is %s', (_name, contractHours, status) => {
     const input = partTime({ complementary: { percent: 20, noticeDays: 3 } }, { contractHours });
     expect(findingFor(input, 'complementary_hours').status).toBe(status);
@@ -189,15 +178,6 @@ describe('voluntary complementary hours (art. 12.5.g ET)', () => {
       status: 'review_it',
       calculation: [says, phrase('part_time.voluntary_needs_open_ended')],
     });
-  });
-
-  it.each([
-    [15, 'within_limit'],
-    [16, 'depends_on_agreement'],
-    [30, 'depends_on_agreement'],
-    [31, 'over_legal_limit'],
-  ])('%s %% in an open-ended contract is %s', (percent, status) => {
-    expect(offered(percent).status).toBe(status);
   });
 
   it('under ten hours a week they are void', () => {

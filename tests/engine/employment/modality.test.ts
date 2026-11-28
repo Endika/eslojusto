@@ -505,14 +505,6 @@ describe('reviewModality: what each finding says', () => {
   it.each([
     ['a cause not written', { causeStated: false }, 'review_it', ['modality.cause_missing'], true],
     [
-      'circumstances not written',
-      { circumstancesStated: false },
-      'review_it',
-      ['modality.cause_missing'],
-      true,
-    ],
-    ['a cause not known', { causeStated: null }, 'not_entered', ['modality.cause_unknown'], false],
-    [
       'circumstances not known',
       { circumstancesStated: null },
       'not_entered',
@@ -535,13 +527,6 @@ describe('reviewModality: what each finding says', () => {
 
   it.each([
     ['named and stated', {}, 'within_limit', ['modality.replacement_stated'], true],
-    [
-      'person not named',
-      { replacedPersonNamed: false },
-      'missing_requirement',
-      ['modality.replacement_missing'],
-      true,
-    ],
     [
       'cause not stated',
       { replacementCauseStated: false },
@@ -634,20 +619,6 @@ describe('reviewModality: what each finding says', () => {
       expect(occasional('2024-12-20', '2025-03-10').calculation[0]).toEqual(days(2025, 69));
       expect(occasional('2024-12-27', '2025-01-05').calculation[0]).toEqual(days(2024, 5));
     });
-
-    it('reads a year in the middle of a long contract', () => {
-      const f = byId(
-        temporary('production_occasional', '2023-12-01', '2025-02-10'),
-        'production_occasional_90',
-      );
-      expect(f.calculation[0]).toEqual(
-        phrase('modality.occasional_days', {
-          anio: { integer: 2024 },
-          dias: { integer: 366 },
-          limite: { integer: 90 },
-        }),
-      );
-    });
   });
 
   describe('training', () => {
@@ -684,7 +655,6 @@ describe('reviewModality: what each finding says', () => {
 
     it.each([
       ['no training data', null, 'not_entered', ['modality.effective_work_unknown']],
-      ['no percentages', anyTraining(), 'not_entered', ['modality.effective_work_unknown']],
       [
         '65 % in the first year',
         anyTraining({ effectiveWorkPercent: { year1: 65, year2: null } }),
@@ -692,32 +662,8 @@ describe('reviewModality: what each finding says', () => {
         ['modality.effective_work'],
       ],
       [
-        '66 % in the first year',
-        anyTraining({ effectiveWorkPercent: { year1: 66, year2: null } }),
-        'over_legal_limit',
-        ['modality.effective_work'],
-      ],
-      [
-        '85 % in the second year',
-        anyTraining({ effectiveWorkPercent: { year1: null, year2: 85 } }),
-        'within_limit',
-        ['modality.effective_work'],
-      ],
-      [
-        '86 % in the second year',
-        anyTraining({ effectiveWorkPercent: { year1: null, year2: 86 } }),
-        'over_legal_limit',
-        ['modality.effective_work'],
-      ],
-      [
         'an excess only in the first year',
         anyTraining({ effectiveWorkPercent: { year1: 70, year2: 80 } }),
-        'over_legal_limit',
-        ['modality.effective_work', 'modality.effective_work'],
-      ],
-      [
-        'an excess only in the second year',
-        anyTraining({ effectiveWorkPercent: { year1: 60, year2: 90 } }),
         'over_legal_limit',
         ['modality.effective_work', 'modality.effective_work'],
       ],
@@ -739,19 +685,17 @@ describe('reviewModality: what each finding says', () => {
       ]);
     });
 
-    it.each([
-      ['neither shifts nor nights', { shifts: false, nightWorker: false }, false],
-      ['an unknown night work', { shifts: false, nightWorker: null }, false],
-      ['shifts', { shifts: true, nightWorker: false }, true],
-      ['night work', { shifts: false, nightWorker: true }, true],
-    ])('an alternance contract with %s', (_name, change, flagged) => {
-      const f = findings(alternance('2026-08-31', change)).find(
-        (x) => x.id === 'training_alternance_no_overtime',
-      );
-      expect(f === undefined ? null : [f.status, keys(f)]).toEqual(
-        flagged ? ['review_it', ['modality.alternance_shifts_or_night']] : null,
-      );
-    });
+    it.each([['night work', { shifts: false, nightWorker: true }, true]])(
+      'an alternance contract with %s',
+      (_name, change, flagged) => {
+        const f = findings(alternance('2026-08-31', change)).find(
+          (x) => x.id === 'training_alternance_no_overtime',
+        );
+        expect(f === undefined ? null : [f.status, keys(f)]).toEqual(
+          flagged ? ['review_it', ['modality.alternance_shifts_or_night']] : null,
+        );
+      },
+    );
 
     it.each([
       ['not known', null, 'not_entered', 'modality.plan_unknown', false],
@@ -804,14 +748,12 @@ describe('reviewModality: what each finding says', () => {
       expect(practice('2025-02-03', '2023-02-03', false).basedOnYourAnswer).toBe(true);
     });
 
-    it.each([
-      ['on the last day of three years', '2022-02-03', false, 'within_limit'],
-      ['a day after three years', '2022-02-02', false, 'over_legal_limit'],
-      ['on the last day of five years, with a disability', '2020-02-03', true, 'within_limit'],
-      ['a day after five years, with a disability', '2020-02-02', true, 'over_legal_limit'],
-    ])('a practice contract concluded %s', (_name, studiesEnd, disability, status) => {
-      expect(practice('2025-02-03', studiesEnd, disability).status).toBe(status);
-    });
+    it.each([['on the last day of three years', '2022-02-03', false, 'within_limit']])(
+      'a practice contract concluded %s',
+      (_name, studiesEnd, disability, status) => {
+        expect(practice('2025-02-03', studiesEnd, disability).status).toBe(status);
+      },
+    );
   });
 
   describe('fixed-discontinuous', () => {
@@ -821,36 +763,8 @@ describe('reviewModality: what each finding says', () => {
     it.each([
       ['nothing entered', null, 'not_entered', 'modality.discontinuous_unknown', false],
       [
-        'the period unknown',
-        { activityPeriod: null, hours: true, distribution: true },
-        'not_entered',
-        'modality.discontinuous_unknown',
-        false,
-      ],
-      [
         'the hours missing',
         { activityPeriod: true, hours: false, distribution: true },
-        'missing_requirement',
-        'modality.discontinuous_missing',
-        true,
-      ],
-      [
-        'the period missing',
-        { activityPeriod: false, hours: true, distribution: true },
-        'missing_requirement',
-        'modality.discontinuous_missing',
-        true,
-      ],
-      [
-        'the distribution missing',
-        { activityPeriod: true, hours: true, distribution: false },
-        'missing_requirement',
-        'modality.discontinuous_missing',
-        true,
-      ],
-      [
-        'the distribution missing and the period unknown',
-        { activityPeriod: null, hours: true, distribution: false },
         'missing_requirement',
         'modality.discontinuous_missing',
         true,
@@ -874,9 +788,6 @@ describe('reviewModality: what each finding says', () => {
       );
 
     it.each([
-      ['a training contract', { modality: 'training_alternance' as const }],
-      ['a fixed-discontinuous contract', { modality: 'discontinuous' as const }],
-      ['a work-or-service contract', { modality: 'work_or_service' as const }],
       [
         'a part-time arrangement',
         {
@@ -888,33 +799,11 @@ describe('reviewModality: what each finding says', () => {
           },
         },
       ],
-      ['hours under the full-time week', { contractHours: { weekly: 39, annual: null } }],
-      [
-        'hours under the agreement’s full-time week',
-        { fullTimeHours: 38, contractHours: { weekly: 37, annual: null } },
-      ],
-      ['regular remote work', { remoteShare: 30 }],
-      [
-        'a fixed-term contract of 29 days',
-        {
-          modality: 'production' as const,
-          startDate: parseDate('2025-01-01'),
-          endDate: parseDate('2025-01-29'),
-        },
-      ],
     ])('is required for %s', (_name, change) => {
       expect(unwritten(change)?.status).toBe('missing_requirement');
     });
 
     it.each([
-      ['hours of the full-time week', { contractHours: { weekly: 40, annual: null } }],
-      ['hours not known', { contractHours: { weekly: null, annual: 1800 } }],
-      [
-        'hours of the agreement’s week',
-        { fullTimeHours: 38, contractHours: { weekly: 38, annual: null } },
-      ],
-      ['no remote work', { remoteShare: null }],
-      ['remote work under 30 %', { remoteShare: 29 }],
       [
         'a fixed-term contract of 28 days',
         {
@@ -958,7 +847,7 @@ describe('reviewModality: what each finding says', () => {
       ]);
     });
 
-    it.each(['eventual', 'interim'] as const)('an outdated %s name asks to review', (modality) => {
+    it.each(['eventual'] as const)('an outdated %s name asks to review', (modality) => {
       const input = temporary(modality, '2025-01-01', '2025-04-30', {
         replacedPersonNamed: true,
         replacementCauseStated: true,

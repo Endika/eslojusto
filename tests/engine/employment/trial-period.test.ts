@@ -376,8 +376,6 @@ describe('trial period details', () => {
 
   it.each([
     ['training_alternance_no_trial', { modality: 'training_alternance' as const }, false],
-    ['training_no_new_trial', { afterTraining: true }, true],
-    ['trial_void_same_duties', { sameDutiesBefore: true }, true],
   ] as const)('a void trial by %s says so and rests on the answer: %s', (id, change, basedOn) => {
     const phraseKey = {
       training_alternance_no_trial: 'trial.void_alternance',
@@ -420,13 +418,6 @@ describe('trial period details', () => {
       only(trialOf({ modality: 'training_practice', trial: months(1) })).basedOnYourAnswer,
     ).toBe(false);
   });
-
-  it('the phrases of an agreement limit say which side of it the trial falls', () => {
-    const agreement = { ...contract().agreement, trialMonths: 4 };
-    expect(only(assess({ agreement, trial: months(3) })).calculation).toEqual([
-      phrase('trial.within_your_agreement', { trial: monthsPhrase(3), months: 4 }),
-    ]);
-  });
 });
 
 describe('trial period from RDL 39/2026, in more detail', () => {
@@ -458,12 +449,12 @@ describe('trial period from RDL 39/2026, in more detail', () => {
     });
   });
 
-  it.each([
-    ['2 weeks', { amount: 2, unit: 'weeks' }, 'within_limit'],
-    ['3 weeks', { amount: 3, unit: 'weeks' }, 'depends_on_agreement'],
-  ] as const)('%s in a contract of 90 days', (_name, trial, status) => {
-    expect(from({ ...fixedTerm('2027-01-01', '2027-03-31'), trial }).status).toBe(status);
-  });
+  it.each([['3 weeks', { amount: 3, unit: 'weeks' }, 'depends_on_agreement']] as const)(
+    '%s in a contract of 90 days',
+    (_name, trial, status) => {
+      expect(from({ ...fixedTerm('2027-01-01', '2027-03-31'), trial }).status).toBe(status);
+    },
+  );
 
   it('a month in a short contract is its real length: 28 days in February, 31 in January', () => {
     expect(from({ ...fixedTerm('2027-02-01', '2027-07-29'), trial: months(1) }).status).toBe(

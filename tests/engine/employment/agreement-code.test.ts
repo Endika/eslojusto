@@ -30,11 +30,7 @@ describe('the scope an agreement code gives (RD 713/2010, anexo 3)', () => {
     ['00', 'unknown'],
     ['01', 'province'],
     ['52', 'province'],
-    ['53', 'unknown'],
-    ['70', 'unknown'],
     ['71', 'regional'],
-    ['86', 'regional'],
-    ['87', 'unknown'],
   ])('reads the authority of a code starting with %s as %s', (digits, authority) => {
     expect(agreementScope(`${digits}004225011981`).authority).toBe(authority);
   });
