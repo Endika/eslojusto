@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, daysInMonth, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, isRealDate, type CivilDate } from '../date';
 import type { EmploymentInput } from './types';
 
 export type EmploymentField =
@@ -73,14 +73,6 @@ const FIRST_PAYSLIP_YEAR = 2000;
 // A contract may be reviewed before it starts, up to a year ahead.
 const MONTHS_AHEAD = 12;
 
-const isRealDate = ({ y, m, d }: CivilDate): boolean =>
-  Number.isInteger(y) &&
-  Number.isInteger(m) &&
-  Number.isInteger(d) &&
-  m >= 1 &&
-  m <= 12 &&
-  d >= 1 &&
-  d <= daysInMonth(y, m);
 const inRange = (v: number, min: number, max: number): boolean =>
   Number.isFinite(v) && v >= min && v <= max;
 const positiveUpTo = (v: number, max: number): boolean => Number.isFinite(v) && v > 0 && v <= max;
@@ -100,12 +92,7 @@ const TRIAL_MAX: Readonly<Record<'days' | 'weeks' | 'months', number>> = {
   weeks: WEEKS_IN_YEAR,
   months: MONTHS_IN_YEAR,
 };
-const minutesOf = (s: string): number | null => {
-  const match = /^(\d{2}):(\d{2})$/.exec(s);
-  if (match === null) return null;
-  const [h, m] = [Number(match[1]), Number(match[2])];
-  return h <= 23 && m <= 59 ? h * 60 + m : null;
-};
+const isClockTime = (s: string): boolean => /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
 
 export function validate(input: EmploymentInput, today: CivilDate): readonly ValidationError[] {
   const errors: ValidationError[] = [];
@@ -192,9 +179,8 @@ export function validate(input: EmploymentInput, today: CivilDate): readonly Val
 
   input.schedule?.forEach((day, i) => {
     for (const slot of day.slots) {
-      const [from, to] = [minutesOf(slot.from), minutesOf(slot.to)];
-      if (from === null || to === null) fail('schedule', 'invalid_time', i);
-      else if (from === to) fail('schedule', 'empty_slot', i);
+      if (!isClockTime(slot.from) || !isClockTime(slot.to)) fail('schedule', 'invalid_time', i);
+      else if (slot.from === slot.to) fail('schedule', 'empty_slot', i);
     }
   });
 

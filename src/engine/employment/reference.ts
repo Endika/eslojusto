@@ -40,7 +40,9 @@ export function permanentReference(
   assessed: readonly Assessed[],
   annualSalary: number | null,
 ): PermanentReference | null {
-  if (annualSalary === null || annualSalary <= 0 || !assessed.some(holds)) return null;
+  // Stryker disable next-line ConditionalExpression: null <= 0 holds as well, so the check below already rejects null; this one narrows the type
+  if (annualSalary === null) return null;
+  if (annualSalary <= 0 || !assessed.some(holds)) return null;
   const on = input.endDate ?? today;
   const common = { startDate: input.startDate, endDate: on, annualSalary };
   return {
@@ -48,7 +50,7 @@ export function permanentReference(
     fixedTermEnd: computeSeverance({
       ...common,
       cause: 'fixed_term_end',
-      fixedTermType: FIXED_TERM_TYPE[input.modality] ?? 'production_circumstances',
+      fixedTermType: FIXED_TERM_TYPE[input.modality],
     }),
     unfairDismissal: computeSeverance({ ...common, cause: 'unfair_dismissal' }),
   };

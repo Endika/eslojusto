@@ -132,9 +132,11 @@ function generalLimit(context: LimitContext): Assessed {
 // Within every limit that could apply, the answer did not matter: the tightest limit, the last
 // reading (readings go from the loosest limit to the tightest), is the one shown.
 function collapse(assessed: Assessed): Assessed {
+  // Stryker disable next-line ConditionalExpression,StringLiteral: the readings differ in their months, so assessAcross never gives a single here; the check narrows the type
   if (assessed.kind === 'single') return assessed;
   if (!assessed.readings.every((r) => r.finding.status === 'within_limit')) return assessed;
   const [tightest] = assessed.readings.slice(-1);
+  // Stryker disable next-line ConditionalExpression: assessAcross needs a world, so there is always a last reading; the check narrows the type
   return tightest === undefined ? assessed : single(tightest.finding);
 }
 
@@ -196,10 +198,9 @@ function legalLimit(context: LimitContext): Assessed {
   return generalLimit(context);
 }
 
+// Readings never stay within the law: when they all do, they collapse into one finding.
 const staysWithinLaw = (assessed: Assessed): boolean =>
-  assessed.kind === 'single'
-    ? assessed.finding.status === 'within_limit'
-    : assessed.readings.every((r) => r.finding.status === 'within_limit');
+  assessed.kind === 'single' && assessed.finding.status === 'within_limit';
 
 const VOID_PHRASE = {
   training_alternance_no_trial: 'trial.void_alternance',

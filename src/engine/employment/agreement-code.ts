@@ -32,7 +32,9 @@ function levelOf(digit: number): AgreementLevel {
 }
 
 export function agreementScope(code: string | null): AgreementScope {
-  if (code === null || !/^[0-9]{14}$/.test(code)) return UNKNOWN;
+  // Stryker disable next-line ConditionalExpression: the pattern below rejects null too, since test() reads it as the text «null»
+  if (code === null) return UNKNOWN;
+  if (!/^[0-9]{14}$/.test(code)) return UNKNOWN;
   return {
     authority: authorityOf(Number(code.slice(0, 2))),
     level: levelOf(Number(code[7])),

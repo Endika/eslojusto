@@ -91,6 +91,7 @@ function nonCompete(input: EmploymentInput, clause: Clause, norms: NormTable): A
 // Art. 21.4 ET: only after specialised training paid by the company, and two years at most.
 function retention(clause: Clause, norms: NormTable): Finding {
   const { months } = clause;
+  // Stryker disable next-line ConditionalExpression: null > 24 is false too, so the null check only narrows the type
   if (months !== null && months > RETENTION_MONTHS)
     return finding(
       'retention',

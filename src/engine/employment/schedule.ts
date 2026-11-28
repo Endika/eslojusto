@@ -91,9 +91,8 @@ export function workWeek(schedule: readonly ScheduleDay[]): WorkWeek {
     .filter((d): d is WorkDay => d !== null)
     .sort((a, b) => a.start - b.start);
   const rests = days.map((d, i) => {
-    const next = days[(i + 1) % days.length];
-    const nextStart =
-      next === undefined ? d.start : next.start + (i + 1 === days.length ? WEEK : 0);
+    const next = days[(i + 1) % days.length] ?? d;
+    const nextStart = next.start + (i + 1 === days.length ? WEEK : 0);
     return Math.max(0, nextStart - d.end);
   });
   return { days, minutes: days.reduce((sum, d) => sum + d.minutes, 0), rests };

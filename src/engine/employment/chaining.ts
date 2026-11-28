@@ -92,14 +92,18 @@ interface Contracts {
 }
 
 // The production contracts that may add up, the current one included, up to today.
-function productionContracts(input: EmploymentInput, today: CivilDate): Contracts {
+function productionContracts(
+  input: EmploymentInput,
+  history: readonly EmploymentPeriod[],
+  today: CivilDate,
+): Contracts {
   const upToToday = (ps: readonly ContributionPeriod[]) =>
     ps
       .filter((p) => compareDates(p.startDate, today) <= 0)
       .map((p) => ({ startDate: p.startDate, endDate: min(p.endDate, today) }));
   const current = { startDate: input.startDate, endDate: input.endDate ?? today };
   const isProduction = PRODUCTION.has(input.modality);
-  const rows = (input.history ?? []).filter((p) => p.kind === 'production');
+  const rows = history.filter((p) => p.kind === 'production');
   const company = rows.filter(
     (p) =>
       p.employer === 'same' &&
@@ -122,9 +126,7 @@ function productionContracts(input: EmploymentInput, today: CivilDate): Contract
 // Transitional provision 5.ª RDL 32/2021: of the contracts concluded before the cutoff, only the
 // one in force on it counts.
 const countedFrom = (contracts: readonly ContributionPeriod[], cutoff: CivilDate) =>
-  contracts.filter(
-    (p) => compareDates(p.startDate, cutoff) >= 0 || compareDates(p.endDate, cutoff) >= 0,
-  );
+  contracts.filter((p) => compareDates(p.endDate, cutoff) >= 0);
 
 // Days covered by the contracts inside [from, to], overlaps counted once.
 function coveredDays(contracts: readonly ContributionPeriod[], from: CivilDate, to: CivilDate) {
@@ -226,8 +228,7 @@ function draftOf(
 }
 
 // Contracts of the history left out of the count, so the person knows what was not compared.
-function leftOut(input: EmploymentInput, groupRead: boolean): EmploymentPhrase[] {
-  const history = input.history ?? [];
+function leftOut(history: readonly EmploymentPeriod[], groupRead: boolean): EmploymentPhrase[] {
   const group = groupRead
     ? 0
     : history.filter((p) => p.employer === 'same_group' || p.employer === 'same_via_agency').length;
@@ -268,7 +269,8 @@ export function reviewChaining(
       ),
     );
   }
-  if (input.history === null) {
+  const { history } = input;
+  if (history === null) {
     return single(
       settle(
         { ...base, status: 'not_entered', calculation: [phrase('chaining.no_history')] },
@@ -281,48 +283,42 @@ export function reviewChaining(
     cutoff_2021_12_31: parseDate(norms.rdl32_2021.inForceSince),
     cutoff_2022_03_30: parseDate(RULES.chaining_18_in_24.from),
   };
-  const contracts = productionContracts(input, today);
-  const ambiguous =
-    contracts.company.overlap_same_contract.length !==
-    contracts.company.overlap_separate_contracts.length;
+  const contracts = productionContracts(input, history, today);
   const worlds = READINGS.chaining_group.flatMap((group) =>
-    READINGS.chaining_overlap
-      .filter((o) => ambiguous || o === 'overlap_same_contract')
-      .flatMap((overlapRead) =>
-        READINGS.chaining_cutoff.map((cutoff) => {
-          const world = {
-            chaining_group: group,
-            chaining_overlap: overlapRead,
-            chaining_cutoff: cutoff,
-          };
-          const counted = [
-            ...contracts.company[overlapRead],
-            ...(group === 'group_counted' ? contracts.group : []),
-          ];
-          return { world, outcome: worstWindow(countedFrom(counted, cutoffs[cutoff])) };
-        }),
-      ),
+    READINGS.chaining_overlap.flatMap((overlapRead) =>
+      READINGS.chaining_cutoff.map((cutoff) => {
+        const world = {
+          chaining_group: group,
+          chaining_overlap: overlapRead,
+          chaining_cutoff: cutoff,
+        };
+        const counted = [
+          ...contracts.company[overlapRead],
+          ...(group === 'group_counted' ? contracts.group : []),
+        ];
+        return { world, outcome: worstWindow(countedFrom(counted, cutoffs[cutoff])) };
+      }),
+    ),
   );
   type Cell = (typeof worlds)[number];
   // A doubt matters when changing only its answer changes the outcome.
   const matters = (dim: Dimension, cells: readonly Cell[]): boolean => {
     const byRest = new Map<string, Set<Outcome['kind']>>();
     for (const { world, outcome } of cells) {
-      const rest = DIMENSIONS.filter((d) => d !== dim)
-        .map((d) => world[d])
-        .join('|');
+      const rest = JSON.stringify(DIMENSIONS.filter((d) => d !== dim).map((d) => world[d]));
       byRest.set(rest, (byRest.get(rest) ?? new Set()).add(outcome.kind));
     }
     return [...byRest.values()].some((kinds) => kinds.size > 1);
   };
   const groupMatters = matters('chaining_group', worlds);
-  const notes = leftOut(input, groupMatters);
+  const notes = leftOut(history, groupMatters);
   const question = DIMENSIONS.find((d) => matters(d, worlds));
   if (question === undefined) {
     return assessAcross('chaining_cutoff', READINGS.chaining_cutoff, (cutoff) => {
       const cell = worlds.find(
         (c) => c.world.chaining_cutoff === cutoff && c.world.chaining_group === 'group_not_counted',
       );
+      // Stryker disable next-line ConditionalExpression,CallExpression: every cutoff has its group_not_counted world, so the guard only narrows the type
       if (cell === undefined) throw new RangeError(`no world for ${cutoff}`);
       return settle(draftOf(cell.outcome, [], notes, input.historyIncomplete), today, norms);
     });
@@ -332,12 +328,11 @@ export function reviewChaining(
   return assessAcross(question, answers, (answer) => {
     const cells = worlds.filter((c) => c.world[question] === answer);
     const worst = cells.reduce((a, b) =>
-      SEVERITY[b.outcome.kind] > SEVERITY[a.outcome.kind] ||
-      (b.outcome.kind === a.outcome.kind && b.outcome.days > a.outcome.days)
+      (SEVERITY[b.outcome.kind] - SEVERITY[a.outcome.kind] || b.outcome.days - a.outcome.days) > 0
         ? b
         : a,
     ).outcome;
-    const doubts = [question, ...DIMENSIONS.filter((d) => d !== question && matters(d, cells))];
+    const doubts = [question, ...DIMENSIONS.filter((d) => matters(d, cells))];
     return settle(draftOf(worst, doubts, notes, input.historyIncomplete), today, norms);
   });
 }
