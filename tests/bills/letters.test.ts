@@ -309,7 +309,11 @@ describe('which telecom letters an exit offers', () => {
       'client.bills.telecom.letter.penalty.filename',
     );
     expect(() => c.letter('telecom_exit_without_penalty', NO_DETAILS, tr)).toThrow();
+    expect(c.filename?.('report')).toBe('client.bills.telecom.report.filename');
     const free = telecomCase(exit(afterChange()), NORMS_BEFORE_FIGURE);
+    expect(free.letter('telecom_exit_without_penalty', NO_DETAILS, tr).title).not.toBe(
+      c.letter('telecom_penalty_review', NO_DETAILS, tr).title,
+    );
     expect(free.freeLetterKinds).toEqual(['telecom_exit_without_penalty']);
     expect(free.filename?.('letter', 'telecom_exit_without_penalty')).toBe(
       'client.bills.telecom.letter.exit.filename',

@@ -12,6 +12,7 @@ import { ELECTRICITY_FLOW as flow } from './steps';
 // again when the pass is verified or dropped.
 export function setUpElectricity(
   root: HTMLElement,
+  // Stryker disable next-line ArrowFunction,StringLiteral: only a detail of 'locked' and an offer of true change the result
   { events, today, tr, tables, detail = () => 'unlocked', offered = () => false }: ElectricitySetup,
 ): SectionForm {
   let shown: CompletedElectricityReview | null = null;

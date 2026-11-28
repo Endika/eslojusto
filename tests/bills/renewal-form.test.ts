@@ -8,6 +8,7 @@ import {
   sheetOfField,
 } from '../../src/bills/renewal/form';
 import { RENEWAL_FIELDS } from '../../src/bills/renewal/ports';
+import { RENEWAL_FLOW } from '../../src/bills/renewal/steps';
 import { renewalPrefill } from '../../src/bills/renewal/prefill';
 import type { RenewalExtraction } from '../../src/documents/contract';
 import { pageTranslator } from '../support/page-strings';
@@ -211,6 +212,101 @@ describe('the renewal form', () => {
   });
 });
 
+describe('what the renewal form requires', () => {
+  const periods: Values = {
+    currentEnergyPricing: 'periods',
+    nextEnergyPricing: 'periods',
+    currentEnergy: null,
+    nextEnergy: null,
+    currentEnergyP1: '0,2',
+    currentEnergyP2: '0,15',
+    currentEnergyP3: '0,1',
+    nextEnergyP1: '0,22',
+    nextEnergyP2: '0,17',
+    nextEnergyP3: '0,12',
+  };
+
+  it.each([
+    'letterDate',
+    'renewalDate',
+    'powerKwP1',
+    'powerKwP2',
+    'currentPowerP1',
+    'currentPowerP2',
+    'nextPowerP1',
+    'nextPowerP2',
+    'currentEnergy',
+    'nextEnergy',
+  ])('asks for %s', (field) => {
+    expect(readRenewalForm(form({ [field]: '' }), TODAY)).toEqual({
+      errors: [{ field, code: 'missing_value' }],
+    });
+  });
+
+  it.each([
+    'currentEnergyP1',
+    'currentEnergyP2',
+    'currentEnergyP3',
+    'nextEnergyP1',
+    'nextEnergyP2',
+    'nextEnergyP3',
+  ])('asks for %s when the letter prices by period', (field) => {
+    expect(readRenewalForm(form({ ...periods, [field]: '' }), TODAY)).toEqual({
+      errors: [{ field, code: 'missing_value' }],
+    });
+  });
+
+  it.each([
+    'powerKwP1',
+    'powerKwP2',
+    'currentPowerP1',
+    'currentPowerP2',
+    'nextPowerP1',
+    'nextPowerP2',
+    'currentEnergy',
+    'nextEnergy',
+  ])('reads a comma and three digits as a decimal one in %s', (field) => {
+    const r = readRenewalForm(form({ [field]: '1,234' }), TODAY);
+    expect('errors' in r ? r.errors : []).toEqual([]);
+  });
+
+  it.each([
+    'currentEnergyP1',
+    'currentEnergyP2',
+    'currentEnergyP3',
+    'nextEnergyP1',
+    'nextEnergyP2',
+    'nextEnergyP3',
+  ])('reads a comma and three digits as a decimal one in %s', (field) => {
+    const r = readRenewalForm(form({ ...periods, [field]: '1,234' }), TODAY);
+    expect('errors' in r ? r.errors : []).toEqual([]);
+  });
+
+  it.each([
+    ['yes', true],
+    ['no', false],
+    ['unknown', null],
+  ] as const)('reads %s to whether the letter came apart as %s', (answer, expected) => {
+    expect(readRenewalForm(form({ separateFromBill: answer }), TODAY)).toMatchObject({
+      input: { separateFromBill: expected },
+    });
+  });
+
+  it('checks a sheet with what the engine bounds only on that sheet', () => {
+    const f = form({ renewalDate: '2026-10-01', annualKwh: '900000' });
+    expect(sheetErrors(f, 'fechas', TODAY)).toEqual([
+      { field: 'renewalDate', code: 'not_after_start' },
+    ]);
+    expect(sheetErrors(f, 'consumo', TODAY)).toEqual([{ field: 'annualKwh', code: 'kwh_range' }]);
+    expect(sheetErrors(f, 'envio', TODAY)).toEqual([]);
+    expect(sheetErrors(form(), 'fechas', TODAY)).toEqual([]);
+  });
+
+  it('puts a question that is on no sheet on the first', () => {
+    expect(sheetOfField('nope' as never)).toBe('fechas');
+  });
+});
+
 describe('the sheets', () => {
   it('ask every question once, and each question is a trackable field', () => {
     const asked = SHEETS.flatMap((sheet) => SHEET_FIELDS[sheet]);
@@ -279,5 +375,14 @@ describe('a comma followed by three digits', () => {
       current: { power: { p1: 30.817, p2: 0.725 } },
       next: { power: { p1: 40.25, p2: 18.372 } },
     });
+  });
+});
+
+describe('the renewal flow', () => {
+  it('completes a sheet when it has no error, and the result always', () => {
+    const empty = document.createElement('form');
+    expect(RENEWAL_FLOW.complete(form(), 'fechas', TODAY)).toBe(true);
+    expect(RENEWAL_FLOW.complete(empty, 'fechas', TODAY)).toBe(false);
+    expect(RENEWAL_FLOW.complete(empty, 'resultado', TODAY)).toBe(true);
   });
 });

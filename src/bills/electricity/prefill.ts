@@ -7,10 +7,10 @@ import {
   type ExtractedValue,
   type FailedCheck,
 } from '../../documents/contract';
-import type { ReadMark, ReadPrefill } from '../../documents/ports';
-import { parseDate, toIso } from '../../engine/date';
+import type { ReadPrefill } from '../../documents/ports';
 import type { EnergyPeriod, PowerPeriod } from '../../engine/bills/types';
 import type { Translate } from '../../i18n/client';
+import { Answers, isoOf, lowest, numberOf } from '../read';
 import {
   BONUS_CATEGORIES,
   ENERGY_PERIODS,
@@ -44,58 +44,24 @@ interface ElectricityRead {
 const MAX_SERVICES = 2;
 const SUFFIX = { p1: 'P1', p2: 'P2', p3: 'P3' } as const;
 
-const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-const lowest = (...cs: Confidence[]): Confidence =>
-  cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
-
-const numberOf = (v: ExtractedValue | undefined): number | null =>
-  typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null;
 const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
+  // Stryker disable next-line ConditionalExpression: a non-string is in no list of strings; typeof only narrows
   typeof v === 'string' && (options as readonly string[]).includes(v) ? (v as T) : null;
-
-function isoOf(v: ExtractedValue | undefined): string | null {
-  if (typeof v !== 'string') return null;
-  try {
-    return toIso(parseDate(v));
-  } catch {
-    return null;
-  }
-}
 
 // A quantity or a unit price with every decimal the bill prints, as the form takes it: «0,123456».
 const DECIMAL = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 8, useGrouping: false });
 const decimalText = (n: number): string => DECIMAL.format(n);
 const amountText = (n: number): string => formatAmountInput(Math.round(n * 100) / 100);
 
-class Answers {
-  readonly entries: [string, string][] = [];
-  readonly marks: ReadMark[] = [];
-
-  read(name: ElectricityFormField, value: string, confidence: Confidence, derived = false) {
-    this.entries.push([name, value]);
-    this.marks.push({
-      id: name,
-      container: `[data-field="${name}"]`,
-      confidence,
-      ...(derived && { derived: true as const }),
-    });
-  }
-
-  // An answer that only opens what was read, such as «Sí» above the figure it asks for.
-  open(name: ElectricityFormField, value: string) {
-    this.entries.push([name, value]);
-  }
-
+class ElectricityAnswers extends Answers<ElectricityFormField> {
   figure(
     name: ElectricityFormField,
     v: ExtractedValue | undefined,
     confidence: Confidence,
     text: (n: number) => string = amountText,
-  ): boolean {
+  ) {
     const n = numberOf(v);
-    if (n === null) return false;
-    this.read(name, text(n), confidence);
-    return true;
+    if (n !== null) this.read(name, text(n), confidence);
   }
 }
 
@@ -104,7 +70,11 @@ const ofBill = (rows: readonly ExtractedRow[], document: ExtractedValue | undefi
 
 // The power and energy lines, one per period. A period billed in stretches at different prices
 // says the price changed, and its figures are left for the person: the form takes one line.
-function lines(a: Answers, power: readonly ExtractedRow[], energy: readonly ExtractedRow[]) {
+function lines(
+  a: ElectricityAnswers,
+  power: readonly ExtractedRow[],
+  energy: readonly ExtractedRow[],
+) {
   const periodOf = <P extends string>(r: ExtractedRow, periods: readonly P[]) =>
     oneOf(r.values['period'], periods);
   const byPower = (p: PowerPeriod) => power.filter((r) => periodOf(r, POWER_PERIODS) === p);
@@ -156,7 +126,11 @@ const amountOf = (rows: readonly ExtractedRow[]) =>
 
 // Services, discounts and regularisations: what the form asks of each. The person still says
 // whether they asked for a service; a bill can't.
-function otherLines(a: Answers, other: readonly ExtractedRow[], tr: Translate): string[] {
+function otherLines(
+  a: ElectricityAnswers,
+  other: readonly ExtractedRow[],
+  tr: Translate,
+): string[] {
   const notes: string[] = [];
   const kind = (k: string) => other.filter((r) => r.values['kind'] === k);
   const services = kind('service');
@@ -205,13 +179,13 @@ function billPrefill(
   e: ElectricityExtraction,
   tr: Translate,
 ): { readonly read: BillRead; readonly notes: readonly string[] } {
-  const a = new Answers();
+  const a = new ElectricityAnswers();
   const v = bill.values;
   const c = bill.confidence;
   const doc = v['document'];
 
-  const postcode = typeof v['postcode'] === 'string' ? v['postcode'] : null;
-  if (postcode !== null && /^\d{5}$/.test(postcode)) a.read('postcode', postcode, c);
+  const postcode = v['postcode'];
+  if (typeof postcode === 'string' && /^\d{5}$/.test(postcode)) a.read('postcode', postcode, c);
   const tariff = oneOf(v['accessTariff'], ['2.0TD', '3.0TD', '6.1TD', 'other'] as const);
   if (tariff) a.read('accessTariff', tariff === '2.0TD' ? '2.0TD' : 'other', c);
   const self = oneOf(v['selfConsumption'], SELF_CONSUMPTION);
@@ -230,7 +204,7 @@ function billPrefill(
     if (iso !== null) a.read(name, iso, c);
   }
   const days = numberOf(v['billedDays']);
-  if (days !== null && Number.isInteger(days)) a.read('billedDays', String(days), c);
+  if (Number.isInteger(days)) a.read('billedDays', String(days), c);
   const market = oneOf(v['market'], MARKETS);
   if (market) a.read('market', market, c);
 
@@ -281,7 +255,7 @@ function billPrefill(
   a.figure('vatPercent', v['vatPercent'], c, decimalText);
   a.figure('total', v['total'], c);
 
-  const low = a.marks.some((m) => m.confidence === 'low');
+  const low = a.lowConfidence();
   return {
     read: {
       entries: a.entries,
@@ -299,7 +273,8 @@ function billPrefill(
 
 // Oldest first; a bill without its last reading goes last, in the order read.
 const byLastReading = (a: BillRead, b: BillRead): number =>
-  a.to === null ? (b.to === null ? 0 : 1) : b.to === null ? -1 : a.to.localeCompare(b.to);
+  // Stryker disable next-line StringLiteral: the texts are only compared when both are dates or both are missing
+  Number(a.to === null) - Number(b.to === null) || (a.to ?? '').localeCompare(b.to ?? '');
 
 // What a read puts into the electricity review, bill by bill. Nothing here reviews anything: each
 // bill fills the form on its own, every answer marked as read and how surely, and the person
@@ -307,6 +282,7 @@ const byLastReading = (a: BillRead, b: BillRead): number =>
 export function electricityPrefill(
   e: ElectricityExtraction,
   tr: Translate,
+  // Stryker disable next-line ArrayDeclaration: a stray entry names no check, so none is worded
   checks: readonly FailedCheck[] = [],
 ): ElectricityRead {
   const prefills = e.bills.map((bill) => billPrefill(bill, e, tr));

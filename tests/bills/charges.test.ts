@@ -232,3 +232,207 @@ describe('«Lo que te cobran»', () => {
     expect(texts(root, '[data-bill-title]')).toEqual([]);
   });
 });
+
+const echo: Translate = (key, vars) => (vars ? `${key} ${JSON.stringify(vars)}` : key);
+const day = (iso: string) => parseDate(iso);
+
+describe('the figures of a bill read', () => {
+  it('reads the operator, the dates and the total of the bill, and the figures of each line', () => {
+    const [bill] = readBills(
+      telecom({
+        bills: [
+          row({
+            document: 1,
+            operatorName: '  Operador  ',
+            issuedOn: '2026-09-22',
+            periodFrom: '2026-09-01',
+            periodTo: '2026-09-30',
+            total: 12.345,
+          }),
+        ],
+        lines: [
+          row({
+            document: 1,
+            concept: '  Tarifa  ',
+            kind: 'fixed_fee',
+            from: '2026-09-01',
+            to: '2026-09-30',
+            amount: 1.239,
+          }),
+          row({ document: 1, concept: '   ', from: 'no', to: 5, amount: 2 }),
+        ],
+      }),
+    );
+    expect(bill).toEqual({
+      operator: 'Operador',
+      issuedOn: day('2026-09-22'),
+      periodFrom: day('2026-09-01'),
+      periodTo: day('2026-09-30'),
+      total: 12.35,
+      lines: [
+        {
+          concept: 'Tarifa',
+          kind: 'fixed_fee',
+          from: day('2026-09-01'),
+          to: day('2026-09-30'),
+          amount: 1.24,
+        },
+        { concept: null, kind: 'other', from: null, to: null, amount: 2 },
+      ],
+    });
+  });
+
+  it('leaves out a line with an amount that is not a charge, and a bill left with no line', () => {
+    const lines = [
+      row({ document: 1, amount: -1 }),
+      row({ document: 1, amount: Number.POSITIVE_INFINITY }),
+      row({ document: 1, amount: '5' }),
+    ];
+    expect(readBills(telecom({ bills: [row({ document: 1, total: 5 })], lines }))).toEqual([]);
+  });
+
+  it('knows a bill only by a whole number, never by another document', () => {
+    const lines = [
+      row({ document: 1.5, amount: 1 }),
+      row({ document: '1', amount: 1 }),
+      row({ amount: 1 }),
+    ];
+    expect(readBills(telecom({ lines }))).toEqual([]);
+  });
+
+  it('orders the bills by the end of their period, or else by their issue, and those with neither last', () => {
+    const read = telecom({
+      bills: [
+        row({ document: 1, operatorName: 'sin fechas' }),
+        row({ document: 2, operatorName: 'emitida', issuedOn: '2026-10-01' }),
+        row({
+          document: 3,
+          operatorName: 'periodo',
+          issuedOn: '2026-09-01',
+          periodTo: '2026-10-31',
+        }),
+      ],
+      lines: [1, 2, 3].map((document) => row({ document, amount: 1 })),
+    });
+    expect(readBills(read).map((b) => b.operator)).toEqual(['periodo', 'emitida', 'sin fechas']);
+  });
+});
+
+describe('the memory of the bills read', () => {
+  const bill = (change: Partial<ReadBill> = {}): ReadBill => ({
+    operator: 'Op',
+    issuedOn: day('2026-09-22'),
+    periodFrom: null,
+    periodTo: null,
+    total: 10,
+    lines: [{ concept: 'a', kind: 'fixed_fee', from: null, to: null, amount: 10 }],
+    ...change,
+  });
+
+  it('replaces a bill read again with its latest reading, and keeps the others', () => {
+    const memory = chargesMemory();
+    memory.add([bill(), bill({ total: 20 })]);
+    memory.add([bill({ lines: [] })]);
+    expect(memory.bills().map((b) => [b.total, b.lines.length])).toEqual([
+      [10, 0],
+      [20, 1],
+    ]);
+  });
+
+  it('tells a bill read with a period start from one read with a period end', () => {
+    const memory = chargesMemory();
+    memory.add([bill({ periodFrom: day('2026-09-01') })]);
+    memory.add([bill({ periodTo: day('2026-09-01') })]);
+    expect(memory.bills()).toHaveLength(2);
+  });
+
+  it('keeps the newest first, whichever was read last', () => {
+    const memory = chargesMemory();
+    memory.add([bill({ issuedOn: day('2026-10-22') })]);
+    memory.add([bill({ issuedOn: day('2026-08-22') })]);
+    expect(memory.bills().map((b) => b.issuedOn)).toEqual([day('2026-10-22'), day('2026-08-22')]);
+  });
+
+  it('knows a bill by its issue or by its period alone, and never one with neither', () => {
+    const memory = chargesMemory();
+    memory.add([bill({ issuedOn: null, periodTo: day('2026-09-30') })]);
+    memory.add([bill({ issuedOn: null, periodTo: day('2026-09-30') })]);
+    memory.add([bill({ periodTo: null })]);
+    memory.add([bill({ periodTo: null })]);
+    expect(memory.bills()).toHaveLength(2);
+    memory.add([bill({ issuedOn: null })]);
+    memory.add([bill({ issuedOn: null })]);
+    expect(memory.bills()).toHaveLength(4);
+  });
+});
+
+describe('the lines and titles of «Lo que te cobran»', () => {
+  const rendered = (read: TelecomExtraction, today = TODAY) => {
+    const root = block();
+    renderCharges(root, readBills(read), today, echo);
+    return root;
+  };
+  const one = (bill: Record<string, ExtractedValue>, line: Record<string, ExtractedValue> = {}) =>
+    telecom({
+      bills: [row({ document: 1, ...bill })],
+      lines: [row({ document: 1, concept: 'C', kind: 'fixed_fee', amount: 1, ...line })],
+    });
+
+  it.each([
+    [
+      { issuedOn: '2026-09-22', operatorName: 'Op' },
+      'bill_operator {"factura":"client.bills.telecom.charges.bill_issued {\\"fecha\\":\\"22-09-2026\\"}","operador":"Op"}',
+    ],
+    [
+      { periodFrom: '2026-09-01', periodTo: '2026-09-30' },
+      'bill_period {"desde":"01-09-2026","hasta":"30-09-2026"}',
+    ],
+    [{ periodFrom: '2026-09-01' }, 'client.bills.telecom.charges.bill'],
+    [{ periodTo: '2026-09-30' }, 'client.bills.telecom.charges.bill'],
+    [{}, 'client.bills.telecom.charges.bill'],
+  ])('titles a bill read as %j', (bill, expected) => {
+    const [title] = texts(rendered(one(bill)), '[data-bill-title]');
+    expect(title).toContain(expected);
+  });
+
+  it.each([
+    [
+      { from: '2026-09-01', to: '2026-09-30' },
+      'client.bills.telecom.charges.period {"desde":"01-09-2026","hasta":"30-09-2026"}',
+    ],
+    [{ from: '2026-09-01' }, 'client.bills.telecom.charges.period_from {"desde":"01-09-2026"}'],
+    [{ to: '2026-09-30' }, 'client.bills.telecom.charges.period_to {"hasta":"30-09-2026"}'],
+  ])('says the period of a line with %j as %s', (line, expected) => {
+    const root = rendered(one({}, line));
+    const slot = root.querySelector<HTMLElement>('[data-line-period]');
+    expect(slot?.hidden).toBe(false);
+    expect(slot?.textContent).toBe(expected);
+  });
+
+  it('leaves the period of a line out when it has no date', () => {
+    const slot = rendered(one({})).querySelector<HTMLElement>('[data-line-period]');
+    expect(slot?.hidden).toBe(true);
+    expect(slot?.textContent).toBe('');
+  });
+
+  it('writes a discount with a minus, and a discount of nothing without', () => {
+    const lines = telecom({
+      lines: [
+        row({ document: 1, concept: 'a', kind: 'discount', amount: 2 }),
+        row({ document: 1, concept: 'b', kind: 'discount', amount: 0 }),
+        row({ document: 1, concept: 'c', kind: 'fixed_fee', amount: 3 }),
+      ],
+    });
+    expect(texts(rendered(lines), '[data-line-amount]').sort()).toEqual([
+      '0,00 €',
+      '3,00 €',
+      '−2,00 €',
+    ]);
+  });
+
+  it('leaves the norm on charges not asked for out of a read with no extra', () => {
+    const root = rendered(one({}));
+    expect(hidden(root, '[data-charges-right="unrequested"]')).toBe(true);
+    expect(hidden(root, '[data-charges-rights]')).toBe(true);
+  });
+});

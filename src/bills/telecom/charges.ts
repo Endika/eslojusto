@@ -8,8 +8,9 @@ import {
   type TelecomCharges,
   type TelecomLineKind,
 } from '../../engine/bills/telecom-charges';
-import { parseDate, toIso, type CivilDate } from '../../engine/date';
+import { toIso, type CivilDate } from '../../engine/date';
 import type { Translate } from '../../i18n/client';
+import { amountOf, dateOf, textOf } from '../read';
 
 export interface ReadLine {
   // As printed; null when the reading left it out, as it does with one that names a number.
@@ -29,24 +30,12 @@ export interface ReadBill {
   readonly lines: readonly ReadLine[];
 }
 
-const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' && v.trim() !== '' ? v.trim() : null;
-const amountOf = (v: ExtractedValue | undefined): number | null =>
-  typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
 const kindOf = (v: ExtractedValue | undefined): TelecomLineKind =>
   TELECOM_LINE_KINDS.find((k) => k === v) ?? 'other';
 
-function dateOf(v: ExtractedValue | undefined): CivilDate | null {
-  if (typeof v !== 'string') return null;
-  try {
-    return parseDate(v);
-  } catch {
-    return null;
-  }
-}
-
 const documentOf = (row: ExtractedRow): number | null => {
   const n = row.values['document'];
+  // Stryker disable next-line ConditionalExpression: Number.isInteger is false for a non-number; typeof only narrows
   return typeof n === 'number' && Number.isInteger(n) ? n : null;
 };
 
@@ -101,8 +90,12 @@ export function chargesMemory() {
       : [b.operator, isoOf(b.issuedOn), isoOf(b.periodFrom), isoOf(b.periodTo), b.total].join('|');
   return {
     add(read: readonly ReadBill[]) {
-      const keys = new Set(read.map(keyOf).filter((k) => k !== null));
-      bills = [...read, ...bills.filter((b) => !keys.has(keyOf(b) ?? ''))].sort(newestFirst);
+      const keys = new Set(read.map(keyOf));
+      const replaced = (b: ReadBill) => {
+        const key = keyOf(b);
+        return key !== null && keys.has(key);
+      };
+      bills = [...read, ...bills.filter((b) => !replaced(b))].sort(newestFirst);
     },
     clear() {
       bills = [];
@@ -160,12 +153,14 @@ function renderLine(root: ParentNode, l: ReadLine, tr: Translate): DocumentFragm
 
 function promotionLines(bills: readonly ReadBill[], c: TelecomCharges, tr: Translate): string[] {
   return c.promotions.map((p) => {
+    // Stryker disable next-line OptionalChaining: a promotion is found in the bills it was worked out from
     const line = bills[p.bill]?.lines[p.line];
     return tr(
       p.ended
         ? 'client.bills.telecom.charges.promotion_ended'
         : 'client.bills.telecom.charges.promotion_ends',
       {
+        // Stryker disable next-line StringLiteral: a promotion's line is always among the bill's lines
         concepto: line ? conceptText(line, tr) : tr('client.bills.telecom.charges.kind.discount'),
         fecha: dayText(toIso(p.endsOn)),
         importe: formatCalculationEuros(p.amount),
@@ -192,6 +187,7 @@ export function renderCharges(
       const frag = template(root, 'charges-bill');
       find(frag, '[data-bill-title]').textContent = billTitle(bill, tr);
       find(frag, '[data-bill-groups]').replaceChildren(
+        // Stryker disable next-line ArrayDeclaration,OptionalChaining: the charges hold one entry for each bill
         ...(c.bills[b]?.groups ?? []).map((group) => {
           const g = template(root, 'charges-group');
           find(g, '[data-group-title]').textContent = tr(
@@ -200,6 +196,7 @@ export function renderCharges(
           find(g, '[data-group-lines]').replaceChildren(
             ...group.lines.flatMap((i) => {
               const line = bill.lines[i];
+              // Stryker disable next-line ArrayDeclaration: a group's lines are indexes of the bill's own
               return line ? [renderLine(root, line, tr)] : [];
             }),
           );
