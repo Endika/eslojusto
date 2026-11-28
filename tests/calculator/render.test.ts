@@ -79,7 +79,7 @@ describe('renderReview', () => {
 });
 
 describe('readForm: «No lo sé» for the holiday days taken', () => {
-  function buildForm(unknown: boolean): HTMLFormElement {
+  function buildForm(): HTMLFormElement {
     const form = document.createElement('form');
     form.innerHTML = `
       <input name="cause" value="resignation">
@@ -87,12 +87,12 @@ describe('readForm: «No lo sé» for the holiday days taken', () => {
       <input name="extraPayProrated" value="yes"><input name="monthlySalary" value="1850">
       <input name="extraPayCount" value="2"><input name="holidayUnit" value="calendar">
       <input name="annualHolidayDays" value="30">
-      <input name="holidayDaysTaken" value="" ${unknown ? 'disabled' : ''}>
-      ${unknown ? '<input name="holidayDaysTakenUnknown" value="yes">' : ''}`;
+      <input name="holidayDaysTaken" value="" disabled>
+      <input name="holidayDaysTakenUnknown" value="yes">`;
     return form;
   }
   it('checked: the engine gets null', () => {
-    const r = readForm(buildForm(true));
+    const r = readForm(buildForm());
     expect('input' in r && r.input.holidayDaysTaken).toBeNull();
   });
 });
