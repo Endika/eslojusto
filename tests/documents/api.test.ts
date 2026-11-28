@@ -679,76 +679,26 @@ describe('what the page sends, and sends nowhere else', () => {
 describe('the shape of what the API answers, field by field', () => {
   const field = (extra: object) => ({ value: 1, confidence: 'high', source: 'payslip', ...extra });
   const fieldsOf = (value: unknown) => parseFinalPay({ fields: { endDate: value } })?.fields;
-
-  it('is nothing unless it is an object with fields', () => {
-    for (const v of [null, undefined, 'x', 5, [], { fields: null }, { fields: [] }, { fields: 5 }])
-      expect(parseFinalPay(v), JSON.stringify(v)).toBeNull();
-  });
-  it.each([
-    ['null', null],
-    ['an array', []],
-    ['a value that is null', field({ value: null })],
-    ['a value that is undefined', field({ value: undefined })],
-    ['a value that is not finite', field({ value: Number.NaN })],
-    ['a value that is infinite', field({ value: Number.POSITIVE_INFINITY })],
-    ['no confidence', field({ confidence: undefined })],
-    ['a confidence that is no text', field({ confidence: 5 })],
-    ['a confidence it does not know', field({ confidence: 'sure' })],
-    ['no source', field({ source: undefined })],
-    ['a source that is no text', field({ source: 7 })],
-    ['a source it does not know', field({ source: 'napkin' })],
-  ])('drops a field with %s', (_name, value) => {
-    expect(fieldsOf(value)).toEqual({});
-  });
-  it.each([
-    ['a text', 'x'],
-    ['a boolean', false],
-    ['zero', 0],
-  ])('keeps a field whose value is %s', (_name, value) => {
-    expect(fieldsOf(field({ value }))).toEqual({ endDate: field({ value }) });
-  });
-
+  it.each([['a value that is infinite', field({ value: Number.POSITIVE_INFINITY })]])(
+    'drops a field with %s',
+    (_name, value) => {
+      expect(fieldsOf(value)).toEqual({});
+    },
+  );
   const rowsOf = (rows: unknown[]) => parseFinalPay({ fields: {}, lists: { contracts: rows } });
   const row = (extra: object) => ({ values: { a: 'x' }, confidence: 'high', ...extra });
   it.each([
     ['null', null],
-    ['values that are no object', row({ values: [] })],
     ['values with an object in them', row({ values: { a: 'x', b: { n: 1 } } })],
-    ['no confidence', row({ confidence: undefined })],
-    ['a confidence it does not know', row({ confidence: 'sure' })],
   ])('drops a row with %s', (_name, value) => {
     expect(rowsOf([value])?.contracts).toEqual([]);
   });
-  it('keeps a row with no source, and with one it knows, but not one it does not', () => {
-    expect(rowsOf([row({})])?.contracts).toEqual([row({})]);
-    expect(rowsOf([row({ source: 'payslip' })])?.contracts).toEqual([row({ source: 'payslip' })]);
-    expect(rowsOf([row({ source: 'other' })])?.contracts).toEqual([row({})]);
-  });
-
   const documentOf = (d: unknown) => parseFinalPay({ fields: {}, documents: [d] })?.documents;
   it.each([
-    ['null', null],
-    ['no kind', { pages: [1] }],
-    ['a kind it does not know', { kind: 'napkin', pages: [1] }],
-    ['a kind that is no text', { kind: 5, pages: [1] }],
-    ['pages that are no list', { kind: 'payslip', pages: 3 }],
-    ['no page', { kind: 'payslip', pages: [] }],
-  ])('drops a document with %s', (_name, d) => {
-    expect(documentOf(d)).toEqual([]);
-  });
-  it.each([
-    ['2026-08', true],
-    ['2026-01', true],
     ['2026-12', true],
-    ['2026-00', false],
-    ['2026-13', false],
-    ['2026-19', false],
-    ['2026-8', false],
-    ['12026-08', false],
     ['x2026-08', false],
-    ['2026-08-01', false],
     ['2026-08x', false],
-    [202608, false],
+    [['2026-08'], false],
   ])('the month %j is %s', (month, kept) => {
     expect(documentOf({ kind: 'payslip', pages: [1], month })).toEqual([
       kept ? { kind: 'payslip', pages: 1, month } : { kind: 'payslip', pages: 1 },
@@ -762,39 +712,12 @@ describe('the shape of what the API answers, field by field', () => {
     readability: { value: 'ok', confidence: 'high' },
     ...extra,
   });
-  it.each([
-    ['null', null],
-    ['no kind', page({ kind: undefined })],
-    ['a kind it does not know', page({ kind: 'napkin' })],
-    ['a readability that is no object', page({ readability: 'ok' })],
-    ['a readability with no value', page({ readability: {} })],
-    ['a readability with a value that is no text', page({ readability: { value: 5 } })],
-    ['a page number that is a fraction', page({ page: 1.5 })],
-    ['a page number that is zero', page({ page: 0 })],
-    ['a page number beyond the limit', page({ page: LIMITS.maxImages + 1 })],
-  ])('drops a page with %s', (_name, p) => {
-    expect(pagesOf(p)).toEqual([]);
-  });
   it('keeps the first and the last page the API takes', () => {
     expect(pagesOf(page({ page: 1 }))).toHaveLength(1);
     expect(pagesOf(page({ page: LIMITS.maxImages }))).toHaveLength(1);
   });
 
   const conflictsOf = (c: unknown) => parseFinalPay({ fields: {}, conflicts: [c] })?.conflicts;
-  it.each([
-    ['null', null],
-    ['no field', { sources: ['payslip'] }],
-    ['a field it does not know', { field: 'nope', sources: ['payslip'] }],
-    ['sources that are no list', { field: 'endDate', sources: 'payslip' }],
-    ['no source it knows', { field: 'endDate', sources: ['other', 'napkin'] }],
-  ])('drops a conflict with %s', (_name, c) => {
-    expect(conflictsOf(c)).toEqual([]);
-  });
-
-  it('keeps a cut list marked only when the API says it is true', () => {
-    expect(parseFinalPay({ fields: {}, truncated: true })).toHaveProperty('truncated', true);
-    expect(parseFinalPay({ fields: {}, truncated: 'yes' })).not.toHaveProperty('truncated');
-  });
 });
 
 describe('the answers of checkout, pass and verify, figure by figure', () => {

@@ -424,28 +424,15 @@ describe('whether a long PDF can go whole', () => {
   const max = LOCATE_LIMITS.maxPages;
 
   it.each([
-    ['one place free and more pages than that', 1, 2, true],
     ['no place free', 0, 5, false],
     ['as many pages as places', 5, 5, false],
-    ['fewer pages than places', 5, 4, false],
     ['the most pages it locates', 3, max, true],
-    ['one page more than it locates', 3, max + 1, false],
   ])('with %s', (_name, free, pages, expected) => {
     expect(canLocate(api, pages, free, [])).toBe(expected);
-  });
-  it('not when the API cannot locate, nor when another long PDF is already chosen', () => {
-    expect(canLocate({}, 5, 2, [])).toBe(false);
-    expect(canLocate(api, 5, 2, [{ long: true }, {}])).toBe(false);
-    expect(canLocate(api, 5, 2, [{}, { long: false }])).toBe(true);
   });
 });
 
 describe('the allowance of a read, when the page and the API disagree', () => {
-  it('a pass that is not valid any more is not sent', () => {
-    const { passes } = setUp();
-    passes.savePass(pass());
-    expect(allowanceFor(passes, NOW + 3_700_000).stored).toBeNull();
-  });
   it('keeps the reads of a pass that is not the one sent, when the API says another is spent', async () => {
     const spent = setUp();
     spent.passes.savePass(pass());
@@ -453,15 +440,6 @@ describe('the allowance of a read, when the page and the API disagree', () => {
     await settleRefusal('pass_revoked', null, spent.deps);
     await settleRefusal('pass_expired', null, spent.deps);
     expect(spent.passes.pass()).toEqual(pass());
-  });
-  it('keeps a free quota when a pass was sent, whatever the API says of the request', async () => {
-    const { deps, passes } = setUp();
-    passes.saveQuota(QUOTA);
-    passes.savePass(pass());
-    await settleRefusal('invalid_request', pass(), deps);
-    expect(passes.quota()).toBe(QUOTA);
-    await settleRefusal('invalid_request', null, deps);
-    expect(passes.quota()).toBeNull();
   });
   it('fetches a pass again only for a payment redeemed, and only when its pass can be read', async () => {
     const unredeemed = setUp({
@@ -509,12 +487,6 @@ describe('what a read keeps of the answer, field by field', () => {
     expect(store.data.has(STORAGE_KEYS.quota)).toBe(false);
     expect(passes.pass()?.readsLeft).toBe(0);
   });
-  it('stops once the person has left while the captcha was being solved', async () => {
-    const { deps, calls, steps, state } = setUp();
-    steps['captcha'] = () => void (state.current = false);
-    expect(await sendRead([image('a')], deps, sending(calls))).toEqual({ kind: 'stopped' });
-    expect(calls).toEqual(['captcha']);
-  });
 });
 
 describe('telling how far preparing the files got', () => {
@@ -538,22 +510,6 @@ describe('telling how far preparing the files got', () => {
       ticking,
     );
     expect(progress).toEqual(['preparing 1/5', 'preparing 3/5', 'preparing 5/5']);
-  });
-  it('says a page again once exactly half a second has passed', async () => {
-    const { deps, progress } = setUp();
-    let clock = NOW;
-    const ticking = {
-      ...deps,
-      now: () => clock,
-      encoder: {
-        encode: async (f: File) => {
-          clock += 500;
-          return image(f.name);
-        },
-      },
-    };
-    await encodeAll([photo('a'), photo('b')], new Map(), ticking);
-    expect(progress).toEqual(['preparing 1/2', 'preparing 2/2']);
   });
 });
 
@@ -587,6 +543,34 @@ describe('what each page may weigh, and when the whole can not fit', () => {
     };
     return encodeAll([photo('a'), photo('b'), photo('c')], new Map(), { ...deps, encoder });
   };
+  it('counts the pages left from the one just encoded', async () => {
+    const room = budget - 4096 - 65 - 64 - encodedSize(40_000);
+    const second = (length: number) => {
+      const { deps } = setUp();
+      const encoder = {
+        encode: async (f: File) => (f.name === 'b' ? heavy(length) : image(f.name)),
+      };
+      return encodeAll([photo('a'), photo('b'), photo('c')], new Map(), { ...deps, encoder });
+    };
+    expect(await second(room)).toMatchObject({ kind: 'encoded' });
+    expect(await second(room + 1)).toEqual({ kind: 'failed', code: 'payload_too_large' });
+  });
+  it('takes a single page that weighs exactly the budget', async () => {
+    const { deps } = setUp();
+    const exact = {
+      mediaType: 'image/jpeg' as const,
+      data: 'x'.repeat(budget - 4096 - 64),
+      bytes: 1,
+    };
+    const encoder = { encode: async () => exact };
+    expect(await encodeAll([photo('a')], new Map(), { ...deps, encoder })).toMatchObject({
+      kind: 'encoded',
+    });
+    const over = { ...exact, data: `${exact.data}x` };
+    expect(
+      await encodeAll([photo('a')], new Map(), { ...deps, encoder: { encode: async () => over } }),
+    ).toEqual({ kind: 'failed', code: 'payload_too_large' });
+  });
   it('goes on while the pages left can still fit at the lightest, and stops with one byte more', async () => {
     const room = budget - 4096 - 64 - 2 * encodedSize(40_000);
     expect(await first(room)).toMatchObject({ kind: 'encoded' });

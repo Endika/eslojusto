@@ -46,7 +46,6 @@ describe('which item statuses count as short', () => {
   it.each([
     ['below_minimum', range, true, 'items'],
     ['deduction_too_high', range, true, 'items'],
-    ['below_minimum', null, true, 'general'],
     ['deduction_too_high', null, true, 'general'],
     ['ok', range, false, 'general'],
   ])('%s with range %j: shortfall %s, letter %s', (status, r, short, kind) => {

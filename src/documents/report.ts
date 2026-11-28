@@ -194,7 +194,9 @@ function interestBlocks({ review, input }: CompletedReview, tr: Translate): Bloc
     ...lateInterestLines(l, input.cause).map(({ key, importe, dias }): Block => ({
       type: 'text',
       text: tr(key, {
+        // Stryker disable next-line ConditionalExpression: a variable the text has no place for is ignored
         ...(importe === undefined ? {} : { importe: formatEuros(importe) }),
+        // Stryker disable next-line ConditionalExpression: a variable the text has no place for is ignored
         ...(dias === undefined ? {} : { dias: formatInteger(dias) }),
       }),
     })),

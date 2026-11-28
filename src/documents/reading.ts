@@ -130,8 +130,7 @@ export async function settleRefusal(
     passes.retirePass();
   }
   if (stored !== null && ['pass_revoked', 'pass_expired'].includes(code)) passes.forgetPass();
-  if (stored === null && code === 'invalid_request' && passes.quota() !== null)
-    passes.forgetQuota();
+  if (stored === null && code === 'invalid_request') passes.forgetQuota();
   return 'failed';
 }
 
@@ -200,7 +199,10 @@ export async function encodeAll<P extends Page, F extends string, L extends stri
   } catch {
     return deps.current() ? { kind: 'failed', code: 'image_unreadable' } : STOPPED;
   }
-  return { kind: 'encoded', files: encoded };
+  // Stryker disable next-line ConditionalExpression: cannotFit already stopped the loop at the budget; this guard keeps the limit explicit
+  return requestBytes(encoded) > LIMITS.requestBudgetBytes
+    ? { kind: 'failed', code: 'payload_too_large' }
+    : { kind: 'encoded', files: encoded };
 }
 
 // The photos that look like they will read badly, each with the one thing to say about it.

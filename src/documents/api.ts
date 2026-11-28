@@ -51,7 +51,7 @@ const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
 const isScalar = (v: unknown): v is string | number | boolean =>
-  typeof v === 'string' || typeof v === 'boolean' || (typeof v === 'number' && Number.isFinite(v));
+  typeof v === 'string' || typeof v === 'boolean' || Number.isFinite(v);
 
 const isOneOf =
   <T extends string>(names: readonly T[]) =>
@@ -189,10 +189,11 @@ export function createApi<F extends string, L extends string>(
     let json: unknown;
     try {
       json = await response.json();
-      // Stryker disable next-line BlockStatement: with no JSON read, the check just below answers the same
+      // Stryker disable BlockStatement: with no JSON read, the check just below answers the same
     } catch {
       return withoutCode();
     }
+    // Stryker restore BlockStatement
     if (!isRecord(json)) return withoutCode();
     if (json['code'] === 'ok' || json['code'] === 'nothing_read') return json;
     return isApiError(json['code']) ? fail(json['code']) : withoutCode();

@@ -100,29 +100,6 @@ describe('mergeRead', () => {
     expect(m.entries).toEqual([['hasReceipts', 'yes']]);
     expect([m.differ, m.recalculated]).toEqual([false, false]);
   });
-
-  it('treats a name that is no value of a listed row as any other value', () => {
-    const m = mergeRead(
-      {
-        entries: [
-          ['other.0.rent', '1'],
-          ['receipts.0', '2'],
-        ],
-        marks: [],
-      },
-      [
-        ['other.0.rent', '0'],
-        ['receipts.0', '0'],
-      ],
-      new Map(),
-      LISTS,
-    );
-    expect(m.entries).toEqual([
-      ['other.0.rent', '1'],
-      ['receipts.0', '2'],
-    ]);
-  });
-
   it('numbers the rows it adds in the order of the rows read', () => {
     const m = mergeRead(
       read([

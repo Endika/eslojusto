@@ -38,7 +38,7 @@ const MAX_PENDING_CHECKOUTS = 5;
 const ABANDONED_AFTER_SECONDS = 7 * 86_400;
 
 function isPendingCheckout(v: unknown): v is PendingCheckout {
-  if (typeof v !== 'object' || v === null) return false;
+  if (!v) return false;
   const { nonce, sessionId, redeemed, expiresAt, startedAt } = v as Record<string, unknown>;
   return (
     typeof nonce === 'string' &&
@@ -55,12 +55,12 @@ interface PassClaims {
   readonly expiresAt: number;
 }
 
-function base64UrlJson(part: string): unknown {
+// A primitive has none of the claims, so it reads as a payload with none.
+function base64UrlJson(part: string): Record<string, unknown> | null {
   try {
     const b64 = part.replace(/-/g, '+').replace(/_/g, '/');
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    return JSON.parse(new TextDecoder().decode(bytes));
-    // Stryker disable next-line BlockStatement: the callers read undefined as they read null
+    return JSON.parse(new TextDecoder().decode(bytes)) as Record<string, unknown> | null;
   } catch {
     return null;
   }
@@ -74,7 +74,7 @@ export function passClaims(token: string): PassClaims | null {
   // Stryker disable next-line ConditionalExpression: a missing or empty payload fails to decode, which reads as no claims
   if (!payload) return null;
   const c = base64UrlJson(payload);
-  if (typeof c !== 'object' || c === null) return null;
+  if (c === null) return null;
   const { typ, sid, exp } = c as Record<string, unknown>;
   if (typ !== 'pass' || typeof sid !== 'string' || !Number.isInteger(exp)) return null;
   return { sessionId: sid, expiresAt: exp as number };
@@ -87,7 +87,7 @@ function quotaDay(token: string): string | null {
   // Stryker disable next-line ConditionalExpression: a missing or empty payload fails to decode, which reads as no claims
   if (!payload) return null;
   const c = base64UrlJson(payload);
-  if (typeof c !== 'object' || c === null) return null;
+  if (c === null) return null;
   const { typ, day } = c as Record<string, unknown>;
   return typ === 'quota' && typeof day === 'string' ? day : null;
 }
@@ -115,7 +115,6 @@ const readJson = (store: KeyValueStore, key: string): Record<string, unknown> | 
     return typeof v === 'object' && v !== null && !Array.isArray(v)
       ? (v as Record<string, unknown>)
       : null;
-    // Stryker disable next-line BlockStatement: the caller reads undefined as it reads null
   } catch {
     return null;
   }
@@ -130,7 +129,8 @@ export function createPassStore(store: KeyValueStore, now: () => number = () => 
     // An expired pass is dropped as soon as it is read: it names a Stripe session and grants nothing.
     pass(): StoredPass | null {
       const v = readJson(store, STORAGE_KEYS.pass);
-      if (!v || typeof v['token'] !== 'string' || typeof v['expiresAt'] !== 'number') return null;
+      if (v === null || typeof v['token'] !== 'string' || typeof v['expiresAt'] !== 'number')
+        return null;
       const left = v['readsLeft'];
       const stored: StoredPass = {
         token: v['token'],
@@ -182,10 +182,11 @@ export function createPassStore(store: KeyValueStore, now: () => number = () => 
       try {
         // Stryker disable next-line ConditionalExpression,ArrayDeclaration: JSON.parse(null) is null, which holds no checkout either
         list = raw === null ? [] : JSON.parse(raw);
-        // Stryker disable next-line BlockStatement: with no list read, none of its entries is a checkout either
+        // Stryker disable BlockStatement: with no list read, none of its entries is a checkout either
       } catch {
         return [];
       }
+      // Stryker restore BlockStatement
       const nowSeconds = now() / 1000;
       return (Array.isArray(list) ? list : [list])
         .filter(isPendingCheckout)
