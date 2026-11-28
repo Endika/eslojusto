@@ -162,8 +162,8 @@ describe('only the listed properties leave', () => {
     expect(Object.keys(clean)).toEqual(['$device_type']);
   });
 
-  it('a campaign tag that is not text does not pass, nor is another value read as an address', () => {
+  it('a campaign tag or an address that is not text does not pass', () => {
     expect(cleanProperties({ utm_source: 5 })).toEqual({});
-    expect(cleanProperties({ $current_url: 5 })).toEqual({ $current_url: 5 });
+    expect(cleanProperties({ $current_url: 5 })).toEqual({});
   });
 });

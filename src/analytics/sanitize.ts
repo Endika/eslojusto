@@ -71,7 +71,11 @@ export function cleanProperties(props: Properties): Properties {
     if (!ALLOWED_KEYS.has(key) || value === null || value === undefined) continue;
     if (CAMPAIGN_KEYS.has(key) && !(typeof value === 'string' && CAMPAIGN_CODE.test(value)))
       continue;
-    clean[key] = key === '$current_url' && typeof value === 'string' ? cleanUrl(value) : value;
+    if (key === '$current_url') {
+      if (typeof value === 'string') clean[key] = cleanUrl(value);
+      continue;
+    }
+    clean[key] = value;
   }
   return clean;
 }

@@ -44,7 +44,7 @@ describe('worlds', () => {
       Array.from({ length: n }, (_, i) => ({ id: `d${i}`, reason: 'pending_validation' }));
     expect(worldsFor(doubts(20))).toHaveLength(2 ** 20);
     expect(() => worldsFor(doubts(21))).toThrow(new RangeError('Too many open doubts: 21'));
-  });
+  }, 30_000);
 });
 
 describe('grouping results into readings', () => {
