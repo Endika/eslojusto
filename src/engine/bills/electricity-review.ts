@@ -98,6 +98,7 @@ export function reviewElectricityBill(
       items,
       totals: totalsOf(items),
       recurring: items.some(
+        // Stryker disable next-line MethodExpression: the readings of one counted item all carry the same recurring flag
         (item) => countedAmount(item) > 0 && findingsOf(item).every((f) => f.recurring),
       ),
       unchecked: UNCHECKED,

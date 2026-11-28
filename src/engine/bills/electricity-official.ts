@@ -148,7 +148,7 @@ function energyFigures(input: ElectricityBillInput, deps: OfficialDeps): EnergyF
 }
 
 // What a kW of `period` costs a year at the bill's own price; null when its lines differ.
-function perKwYear(input: ElectricityBillInput, period: PowerPeriod): number | null {
+export function perKwYear(input: ElectricityBillInput, period: PowerPeriod): number | null {
   const prices = new Set(
     input.power
       .filter((l) => l.period === period)

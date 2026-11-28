@@ -1,26 +1,16 @@
 import { round2 } from '../money';
 import { billsPhrase } from './calculation';
+import { perKwYear } from './electricity-official';
 import { billFinding, single, type BillItem } from './finding';
 import type { NormTable } from './norms';
 import type { ElectricityBillInput } from './types';
-
-// What a kW of P1 costs a year at the bill's own price; null when its lines carry different prices.
-function p1CostPerYear(input: ElectricityBillInput): number | null {
-  const prices = new Set(
-    input.power
-      .filter((l) => l.period === 'p1')
-      .map((l) => (l.unit === 'per_kw_day' ? l.price * 365 : l.price)),
-  );
-  const [price, ...more] = [...prices];
-  return price === undefined || more.length > 0 ? null : price;
-}
 
 // The contracted power beside the highest power used in the last 12 months and what a kW of P1
 // costs a year: figures with no verdict, and the rule that the power changes once every 12 months.
 export function powerUsed(input: ElectricityBillInput, norms: NormTable): BillItem {
   const { p1, p2 } = input.contractedPower;
   const used = input.maxPowerUsed;
-  const cost = p1CostPerYear(input);
+  const cost = perKwYear(input, 'p1');
   return single(
     billFinding(
       'power_used',
