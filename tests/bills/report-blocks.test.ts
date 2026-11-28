@@ -34,8 +34,8 @@ const cited = (norm: BillsNormId, from: string): RowCitation => ({
   doubt: null,
 });
 
-const found = (rule: 'vat' | 'billing', rows: RowCitation[] = []): BillFinding => ({
-  ...billFinding('vat', 'paid_over', [billsPhrase('scope.over_15kw')], [rule], NORMS, {
+const found = (rules: ('vat' | 'billing')[], rows: RowCitation[] = []): BillFinding => ({
+  ...billFinding('vat', 'paid_over', [billsPhrase('scope.over_15kw')], rules, NORMS, {
     amount: 1,
     direction: 'over',
   }),
@@ -121,7 +121,7 @@ describe('the blocks of a report', () => {
 
   it('says a bill listed as a copy only as that, without its lines or totals', () => {
     const model = blocks([
-      review({ skipped: 'COPY', items: [single(found('vat'))], totals: totals(3) }),
+      review({ skipped: 'COPY', items: [single(found(['vat']))], totals: totals(3) }),
     ]);
     expect(model.blocks.slice(5)).toEqual([
       { type: 'subheading', text: 'HEAD' },
@@ -147,8 +147,8 @@ describe('the blocks of a report', () => {
   });
 
   it('gives every reading of a line the norms leave open, and each rule and row once', () => {
-    const a = found('vat', [cited(NORM_A, '2026-01-01'), cited(NORM_A, '2026-02-01')]);
-    const b = found('billing', [cited(NORM_A, '2026-01-01'), cited(NORM_B, '2026-01-01')]);
+    const a = found(['vat'], [cited(NORM_A, '2026-01-01'), cited(NORM_A, '2026-02-01')]);
+    const b = found(['vat', 'billing'], [cited(NORM_A, '2026-01-01'), cited(NORM_B, '2026-01-01')]);
     const list = blocks([review({ items: [readingsOf(a, b)] })]).blocks.slice(6, -1);
     expect(types(list)).toEqual([
       'row',

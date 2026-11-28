@@ -38,7 +38,7 @@ export function telecomPrefill(
   const notes: string[] = [];
 
   const months = amountOf(fields.commitmentMonths?.value);
-  if (months !== null && Number.isInteger(months)) {
+  if (Number.isInteger(months)) {
     a.open('hasCommitment', 'yes');
     a.field('months', fields.commitmentMonths, String(months));
     const starts = isoOf(fields.commitmentStartsOn?.value);
@@ -69,6 +69,7 @@ export function telecomPrefill(
       );
   }
   const index = fields.priceReviewIndex?.value;
+  // Stryker disable next-line ConditionalExpression: a non-string is in no list of strings; typeof only narrows
   if (typeof index === 'string' && (PRICE_INDEXES as readonly string[]).includes(index))
     a.field('priceIndex', fields.priceReviewIndex, index);
 

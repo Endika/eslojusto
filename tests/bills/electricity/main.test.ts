@@ -134,6 +134,13 @@ describe('the electricity section', () => {
   it('keeps what a locked year offers out of the result only when it is offered', () => {
     vi.mocked(readElectricityForm).mockReturnValue({ input } as never);
     vi.mocked(reviewElectricityBill).mockReturnValue({ ok: true, review } as never);
+    const withDefaults = (extra: Parameters<typeof config>[0]) => {
+      vi.mocked(renderElectricityResult).mockClear();
+      (config(extra) as Config).review(form, result, DAY);
+      return vi.mocked(renderElectricityResult).mock.lastCall?.[4];
+    };
+    expect(withDefaults({ detail: () => 'locked' })).toBe(false);
+    expect(withDefaults({ offered: () => true })).toBe(false);
     for (const [detail, offered, expected] of [
       ['locked', true, true],
       ['locked', false, false],
