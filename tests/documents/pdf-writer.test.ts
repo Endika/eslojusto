@@ -120,6 +120,53 @@ describe('where the text lands', () => {
   });
 });
 
+describe('the room a line has', () => {
+  const lines = (draw: (doc: PdfDocument) => void) => {
+    const doc = make();
+    draw(doc);
+    return placed(doc)[0]?.map((l) => l.replace(/ @.*×/, ' ×'));
+  };
+
+  it('is the width of the page less the indent', () => {
+    expect(lines((d) => d.paragraph('a'.repeat(95), S))).toEqual(['F1 10 ×95']);
+    expect(lines((d) => d.paragraph('a'.repeat(94), S, { indent: 10 }))).toEqual([
+      'F1 10 ×93',
+      'F1 10 ×1',
+    ]);
+    expect(lines((d) => d.paragraph('a'.repeat(93), S, { indent: 10 }))).toEqual(['F1 10 ×93']);
+  });
+  it('is, for the label of a row, what its value and a gap leave', () => {
+    const label = (n: number) => `${'a'.repeat(40)} ${'b'.repeat(n - 41)}`;
+    const row = (n: number) => lines((d) => d.row(label(n), 'WWWW', S));
+    expect(row(83)).toEqual(['F1 10 ×4', 'F1 10 ×83']);
+    expect(row(84)).toEqual(['F1 10 ×4', 'F1 10 ×40', 'F1 10 ×43']);
+  });
+  it('is, for a long value on a line to write on, the line less four points', () => {
+    const value = `${'a'.repeat(9)} ${'b'.repeat(10)}`;
+    const wrapped = lines((d) => d.blank('l', S, 100, value, S, true));
+    expect(wrapped?.slice(0, 2)).toEqual(['F1 10 ×9', 'F1 10 ×10']);
+  });
+  it('is never wrapped for a value that is not asked to wrap, but shrunk', () => {
+    expect(lines((d) => d.blank('l', S, 100, 'W'.repeat(24)))?.[0]).toBe('F1 4 ×24');
+  });
+  it('moves on from a row by one and four tenths of its size, when the style has no leading', () => {
+    const labels = `${'a'.repeat(60)} ${'b'.repeat(60)}`;
+    const doc = make();
+    doc.row(labels, 'c', S);
+    expect(placed(doc)[0]).toEqual([
+      'F1 10 @530.28 767.89 ×1',
+      'F1 10 @60 767.89 ×60',
+      'F1 10 @60 753.89 ×60',
+    ]);
+  });
+  it('leaves room under a line to write on for what comes next', () => {
+    const doc = make();
+    doc.blank('lab', S, 100, undefined, S);
+    doc.paragraph('abc', S);
+    expect(placed(doc)[0]?.at(-1)).toBe('F1 10 @60 721.89 ×3');
+  });
+});
+
 describe('rules and space', () => {
   it('draws a rule across the page and moves on by what it asks for', () => {
     const doc = make();

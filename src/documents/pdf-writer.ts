@@ -157,7 +157,7 @@ export class PdfDocument {
           line = word;
         }
         while (this.measure(line, style) > max && line.length > 1) {
-          let cut = line.length - 1;
+          let cut = line.length;
           while (cut > 1 && this.measure(line.slice(0, cut), style) > max) cut--;
           lines.push(line.slice(0, cut));
           line = line.slice(cut);
@@ -271,6 +271,7 @@ export class PdfDocument {
       // A long value shrinks to fit on its line rather than cross the margin.
       const room = width - 4;
       const measured = this.measure(value, valueStyle);
+      // Stryker disable next-line EqualityOperator: at exactly the room, the fitted size is the size itself
       const fitted =
         measured > room ? { ...valueStyle, size: (valueStyle.size * room) / measured } : valueStyle;
       this.textAt(value, 2, this.y - 5, fitted);
