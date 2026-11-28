@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { parseDate } from '../../src/engine/date';
 import { LEGAL_INTEREST } from '../../src/engine/law/data/legal-interest';
 import { reviewMortgage } from '../../src/engine/mortgage/review';
@@ -50,7 +50,10 @@ const SPLIT: Partial<MortgageInput> = {
 };
 
 describe('the mortgage report', () => {
-  const model = report(SPLIT, DEPS);
+  let model: DocumentModel;
+  beforeEach(() => {
+    model = report(SPLIT, DEPS);
+  });
 
   it('dates the report and gives the data the person confirmed', () => {
     expect(model.title).toBe('Revisión de los gastos y comisiones de tu hipoteca');
