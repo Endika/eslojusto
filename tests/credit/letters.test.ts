@@ -2,7 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { BE1904 } from '../../src/engine/credit/data/be1904';
 import { CREDIT_NORMS } from '../../src/engine/credit/data/norms';
 import { CREDIT_SOURCES } from '../../src/engine/credit/data/sources';
-import { reviewCredit } from '../../src/engine/credit/review';
+import type { CreditCalculation, CreditFigure } from '../../src/engine/credit/calculation';
+import { creditPhrase } from '../../src/engine/credit/calculation';
+import {
+  findingsOf,
+  single,
+  type CreditFinding,
+  type CreditItem,
+} from '../../src/engine/credit/finding';
+import { reviewCredit, type CreditReview } from '../../src/engine/credit/review';
 import type { CreditInput } from '../../src/engine/credit/types';
 import { parseDate } from '../../src/engine/date';
 import { creditCase } from '../../src/credit/case';
@@ -279,8 +287,12 @@ describe('the credit review as the pass sees it', () => {
     expect(c.filename?.('letter', 'early_repayment_review')).toBe(
       'client.credit.letter.repayment.filename',
     );
+    expect(c.filename?.('letter')).toBe('client.credit.letter.information.filename');
     expect(c.letter('early_repayment_review', NO_DETAILS, tr).title).toBe(
       'Revisión de la compensación por devolver antes el crédito',
+    );
+    expect(c.letter('credit_information', NO_DETAILS, tr).title).toBe(
+      'Petición de información de mi crédito',
     );
     expect(c.report(tr, TODAY)).toEqual(creditReport(r, tr, TODAY));
   });
@@ -295,6 +307,29 @@ describe('the credit review as the pass sees it', () => {
     expect(creditCase(completed(loan({ declaredApr: 12 })), CREDIT_NORMS).quiet).toBe(false);
   });
 
+  describe('quiet', () => {
+    const calm = completed(card());
+    const quiet = (review: Partial<CreditReview>) =>
+      creditCase({ ...calm, review: { ...calm.review, ...review } }, CREDIT_NORMS).quiet;
+    const charged = completed(repaid({ compensationCharged: 120 })).review;
+
+    it('needs no indicator read, or a calm one', () => {
+      const { indicator } = calm.review;
+      expect(indicator).not.toBeNull();
+      expect(quiet({ indicator: null })).toBe(true);
+      expect(quiet({ indicator: indicator && { ...indicator, status: 'above' } })).toBe(false);
+    });
+
+    it('needs nothing charged over a cap', () => {
+      const overCharged = { counted: 0, upTo: 5 };
+      expect(quiet({ totals: { ...calm.review.totals, overCharged } })).toBe(false);
+    });
+
+    it('needs every finding settled, not just one', () => {
+      expect(quiet({ items: [...calm.review.items, ...charged.items] })).toBe(false);
+    });
+  });
+
   it('does not offer the pass for the indicator alone, and keeps the free letter', () => {
     const c = creditCase(completed(card({ declaredApr: 30 })), CREDIT_NORMS);
     expect(c).toMatchObject({
@@ -302,5 +337,88 @@ describe('the credit review as the pass sees it', () => {
       letterKinds: [],
       freeLetterKinds: ['credit_information'],
     });
+  });
+});
+
+const shape = (model: DocumentModel) => model.blocks.map((b) => b.type).join(' ');
+const HEADER = 'title blank blank blank blank';
+
+describe('the blocks of a letter', () => {
+  it.each([
+    [
+      'the request for information',
+      () => informationLetter(completed(loan()), CREDIT_NORMS, DETAILS, tr),
+      `${HEADER} text text source text text text blank`,
+    ],
+    [
+      'the early repayment over a cap, with the lowest reading noted',
+      () => repaymentLetter(completed(repaid({ compensationCharged: 120 })), DETAILS, tr),
+      `${HEADER} text text text text text text note source source source text text blank`,
+    ],
+    [
+      'the early repayment over the interest left',
+      () =>
+        repaymentLetter(
+          completed(
+            repaid({ compensationCharged: 120, interestSettled: null, remainingInterest: 30 }),
+          ),
+          DETAILS,
+          tr,
+        ),
+      `${HEADER} text text text text text text text source source source source text text blank`,
+    ],
+    [
+      'the early repayment charged without a basis',
+      () =>
+        repaymentLetter(
+          completed(loan({ rateType: 'variable', earlyRepayment: repayment() })),
+          DETAILS,
+          tr,
+        ),
+      `${HEADER} text text text text source text text blank`,
+    ],
+    [
+      'the early repayment within the cap, with nothing to ask',
+      () => repaymentLetter(completed(repaid({ compensationCharged: 50 })), DETAILS, tr),
+      `${HEADER} text text text blank`,
+    ],
+  ])('%s', (_, letter, expected) => {
+    expect(shape(letter())).toBe(expected);
+  });
+});
+
+describe('a letter built from a review that carries less than it should', () => {
+  const real = completed(repaid({ compensationCharged: 120 }));
+  const item = real.review.items.find((i) => findingsOf(i)[0]?.id === 'early_repayment');
+  const finding = findingsOf(item as CreditItem)[0] as CreditFinding;
+  const withCalculation = (calculation: CreditCalculation): CompletedCreditReview => ({
+    ...real,
+    review: { ...real.review, items: [single({ ...finding, calculation })] },
+  });
+  const phrase = (vars?: Record<string, CreditFigure>) =>
+    creditPhrase('early_repayment.base_principal', vars);
+
+  it('skips an item with no findings when looking for the early repayment', () => {
+    const none: CreditItem = { kind: 'readings', question: 'repayment_base', readings: [] };
+    expect(repaymentLine({ ...real.review, items: [none, ...real.review.items] })).not.toBeNull();
+  });
+
+  it('leaves a figure blank that the review did not work out as euros', () => {
+    const base = (vars?: Record<string, CreditFigure>) =>
+      text(repaymentLetter(withCalculation([phrase(vars)]), NO_DETAILS, tr));
+    const blank = 'Sobre , el capital devuelto, el tope es de .';
+    expect(base()).toContain(blank);
+    expect(base({ base: { percent: 1 }, cap: 7 })).toContain(blank);
+    expect(base({ base: { euros: 5 }, cap: { euros: 1 } })).toContain(
+      'Sobre 5,00 €, el capital devuelto, el tope es de 1,00 €.',
+    );
+    expect(text(repaymentLetter(withCalculation([]), NO_DETAILS, tr))).toContain(blank);
+  });
+
+  it('writes no body when the repayment is missing from the answers', () => {
+    const noRepayment = { ...real, input: { ...real.input, earlyRepayment: null } };
+    expect(shape(repaymentLetter(noRepayment, NO_DETAILS, tr))).toBe(
+      `${HEADER} text text text blank`,
+    );
   });
 });
