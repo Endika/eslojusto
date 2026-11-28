@@ -3,6 +3,7 @@ import { EMPLOYMENT_NORMS } from '../../src/engine/employment/data/norms';
 import { MINIMUM_WAGE } from '../../src/engine/employment/data/minimum-wage';
 import { reviewEmployment, type EmploymentReview } from '../../src/engine/employment/review';
 import type { EmploymentInput } from '../../src/engine/employment/types';
+import type { Block } from '../../src/documents/ports';
 import type { Translate } from '../../src/i18n/client';
 import { contract } from '../engine/employment/input';
 import { pageTranslator } from '../support/page-strings';
@@ -282,3 +283,31 @@ export const corners: readonly EmploymentInput[] = [
     holidays: { days: 0, unit: 'calendar', workDaysPerWeek: null, includedInSalary: false },
   }),
 ];
+
+// The blocks a PDF could not draw as they stand: of no known kind, or with a word it needs missing.
+export function malformed(blocks: readonly Block[]): Block[] {
+  const filled = (...words: (string | undefined)[]) =>
+    words.every((w) => w !== undefined && w !== '');
+  return blocks.filter((b) => {
+    switch (b.type) {
+      case 'rule':
+        return false;
+      case 'row':
+        return !filled(b.label, b.value);
+      case 'blank':
+        return !filled(b.label);
+      case 'source':
+        return !filled(b.text, b.url);
+      case 'title':
+      case 'meta':
+      case 'heading':
+      case 'subheading':
+      case 'text':
+      case 'note':
+      case 'bullet':
+        return !filled(b.text);
+      default:
+        return true;
+    }
+  });
+}
