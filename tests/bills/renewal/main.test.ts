@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyConditions } from '../../../src/bills/renewal/conditions';
 import {
   SHEETS,
@@ -52,11 +52,9 @@ const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 let c: Config;
 let rootGiven: unknown;
-beforeAll(() => {
+beforeEach(() => {
   c = setup();
   rootGiven = vi.mocked(setUpSection).mock.calls[0]?.[0];
-});
-beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(readRenewalForm).mockReturnValue({ input } as never);
   vi.mocked(reviewRenewal).mockImplementation(
