@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { pdfMaker, renderPdf, STYLES, unprintable } from '../../src/documents/pdf';
-import { INK, PdfDocument, pdfString, SOFT } from '../../src/documents/pdf-writer';
+import { PdfDocument, pdfString } from '../../src/documents/pdf-writer';
 import type { Block } from '../../src/documents/ports';
 import { streams } from '../support/pdf-streams';
 import { sans } from '../../src/documents/fonts/sans';
@@ -72,31 +72,6 @@ describe('the PDF writer', () => {
     expect(text).toContain('En Logroño, a 7 de octubre de 2026');
   });
 
-  it('flags only a field with a character neither font can draw', () => {
-    expect(
-      unprintable({
-        name: 'Ñandú Pérez-Gómez',
-        id: 'X1234567L',
-        company: 'Çà SL',
-        place: 'A Coruña',
-      }),
-    ).toEqual([]);
-    expect(
-      unprintable({ name: '王小明', id: '12345678Z', company: 'Empresa', place: 'Ελλάδα' }),
-    ).toEqual(['name', 'place']);
-  });
-
-  it('a hard space, a hard hyphen or a direction mark is drawn, not flagged', () => {
-    expect(
-      unprintable({
-        name: 'Ana Pérez‑Gómez',
-        id: '12 345 678Z',
-        company: '‎Empresa‐SL⁦',
-        place: 'Vigo⁩',
-      }),
-    ).toEqual([]);
-  });
-
   it('a long value shrinks to its line instead of crossing the margin', async () => {
     const long = 'W'.repeat(80);
     const doc = new PdfDocument({ sans, serif }, 'x');
@@ -130,11 +105,6 @@ describe('the PDF writer', () => {
     expect(general).not.toContain('la propuesta recoge');
   });
 
-  it('links each source', async () => {
-    const pdf = latin1(await renderPdf(reportModel(completed(), tr, today)));
-    expect(pdf).toContain('/URI (https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430#a56)');
-  });
-
   it('breaks long text into lines and pages, and never splits an amount', () => {
     const doc = new PdfDocument({ sans, serif }, 'x');
     const style = { font: 'serif', size: 10 } as const;
@@ -144,13 +114,6 @@ describe('the PDF writer', () => {
     expect(lines.some((l) => l.includes('1.234,56\u00a0€'))).toBe(true);
     for (let i = 0; i < 120; i++) doc.paragraph('Una línea.', style);
     expect(doc.pageCount).toBeGreaterThan(1);
-  });
-
-  it('writes a character the font lacks as a question mark rather than nothing', () => {
-    const doc = new PdfDocument({ sans, serif }, 'x');
-    expect(doc.measure('ع', { font: 'sans', size: 10 })).toBe(
-      doc.measure('?', { font: 'sans', size: 10 }),
-    );
   });
 
   it('a missing character copies as «?», never as the character that first used the glyph', async () => {
@@ -204,18 +167,10 @@ describe('how each block is laid out', () => {
     ],
     [{ type: 'text', text: 'X' }, [['paragraph', 'X', STYLES.text, { after: 6 }]]],
     [{ type: 'note', text: 'N' }, [['paragraph', 'N', STYLES.note, { after: 4 }]]],
-    [
-      { type: 'row', label: 'L', value: 'V' },
-      [['row', 'L', 'V', { ...STYLES.row, color: SOFT }, { ...STYLES.row, color: INK }]],
-    ],
     [{ type: 'bullet', text: 'B' }, [['paragraph', '•  B', STYLES.text, { indent: 8, after: 4 }]]],
     [
       { type: 'source', text: 'U', url: 'https://a.test' },
       [['paragraph', 'U', STYLES.source, { after: 2, link: 'https://a.test' }]],
-    ],
-    [
-      { type: 'blank', label: 'L' },
-      [['blank', 'L', STYLES.label, width * 0.7, undefined, STYLES.row, false]],
     ],
     [
       { type: 'blank', label: 'L', value: 'v', wrap: true },

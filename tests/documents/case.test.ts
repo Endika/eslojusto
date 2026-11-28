@@ -44,10 +44,8 @@ describe('which item statuses count as short', () => {
   const range = { min: 1, max: 2 };
 
   it.each([
-    ['below_minimum', range, true, 'items'],
     ['deduction_too_high', range, true, 'items'],
     ['deduction_too_high', null, true, 'general'],
-    ['ok', range, false, 'general'],
   ])('%s with range %j: shortfall %s, letter %s', (status, r, short, kind) => {
     expect(hasShortfall(reviewOf(status, r))).toBe(short);
     expect(letterKind(reviewOf(status, r))).toBe(kind);

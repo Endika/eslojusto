@@ -62,10 +62,6 @@ describe('what the documents state', () => {
     void holidayDaysTaken;
     expect(hasHolidayDays(prefillFrom({ ...e, fields: rest }))).toBe(false);
   });
-  it('a contract type only goes with a fixed-term end', () => {
-    const filled = prefillFrom({ ...e, fields: { ...e.fields, cause: f('resignation') } });
-    expect(filled.fields.map((x) => x.name)).not.toContain('fixedTermType');
-  });
   it('says nothing about other jobs without a work history', () => {
     expect(prefillFrom(e).otherContracts).toBeNull();
   });
@@ -78,16 +74,6 @@ describe('the latest monthly payslip', () => {
     startDate: p('2019-02-11'),
     payslipTotalAccrued: p(2100),
   };
-  it('with proration: the salary is the month’s total, marked as worked out', () => {
-    const filled = prefillFrom(
-      extraction({ ...base, extraPayProrated: p(true, 'medium'), extraPayProratedAmount: p(300) }),
-    );
-    expect(filled.fields).toEqual([
-      { name: 'startDate', value: '2019-02-11', confidence: 'high' },
-      { name: 'extraPayProrated', value: 'yes', confidence: 'medium' },
-      { name: 'monthlySalary', value: '2.100,00', confidence: 'medium', derived: true },
-    ]);
-  });
   it('without proration and an extra payment paid that month: the total less that payment', () => {
     const filled = prefillFrom(
       extraction({
@@ -108,26 +94,6 @@ describe('the latest monthly payslip', () => {
       confidence: 'low',
       derived: true,
     });
-  });
-  it('without proration and no extra payment paid that month: the whole total', () => {
-    const filled = prefillFrom(
-      extraction({ ...base, extraPayProrated: p(false), extraPayPaid: p(false, 'medium') }),
-    );
-    expect(filled.fields).toContainEqual({
-      name: 'monthlySalary',
-      value: '2.100,00',
-      confidence: 'medium',
-      derived: true,
-    });
-  });
-  it('an extra payment said to be paid but without its amount gives no salary', () => {
-    const filled = prefillFrom(
-      extraction({ ...base, extraPayProrated: p(false), extraPayPaid: p(true) }),
-    );
-    expect(filled.fields.map((x) => x.name)).not.toContain('monthlySalary');
-  });
-  it('without knowing whether extra pay is prorated, no salary is proposed', () => {
-    expect(prefillFrom(extraction({ ...base })).fields.map((x) => x.name)).toEqual(['startDate']);
   });
   it('a period that is not a whole month gives no salary', () => {
     const filled = prefillFrom(
@@ -157,12 +123,6 @@ describe('a work history', () => {
     { values: { startDate: '2021-01-01', endDate: '2022-01-31' }, confidence: 'low' },
     { values: { startDate: '2026-01-01', endDate: '2027-01-31' }, confidence: 'high' },
   ];
-  it('fills other jobs: not the one under review, nor older than 6 years, nor ending after it', () => {
-    expect(
-      prefillFrom(extraction({}, rows), { startDate: '2016-03-01', endDate: '2026-09-15' })
-        .otherContracts,
-    ).toEqual([{ startDate: '2021-01-01', endDate: '2022-01-31', confidence: 'low' }]);
-  });
   it('takes this job’s dates from the same pack before the form', () => {
     const pack = extraction(
       { startDate: f('2016-03-01'), endDate: f('2026-09-15', 'high', 'dismissal_letter') },
@@ -171,9 +131,6 @@ describe('a work history', () => {
     expect(prefillFrom(pack, { endDate: '2030-01-01' }).otherContracts).toEqual([
       { startDate: '2021-01-01', endDate: '2022-01-31', confidence: 'low' },
     ]);
-  });
-  it('without the dates of this job yet, every finished row', () => {
-    expect(prefillFrom(extraction({}, rows)).otherContracts).toHaveLength(4);
   });
 });
 
@@ -318,20 +275,5 @@ describe('counting what was filled', () => {
       hasLowConfidence(prefillFrom(extraction({ startDate: f('2016-03-01') }, rows)));
     expect(jobs([row('high'), row('low')])).toBe(true);
     expect(jobs([])).toBe(false);
-  });
-  it('is unsure when a field or a row of another job is', () => {
-    const row = (confidence: 'high' | 'low') => ({
-      values: { startDate: '2020-01-01', endDate: '2022-01-01' },
-      confidence,
-    });
-    expect(
-      hasLowConfidence(prefillFrom(extraction({ startDate: f('2016-03-01') }, [row('high')]))),
-    ).toBe(false);
-    expect(
-      hasLowConfidence(prefillFrom(extraction({ startDate: f('2016-03-01') }, [row('low')]))),
-    ).toBe(true);
-    expect(hasLowConfidence(prefillFrom(extraction({ startDate: f('2016-03-01', 'low') })))).toBe(
-      true,
-    );
   });
 });

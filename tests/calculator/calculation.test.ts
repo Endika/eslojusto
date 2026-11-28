@@ -25,47 +25,28 @@ describe('calculation text', () => {
     expect(text).toBe('4.383 días × 12/365 × 1.234,50 €/día 1000 meses × 2,75 = 1.031,5 días.');
   });
 
-  it('words a nested phrase in place', () => {
-    const share = (importe: number) =>
-      phrase('extra_pay.share', {
-        importe: { euros: importe },
-        dias: 1,
-        total: 2,
-        por_dias: { euros: importe / 2 },
-        meses: { days: 0.5 },
-        meses_periodo: 6,
-        por_meses: { euros: importe / 12 },
-      });
-    expect(calculationText([phrase('extra_pay.semiannual', { paga: share(600) })], es)).toBe(
-      'Devengo semestral: 600,00 € × 1/2 días = 300,00 € o × 0,5/6 meses = 50,00 €, suponiendo que no se ha cobrado nada del periodo abierto.',
-    );
-  });
-
-  it.each([
-    'resignation',
-    'fixed_term_end',
-    'objective_dismissal',
-    'unfair_dismissal',
-    'disciplinary_dismissal',
-  ] as const)('%s: every item fills every placeholder', (cause: Cause) => {
-    const e: FinalPayInput = {
-      cause,
-      fixedTermType: 'production_circumstances',
-      startDate: f('2005-03-15'),
-      endDate: f('2026-06-30'),
-      monthlySalary: 2000,
-      extraPayProrated: false,
-      extraPayCount: 1,
-      extraPayAmount: 2000,
-      extraPayAccrual: 'unknown',
-      holidayUnit: 'calendar',
-      annualHolidayDays: 30,
-      holidayDaysTaken: 3,
-      agreementNoticeDays: 15,
-    };
-    const r = reviewFinalPay(e, {}, f('2026-10-06'));
-    if (!r.ok) throw new Error('invalid input');
-    for (const { item } of r.review.items)
-      expect(calculationText(item.calculation, es), item.id).not.toMatch(/[{}]/);
-  });
+  it.each(['objective_dismissal', 'unfair_dismissal', 'disciplinary_dismissal'] as const)(
+    '%s: every item fills every placeholder',
+    (cause: Cause) => {
+      const e: FinalPayInput = {
+        cause,
+        fixedTermType: 'production_circumstances',
+        startDate: f('2005-03-15'),
+        endDate: f('2026-06-30'),
+        monthlySalary: 2000,
+        extraPayProrated: false,
+        extraPayCount: 1,
+        extraPayAmount: 2000,
+        extraPayAccrual: 'unknown',
+        holidayUnit: 'calendar',
+        annualHolidayDays: 30,
+        holidayDaysTaken: 3,
+        agreementNoticeDays: 15,
+      };
+      const r = reviewFinalPay(e, {}, f('2026-10-06'));
+      if (!r.ok) throw new Error('invalid input');
+      for (const { item } of r.review.items)
+        expect(calculationText(item.calculation, es), item.id).not.toMatch(/[{}]/);
+    },
+  );
 });

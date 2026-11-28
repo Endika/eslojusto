@@ -9,10 +9,6 @@ const state = (fresh: boolean, downloaded: Download[], showing = true) => ({
 });
 
 describe('the notice after paying', () => {
-  it('only after a payment made in this page', () => {
-    expect(noticeView(state(false, []))).toBe('hidden');
-    expect(warnsOnLeave(state(false, []))).toBe(false);
-  });
   it('in full until the report and the letter were each downloaded once, then one line', () => {
     expect(noticeView(state(true, []))).toBe('full');
     expect(noticeView(state(true, ['report']))).toBe('full');

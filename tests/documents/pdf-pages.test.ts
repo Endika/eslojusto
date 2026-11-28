@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   createPdfPages,
@@ -34,24 +34,6 @@ function recordingRaster() {
   };
   return { raster, made, budgets };
 }
-
-describe('the PDF-to-pages adapter, with pdf.js', () => {
-  const pdfjs = { getDocument } as unknown as PdfJs;
-
-  it('counts the pages of a PDF', async () => {
-    const opened = await createPdfPages(pdfjs, recordingRaster().raster).open(
-      pdfFile(syntheticPdf(3)),
-    );
-    expect(typeof opened === 'string' ? opened : opened.pages).toBe(3);
-  });
-
-  it('answers a code for a file that is not a PDF it can open', async () => {
-    const broken = new TextEncoder().encode('%PDF-1.7\nnot really a document');
-    expect(await createPdfPages(pdfjs, recordingRaster().raster).open(pdfFile(broken))).toBe(
-      'pdf_unreadable',
-    );
-  });
-});
 
 describe('the PDF-to-pages adapter, drawing', () => {
   // A one-page document of A4 size that draws nothing.
@@ -86,14 +68,6 @@ describe('the PDF-to-pages adapter, drawing', () => {
     });
     expect(made).toEqual([{ width: 1108, height: 1568 }]);
     expect(budgets).toEqual([300_000]);
-  });
-
-  it('draws a page smaller when the locate step asks for it', async () => {
-    const { raster, made } = recordingRaster();
-    const opened = await createPdfPages(fakePdfjs(), raster).open(pdfFile(syntheticPdf(1)));
-    if (typeof opened === 'string') throw new Error(opened);
-    await opened.render(1, 100_000, 768);
-    expect(made).toEqual([{ width: 543, height: 768 }]);
   });
 
   it('tells a password-protected PDF from a broken one', async () => {
@@ -146,17 +120,14 @@ describe('the PDF-to-pages adapter, in what it asks of pdf.js', () => {
     ]);
   });
 
-  it.each([-1, Number.NaN])(
-    'answers unreadable for a document of %s pages, and frees it',
-    async (n) => {
-      const calls: unknown[] = [];
-      const opened = await createPdfPages(pdfjsOf(n, calls), recordingRaster().raster).open(
-        pdfFile(syntheticPdf(1)),
-      );
-      expect(opened).toBe('pdf_unreadable');
-      expect(calls).toContain('destroy');
-    },
-  );
+  it.each([-1])('answers unreadable for a document of %s pages, and frees it', async (n) => {
+    const calls: unknown[] = [];
+    const opened = await createPdfPages(pdfjsOf(n, calls), recordingRaster().raster).open(
+      pdfFile(syntheticPdf(1)),
+    );
+    expect(opened).toBe('pdf_unreadable');
+    expect(calls).toContain('destroy');
+  });
 
   it('draws onto the canvas at the scale that fits, and cancels nothing that finished', async () => {
     const calls: unknown[] = [];

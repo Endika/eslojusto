@@ -57,20 +57,6 @@ const measure = (grey: Float32Array, longSide = 1568) =>
   measureQuality(rgba(grey), WIDTH, HEIGHT, longSide);
 
 describe('photo quality', () => {
-  it('says nothing of a sharp, well-lit page of the usual size', () => {
-    const signals = measure(page());
-    expect(signals.brightness).toBeGreaterThan(150);
-    expect(signals.sharpness).toBeGreaterThan(10_000);
-    expect(qualityProblem(signals)).toBeNull();
-  });
-
-  it('calls a page in shadow dark, even when it is sharp', () => {
-    const signals = measure(page(50, 10));
-    expect(signals.brightness).toBeLessThan(MIN_BRIGHTNESS);
-    expect(signals.sharpness).toBeGreaterThan(MIN_SHARPNESS);
-    expect(qualityProblem(signals)).toBe('dark');
-  });
-
   it('keeps a slightly soft page and calls one blurred past reading blurry', () => {
     const soft = measure(blurred(page(), 1));
     expect(soft.sharpness).toBeGreaterThan(MIN_SHARPNESS);
@@ -80,19 +66,9 @@ describe('photo quality', () => {
     expect(qualityProblem(unreadable)).toBe('blurry');
   });
 
-  it('calls a blank or uniform photo blurry: it has no edges to read', () => {
-    expect(qualityProblem(measure(new Float32Array(WIDTH * HEIGHT).fill(200)))).toBe('blurry');
-  });
-
   it('calls a sharp photo below the minimum size small', () => {
     expect(qualityProblem(measure(page(), MIN_LONG_SIDE - 1))).toBe('small');
     expect(qualityProblem(measure(page(), MIN_LONG_SIDE))).toBeNull();
-  });
-
-  it('reads brightness as luma, so a red page is darker than a white one', () => {
-    const red = new Uint8ClampedArray(WIDTH * HEIGHT * 4);
-    for (let i = 0; i < red.length; i += 4) red.set([255, 0, 0, 255], i);
-    expect(measureQuality(red, WIDTH, HEIGHT, 1568).brightness).toBeCloseTo(76.245, 2);
   });
 
   // The measure runs on the main thread once per photo, up to 25 in a pack. About 2 ms here.

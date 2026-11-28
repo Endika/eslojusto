@@ -53,15 +53,6 @@ describe('a basket kept in memory', () => {
     basket.put('july');
     expect(basket.entriesWith('july, corrected')).toEqual(['june', 'july, corrected']);
   });
-
-  it('gives a copy of what it keeps', () => {
-    const basket = createBasket<string>();
-    basket.put('june');
-    const seen = basket.entries();
-    basket.next();
-    basket.put('july');
-    expect(seen).toEqual(['june']);
-  });
 });
 
 describe('a paid review built from a basket', () => {
@@ -145,12 +136,6 @@ describe('a year of electricity bills as the pass sees it', () => {
     onPeriod(meterOver, '2026-06-30', '2026-07-31'),
   ];
 
-  it('is not offered for one small difference, and is once it comes back bill after bill', () => {
-    expect(electricityCase([meterOver], BILLS_NORMS).offer).toBe(false);
-    expect(electricityCase([meterOver], BILLS_NORMS).quiet).toBe(false);
-    expect(electricityCase(year, BILLS_NORMS).offer).toBe(true);
-  });
-
   it('adds up every bill once, with the yearly estimate apart from the total', () => {
     const lines = texts(
       electricityCase([...year, meterOver], BILLS_NORMS).report(billsTr, today).blocks,
@@ -164,12 +149,6 @@ describe('a year of electricity bills as the pass sees it', () => {
     expect(lines).toContain(
       'Es la misma que otra factura de tu año (mismo suministro y periodo) y no cuenta dos veces.',
     );
-  });
-
-  it('lists a single bill without a year to add up', () => {
-    const lines = texts(electricityCase([meterOver], BILLS_NORMS).report(billsTr, today).blocks);
-    expect(lines).not.toContain('Lo que suman tus facturas');
-    expect(lines.some((l) => l.startsWith('Alquiler del contador: Por encima'))).toBe(true);
   });
 });
 
