@@ -1,5 +1,6 @@
 import { parseAmount } from '../calculator/number';
-import { pick, triState, tryDate } from '../calculator/review-form';
+import { pick, triState } from '../calculator/review-form';
+import { dateOf } from '../documents/read';
 import { compareDates, type CivilDate } from '../engine/date';
 import { deedPicksOption } from '../engine/mortgage/fees';
 import { scope } from '../engine/mortgage/scope';
@@ -212,7 +213,7 @@ function read(form: HTMLFormElement, today: CivilDate): Reading {
       if (required) fail(field, 'missing_value');
       return null;
     }
-    const d = tryDate(t);
+    const d = dateOf(t);
     if (d === null) fail(field, 'invalid_date');
     else if (past && compareDates(d, today) > 0) fail(field, 'in_future');
     return d;

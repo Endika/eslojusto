@@ -7,7 +7,8 @@ import {
 } from '../../documents/contract';
 import type { ReadPrefill } from '../../documents/ports';
 import type { Translate } from '../../i18n/client';
-import { Answers, amountOf, isoOf, lowest, textOf } from '../read';
+import { amountOf, isoOf, lowest, textOf } from '../../documents/read';
+import { Answers } from '../read';
 import { PRICE_INDEXES, type TelecomFormField } from './form';
 
 // The questions beside which the contract's own words are shown, to check the answer against them.

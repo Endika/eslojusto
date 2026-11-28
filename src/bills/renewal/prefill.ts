@@ -2,7 +2,8 @@ import { formatAmountInput } from '../../calculator/number';
 import type { RenewalExtraction, SourcedField } from '../../documents/contract';
 import type { ReadPrefill } from '../../documents/ports';
 import type { Translate } from '../../i18n/client';
-import { Answers, isoOf, numberOf } from '../read';
+import { isoOf, numberOf } from '../../documents/read';
+import { Answers } from '../read';
 import { ENERGY_PRICINGS, POWER_UNITS, type RenewalFormField } from './form';
 
 // Prices come with up to six decimals; the form takes them back with a decimal comma.

@@ -1,5 +1,6 @@
 import { parseAmount } from '../calculator/number';
-import { pick, tryDate } from '../calculator/review-form';
+import { pick } from '../calculator/review-form';
+import { dateOf } from '../documents/read';
 import type { CivilDate } from '../engine/date';
 import type { FieldErrorCode } from './result';
 
@@ -47,7 +48,7 @@ export function answers<Field extends string>(form: HTMLFormElement) {
       if (required) fail(field, 'missing_value');
       return null;
     }
-    const d = tryDate(t);
+    const d = dateOf(t);
     if (d === null) fail(field, 'invalid_date');
     return d;
   };

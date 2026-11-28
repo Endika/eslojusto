@@ -1,4 +1,5 @@
-import { chosen, tryDate } from '../calculator/review-form';
+import { chosen } from '../calculator/review-form';
+import { dateOf } from '../documents/read';
 import { deedPicksOption } from '../engine/mortgage/fees';
 import type { Scope } from '../engine/mortgage/types';
 import { formScope, type Sheet } from './form';
@@ -21,7 +22,7 @@ const INVOICE_SHEETS: readonly Sheet[] = [
 const PREPAYMENTS = ['partial_prepayment', 'full_prepayment', 'creditor_subrogation'];
 
 const deedOn = (form: HTMLFormElement) =>
-  tryDate(form.querySelector<HTMLInputElement>('[name="deedOn"]')?.value.trim() ?? '');
+  dateOf(form.querySelector<HTMLInputElement>('[name="deedOn"]')?.value.trim() ?? '');
 
 // The loan sheet and the result always; the rest only for a mortgage within the review, each as
 // its answers ask for it.

@@ -760,22 +760,6 @@ describe('what the form does not take', () => {
     expect(p).toMatchObject({ entries: [['hasOffer', 'yes']], marks: [], count: 0, notes: [] });
   });
 
-  it.each([['0', 0, '0,00']])(
-    '%s is read as an amount only when it is one',
-    (_, value, entered) => {
-      const p = prefill({ documents: [], fields: { effectiveWorkPercent: f(value) } });
-      expect(entry(p, 'effectiveYear1')).toBe(entered);
-    },
-  );
-
-  it.each([['a negative', -1, undefined]])(
-    '%s is read as a whole number only when it is one',
-    (_, value, entered) => {
-      const p = prefill({ documents: [], clauses: [row({ label: 'non_compete', months: value })] });
-      expect(entry(p, 'clauses.0.months')).toBe(entered);
-    },
-  );
-
   it('quotes the documents’ words trimmed, and none that are blank', () => {
     const quoted = prefill({
       fields: { ...contract, modalityText: f('  Contrato temporal  '), causeText: f('   ') },

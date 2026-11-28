@@ -10,7 +10,7 @@ import {
 } from '../../engine/bills/telecom-charges';
 import { toIso, type CivilDate } from '../../engine/date';
 import type { Translate } from '../../i18n/client';
-import { amountOf, dateOf, textOf } from '../read';
+import { amountOf, dateOf, textOf } from '../../documents/read';
 
 export interface ReadLine {
   // As printed; null when the reading left it out, as it does with one that names a number.

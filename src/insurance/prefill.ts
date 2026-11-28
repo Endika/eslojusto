@@ -2,14 +2,13 @@ import { formatAmountInput } from '../calculator/number';
 import {
   INSURANCE_CHECKS,
   type Confidence,
-  type ExtractedValue,
   type FailedCheck,
   type InsuranceExtraction,
   type SourcedField,
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
+import { isoOf, oneOf, positiveAmountOf, textOf, yesNo } from '../documents/read';
 import { conflictLines } from '../documents/summary';
-import { parseDate, toIso } from '../engine/date';
 import type { Translate } from '../i18n/client';
 import { CAR_COVERS, LINES, type InsuranceFormField } from './form';
 
@@ -27,16 +26,6 @@ const INSURANCE_CONFLICT_FIELDS = ['expiresOn'] as const;
 
 // What the person remembers is still theirs to confirm: a reading is never more than fairly sure.
 const atMostMedium = (c: Confidence): Confidence => (c === 'high' ? 'medium' : c);
-
-const isFiniteNumber = (v: unknown): v is number => Number.isFinite(v);
-const amountOf = (v: ExtractedValue | undefined): number | null =>
-  isFiniteNumber(v) && v > 0 ? Math.round(v * 100) / 100 : null;
-const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' ? v.trim() || null : null;
-const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
-  options.find((o) => o === v) ?? null;
-const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
-  v === true ? 'yes' : v === false ? 'no' : null;
 
 class Answers {
   readonly entries: [string, string][] = [];
@@ -63,14 +52,6 @@ class Answers {
   }
 }
 
-function dateText(v: ExtractedValue | undefined): string | null {
-  try {
-    return toIso(parseDate(String(v)));
-  } catch {
-    return null;
-  }
-}
-
 // How the policy was taken out says whether it was at a distance: by internet or by phone, or
 // face to face. What the person remembers is still theirs to confirm.
 const DISTANCE = { online: 'yes', phone: 'yes', in_person: 'no' } as const;
@@ -91,17 +72,17 @@ export function insurancePrefill(
   if (line === 'car')
     a.field('carCover', fields.carCover, oneOf(fields.carCover?.value, CAR_COVERS));
   a.field('renews', fields.renews, yesNo(fields.renews?.value));
-  a.field('expiresOn', fields.expiresOn, dateText(fields.expiresOn?.value));
+  a.field('expiresOn', fields.expiresOn, isoOf(fields.expiresOn?.value));
 
   const channel = fields.channel;
   const distance = oneOf(channel?.value, ['online', 'phone', 'in_person'] as const);
   if (channel && distance)
     a.read('distance', DISTANCE[distance], atMostMedium(channel.confidence), true);
-  a.field('concludedOn', fields.concludedOn, dateText(fields.concludedOn?.value));
+  a.field('concludedOn', fields.concludedOn, isoOf(fields.concludedOn?.value));
 
-  const noticeOn = dateText(fields.noticeOn?.value);
-  const previous = amountOf(fields.previousPremium?.value);
-  const next = amountOf(fields.newPremium?.value);
+  const noticeOn = isoOf(fields.noticeOn?.value);
+  const previous = positiveAmountOf(fields.previousPremium?.value);
+  const next = positiveAmountOf(fields.newPremium?.value);
   const changes = yesNo(fields.coverChanges?.value);
   if (noticeOn !== null || previous !== null || next !== null || changes !== null) {
     a.open('hasNotice', 'yes');

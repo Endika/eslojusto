@@ -1,5 +1,4 @@
 import { formatAmountInput } from '../calculator/number';
-import { tryDate } from '../calculator/review-form';
 import {
   CREDIT_CHECKS,
   type Confidence,
@@ -10,8 +9,18 @@ import {
   type SourcedField,
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
+import {
+  amountOf,
+  dateOf,
+  isNumber,
+  lowest,
+  oneOf,
+  positiveOf,
+  textOrBlank,
+  yesNo,
+} from '../documents/read';
 import { conflictLines } from '../documents/summary';
-import { compareDates, toIso, type CivilDate } from '../engine/date';
+import { compareDates, toIso } from '../engine/date';
 import type { ChargeKind, ChargePayment } from '../engine/credit/types';
 import type { Translate } from '../i18n/client';
 import { CHARGE_PAYMENTS, RATE_TYPES, type CreditFormField } from './form';
@@ -40,27 +49,9 @@ const CREDIT_CONFLICT_FIELDS = [
 const LOANS = ['personal_loan', 'car_loan'] as const;
 const PRODUCTS = [...LOANS, 'revolving'] as const;
 
-const lowest = (...cs: Confidence[]): Confidence =>
-  (['low', 'medium'] as const).find((c) => cs.includes(c)) ?? 'high';
-
-const isNumber = (v: ExtractedValue | undefined): v is number => Number.isFinite(v);
-const amountOf = (v: ExtractedValue | undefined): number | null =>
-  isNumber(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
 // A rate keeps up to the four decimals `rateText` shows.
 const rateOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && v >= 0 ? Math.round(v * 10_000) / 10_000 : null;
-const positiveOf = (v: ExtractedValue | undefined): number | null => {
-  const n = amountOf(v);
-  return n === 0 ? null : n;
-};
-const textOf = (v: ExtractedValue | undefined): string => (typeof v === 'string' ? v.trim() : '');
-const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
-  options.find((o) => o === v) ?? null;
-const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
-  v === true ? 'yes' : v === false ? 'no' : null;
-
-const dateOf = (v: ExtractedValue | undefined): CivilDate | null => tryDate(String(v));
-
 const cents = (n: number): number => Math.round(n * 100);
 const sum = (ns: readonly number[]): number => cents(ns.reduce((s, n) => s + n, 0)) / 100;
 
@@ -358,9 +349,9 @@ export function creditPrefill(
   }
 
   const quotes: Partial<Record<Quoted, string>> = {};
-  const early = textOf(e.fields.earlyRepaymentClauseText?.value);
+  const early = textOrBlank(e.fields.earlyRepaymentClauseText?.value);
   if (early && !revolving) quotes.compensation = early;
-  const withdrawal = textOf(e.fields.withdrawalClauseText?.value);
+  const withdrawal = textOrBlank(e.fields.withdrawalClauseText?.value);
   if (withdrawal) quotes.infoReceived = withdrawal;
 
   const low = a.marks.some((m) => m.confidence === 'low');
