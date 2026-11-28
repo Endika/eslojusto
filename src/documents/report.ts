@@ -18,7 +18,7 @@ import {
   withHolidayNote,
 } from '../calculator/render';
 import type { Translate } from '../i18n/client';
-import { longDate, NO_DETAILS, type LetterDetails } from './letter';
+import { longDate, NO_DETAILS, placeAndDate, type LetterDetails } from './letter';
 import type { Block, DocumentModel } from './ports';
 
 // «2026-10-07» → «07-10-2026», as the site writes dates.
@@ -53,6 +53,7 @@ function sources(list: Item['sources'], tr: Translate): Block[] {
 
 function referenceNote(r: ItemResult, reference: number | null, tr: Translate): Block[] {
   const key = referenceKey(r, reference);
+  // Stryker disable next-line ConditionalExpression: a key is only given with a reference; the test narrows its type
   return key === null || reference === null
     ? []
     : [{ type: 'note', text: tr(key, { importe: formatEuros(reference) }) }];
@@ -296,13 +297,7 @@ export function letterModel(
       },
       ...lines,
       { type: 'text', text: tr('client.documents.letter.closing') },
-      {
-        type: 'text',
-        text: tr('client.documents.letter.place_date', {
-          lugar: details.place.trim() || tr('client.documents.letter.place_blank'),
-          fecha: details.date ? longDate(details.date) : tr('client.documents.letter.date_blank'),
-        }),
-      },
+      placeAndDate(details, tr),
       { type: 'text', text: tr('client.documents.letter.received') },
       blank(tr('client.documents.letter.name'), details.name),
     ],
