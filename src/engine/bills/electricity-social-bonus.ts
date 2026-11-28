@@ -74,11 +74,9 @@ export function checkSocialBonus(
   );
   const smallest = (row: readonly number[]) => Math.min(...row);
   const yearCap = Math.min(...caps.stretches.flatMap((s) => s.rows.map((r) => smallest(r.value))));
-  const periodCap = Math.min(
-    prorated(caps.stretches, smallest, 365).low,
-    // Stryker disable next-line StringLiteral: prorated reads any base but 365 as the real length of the year
-    prorated(caps.stretches, smallest, 'actual').low,
-  );
+  // Stryker disable next-line StringLiteral: prorated reads any base but 365 as the real length of the year
+  const actualCap = prorated(caps.stretches, smallest, 'actual').low;
+  const periodCap = Math.min(prorated(caps.stretches, smallest, 365).low, actualCap);
   const kwh = kwhBilled(input);
   const capped = Math.max(0, Math.min(kwh, periodCap, yearCap - bonus.kwhSoFar));
   const power = sum(input.power.map((l) => l.amount));
