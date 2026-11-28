@@ -4,6 +4,8 @@ import { TRANSLATIONS } from '../../src/i18n';
 import { es, type Key } from '../../src/i18n/es';
 import { SOURCE_LINE, fidelityProblems, figures, sourceHash } from '../../scripts/i18n-fidelity';
 import { LANGS, type Lang } from '../../src/i18n/languages';
+import { LAST_UPDATED, lastUpdated } from '../../src/content/updated';
+import { bySeniority, durationByTime, fixedTerms, spanLabel } from '../../src/content/examples';
 
 // What is written once per language beside the dictionary: the prose files and the copy modules.
 // A published language can't lean on the Spanish fallback for any of them.
@@ -48,8 +50,7 @@ describe('what each language writes on its own', () => {
 });
 
 describe('the sitemap date of a page in another language', () => {
-  it('is its Spanish page’s', async () => {
-    const { LAST_UPDATED, lastUpdated } = await import('../../src/content/updated');
+  it('is its Spanish page’s', () => {
     expect(lastUpdated('/eu/finiquito/')).toBe(LAST_UPDATED['/finiquito/']);
     expect(lastUpdated('/zh/')).toBe(LAST_UPDATED['/']);
     expect(lastUpdated('/finiquito/')).toBe(LAST_UPDATED['/finiquito/']);
@@ -119,9 +120,7 @@ describe('a translation stays on today’s Spanish', () => {
 });
 
 describe('the spans of the example tables', () => {
-  it('read in Spanish as the labels they replace', async () => {
-    const { bySeniority, durationByTime, fixedTerms, spanLabel } =
-      await import('../../src/content/examples');
+  it('read in Spanish as the labels they replace', () => {
     for (const row of [...bySeniority, ...durationByTime])
       expect(spanLabel(row.months, 'es')).toBe(row.label);
     for (const row of fixedTerms) expect(spanLabel(row.months, 'es', 'months')).toBe(row.label);
