@@ -9,7 +9,9 @@ import {
   type PvpcHourly,
 } from '../../../src/engine/bills/electricity-official';
 import type { NormTable } from '../../../src/engine/bills/norms';
+import type { Table, TableRow } from '../../../src/engine/bills/tables';
 import { compareWithPvpc, renewalTaxes } from '../../../src/engine/bills/renewal-official';
+import type { ElectricityTaxRate, VatRate } from '../../../src/engine/bills/tables';
 import type { RenewalDeps, RenewalInput } from '../../../src/engine/bills/renewal-types';
 import { round2 } from '../../../src/engine/money';
 import { fromOrdinal, ordinal, parseDate, toIso } from '../../../src/engine/date';
@@ -294,5 +296,295 @@ describe('taxes of a renewal', () => {
     expect(renewalTaxes(letter({ renewalDate: '2027-01-15' }), 1071.15, deps)).toEqual({
       kind: 'missing',
     });
+  });
+});
+
+describe('more cases of the PVPC comparison', () => {
+  const officialDeps = (
+    pvpc: PvpcHourly,
+    change: Partial<RenewalDeps> = {},
+  ): RenewalDeps & OfficialDeps => ({
+    ...deps,
+    ...change,
+    pvpc,
+    tollHolidays: [...TOLL_HOLIDAYS, { year: 2025, days: [], citation: 'test', url: 'test' }],
+  });
+  const december = BILLS_NORMS.rdl25_2026_december;
+  const open: NormTable = {
+    ...BILLS_NORMS,
+    rdl25_2026_december: {
+      ...december,
+      status: 'conditional',
+      condition: {
+        text: december.condition?.text ?? '',
+        decidesOn: december.condition?.decidesOn ?? '',
+        source: december.condition?.source ?? '',
+        met: null,
+      },
+    },
+  };
+  const held = <V>(table: Table<V>, change: Partial<TableRow<V>>): Table<V> => {
+    const [row] = table;
+    if (row === undefined) throw new Error('no row');
+    return [{ ...row, ...change }];
+  };
+  const pvpc = flat('2026-10-01', '2026-10-14', 150);
+
+  it('needs the use of each period when the letter prices them apart', () => {
+    const apart = { p1: 0.2, p2: 0.15, p3: 0.1 };
+    const next = { power: letter().next.power, energy: apart };
+    expect(compareWithPvpc(letter({ next }), officialDeps(pvpc))).toEqual({
+      kind: 'needs_period_use',
+    });
+  });
+
+  it('counts the whole months the prices cover, across a year', () => {
+    // From 20-11-2025 to 14-10-2026: ten whole months, and a few days over.
+    expect(
+      compareWithPvpc(letter(), officialDeps(flat('2025-11-20', '2026-10-14', 150))),
+    ).toMatchObject({
+      kind: 'ok',
+      months: 10,
+    });
+  });
+
+  it('starts from the first day published, whatever the order the days come in', () => {
+    const days = Object.fromEntries(
+      Object.entries(flat('2026-10-01', '2026-10-14', 150).days).reverse(),
+    );
+    expect(
+      compareWithPvpc(letter(), officialDeps({ coveredUntil: '2026-10-14', days })),
+    ).toMatchObject({
+      kind: 'ok',
+      from: '2026-10-01',
+    });
+  });
+
+  it('has no data when a day between the first and the last has no prices', () => {
+    const { days } = flat('2026-10-01', '2026-10-14', 150);
+    const gap = { ...days };
+    delete gap['2026-10-05'];
+    expect(
+      compareWithPvpc(letter(), officialDeps({ coveredUntil: '2026-10-14', days: gap })),
+    ).toEqual({
+      kind: 'no_data',
+    });
+  });
+
+  it.each([
+    ['the tolls', { tolls: [] }],
+    ['the PVPC margin', { pvpcMargin: [] }],
+  ])('names the day when %s are not loaded', (_, tables) => {
+    expect(
+      compareWithPvpc(letter(), officialDeps(pvpc, { tables: { ...BILLS_TABLES, ...tables } })),
+    ).toEqual({ kind: 'missing_table', day: '2026-10-31' });
+  });
+
+  it.each([
+    ['the tolls', 'tolls'],
+    ['the PVPC margin', 'pvpcMargin'],
+  ] as const)('names the norms when only %s depend on one', (_, name) => {
+    const tables = {
+      ...BILLS_TABLES,
+      [name]: held(BILLS_TABLES[name] as Table<unknown>, {
+        from: '2026-12-01',
+        until: '2026-12-31',
+        norm: 'rdl25_2026_december',
+      }),
+    };
+    expect(
+      compareWithPvpc(
+        letter({ renewalDate: '2026-12-10' }),
+        officialDeps(pvpc, { tables, norms: open }),
+      ),
+    ).toEqual({ kind: 'conditional', norms: ['rdl25_2026_december'] });
+  });
+});
+
+describe('more cases of the taxes of a renewal', () => {
+  const december = NORMS_BEFORE_FIGURE.rdl25_2026_december;
+  const open: NormTable = {
+    ...NORMS_BEFORE_FIGURE,
+    rdl25_2026_december: {
+      ...december,
+      status: 'conditional',
+      condition: {
+        text: december.condition?.text ?? '',
+        decidesOn: december.condition?.decidesOn ?? '',
+        source: december.condition?.source ?? '',
+        met: null,
+      },
+    },
+  };
+  const renewal = letter({ renewalDate: '2026-12-10' });
+  const base = { from: '2026-12-01', until: '2026-12-31' };
+  const taxRow = (
+    percent: number,
+    norm: TableRow<ElectricityTaxRate>['norm'],
+    change: Partial<TableRow<ElectricityTaxRate>> = {},
+  ): TableRow<ElectricityTaxRate> => ({
+    ...base,
+    value: { percent, minimumPerMwh: 0 },
+    norm,
+    url: BILLS_NORMS[norm].url,
+    ...change,
+  });
+  const vatRow = (
+    value: VatRate,
+    norm: TableRow<VatRate>['norm'],
+    change: Partial<TableRow<VatRate>> = {},
+  ): TableRow<VatRate> => ({ ...base, value, norm, url: BILLS_NORMS[norm].url, ...change });
+  const general21 = vatRow({ kind: 'general', percent: 21 }, 'law37_1992');
+  const taxes = (
+    electricityTax: Table<ElectricityTaxRate>,
+    vat: Table<VatRate>,
+    input: RenewalInput = renewal,
+    norms: NormTable = open,
+  ) => renewalTaxes(input, 1000, { tables: { ...BILLS_TABLES, electricityTax, vat }, norms });
+  const optionsOf = (result: ReturnType<typeof renewalTaxes>) =>
+    result.kind === 'conditional'
+      ? result.options.map((o) => [o.electricityTaxPercent, o.vatPercent])
+      : result.kind;
+
+  describe('while a norm is not settled', () => {
+    const reduced = taxRow(0.5, 'rdl25_2026_december');
+    const general = taxRow(5.11, 'law38_1992', { unless: ['rdl25_2026_december'] });
+
+    it.each([
+      ['the reduced row first', [reduced, general]],
+      ['the general row first', [general, reduced]],
+    ])('picks, in each way it may go, the row that holds, with %s', (_, rows) => {
+      const result = taxes(rows, [general21]);
+      expect(optionsOf(result)).toEqual([
+        [0.5, 21],
+        [5.11, 21],
+      ]);
+      if (result.kind !== 'conditional') throw new Error('conditional');
+      expect(result.options.map((o) => o.when)).toEqual([
+        [{ met: ['rdl25_2026_december'], notMet: [] }],
+        [{ met: [], notMet: ['rdl25_2026_december'] }],
+      ]);
+    });
+
+    it('takes the norms that decide from the VAT alone when the tax is settled', () => {
+      const vat = BILLS_TABLES.vat.filter((r) => r.from === '2026-12-01');
+      const result = taxes([taxRow(5.11, 'law38_1992')], vat);
+      expect(optionsOf(result)).toEqual([
+        [5.11, 10],
+        [5.11, 21],
+      ]);
+      if (result.kind !== 'conditional') throw new Error('conditional');
+      const decided = result.options.flatMap((o) => o.when.flatMap((w) => [...w.met, ...w.notMet]));
+      expect(new Set(decided)).toEqual(new Set(['rdl25_2026_december', 'rdl25_2026']));
+    });
+
+    it.each([
+      [
+        'the reduced row first',
+        [reduced, taxRow(5.11, 'law38_1992', { unless: ['rdl25_2026_december', 'rdl10_2026'] })],
+      ],
+      [
+        'the general row first',
+        [taxRow(5.11, 'law38_1992', { unless: ['rdl25_2026_december', 'rdl10_2026'] }), reduced],
+      ],
+    ])(
+      'gives way to the reduced row only when every norm it gives way to holds, with %s',
+      (_, rows) => {
+        // rdl10_2026 is in force and decides nothing: it holds in every way the rest may go.
+        expect(optionsOf(taxes(rows, [general21]))).toEqual([
+          [0.5, 21],
+          [5.11, 21],
+        ]);
+      },
+    );
+
+    it('lists the ways in which the VAT has no row', () => {
+      const result = taxes(
+        [reduced, general],
+        [vatRow({ kind: 'general', percent: 21 }, 'rdl25_2026_december')],
+      );
+      if (result.kind !== 'conditional') throw new Error('conditional');
+      expect(result.unknown).toEqual([{ met: [], notMet: ['rdl25_2026_december'] }]);
+    });
+
+    it('keeps a row that gives way only to a norm that is not in force and decides nothing', () => {
+      const result = taxes(
+        [taxRow(9, 'law38_1992', { unless: ['rdl18_2026_august'] }), reduced],
+        [general21],
+      );
+      expect(optionsOf(result)).toEqual([[9, 21]]);
+      if (result.kind !== 'conditional') throw new Error('conditional');
+      expect(result.unknown).toEqual([]);
+    });
+  });
+
+  describe('the reduced VAT, by power', () => {
+    const reducedVat = (powerLimitIncluded: boolean) =>
+      vatRow(
+        {
+          kind: 'reduced',
+          percent: 10,
+          generalPercent: 21,
+          powerLimitKw: 10,
+          powerLimitIncluded,
+          severeVulnerable: true,
+        },
+        'law37_1992',
+      );
+    const vatFor = (included: boolean, kw: number) => {
+      const result = renewalTaxes(
+        letter({ renewalDate: '2026-12-10', powerKw: { p1: kw, p2: kw } }),
+        1000,
+        {
+          tables: {
+            ...BILLS_TABLES,
+            electricityTax: [taxRow(5.11, 'law38_1992')],
+            vat: [reducedVat(included)],
+          },
+          norms: BILLS_NORMS,
+        },
+      );
+      return result.kind === 'ok' ? result.vatPercent : result.kind;
+    };
+
+    it.each([
+      [true, 10, 10],
+      [true, 10.1, 21],
+      [false, 10, 21],
+      [false, 9.9, 10],
+    ])('a limit included %s and a supply of %s kW pays %s', (included, kw, percent) => {
+      expect(vatFor(included, kw)).toBe(percent);
+    });
+  });
+
+  describe('with a table that has no row', () => {
+    it.each([
+      ['no tax', [], [general21]],
+      ['no VAT', [taxRow(5.11, 'law38_1992')], []],
+    ])('is missing with %s', (_, tax, vat) => {
+      expect(taxes(tax, vat, renewal, BILLS_NORMS)).toEqual({ kind: 'missing' });
+    });
+  });
+
+  it('takes a declared cost a euro off as matching, and a cent more as not', () => {
+    const plain = {
+      ...BILLS_TABLES,
+      electricityTax: [taxRow(0, 'law38_1992')],
+      vat: [vatRow({ kind: 'general', percent: 0 }, 'law37_1992')],
+    };
+    const declared = (withTax: number) => {
+      const result = renewalTaxes(
+        letter({ renewalDate: '2026-12-10', declared: { withoutTax: null, withTax } }),
+        100,
+        {
+          tables: plain,
+          norms: BILLS_NORMS,
+        },
+      );
+      return result.kind === 'ok' ? result.declaredMatches : result.kind;
+    };
+    expect(declared(101)).toBe(true);
+    expect(declared(99)).toBe(true);
+    expect(declared(101.01)).toBe(false);
   });
 });

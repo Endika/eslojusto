@@ -59,7 +59,7 @@ function allOf(ids: readonly BillsNormId[], day: string, norms: NormTable): Hold
   return holds.every((h) => h === 'holds') ? 'holds' : 'open';
 }
 
-const restsOn = (row: TableRow<unknown>): readonly BillsNormId[] => [
+export const restsOn = (row: TableRow<unknown>): readonly BillsNormId[] => [
   row.norm,
   ...(row.alsoRestsOn ?? []),
 ];

@@ -12,7 +12,7 @@ import { pvpcMeanAllBetween, type OfficialDeps } from './electricity-official';
 import { normStanding, type BillsNormId } from './norms';
 import { recalculate, regulatedOn } from './renewal';
 import type { RenewalDeps, RenewalInput } from './renewal-types';
-import { valueOn, type RowDoubt, type TableRow, type VatRate } from './tables';
+import { restsOn, valueOn, type RowDoubt, type TableRow, type VatRate } from './tables';
 
 const WINDOW_DAYS = 365;
 const DECLARED_TOLERANCE = 1;
@@ -57,6 +57,7 @@ export function compareWithPvpc(
   const letter = recalculate(input);
   if (letter.kind !== 'ok') return letter;
   const { annualKwh } = input;
+  // Stryker disable next-line ConditionalExpression,ObjectLiteral,StringLiteral: recalculate has refused a letter with no consumption already; this narrows the type
   if (annualKwh === null) return { kind: 'no_consumption' };
   const regulated = regulatedOn(input.renewalDate, deps);
   const margin = valueOn(deps.tables.pvpcMargin, input.renewalDate, deps.norms);
@@ -179,9 +180,8 @@ export function renewalTaxes(
     const pick = <V>(rows: readonly TableRow<V>[]) =>
       rows.find(
         (row) =>
-          [row.norm, ...(row.alsoRestsOn ?? [])].every(
-            (id) => !deciding.includes(id) || holds(id),
-          ) && !(row.unless !== undefined && row.unless.every(holds)),
+          restsOn(row).every((id) => !deciding.includes(id) || holds(id)) &&
+          !(row.unless !== undefined && row.unless.every(holds)),
       );
     const [t, v] = [pick(taxRows), pick(vatRows)];
     const outcome = { met, notMet: deciding.filter((id) => !met.includes(id)) };
