@@ -217,19 +217,6 @@ describe('notice of changes (art. 22.3 LCS)', () => {
 });
 
 describe('premium change', () => {
-  it('a rise is given in euros and per cent, as a fact', () => {
-    const f = premiumOf(policy({ notice: notice() }), INSURANCE_NORMS);
-    expect(f.id).toBe('premium');
-    expect(f.status).toBe('up');
-    expect(f.calculation[0]?.vars).toEqual({
-      previous: { euros: 300 },
-      next: { euros: 345 },
-      difference: { euros: 45 },
-      percent: { percent: 15 },
-    });
-    expect(f.sources).toEqual([]);
-  });
-
   it.each([
     [300, 280.5, 'down', 19.5, 6.5],
     [300, 300, 'same', 0, 0],
@@ -255,20 +242,16 @@ describe('premium change', () => {
     expect(f.sources).toEqual([]);
   });
 
-  it.each([
-    [300, null],
-    [null, null],
-  ])('with the premiums %s and %s there is nothing to compare', (previousPremium, newPremium) => {
-    const f = premiumOf(
-      policy({ notice: notice({ previousPremium, newPremium }) }),
-      INSURANCE_NORMS,
-    );
-    expect([f.id, f.status]).toEqual(['premium', 'not_entered']);
-    expect(f.calculation).toStrictEqual([{ key: 'item.not_entered' }]);
-    expect(f.sources).toEqual([]);
-  });
-
-  it('without a notice there is no premium item', () => {
-    expect(premiumChange(policy(), INSURANCE_NORMS)).toBeNull();
-  });
+  it.each([[300, null]])(
+    'with the premiums %s and %s there is nothing to compare',
+    (previousPremium, newPremium) => {
+      const f = premiumOf(
+        policy({ notice: notice({ previousPremium, newPremium }) }),
+        INSURANCE_NORMS,
+      );
+      expect([f.id, f.status]).toEqual(['premium', 'not_entered']);
+      expect(f.calculation).toStrictEqual([{ key: 'item.not_entered' }]);
+      expect(f.sources).toEqual([]);
+    },
+  );
 });

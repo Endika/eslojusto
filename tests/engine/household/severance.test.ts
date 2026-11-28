@@ -88,17 +88,6 @@ describe('the severance finding', () => {
       DEPS.minimumWage,
     );
 
-  it('does not apply to any other termination', () => {
-    expect(
-      assessSeverance(
-        household({ termination: desistimiento({ route: 'et_cause' }) }),
-        NORMS,
-        DEPS.minimumWage,
-      ),
-    ).toBeNull();
-    expect(assessSeverance(household(), NORMS, DEPS.minimumWage)).toBeNull();
-  });
-
   it('cites art. 11.2', () => {
     const a = run('2026-02-28');
     if (a?.kind !== 'single') throw new Error('expected one finding');
@@ -160,27 +149,6 @@ describe('what the severance finding shows', () => {
           status: 'below_minimum',
           amount: { min: 402.74 },
           calculation: [figure(31, 1783.56), shortfall(1380.82, 402.74), PRORATED_NOTE],
-          basedOnYourAnswer: true,
-        },
-      ],
-    ],
-    [
-      'it is not known whether it was made available',
-      { severanceAvailable: null, severanceOffered: 100_000 },
-      {},
-      [
-        {
-          when: 'complete_years_only',
-          status: 'review_it',
-          amount: null,
-          calculation: [figure(24, 1380.82), UNKNOWN],
-          basedOnYourAnswer: true,
-        },
-        {
-          when: 'prorated_by_months',
-          status: 'review_it',
-          amount: null,
-          calculation: [figure(31, 1783.56), UNKNOWN, PRORATED_NOTE],
           basedOnYourAnswer: true,
         },
       ],

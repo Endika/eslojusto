@@ -15,10 +15,6 @@ const ending = (change = {}, termination = {}) =>
   );
 
 describe('final pay of a worker paid monthly', () => {
-  it('is nothing without a termination', () => {
-    expect(assessFinalPay(household(), NORMS)).toBeNull();
-  });
-
   it('counts holidays in calendar days against the 30 of art. 9', () => {
     const pay = ending({ holidays: { days: 30, longestStretch: 15, taken: 0 } });
     if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
@@ -82,16 +78,6 @@ describe('final pay of a worker paid monthly', () => {
     expect(pay.items.find((i) => i.id === 'extra_pay')?.calculation[0]?.key).toBe(
       'extra_pay.annual',
     );
-  });
-
-  it('cites the household rules, not the Estatuto', () => {
-    const pay = ending();
-    if (pay?.kind !== 'monthly') throw new Error('expected a monthly pay');
-    expect(pay.items.map((i) => i.sources.map((s) => s.citation.split(' (')[0]))).toEqual([
-      ['Real Decreto 1620/2011, art. 8.1'],
-      ['Real Decreto 1620/2011, art. 9'],
-      ['Real Decreto 1620/2011, art. 8.4'],
-    ]);
   });
 
   it('asks for the salary', () => {

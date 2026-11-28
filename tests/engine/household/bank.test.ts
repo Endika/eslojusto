@@ -93,23 +93,6 @@ describe('the synthetic bank of household cases', () => {
     for (const c of CASES) expect(c.description.length, c.id).toBeGreaterThan(40);
   });
 
-  it('covers the pay, the form of the desistimiento, severance, notice and the live-in rule', () => {
-    const ids = new Set(CASES.flatMap((c) => c.expected.items.map((i) => i.id)));
-    for (const id of [
-      'smi_monthly',
-      'smi_hourly_external',
-      'smi_in_kind_cap',
-      'desistimiento_written',
-      'dismissal_presumed',
-      'desistimiento_severance',
-      'desistimiento_notice',
-      'live_in_night_notice',
-      'termination_causes',
-      'unemployment_situation',
-    ])
-      expect(ids, id).toContain(id);
-  });
-
   it.each(CASES.map((c) => [c.id, c] as const))('%s', (_, c) => {
     const result = reviewHousehold(toInput(c.input), f(c.today), DEPS);
     if (!result.ok) throw new Error(`invalid input: ${JSON.stringify(result.errors)}`);

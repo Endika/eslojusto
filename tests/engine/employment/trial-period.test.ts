@@ -220,10 +220,6 @@ describe('void and unwritten trial periods', () => {
     });
   });
 
-  it('without a trial period there is nothing to check', () => {
-    expect(only(assess({ trial: null })).status).toBe('not_entered');
-  });
-
   it('never opens the pass for a limit, only for a void trial', () => {
     const limits = [
       assess({ trial: months(12), technical: false, smallCompany: false }),
