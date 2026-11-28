@@ -363,4 +363,18 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['tests/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'CallExpression:matches([callee.name=/^(it|test)$/], [callee.object.name=/^(it|test)$/], [callee.callee.object.name=/^(it|test)$/]) ImportExpression',
+          message:
+            'Import before the test: a module loaded inside one counts as covered by it, static mutants and all.',
+        },
+      ],
+    },
+  },
 );
