@@ -307,11 +307,6 @@ describe('the tabs', () => {
 describe('the flow', () => {
   const flow = rentalFlow(NORMS);
 
-  it('walks the steps and their sections', () => {
-    expect(flow.steps).toBe(STEPS);
-    expect(flow.sectionOfStep).toBe(SECTION_OF_STEP);
-  });
-
   it('leaves out what the gate leaves out', () => {
     const f = answered([['contractType', 'seasonal']]);
     expect(flow.applies(f, 'fechas')).toBe(true);

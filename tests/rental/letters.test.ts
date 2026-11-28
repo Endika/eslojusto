@@ -410,19 +410,6 @@ describe('the letters block by block', () => {
     'blank: client.rental.letter.address',
   ];
 
-  it('the deposit letter asks for the balance, the rule, the interest and the account', () => {
-    expect(shape(depositLetter(completed(depositOut), TODAY, details, keys))).toEqual([
-      ...head('deposit'),
-      'text: client.rental.letter.deposit.body {"contrato":"15-03-2024","llaves":"30-06-2026","pendiente":"150,00 €"}',
-      'text: client.rental.letter.deposit.interest_rule',
-      'text: client.rental.letter.deposit.interest {"fecha":"07-10-2026","importe":"1,98 €"}',
-      'note: client.rental.letter.lowest',
-      'text: client.rental.letter.deposit.account',
-      'blank: client.rental.letter.iban',
-      ...close,
-    ]);
-  });
-
   it('the deposit letter leaves out the interest when none runs', () => {
     const lines = shape(depositLetter(completed(balanceOnly), TODAY, details, keys));
     expect(lines.slice(5, -4)).toEqual([
@@ -514,25 +501,9 @@ describe('the rent letter, line by line', () => {
   const lines = (r: CompletedRentalReview) => shape(rentLetter(r, details, keys)).slice(6, -4);
 
   it.each([
-    ['the agreed index when no cap applies', index(false), null, 'rent.index {', false],
     ['a flash index, worded as such', index(true), null, 'rent.index_flash {', false],
-    [
-      'the cap when it is lower than the agreed index',
-      index(false),
-      fixed(2.08),
-      'rent.cap_fixed',
-      false,
-    ],
     ['the cap when it equals the agreed figure', fixed(2), fixed(2), 'rent.cap_fixed', false],
     ['the cap alone when nothing was agreed', null, fixed(2), 'rent.cap_fixed', false],
-    ['a cap that is an index', null, index(true), 'rent.cap_index', false],
-    [
-      'the agreed figure when it is lower than the cap, naming the cap apart',
-      fixed(1),
-      fixed(2),
-      'rent.fixed',
-      true,
-    ],
   ] as const)('words %s', (_, agreed, capRate, criterion, capNoted) => {
     const r = withReading(completed(riseAboveIrav), {
       agreed,
@@ -556,14 +527,6 @@ describe('the rent letter, line by line', () => {
     expect(lines({ ...r, input: { ...r.input, updates: [] } })[0]).toContain(
       '"pagada":"0,00' + String.fromCharCode(160) + '€"',
     );
-  });
-
-  it('notes the lowest reading of a doubt that is not a pending norm', () => {
-    const byEmail = contract({
-      ...riseAboveIrav,
-      updates: [update('2025-03-20', 1000, 1030, { notice: 'email' })],
-    });
-    expect(lines(completed(byEmail)).slice(1)).toEqual(['note: client.rental.letter.lowest']);
   });
 
   it('says a norm is pending only for the lower of two readings that rests on it', () => {

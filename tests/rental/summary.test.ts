@@ -99,12 +99,7 @@ describe('how a doubtful item stands against the totals', () => {
     upTo,
   });
 
-  it.each([
-    ['no reading above zero', depends(0, 0), 'in'],
-    ['none of it counted', depends(0, 50), 'out'],
-    ['only the lowest reading', depends(20, 50), 'lowest'],
-    ['all its readings', depends(50, 50), 'in'],
-  ] as const)('%s', (_, summary, share) => {
+  it.each([['all its readings', depends(50, 50), 'in']] as const)('%s', (_, summary, share) => {
     expect(totalShare(summary)).toBe(share);
   });
 

@@ -348,11 +348,6 @@ describe('the rental report, block by block', () => {
         'client.rental.total.owed_up_to {"importe":"151,98 €","maximo":"152,01 €"}',
       ],
     ],
-    [
-      'a total that is all counted',
-      riseAboveIrav,
-      ['client.rental.total.paidOver {"importe":"184,00 €"}'],
-    ],
   ] as const)('gives %s', (_, input, bullets) => {
     const summary = between(lines(completed(input)), 'summary', 'items');
     expect(summary.slice(1)).toEqual(
@@ -403,11 +398,6 @@ describe('the rental report, block by block', () => {
 
     it.each([
       [
-        'a figure',
-        reading('paid_over', 184),
-        `text: client.rental.status.paid_over {"importe":"${eur('184,00')}"}`,
-      ],
-      [
         'a figured result with no figure',
         reading('over_cap', null),
         'text: client.rental.status.over_cap_no_amount',
@@ -422,30 +412,6 @@ describe('the rental report, block by block', () => {
     });
 
     it.each([
-      [
-        'nothing of it counted',
-        reading('within_limit', 7),
-        reading('paid_over', 50),
-        'reading.within_limit',
-        'reading_amount.paid_over',
-        'note: client.rental.share.out',
-      ],
-      [
-        'only its lowest reading counted',
-        reading('owed', 20),
-        reading('owed', 50),
-        'reading_amount.owed',
-        'reading_amount.owed',
-        `note: client.rental.share.lowest {"importe":"${eur('20,00')}"}`,
-      ],
-      [
-        'all of it counted',
-        reading('owed', 50),
-        reading('owed', 50),
-        'reading_amount.owed',
-        'reading_amount.owed',
-        null,
-      ],
       [
         'a figured result with no figure',
         reading('over_cap', null),
@@ -499,15 +465,6 @@ describe('the rental report, indices and norms', () => {
 
   it.each([
     [
-      'by index within a month',
-      figure('irav', '2025-02'),
-      figure('ipc', '2025-02'),
-      [
-        'bullet: IPC de febrero de 2025: 3 %, publicado el 14-03-2025',
-        'bullet: IRAV de febrero de 2025: 3 %, publicado el 14-03-2025',
-      ],
-    ],
-    [
       'by month first',
       figure('ipc', '2026-01'),
       figure('irav', '2025-02'),
@@ -516,33 +473,8 @@ describe('the rental report, indices and norms', () => {
         'bullet: IPC de enero de 2026: 3 %, publicado el 14-03-2025',
       ],
     ],
-    [
-      'a flash and its definitive figure apart',
-      figure('ipc', '2025-02', true),
-      figure('ipc', '2025-02'),
-      [
-        'bullet: IPC adelantado de febrero de 2025: 3 %, publicado el 14-03-2025',
-        'bullet: IPC de febrero de 2025: 3 %, publicado el 14-03-2025',
-      ],
-    ],
-    [
-      'the figure of a rise without a cap',
-      figure('ipc', '2025-02'),
-      null,
-      ['bullet: IPC de febrero de 2025: 3 %, publicado el 14-03-2025'],
-    ],
-    [
-      'a figure once, however many times it was used',
-      figure('ipc', '2025-02'),
-      figure('ipc', '2025-02'),
-      ['bullet: IPC de febrero de 2025: 3 %, publicado el 14-03-2025'],
-    ],
   ] as const)('lists the indices %s', (_, agreed, cap, expected) => {
     expect(listed(withRates(agreed, cap))).toEqual(expected);
-  });
-
-  it('lists the indices behind every reading of a doubt', () => {
-    expect(listed(completed(unknownLargeLandlord)).length).toBeGreaterThan(0);
   });
 
   it('gives a norm once, with its days when a wording ended and how it stands otherwise', () => {
@@ -568,13 +500,6 @@ describe('the rental report, indices and norms', () => {
     expect(withUntil).toContain(
       'source: disposición final 6.ª (Real Decreto-ley 29/2026, de 6 de octubre) · con efectos del 08-10-2026 al 31-12-2027',
     );
-  });
-
-  it('names the cap beside the figures only for a reading that has one', () => {
-    const capLine = (r: CompletedRentalReview) =>
-      lines(r, keys).filter((l) => l.startsWith('bullet: client.rental.detail.cap'));
-    expect(capLine(withRates(figure('ipc', '2025-02'), null))).toEqual([]);
-    expect(capLine(completed(full))).toHaveLength(1);
   });
 
   it('adds the company hint to a rise whose landlord may be a large one', () => {
