@@ -167,6 +167,7 @@ describe('answers that are not of the kind asked', () => {
     ['a deposit without end', { deposit: f(Infinity) }, 'deposit'],
     ['advance months in halves', { advanceMonths: f(1.5) }, 'advanceMonths'],
     ['advance months written as text', { advanceMonths: f('2') }, 'advanceMonths'],
+    ['a negative number of months in advance', { advanceMonths: f(-1) }, 'advanceMonths'],
     ['agreed months in halves', { agreedMonths: f(1.5) }, 'agreedMonths'],
     ['a use that is none of the known', { use: f('castle') }, 'contractType'],
     ['a landlord that is neither', { landlordType: f('state') }, 'landlordType'],
@@ -186,6 +187,7 @@ describe('answers that are not of the kind asked', () => {
     ],
     ['a date that is not one', { signedOn: f('garbage') }, 'signedOn'],
     ['a date written as a number', { startDate: f(20240320) }, 'startDate'],
+    ['a postcode written as a number', { postcode: f(28013) }, 'region'],
     ['a postcode of six digits', { postcode: f('280130') }, 'region'],
     ['a postcode led by a letter', { postcode: f('x28013') }, 'region'],
     [
@@ -411,7 +413,8 @@ describe('rises', () => {
         rentsOf([
           ['2025-02', 1000],
           ['2025-03', null],
-          ['2025-04', 1000],
+          ['2025-04', null],
+          ['2025-05', 1000],
         ]),
       ).toEqual([]);
       expect(
@@ -859,5 +862,228 @@ describe('what is left of the receipts and the move-out', () => {
       { startDate: '2024-03-20' },
     );
     expect(mark(p, 'updates.0.year')?.confidence).toBe('high');
+  });
+});
+
+describe('rises, one by one', () => {
+  const rises = (
+    notices: RentalExtraction['notices'],
+    receipts: RentalExtraction['receipts'] = [],
+    fields: RentalExtraction['fields'] = lease,
+  ) => prefill({ fields, notices, receipts });
+  const at = (p: ReturnType<typeof prefill>, key: string) =>
+    p.entries.filter(([n]) => n.endsWith(`.${key}`)).map(([, v]) => v);
+  const months = (...rents: readonly (readonly [string, number])[]) =>
+    rents.map(([month, rent]) => row({ month, rent }));
+
+  it('read no new rent from a notice that gives only the rent before it, or only a percentage', () => {
+    const before = rises([row({ previousRent: 1000, noticeOn: '2025-02-01' })]);
+    expect(at(before, 'previousRent')).toEqual(['1.000,00']);
+    expect(mark(before, 'updates.0.previousRent')?.derived).toBeUndefined();
+    expect(at(before, 'newRent')).toEqual([]);
+    expect(at(before, 'chargedFrom')).toEqual([]);
+    const percent = rises([row({ percent: 5, appliesFrom: '2025-03-20' })]);
+    expect(at(percent, 'newRent')).toEqual([]);
+    expect(at(percent, 'previousRent')).toEqual([]);
+  });
+
+  it('keep a rise to the same rent, and one with only the new rent, however low', () => {
+    expect(
+      entry(
+        rises([row({ previousRent: 1000, newRent: 1000, noticeOn: '2025-02-01' })]),
+        'hasUpdates',
+      ),
+    ).toBe('yes');
+    expect(entry(rises([row({ newRent: 900, noticeOn: '2025-02-01' })]), 'hasUpdates')).toBe('yes');
+  });
+
+  it('put the rises in date order, the undated last, and open the sheet once', () => {
+    const p = rises([
+      row({ previousRent: 1050, newRent: 1100 }),
+      row({ previousRent: 1030, newRent: 1060, appliesFrom: '2026-03-20' }),
+      row({ previousRent: 1000, newRent: 1030, appliesFrom: '2025-03-20' }),
+    ]);
+    expect(at(p, 'newRent')).toEqual(['1.030,00', '1.060,00', '1.100,00']);
+    expect(p.entries.filter(([n]) => n === 'hasUpdates')).toHaveLength(1);
+    expect(entry(p, 'updates.2.year')).toBeUndefined();
+    expect(entry(p, 'updates.2.chargedFrom')).toBeUndefined();
+  });
+
+  it('leave a notice that fits no receipt to its own date, and the receipt to its own rise', () => {
+    const p = rises(
+      [row({ previousRent: 1000, newRent: 1500, appliesFrom: '2030-01-20' })],
+      months(['2025-02', 1000], ['2025-03', 1030]),
+    );
+    expect(at(p, 'newRent')).toEqual(['1.030,00', '1.500,00']);
+    const noRent = rises(
+      [row({ previousRent: 1000, appliesFrom: '2030-01-20' })],
+      months(['2025-02', 1000], ['2025-03', 1030]),
+    );
+    expect(at(noRent, 'chargedFrom')).toEqual(['2025-03-01', '2030-01-20']);
+  });
+
+  it('read a notice with a date that is no date, a rent a euro off, or no new rent beside low rents', () => {
+    const garbled = rises([row({ newRent: 1030, appliesFrom: 'garbage', noticeOn: '2025-02-01' })]);
+    expect(at(garbled, 'chargedFrom')).toEqual([]);
+    expect(at(garbled, 'newRent')).toEqual(['1.030,00']);
+    const euroOff = rises(
+      [row({ newRent: 1031, noticeOn: '2025-04-01' })],
+      months(['2025-02', 1000], ['2025-03', 1030]),
+    );
+    expect(entry(euroOff, 'updates.0.noticeOn')).toBe('2025-04-01');
+    const cheap = rises(
+      [row({ previousRent: 0.5, noticeOn: '2025-04-01' })],
+      months(['2025-02', 0.5], ['2025-03', 1]),
+    );
+    expect(entry(cheap, 'updates.0.noticeOn')).toBeUndefined();
+    const undated = rises(
+      [row({ previousRent: 1000, noticeOn: '2025-04-01' })],
+      months(['2025-02', 1000], ['2025-03', 1030]),
+    );
+    expect(entry(undated, 'updates.0.noticeOn')).toBeUndefined();
+  });
+
+  it('take what a notice leaves out from the receipt it matches, and say it was worked out', () => {
+    const p = rises(
+      [row({ newRent: 1030, appliesFrom: '2025-03-20' })],
+      months(['2025-02', 1000], ['2025-03', 1030]),
+    );
+    expect(at(p, 'previousRent')).toEqual(['1.000,00']);
+    expect(mark(p, 'updates.0.previousRent')?.derived).toBe(true);
+    expect(mark(p, 'updates.0.newRent')?.derived).toBeUndefined();
+    const alone = rises([row({ newRent: 1030, appliesFrom: '2025-03-20' })]);
+    expect(at(alone, 'previousRent')).toEqual([]);
+  });
+
+  it('say both rents of a rise seen only in the receipts were worked out', () => {
+    const p = prefill({ fields: lease, receipts: months(['2025-02', 1000], ['2025-03', 1030]) });
+    expect(mark(p, 'updates.0.previousRent')?.derived).toBe(true);
+    expect(mark(p, 'updates.0.newRent')?.derived).toBe(true);
+  });
+
+  it('place a notice matched across a gap in the anniversary the gap holds', () => {
+    const p = rises(
+      [row({ previousRent: 1000, newRent: 1030, noticeOn: '2025-01-05' })],
+      months(['2024-01', 1000], ['2025-01', 1030]),
+      { ...lease, signedOn: f('2023-01-20'), startDate: f('2023-02-01') },
+    );
+    expect(entry(p, 'updates.0.year')).toBe('2024');
+  });
+
+  it('place a rise whose gap ends just before an anniversary in that anniversary’s year', () => {
+    const p = prefill({
+      fields: { ...lease, signedOn: f('2023-01-20'), startDate: f('2023-02-01') },
+      receipts: months(['2024-02', 1000], ['2025-01', 1030]),
+    });
+    expect(entry(p, 'updates.0.year')).toBe('2025');
+  });
+
+  it('ask to check the year of a rise near an anniversary, or when no start is known', () => {
+    const matched = (fields: RentalExtraction['fields'], appliesFrom: string) =>
+      rises(
+        [row({ newRent: 1030, appliesFrom })],
+        months(['2025-11', 1000], ['2025-12', 1030]),
+        fields,
+      );
+    const near = matched(lease, '2025-12-15');
+    expect(mark(near, 'updates.0.chargedFrom')?.confidence).toBe('high');
+    expect(mark(near, 'updates.0.year')).toMatchObject({ confidence: 'low', derived: true });
+    expect(mark(matched({}, '2025-12-15'), 'updates.0.year')?.confidence).toBe('low');
+    expect(mark(matched(lease, '2025-03-20'), 'updates.0.year')?.confidence).toBe('high');
+  });
+});
+
+describe('fees and guarantees, by field', () => {
+  it('leave a guarantee with neither an amount nor months without an amount', () => {
+    const p = prefill({ fields: lease, guarantees: [row({ kind: 'cash' })] });
+    expect(p.entries.filter(([n]) => n.startsWith('guarantees.'))).toEqual([
+      ['guarantees.0.kind', 'cash'],
+    ]);
+  });
+
+  it('read a fee’s kind only when it is one, and its total before base and VAT', () => {
+    const p = prefill({
+      invoices: [
+        row({ conceptKind: 'bogus', base: 100, vat: 21, total: 150 }),
+        row({ conceptKind: 'agency_fee' }),
+      ],
+    });
+    expect(p.entries.filter(([n]) => n.startsWith('fees.'))).toEqual([
+      ['fees.0.amount', '150,00'],
+      ['fees.1.kind', 'agency_fee'],
+    ]);
+  });
+
+  it('count an invoice as not adding up only past the tolerance, and when all three figures are there', () => {
+    const invoices = [
+      row({ conceptKind: 'agency_fee', base: 0.05, vat: 0, total: 0.1 }),
+      row({ conceptKind: 'solvency_check', base: 100, vat: 21, total: 121 }),
+    ];
+    const p = rentalPrefill(extraction({ invoices }), {}, tr, ['invoice_total_mismatch']);
+    expect(mark(p, 'fees.0.amount')?.confidence).toBe('low');
+    expect(mark(p, 'fees.1.amount')?.confidence).toBe('low');
+    const partial = rentalPrefill(
+      extraction({
+        invoices: [
+          row({ conceptKind: 'agency_fee', base: 100, total: 90 }),
+          invoices[1] as ExtractedRow,
+        ],
+      }),
+      {},
+      tr,
+      ['invoice_total_mismatch'],
+    );
+    expect(mark(partial, 'fees.1.amount')?.confidence).toBe('low');
+  });
+});
+
+describe('charges, by row', () => {
+  const community = (annualAmount: number, confidence: Confidence = 'high') =>
+    row({ kind: 'community', annualAmount }, confidence);
+
+  it('add the amounts of a concept the contract names twice, and say they were added', () => {
+    const p = prefill({ charges: [community(300, 'low'), community(300)] });
+    expect(entry(p, 'hasCharges')).toBe('yes');
+    expect(entry(p, 'charges.0.annualAgreed')).toBe('600,00');
+    expect(mark(p, 'charges.0.annualAgreed')).toMatchObject({ confidence: 'low', derived: true });
+    expect(mark(p, 'charges.0.kind')?.confidence).toBe('low');
+    const one = prefill({ charges: [community(600)] });
+    expect(mark(one, 'charges.0.annualAgreed')?.derived).toBeUndefined();
+  });
+
+  it('give each row the confidence of its own first answer, and say receipts were summed only for a year read', () => {
+    const p = prefill({
+      charges: [community(600, 'low'), row({ kind: 'waste' })],
+      receipts: [
+        row({ month: '2025-01', rent: 1000, community: 50 }, 'medium'),
+        row({ month: '2026-01', rent: 1000, community: 50 }),
+      ],
+    });
+    expect(p.entries.filter(([n]) => /^charges\.\d\.kind$/.test(n))).toEqual([
+      ['charges.0.kind', 'community'],
+      ['charges.1.kind', 'community'],
+      ['charges.2.kind', 'waste'],
+    ]);
+    expect(mark(p, 'charges.0.kind')?.confidence).toBe('low');
+    expect(mark(p, 'charges.1.kind')?.confidence).toBe('high');
+    expect(mark(p, 'charges.0.amount')?.confidence).toBe('medium');
+    const termsOnly = prefill({ charges: [row({ kind: 'waste' })] });
+    expect(termsOnly.notes).not.toContain(tr('client.rental.documents.receipt_sums'));
+    expect(p.notes).toContain(tr('client.rental.documents.receipt_sums'));
+  });
+
+  it('say receipts were summed when a concept with no receipts comes before one with them', () => {
+    const p = prefill({
+      charges: [row({ kind: 'community' })],
+      receipts: [row({ month: '2025-01', rent: 1000, waste: 30 })],
+    });
+    expect(p.notes).toContain(tr('client.rental.documents.receipt_sums'));
+  });
+
+  it('mark a year read from receipts alone with the receipts’ confidence', () => {
+    const p = prefill({
+      receipts: [row({ month: '2025-01', rent: 1000, community: 50 }, 'medium')],
+    });
+    expect(mark(p, 'charges.0.kind')?.confidence).toBe('medium');
   });
 });
