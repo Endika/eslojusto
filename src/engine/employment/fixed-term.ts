@@ -25,6 +25,7 @@ type RuleStanding = 'not_in_force' | 'in_force' | 'doubtful';
 export function ruleStanding(id: EmploymentRuleId, day: CivilDate, norms: NormTable): RuleStanding {
   const rule = RULES[id];
   const iso = toIso(day);
+  // Stryker disable next-line ConditionalExpression: with no end date `iso > null` is already false
   if (iso < rule.from || (rule.until !== null && iso > rule.until)) return 'not_in_force';
   const standing = normStanding(norms[rule.norm], iso);
   if (standing === 'not_in_force' || standing === 'in_force') return standing;

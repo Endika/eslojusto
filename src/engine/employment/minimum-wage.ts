@@ -221,6 +221,7 @@ export function contractAnnualPay(input: EmploymentInput): number | null {
   if (salary.period === 'month' && !salary.prorated && extraPaysOf(salary) > 0 && !onlyBase)
     return null;
   const pay = annualPay(input, salary.amount, FAVOURABLE.hours);
+  // Stryker disable next-line ConditionalExpression: hoursInDoubt has already returned for the only pay without hours, so the null check only narrows the type
   return pay === null || pay.extraPaysUnknown ? null : round2(pay.annual);
 }
 
@@ -372,7 +373,7 @@ export function compareByYear(
     const shortfall = Math.max(0, round2(minimum - paid));
     const days = daysInside(year, input.startDate, until);
     const certain = verdictOf(input, shortfall, {
-      hoursKnown: coefficient !== null && (short || pay !== null),
+      hoursKnown: coefficient !== null,
       // Art. 4.1: the floor per working day already holds the share of the extra payments.
       extraPaysUnknown: pay?.extraPaysUnknown === true,
       effectsVerified: row.retroactiveVerified || toIso(input.startDate) >= row.publishedOn,
@@ -662,6 +663,7 @@ function contractFinding(
   const pay = annualPay(input, counted, world.hours);
   const gap = breakdownGap(salary);
   const years = compareByYear(input, today, deps.minimumWage, world);
+  // Stryker disable next-line ConditionalExpression: a year not compared has no verdict, so the kind check only narrows the type
   const below = years.flatMap((y) => (y.kind === 'compared' && y.verdict === 'below' ? [y] : []));
   const accrued = below.flatMap((y) => (y.accrued === null ? [] : [y.accrued]));
   const total = sumOf(accrued);
@@ -704,6 +706,7 @@ function contractFinding(
   const decreeArticle = short ? 'art. 4.1' : 'art. 3.1';
   const sources = uniqueSources([
     ruleSource(id, deps.norms),
+    // Stryker disable next-line ConditionalExpression: smi_annual and smi_temporary_120 cite the same article as the finding's own rule, which uniqueSources keeps once
     ...(id === 'smi_prorata' ? [ruleSource('smi_annual', deps.norms)] : []),
     // Stryker disable next-line ArrayDeclaration: smi_absorption cites the same article as smi_annual, which uniqueSources keeps once; the rule stays so the finding names it should the two articles ever differ
     ...(short ? [] : [ruleSource('smi_absorption', deps.norms)]),
@@ -733,7 +736,7 @@ function yearOutcomes(
   return JSON.stringify(
     compareByYear(input, today, deps.minimumWage, world).map((y) =>
       // Stryker disable next-line ConditionalExpression: a year not compared reads the same in every world
-      y.kind === 'compared' ? [y.year, y.verdict, y.shortfall] : [y.year, y.kind],
+      y.kind === 'compared' ? [y.year, y.verdict, y.shortfall] : y.year,
     ),
   );
 }

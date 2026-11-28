@@ -19,10 +19,10 @@ const PART_TIME = {
 };
 
 describe('information blocks', () => {
-  const blocks = informationBlocks(contract(), EMPLOYMENT_NORMS);
+  const blocks = () => informationBlocks(contract(), EMPLOYMENT_NORMS);
 
   it('lists the agreement, public holidays, time record, late payment, limitation and the model', () => {
-    expect(blocks.map((b) => b.id)).toEqual([
+    expect(blocks().map((b) => b.id)).toEqual([
       'agreement',
       'public_holidays',
       'time_record',
@@ -34,7 +34,7 @@ describe('information blocks', () => {
 
   it('each block says its own phrases and cites its own sources', () => {
     expect(
-      blocks.map((b) => [b.id, b.calculation.map((p) => p.key), b.sources.map((s) => s.id)]),
+      blocks().map((b) => [b.id, b.calculation.map((p) => p.key), b.sources.map((s) => s.id)]),
     ).toEqual([
       [
         'agreement',
@@ -54,7 +54,7 @@ describe('information blocks', () => {
   });
 
   it('only the agreement links the public register', () => {
-    expect(blocks.map((b) => b.links.map((l) => l.url))).toEqual([
+    expect(blocks().map((b) => b.links.map((l) => l.url))).toEqual([
       ['https://expinterweb.mites.gob.es/regcon/'],
       [],
       [],
@@ -70,11 +70,11 @@ describe('information blocks', () => {
       EMPLOYMENT_NORMS,
     );
     expect(named[0]?.calculation[0]?.key).toBe('information.agreement.named');
-    expect(blocks[0]?.calculation[0]?.key).toBe('information.agreement.not_named');
+    expect(blocks()[0]?.calculation[0]?.key).toBe('information.agreement.not_named');
   });
 
   it('the model document cites only the decree that announces it', () => {
-    const model = blocks.find((b) => b.id === 'information_model');
+    const model = blocks().find((b) => b.id === 'information_model');
     expect(model?.links).toEqual([]);
     expect(model?.sources.map((s) => s.url)).toEqual([
       'https://www.boe.es/buscar/act.php?id=BOE-A-2026-19200#da',
