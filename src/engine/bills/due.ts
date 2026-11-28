@@ -60,6 +60,7 @@ export function billsDue(today: CivilDate, deps: DueDeps): readonly DueItem[] {
   const iso = toIso(today);
 
   for (const norm of Object.values(norms)) {
+    // Stryker disable next-line OptionalChaining: a conditional norm always carries its condition
     if (norm.status !== 'conditional' || norm.condition?.met !== null) continue;
     const { text, decidesOn } = norm.condition;
     const overdue = iso > toIso(addDays(parseDate(decidesOn), CONDITION_GRACE_DAYS));
@@ -84,6 +85,7 @@ export function billsDue(today: CivilDate, deps: DueDeps): readonly DueItem[] {
     const untils = tables[table].map((r) => r.until);
     const closed = untils.filter((u): u is string => u !== null);
     if (closed.length === 0 || closed.length < untils.length) return [];
+    // Stryker disable next-line EqualityOperator: equal days are the same string
     const lastDay = closed.reduce((a, b) => (b > a ? b : a));
     return [{ kind: 'table_ends' as const, table, lastDay }];
   });

@@ -1,4 +1,12 @@
-import { addDays, fromOrdinal, ordinal, parseDate, toIso, type CivilDate } from '../date';
+import {
+  addDays,
+  daysBetween,
+  fromOrdinal,
+  ordinal,
+  parseDate,
+  toIso,
+  type CivilDate,
+} from '../date';
 import { round2 } from '../money';
 import { pvpcMeanAllBetween, type OfficialDeps } from './electricity-official';
 import { normStanding, type BillsNormId } from './norms';
@@ -74,8 +82,7 @@ export function compareWithPvpc(
     kind: 'ok',
     from: toIso(addDays(from, 1)),
     to: deps.pvpc.coveredUntil,
-    months:
-      ordinal(last) - ordinal(from) < WINDOW_DAYS ? wholeMonths(addDays(from, 1), last) : null,
+    months: daysBetween(from, last) < WINDOW_DAYS ? wholeMonths(addDays(from, 1), last) : null,
     annual,
     next: letter.next,
     difference: round2(letter.next - annual),

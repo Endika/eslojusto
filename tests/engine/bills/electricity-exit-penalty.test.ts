@@ -45,13 +45,25 @@ describe('a penalty for leaving the contract', () => {
     [{}, { holder: 'microenterprise' }, 'exit.not_person'],
     [{}, { holder: null }, 'exit.not_person'],
     [{}, { ...person, issuedOn: parseDate('2026-06-11') }, 'exit.before_rules'],
+    [
+      { priceType: 'fixed' },
+      { ...person, issuedOn: parseDate('2026-06-12') },
+      'exit.fixed_first_term',
+    ],
   ] as const)('%j for %j cannot be checked', (change, bill, key) => {
     const item = check(change, bill);
     expect(summary(item)).toEqual({ status: 'not_checkable', amount: null, counted: 0 });
     expect(only(item).calculation).toEqual([{ key }]);
+    expect(only(item).id).toBe('exit_penalty');
   });
 
   it('gives nothing when the bill has no penalty', () => {
     expect(checkExitPenalty(juneBill(), BILLS_NORMS)).toBeNull();
+  });
+
+  it.each([0, -5])('gives nothing for a penalty of %s', (amount) => {
+    expect(
+      checkExitPenalty(freeBill({ exitPenalty: penalty({ amount }) }), BILLS_NORMS),
+    ).toBeNull();
   });
 });

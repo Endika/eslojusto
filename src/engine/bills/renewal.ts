@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, ordinal, parseDate } from '../date';
+import { addMonthsClamped, compareDates, daysBetween, parseDate } from '../date';
 import { round2 } from '../money';
 import type { BillsNormId } from './norms';
 import type {
@@ -136,7 +136,7 @@ function notice(input: RenewalInput): Notice {
   if (input.letterDate < NOTICE_SINCE) return { kind: 'not_checked_before', since: NOTICE_SINCE };
   const separate = input.separateFromBill;
   const [letter, renewal] = [parseDate(input.letterDate), parseDate(input.renewalDate)];
-  const days = ordinal(renewal) - ordinal(letter);
+  const days = daysBetween(letter, renewal);
   if (compareDates(renewal, addMonthsClamped(letter, 1)) < 0)
     return { kind: 'short', days, separate };
   if (separate === false) return { kind: 'not_separate' };
