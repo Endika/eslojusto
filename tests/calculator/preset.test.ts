@@ -48,7 +48,7 @@ describe('a preset cause', () => {
   it('once the visitor picks another cause, the visit starts on the cause again', () => {
     const f = form('resignation');
     check(f, 'unfair_dismissal');
-    expect(opensOn(presetCauseFlow('resignation'), f)).toBe('causa');
+    expect(presetCauseFlow('resignation').opensOn?.(f)).toBe('causa');
   });
 
   it('a reset brings the marked cause back, and with it the start past the cause', () => {

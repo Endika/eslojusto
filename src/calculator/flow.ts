@@ -32,13 +32,12 @@ export const sheetAnchor = (step: string): string => `#sheet-${step}`;
 export const stepOfHash = (hash: string): string => hash.replace(/^#(sheet-)?/, '');
 
 export function indexOfHash<S extends string>(flow: Flow<S>, hash: string): number {
-  const i = flow.steps.indexOf(stepOfHash(hash) as S);
-  return i < 0 ? 0 : i;
+  return Math.max(0, flow.steps.indexOf(stepOfHash(hash) as S));
 }
 
 export function startStep<S extends string>(flow: Flow<S>, form: HTMLFormElement): number {
-  const step = flow.opensOn?.(form);
-  return step === undefined ? 0 : Math.max(0, flow.steps.indexOf(step));
+  const step = flow.opensOn?.(form) ?? flow.steps[0];
+  return Math.max(0, flow.steps.indexOf(step));
 }
 
 // The next sheet asked in `direction`, or the result going forward.
@@ -59,8 +58,8 @@ export function firstIncomplete<S extends string>(
   form: HTMLFormElement,
   today: CivilDate,
 ): number {
-  const i = flow.steps.findIndex(
-    (s, j) => j <= lastSheet(flow) && flow.applies(form, s) && !flow.complete(form, s, today),
-  );
+  const i = flow.steps
+    .slice(0, lastSheet(flow))
+    .findIndex((s) => flow.applies(form, s) && !flow.complete(form, s, today));
   return i < 0 ? lastSheet(flow) : i;
 }
