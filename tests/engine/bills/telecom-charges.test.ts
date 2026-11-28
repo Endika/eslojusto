@@ -113,4 +113,19 @@ describe('the charges of telecom bills', () => {
       telecomCharges([bill(line('discount', 0, null, '2026-12-31'))], TODAY).promotions,
     ).toEqual([]);
   });
+
+  it('tells only of discounts with an end day and an amount', () => {
+    const c = telecomCharges(
+      [
+        bill(
+          line('handset', 5, null, '2026-10-15'),
+          line('discount', 0, null, '2026-10-15'),
+          line('discount', -2, null, '2026-10-15'),
+          line('discount', 3),
+        ),
+      ],
+      TODAY,
+    );
+    expect(c.promotions).toEqual([]);
+  });
 });

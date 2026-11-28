@@ -44,6 +44,23 @@ describe('the telecom review', () => {
     expect(r.totals.counted).toBe(60);
   });
 
+  it('counts the penalty once too when a reading of leaving over a change keeps it within the limit', () => {
+    const r = review({
+      changeNotice: priceRise,
+      handset: { value: 120, kept: true },
+      penaltyCharged: 100,
+    });
+    expect(statuses(r)).toEqual(['change_exit:within_limit', 'change_exit:paid_over']);
+  });
+
+  it('keeps the length of the commitment when leaving over a change settles the penalty', () => {
+    const r = review({
+      changeNotice: priceRise,
+      commitment: { startedOn: parseDate('2025-03-01'), months: 30, agreedPenalty: 180 },
+    });
+    expect(statuses(r)).toEqual(['commitment_length:above_legal_maximum', 'change_exit:paid_over']);
+  });
+
   it('keeps the commitment cap while the change of conditions is in doubt', () => {
     const r = review({ changeNotice: { ...priceRise, index: 'ipc_plus' }, penaltyCharged: 90 });
     expect(statuses(r)).toEqual(['commitment_penalty:paid_over', 'change_exit:review_it']);
@@ -77,6 +94,7 @@ describe('the telecom review', () => {
     });
     expect(r.scope).toEqual({ inScope: false, reason: 'exit_before_2022' });
     expect(r.items).toEqual([]);
+    expect(r.totals).toEqual({ counted: 0, upTo: 0, under: 0 });
   });
 
   it('turns away what cannot be read', () => {
