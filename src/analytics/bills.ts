@@ -190,8 +190,10 @@ export function telecomAnalytics(
 type RenewalCompleted = Props<'renewal_review_completed'>;
 
 // Which side of the PVPC the letter's new prices fall on; none when there is nothing to compare.
-const versusPvpc = ({ pvpc }: CompletedRenewalReview['review']): RenewalCompleted['vs_pvpc'] =>
-  pvpc.kind !== 'ok' || pvpc.difference === 0 ? 'none' : pvpc.difference > 0 ? 'above' : 'below';
+function versusPvpc({ pvpc }: CompletedRenewalReview['review']): RenewalCompleted['vs_pvpc'] {
+  if (pvpc.kind !== 'ok') return 'none';
+  return pvpc.difference > 0 ? 'above' : pvpc.difference < 0 ? 'below' : 'none';
+}
 
 export const renewalReviewProps = (
   { review }: CompletedRenewalReview,

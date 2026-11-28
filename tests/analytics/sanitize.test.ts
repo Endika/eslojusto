@@ -158,8 +158,12 @@ describe('only the listed properties leave', () => {
   });
 
   it('a property with no value does not leave', () => {
-    expect(cleanProperties({ $os: null, $browser: undefined, $device_type: 'Desktop' })).toEqual({
-      $device_type: 'Desktop',
-    });
+    const clean = cleanProperties({ $os: null, $browser: undefined, $device_type: 'Desktop' });
+    expect(Object.keys(clean)).toEqual(['$device_type']);
+  });
+
+  it('a campaign tag that is not text does not pass, nor is another value read as an address', () => {
+    expect(cleanProperties({ utm_source: 5 })).toEqual({});
+    expect(cleanProperties({ $current_url: 5 })).toEqual({ $current_url: 5 });
   });
 });
