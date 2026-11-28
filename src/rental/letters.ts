@@ -13,6 +13,7 @@ import { detailLine, placeAndDate, type LetterDetails, type LetterKind } from '.
 import type { Block, DocumentModel } from '../documents/ports';
 import type { Translate } from '../i18n/client';
 import type { CompletedRentalReview } from './ports';
+import { capSource } from './cap';
 import { dayText, monthText, percentText } from './render';
 
 const day = (d: CivilDate) => dayText(toIso(d));
@@ -83,12 +84,18 @@ function closing(details: LetterDetails, tr: Translate): Block[] {
   ];
 }
 
+// A figure that depends on the day count is the lowest of the readings, and the letter says so.
+const lowestNote = (review: RentalReview, tr: Translate): Block[] =>
+  // Stryker disable next-line OptionalChaining: a move-out always comes with its interest item, and the letters only reach this with one
+  itemOf(review, 'deposit_interest')?.outcome.kind === 'depends'
+    ? [{ type: 'note', text: tr('client.rental.letter.lowest') }]
+    : [];
+
 // The interest the balance still out has run up to, the last day counted being the eve of the
 // review; only the lowest reading, as with every figure in a letter.
 function interestBlocks(review: RentalReview, today: CivilDate, tr: Translate): Block[] {
   const interest = interestOwed(review);
   if (interest === null) return [];
-  const item = itemOf(review, 'deposit_interest');
   return [
     {
       type: 'text',
@@ -97,18 +104,16 @@ function interestBlocks(review: RentalReview, today: CivilDate, tr: Translate): 
         importe: formatEuros(interest),
       }),
     },
-    ...(item?.outcome.kind === 'depends'
-      ? [{ type: 'note', text: tr('client.rental.letter.lowest') } as const]
-      : []),
+    ...lowestNote(review, tr),
   ];
 }
 
 // The day the last of the deposit came back.
 const lastReturn = (out: MoveOut): CivilDate | null =>
-  out.returns.reduce<CivilDate | null>(
-    (last, r) => (last === null || compareDates(r.on, last) > 0 ? r.on : last),
-    null,
-  );
+  out.returns
+    .map((r) => r.on)
+    .sort(compareDates)
+    .at(-1) ?? null;
 
 // Asks for the deposit back: the contract, the day of the keys, what is pending, what art. 36.4
 // LAU says of interest, the interest so far and the account to pay it into. With the deposit
@@ -150,9 +155,7 @@ export function depositLetter(
               importe: formatEuros(interestOwed(review) ?? 0),
             }),
           },
-          ...(itemOf(review, 'deposit_interest')?.outcome.kind === 'depends'
-            ? [{ type: 'note', text: tr('client.rental.letter.lowest') } as const]
-            : []),
+          ...lowestNote(review, tr),
           { type: 'text', text: tr('client.rental.letter.deposit.account_interest') },
         ];
   return {
@@ -204,7 +207,7 @@ function rateWords(rate: RateFigure, cap: string | null, tr: Translate): string 
 function riseBlocks(line: RiseLine, input: CompletedRentalReview['input'], tr: Translate): Block[] {
   const { item, reading } = line;
   const binding = bindingRate(reading);
-  const cap = reading.cap && item.sources.find((s) => s.id === reading.cap?.rule);
+  const cap = capSource(reading, item);
   const capCitation = cap ? cap.citation : null;
   const subida = tr('client.rental.letter.rent.rise', { aniversario: day(item.anniversary) });
   const pending = item.sources
@@ -222,11 +225,12 @@ function riseBlocks(line: RiseLine, input: CompletedRentalReview['input'], tr: T
       text: binding
         ? tr('client.rental.letter.rent.line', {
             ...figures,
-            criterio: rateWords(binding.rate, binding.cap ? (capCitation ?? '') : null, tr),
+            criterio: rateWords(binding.rate, binding.cap ? capCitation : null, tr),
           })
         : tr('client.rental.letter.rent.line_no_rate', figures),
     },
     // A cap that did not set the rent is still named: art. 18 and that year's cap.
+    // Stryker disable next-line OptionalChaining: a cap norm is found only for a reading with a cap, which always has a binding rate
     ...(cap && !binding?.cap
       ? [
           {

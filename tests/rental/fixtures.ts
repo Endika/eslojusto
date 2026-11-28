@@ -2,6 +2,7 @@ import { parseDate as f } from '../../src/engine/date';
 import { RENTAL_TABLES } from '../../src/engine/rental/data/tables';
 import { reviewRental, type RentalReview } from '../../src/engine/rental/review';
 import type { RentalInput } from '../../src/engine/rental/types';
+import type { DocumentModel } from '../../src/documents/ports';
 import type { Translate } from '../../src/i18n/client';
 import { contract, update } from '../engine/rental/fixtures';
 import { pageTranslator } from '../support/page-strings';
@@ -10,6 +11,16 @@ export { contract, update };
 
 export const TODAY = f('2026-10-08');
 export const tr: Translate = pageTranslator('rental');
+
+// A translator that says the key and the variables it was given, to check what a document is made of.
+export const keys: Translate = (key, vars) => (vars ? `${key} ${JSON.stringify(vars)}` : key);
+
+export const shape = (model: DocumentModel): string[] =>
+  model.blocks.map((b) => {
+    if ('text' in b) return `${b.type}: ${b.text}`;
+    if (b.type === 'row') return `row: ${b.label} | ${b.value}`;
+    return `${b.type}: ${'label' in b ? b.label : ''}`;
+  });
 
 export const review = (input: RentalInput): RentalReview => {
   const r = reviewRental(input, TODAY, RENTAL_TABLES);

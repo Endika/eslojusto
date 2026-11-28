@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { parseDate as f, type CivilDate } from '../../src/engine/date';
 import { RENTAL_TABLES } from '../../src/engine/rental/data/tables';
 import type { IndexSeries } from '../../src/engine/rental/indices';
-import { reviewRental } from '../../src/engine/rental/review';
+import type { ItemReading, ItemResult } from '../../src/engine/rental/item';
+import type { RateFigure, RentUpdateReading } from '../../src/engine/rental/rent-update';
+import {
+  reviewRental,
+  type RentalReview,
+  type RentUpdateItem,
+} from '../../src/engine/rental/review';
 import type { RentalInput, ReviewDeps } from '../../src/engine/rental/types';
 import { NO_DETAILS, type LetterDetails } from '../../src/documents/letter';
 import type { Block, DocumentModel } from '../../src/documents/ports';
@@ -13,9 +19,11 @@ import { NORMS_BEFORE_VOTE } from '../engine/rental/norms-before-vote';
 import { FORBIDDEN } from '../support/forbidden';
 import {
   contract,
+  keys,
   repealedWindow,
   review,
   riseAboveIrav,
+  shape,
   TODAY,
   tr,
   unknownLargeLandlord,
@@ -50,6 +58,35 @@ const depositOut = contract({
   },
 });
 
+// 850 € of a 2.000 € deposit came back, 1.000 € on time: the balance is owed, but no interest runs.
+const balanceOnly = contract({
+  signedOn: f('2024-03-15'),
+  startDate: f('2024-03-20'),
+  deposit: 2000,
+  moveOut: {
+    keysReturnedOn: f('2026-06-30'),
+    returns: [{ on: f('2026-07-20'), amount: 1000 }],
+    deductions: [],
+  },
+});
+
+// Keys back 30-06-2025; the whole 1.000 € came back on 30-06-2026, eleven months late.
+const lateInFull = contract({
+  signedOn: f('2021-03-15'),
+  startDate: f('2021-03-20'),
+  moveOut: {
+    keysReturnedOn: f('2025-06-30'),
+    returns: [{ on: f('2026-06-30'), amount: 1000 }],
+    deductions: [],
+  },
+});
+
+// Keys back on 06-09-2026: the whole 1.000 € is owed, and a single day of interest, 0,09 € on
+// either day count.
+const oneDay = contract({
+  moveOut: { keysReturnedOn: f('2026-09-06'), returns: [], deductions: [] },
+});
+
 // Synthetic: IRAV September 2026 2,50 % and IPC 4,90 %, out 15-10-2026. A 3 % clause on a 2021
 // contract: with RDL 29/2026, the 2 % cap; without, the CPI leaves 3 %.
 const SYNTHETIC = 'https://www.ine.es/synthetic';
@@ -74,11 +111,9 @@ const fixedPercentRise = contract({
   fixedPercent: 3,
   updates: [update('2026-10-20', 1000, 1040)],
 });
-const pendingRise = completed(fixedPercentRise, f('2026-12-20'), {
-  ...FUTURE,
-  norms: NORMS_BEFORE_VOTE,
-});
-const validatedRise = completed(fixedPercentRise, f('2026-12-20'), FUTURE);
+const pendingRise = () =>
+  completed(fixedPercentRise, f('2026-12-20'), { ...FUTURE, norms: NORMS_BEFORE_VOTE });
+const validatedRise = () => completed(fixedPercentRise, f('2026-12-20'), FUTURE);
 
 const details: LetterDetails = {
   ...NO_DETAILS,
@@ -115,6 +150,23 @@ describe('which letters a rental review offers', () => {
     expect(rentalLetterKinds(review(contract()))).toEqual([]);
   });
 
+  it('the deposit letter for a balance owed on which no interest runs', () => {
+    expect(rentalLetterKinds(review(balanceOnly))).toEqual(['deposit_return']);
+  });
+
+  it('only a rise asks for rent, and only what is owed asks for the deposit', () => {
+    const paidOver = { status: 'paid_over', amount: 50, accumulated: 50 } as unknown as ItemReading;
+    const asRead = (base: RentalReview, kind: ItemResult['kind']): RentalReview => ({
+      ...base,
+      items: base.items.map((i) =>
+        i.kind === kind ? { ...i, outcome: { kind: 'single', value: paidOver } } : i,
+      ),
+    });
+    expect(rentalLetterKinds(asRead(review(balanceOnly), 'deposit_return'))).toEqual([]);
+    expect(rentalLetterKinds(asRead(review(lateInFull), 'deposit_interest'))).toEqual([]);
+    expect(riseLines(asRead(review(depositOut), 'deposit_return'))).toEqual([]);
+  });
+
   it('both, deposit first', () => {
     const both = { ...riseAboveIrav, moveOut: depositOut.moveOut };
     expect(rentalLetterKinds(review(both))).toEqual(['deposit_return', 'rent_review']);
@@ -122,14 +174,14 @@ describe('which letters a rental review offers', () => {
 });
 
 describe('the deposit letter', () => {
-  const r = completed(depositOut);
-  const all = text(depositLetter(r, TODAY, details, tr));
+  const r = () => completed(depositOut);
+  const all = () => text(depositLetter(r(), TODAY, details, tr));
 
   it('gives the contract, the keys, what is pending and the art. 36.4 LAU', () => {
-    expect(all).toContain('con fecha 15-03-2024');
-    expect(all).toContain('Te devolví las llaves el 30-06-2026');
-    expect(all).toMatch(/queda por devolver 150,00\s€/);
-    expect(all).toContain(
+    expect(all()).toContain('con fecha 15-03-2024');
+    expect(all()).toContain('Te devolví las llaves el 30-06-2026');
+    expect(all()).toMatch(/queda por devolver 150,00\s€/);
+    expect(all()).toContain(
       'el art. 36.4 LAU prevé interés legal pasado un mes desde la entrega de las llaves',
     );
   });
@@ -137,13 +189,13 @@ describe('the deposit letter', () => {
   it('gives only the lower interest, up to the last day counted', () => {
     // 150 € from 31-07-2026 to 07-10-2026 and 850 € to 13-08-2026, at 3,25 %: 1,98 € on 365
     // days, 2,01 € on 360. The letter asks only for what holds in both.
-    expect(all).toMatch(/Hasta el 07-10-2026, ese interés suma 1,98\s€\./);
-    expect(all).toContain('Esta cifra es la más baja de las cuentas posibles.');
-    expect(all).not.toMatch(/2,01|365|360/);
+    expect(all()).toMatch(/Hasta el 07-10-2026, ese interés suma 1,98\s€\./);
+    expect(all()).toContain('Esta cifra es la más baja de las cuentas posibles.');
+    expect(all()).not.toMatch(/2,01|365|360/);
   });
 
   it('fills the account and the person’s details, and leaves no line to sign', () => {
-    const model = depositLetter(r, TODAY, details, tr);
+    const model = depositLetter(r(), TODAY, details, tr);
     expect(model.blocks).toContainEqual({
       type: 'blank',
       label: 'Cuenta (IBAN)',
@@ -168,12 +220,14 @@ describe('the deposit letter', () => {
       value: 'Alex Ejemplo',
       wrap: true,
     });
-    expect(all).toContain('En Villaficticia, a 8 de octubre de 2026');
-    expect(all.toLowerCase()).not.toContain('firma');
+    expect(all()).toContain('En Villaficticia, a 8 de octubre de 2026');
+    expect(all().toLowerCase()).not.toContain('firma');
   });
 
   it('leaves the lines blank when nothing was typed', () => {
-    const blanks = depositLetter(r, TODAY, NO_DETAILS, tr).blocks.filter((b) => b.type === 'blank');
+    const blanks = depositLetter(r(), TODAY, NO_DETAILS, tr).blocks.filter(
+      (b) => b.type === 'blank',
+    );
     expect(blanks.every((b) => !('value' in b))).toBe(true);
     expect(blanks.map((b) => b.type === 'blank' && b.label)).toEqual([
       'Nombre y apellidos',
@@ -187,25 +241,14 @@ describe('the deposit letter', () => {
 });
 
 describe('the deposit letter, deposit back in full but late', () => {
-  // Keys back 30-06-2025; the whole 1.000 € came back on 30-06-2026, eleven months late.
-  const late = completed(
-    contract({
-      signedOn: f('2021-03-15'),
-      startDate: f('2021-03-20'),
-      moveOut: {
-        keysReturnedOn: f('2025-06-30'),
-        returns: [{ on: f('2026-06-30'), amount: 1000 }],
-        deductions: [],
-      },
-    }),
-  );
+  const late = () => completed(lateInFull);
 
   it('is offered for the interest alone', () => {
-    expect(rentalLetterKinds(late.review)).toEqual(['deposit_return']);
+    expect(rentalLetterKinds(late().review)).toEqual(['deposit_return']);
   });
 
   it('asks only for the interest of the delay, never for a deposit of 0 €', () => {
-    const all = text(depositLetter(late, TODAY, details, tr));
+    const all = text(depositLetter(late(), TODAY, details, tr));
     expect(all).toMatch(
       /Te devolví las llaves el 30-06-2025 y me devolviste la fianza el 30-06-2026, pasado el mes que prevé el art\. 36\.4 LAU; los intereses legales de ese retraso son \d+,\d\d\s€\./,
     );
@@ -284,10 +327,10 @@ describe('the rent letter', () => {
   });
 
   it('carries a rise pending validation with its lower reading, and says why', () => {
-    const [line] = riseLines(pendingRise.review);
+    const [line] = riseLines(pendingRise().review);
     expect(line?.pending).toBe(true);
     expect(line?.reading).toMatchObject({ maxRent: 1030, monthly: 10 });
-    const all = text(rentLetter(pendingRise, details, tr));
+    const all = text(rentLetter(pendingRise(), details, tr));
     expect(all).toMatch(/la renta que resulta según el art\. 18 LAU es 1\.030,00\s€ al mes/);
     expect(all).toMatch(/pago 1\.040,00\s€, 10,00\s€ más cada mes/);
     expect(all).toContain(
@@ -297,10 +340,10 @@ describe('the rent letter', () => {
   });
 
   it('a rise under the validated RDL 29/2026 is one reading, not a pending one', () => {
-    const [line] = riseLines(validatedRise.review);
+    const [line] = riseLines(validatedRise().review);
     expect(line?.pending).toBe(false);
     expect(line?.reading).toMatchObject({ maxRent: 1020, monthly: 20 });
-    const all = text(rentLetter(validatedRise, details, tr));
+    const all = text(rentLetter(validatedRise(), details, tr));
     expect(all).toMatch(/la renta que resulta según el art\. 18 LAU es 1\.020,00\s€ al mes/);
     expect(all).not.toContain('pendiente de convalidación');
   });
@@ -345,10 +388,202 @@ describe('the rental case', () => {
     for (const model of [
       paid.letter('deposit_return', details, tr),
       paid.letter('rent_review', details, tr),
-      rentLetter(pendingRise, NO_DETAILS, tr),
+      rentLetter(pendingRise(), NO_DETAILS, tr),
     ]) {
       const all = text(model).toLowerCase();
       for (const forbidden of FORBIDDEN) expect(all).not.toMatch(forbidden);
     }
+  });
+});
+
+describe('the letters block by block', () => {
+  const close = [
+    'text: client.rental.letter.regards',
+    'text: client.documents.letter.place_date {"lugar":"Villaficticia","fecha":"8 de octubre de 2026"}',
+    'blank: client.documents.letter.name',
+  ];
+  const head = (title: string) => [
+    `title: client.rental.letter.${title}.title`,
+    'blank: client.documents.letter.name',
+    'blank: client.documents.letter.id',
+    'blank: client.rental.letter.landlord',
+    'blank: client.rental.letter.address',
+  ];
+
+  it('the deposit letter asks for the balance, the rule, the interest and the account', () => {
+    expect(shape(depositLetter(completed(depositOut), TODAY, details, keys))).toEqual([
+      ...head('deposit'),
+      'text: client.rental.letter.deposit.body {"contrato":"15-03-2024","llaves":"30-06-2026","pendiente":"150,00 €"}',
+      'text: client.rental.letter.deposit.interest_rule',
+      'text: client.rental.letter.deposit.interest {"fecha":"07-10-2026","importe":"1,98 €"}',
+      'note: client.rental.letter.lowest',
+      'text: client.rental.letter.deposit.account',
+      'blank: client.rental.letter.iban',
+      ...close,
+    ]);
+  });
+
+  it('the deposit letter leaves out the interest when none runs', () => {
+    const lines = shape(depositLetter(completed(balanceOnly), TODAY, details, keys));
+    expect(lines.slice(5, -4)).toEqual([
+      expect.stringMatching(/^text: client.rental.letter.deposit.body /),
+      'text: client.rental.letter.deposit.interest_rule',
+      'text: client.rental.letter.deposit.account',
+    ]);
+  });
+
+  it('the deposit letter words one day count without the note on the lowest', () => {
+    const lines = shape(depositLetter(completed(oneDay), TODAY, details, keys));
+    expect(lines.slice(5, -4)).toEqual([
+      expect.stringMatching(/^text: client.rental.letter.deposit.body /),
+      'text: client.rental.letter.deposit.interest_rule',
+      expect.stringMatching(/^text: client.rental.letter.deposit.interest /),
+      'text: client.rental.letter.deposit.account',
+    ]);
+  });
+
+  it('the late deposit letter asks for the interest alone, from the last day it came back', () => {
+    const twoReturns = contract({
+      ...lateInFull,
+      moveOut: {
+        keysReturnedOn: f('2025-06-30'),
+        returns: [
+          { on: f('2026-06-30'), amount: 600 },
+          { on: f('2025-09-15'), amount: 400 },
+        ],
+        deductions: [],
+      },
+    });
+    const lines = shape(depositLetter(completed(twoReturns), TODAY, details, keys));
+    expect(lines.slice(5, -4)).toEqual([
+      expect.stringMatching(
+        /^text: client.rental.letter.deposit.body_late .*"devuelta":"30-06-2026"/,
+      ),
+      'note: client.rental.letter.lowest',
+      'text: client.rental.letter.deposit.account_interest',
+    ]);
+  });
+
+  it('the rent letter asks for each rise, its cap and what is pending', () => {
+    expect(shape(rentLetter(pendingRise(), details, keys))).toEqual([
+      ...head('rent'),
+      'text: client.rental.letter.rent.body {"contrato":"15-10-2021"}',
+      expect.stringMatching(/^bullet: client.rental.letter.rent.line \{"subida":.*"criterio":/),
+      'note: client.rental.letter.rent.cap {"norma":"LAU, art. 18.1, párrafo tercero (Real Decreto-ley 7/2019, de 1 de marzo)"}',
+      expect.stringMatching(/^note: client.rental.letter.rent.pending \{"normas":"art. 4.Dos/),
+      'text: client.rental.letter.rent.ask',
+      ...close,
+    ]);
+  });
+});
+
+describe('the rent letter, line by line', () => {
+  const reshaped = (
+    r: CompletedRentalReview,
+    change: (item: RentUpdateItem) => Partial<RentUpdateItem>,
+  ): CompletedRentalReview => ({
+    ...r,
+    review: {
+      ...r.review,
+      items: r.review.items.map((i) => (i.kind === 'rent_update' ? { ...i, ...change(i) } : i)),
+    },
+  });
+  const withReading = (r: CompletedRentalReview, patch: Partial<RentUpdateReading>) =>
+    reshaped(r, (item) => {
+      const { outcome } = item;
+      return {
+        outcome:
+          outcome.kind === 'single'
+            ? { ...outcome, value: { ...outcome.value, ...patch } }
+            : { ...outcome, low: { ...outcome.low, ...patch } },
+      };
+    });
+  const index = (flash: boolean): RateFigure => ({
+    kind: 'index',
+    figure: {
+      index: 'ipc',
+      month: '2025-02',
+      rate: 3,
+      publishedOn: '2025-03-14',
+      flash,
+      clampedFrom: null,
+    },
+  });
+  const fixed = (rate: number): RateFigure => ({ kind: 'fixed', rate });
+  const cap = (rate: RateFigure) => ({ rule: 'cap_irav' as const, rate });
+  const lines = (r: CompletedRentalReview) => shape(rentLetter(r, details, keys)).slice(6, -4);
+
+  it.each([
+    ['the agreed index when no cap applies', index(false), null, 'rent.index {', false],
+    ['a flash index, worded as such', index(true), null, 'rent.index_flash {', false],
+    [
+      'the cap when it is lower than the agreed index',
+      index(false),
+      fixed(2.08),
+      'rent.cap_fixed',
+      false,
+    ],
+    ['the cap when it equals the agreed figure', fixed(2), fixed(2), 'rent.cap_fixed', false],
+    ['the cap alone when nothing was agreed', null, fixed(2), 'rent.cap_fixed', false],
+    ['a cap that is an index', null, index(true), 'rent.cap_index', false],
+    [
+      'the agreed figure when it is lower than the cap, naming the cap apart',
+      fixed(1),
+      fixed(2),
+      'rent.fixed',
+      true,
+    ],
+  ] as const)('words %s', (_, agreed, capRate, criterion, capNoted) => {
+    const r = withReading(completed(riseAboveIrav), {
+      agreed,
+      cap: capRate && cap(capRate),
+    });
+    const [bullet, ...notes] = lines(r);
+    expect(bullet).toContain(`"criterio":"client.rental.letter.${criterion}`);
+    expect(notes.some((n) => n.startsWith('note: client.rental.letter.rent.cap '))).toBe(capNoted);
+  });
+
+  it('says so when no figure was agreed and no cap applied', () => {
+    const noClause = contract({ ...riseAboveIrav, updateClause: 'none' });
+    const [bullet, ...notes] = lines(completed(noClause));
+    expect(bullet).toMatch(/^bullet: client.rental.letter.rent.line_no_rate /);
+    expect(notes).toEqual([]);
+  });
+
+  it('puts the rent paid as it was entered, or none when the rise has no row', () => {
+    const r = completed(riseAboveIrav);
+    expect(lines(r)[0]).toContain('"pagada":"1.030,00' + String.fromCharCode(160) + '€"');
+    expect(lines({ ...r, input: { ...r.input, updates: [] } })[0]).toContain(
+      '"pagada":"0,00' + String.fromCharCode(160) + '€"',
+    );
+  });
+
+  it('notes the lowest reading of a doubt that is not a pending norm', () => {
+    const byEmail = contract({
+      ...riseAboveIrav,
+      updates: [update('2025-03-20', 1000, 1030, { notice: 'email' })],
+    });
+    expect(lines(completed(byEmail)).slice(1)).toEqual(['note: client.rental.letter.lowest']);
+  });
+
+  it('says a norm is pending only for the lower of two readings that rests on it', () => {
+    const pendingSources = (r: CompletedRentalReview, status: 'pending_validation' | 'in_force') =>
+      reshaped(r, (item) => ({ sources: item.sources.map((s) => ({ ...s, status })) }));
+    const noted = (r: CompletedRentalReview) => lines(r).some((l) => l.includes('rent.pending'));
+    expect(noted(pendingRise())).toBe(true);
+    expect(noted(pendingSources(pendingRise(), 'in_force'))).toBe(false);
+    expect(lines(pendingSources(pendingRise(), 'in_force')).slice(-1)).toEqual([
+      'note: client.rental.letter.lowest',
+    ]);
+    expect(lines(pendingSources(completed(riseAboveIrav), 'pending_validation')).slice(1)).toEqual(
+      [],
+    );
+  });
+});
+
+describe('the deposit letter without a move-out', () => {
+  it('leaves the day of the keys blank', () => {
+    const lines = shape(depositLetter(completed(contract()), TODAY, details, keys));
+    expect(lines[5]).toContain('"llaves":""');
   });
 });

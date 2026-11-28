@@ -8,6 +8,7 @@ import { formatEuros, formatInteger } from '../calculator/number';
 import { longDate } from '../documents/letter';
 import type { Block, DocumentModel } from '../documents/ports';
 import type { Translate } from '../i18n/client';
+import { capSource } from './cap';
 import type { CompletedRentalReview } from './ports';
 import {
   calculationLines,
@@ -120,7 +121,7 @@ function figureRows(figures: Figures, tr: Translate): Block[] {
 
 // The cap's norm, on a line of its own under the figures.
 function capNote(r: RentUpdateReading, item: RentUpdateItem, tr: Translate): string[] {
-  const cap = r.cap && item.sources.find((s) => s.id === r.cap?.rule);
+  const cap = capSource(r, item);
   return cap ? [`${tr('client.rental.detail.cap')}: ${cap.citation}`] : [];
 }
 
@@ -174,6 +175,7 @@ function itemBlocks(item: RentalItemResult, input: RentalInput, tr: Translate): 
 // Every index figure a rise was compared with, once, with its month and publication day.
 function indexFigures(items: readonly RentalItemResult[]): IndexFigure[] {
   const figures = new Map<string, IndexFigure>();
+  // Stryker disable next-line MethodExpression,ConditionalExpression: the filter narrows the type; the readings of any other item carry no agreed or cap rate, so none yields a figure
   for (const item of items.filter((i): i is RentUpdateItem => i.kind === 'rent_update')) {
     const values =
       item.outcome.kind === 'single'
@@ -247,6 +249,7 @@ export function rentalReport(
             { type: 'heading', text: tr('client.rental.report.indices') } as const,
             ...indices.map((figure): Block => ({
               type: 'bullet',
+              // Stryker disable next-line StringLiteral: rateText words any kind but 'fixed' as an index figure
               text: rateText({ kind: 'index', figure }, tr),
             })),
           ]
