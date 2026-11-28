@@ -38,30 +38,26 @@ type PointResult = Completed['smi'];
 const findingsOf = (a: Assessed): readonly Finding[] =>
   a.kind === 'single' ? [a.finding] : a.readings.map((r) => r.finding);
 
-// The family of a point: its item, with the extra pays apart from the holidays they share it with.
-function familyOf(f: Finding): Family | null {
-  switch (f.item) {
-    case 'minimum_wage':
-      return 'smi';
-    case 'modality':
-      return 'modality_check';
-    case 'chaining':
-      return 'chaining';
-    case 'trial_period':
-      return 'trial';
-    case 'working_time':
-      return 'working_time';
-    case 'part_time':
-      return 'part_time_check';
-    case 'holidays_pay':
-      return f.id === 'extra_pays' ? 'extra_pays' : 'holidays';
-    case 'clauses':
-      return 'clauses';
-    case 'information':
-      return 'information';
-    case 'offer':
-      return null;
-  }
+const FAMILY: Readonly<Partial<Record<Finding['item'], Family>>> = {
+  minimum_wage: 'smi',
+  modality: 'modality_check',
+  chaining: 'chaining',
+  trial_period: 'trial',
+  working_time: 'working_time',
+  part_time: 'part_time_check',
+  clauses: 'clauses',
+  information: 'information',
+};
+
+// The family of a point: its item, with the extra pays apart from the holidays they share it with;
+// the offer has none. The readings of a point answer the same question, so its first one stands
+// for it.
+function familyOf(a: Assessed): Family | undefined {
+  const first = findingsOf(a)[0];
+  // Stryker disable next-line ConditionalExpression: a point always holds a finding, so the guard only narrows the type
+  if (first === undefined) return undefined;
+  if (first.item === 'holidays_pay') return first.id === 'extra_pays' ? 'extra_pays' : 'holidays';
+  return FAMILY[first.item];
 }
 
 // A point's status, or `readings` when its verdict changes with a «No lo sé».
@@ -70,17 +66,12 @@ const pointStatus = (a: Assessed): PointResult =>
 
 // Of several points, the status that weighs most: POINT_STATUSES runs from the most to the least.
 function familyStatus(points: readonly Assessed[], family: Family): PointResult {
-  const statuses = points
-    .filter((a) => {
-      const first = findingsOf(a)[0];
-      return first !== undefined && familyOf(first) === family;
-    })
-    .map(pointStatus);
+  const statuses = points.filter((a) => familyOf(a) === family).map(pointStatus);
   return POINT_STATUSES.find((s) => statuses.includes(s)) ?? 'none';
 }
 
 const minimumWagePoints = (review: EmploymentReview): readonly Assessed[] =>
-  review.items.filter((a) => findingsOf(a)[0]?.item === 'minimum_wage');
+  review.items.filter((a) => familyOf(a) === 'smi');
 
 const BELOW_YEAR: ReadonlySet<EmploymentPhrase['key']> = new Set([
   'minimum_wage.year.below',
@@ -98,7 +89,7 @@ const certain = (a: Assessed, of: (f: Finding) => number): number =>
 const shortfall = (f: Finding): number =>
   f.status === 'below_minimum' && f.amount !== null ? f.amount.min : 0;
 
-function yearsBucket(n: number): Completed['smi_years_below'] {
+export function yearsBucket(n: number): Completed['smi_years_below'] {
   if (n <= 0) return '0';
   if (n === 1) return '1';
   return n === 2 ? '2' : '3+';

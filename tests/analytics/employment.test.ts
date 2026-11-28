@@ -9,9 +9,14 @@ import {
   type Track,
 } from '../../src/analytics/events';
 import { documentsAnalytics } from '../../src/analytics/documents';
-import { employmentAnalytics, employmentReviewProps } from '../../src/analytics/employment';
+import {
+  employmentAnalytics,
+  employmentReviewProps,
+  yearsBucket,
+} from '../../src/analytics/employment';
 import { EMPLOYMENT_FAQ_TOPICS } from '../../src/content/employment-faq-topics';
 import { parseDate as f } from '../../src/engine/date';
+import type { EmploymentPeriod } from '../../src/engine/employment/types';
 import type { EmploymentInput } from '../../src/engine/employment/types';
 import { SHEET_FIELDS, SHEETS } from '../../src/employment/form';
 import { STEPS } from '../../src/employment/steps';
@@ -139,6 +144,83 @@ describe('employment events', () => {
     );
   });
 
+  it('names what each family of points came to', () => {
+    expect(props(contract())).toMatchObject({
+      smi: 'within_limit',
+      modality_check: 'within_limit',
+      chaining: 'none',
+      trial: 'within_limit',
+      working_time: 'missing_requirement',
+      part_time_check: 'none',
+      holidays: 'within_limit',
+      extra_pays: 'within_limit',
+      clauses: 'none',
+      information: 'within_limit',
+    });
+    const earlier = (startDate: string, endDate: string): EmploymentPeriod => ({
+      startDate: f(startDate),
+      endDate: f(endDate),
+      employer: 'same',
+      kind: 'production',
+    });
+    const production = contract({
+      modality: 'production',
+      startDate: f('2026-08-01'),
+      signedOn: f('2026-08-01'),
+      endDate: f('2026-12-31'),
+      causeStated: true,
+      circumstancesStated: true,
+      history: [earlier('2025-12-01', '2026-03-01'), earlier('2026-03-10', '2026-07-15')],
+      partTime: {
+        hoursStated: false,
+        distributionStated: false,
+        complementary: null,
+        voluntaryPercent: null,
+      },
+      contractHours: { weekly: 20, annual: null },
+      clauses: [
+        {
+          label: 'mandatory_overtime',
+          months: null,
+          compensationStated: null,
+          trainingDescribed: null,
+          waivedRight: null,
+          costsOnWorker: null,
+          literal: { text: 'Cláusula sintética de prueba.' },
+        },
+      ],
+      trial: { amount: 7, unit: 'months' },
+      extraPays: { count: 2, prorated: true },
+      holidays: { days: 20, unit: 'calendar', workDaysPerWeek: 5, includedInSalary: false },
+      agreement: { ...contract().agreement, named: true },
+    });
+    expect(props(production)).toMatchObject({
+      part_time: true,
+      chaining: 'within_limit',
+      trial: 'depends_on_agreement',
+      part_time_check: 'missing_requirement',
+      holidays: 'review_it',
+      extra_pays: 'depends_on_agreement',
+      clauses: 'review_it',
+      history: true,
+    });
+  });
+
+  it('counts the years below the minimum in a bucket', () => {
+    // Every year up to the one the contract was signed in is held to the pay it states.
+    const years = (startDate: string, signedOn: string) =>
+      props(
+        contract({
+          startDate: f(startDate),
+          signedOn: f(signedOn),
+          salary: { ...belowMinimum.salary, amount: 800 },
+        }),
+      ).smi_years_below;
+    expect(years('2026-01-01', '2026-01-01')).toBe('1');
+    expect(years('2025-12-20', '2026-01-05')).toBe('2');
+    expect([0, 1, 2, 3, 9].map(yearsBucket)).toEqual(['0', '1', '2', '3+', '3+']);
+  });
+
   it('names a point that depends on a «No lo sé» as readings, with no difference from it', () => {
     const p = props(unknownComplement);
     expect(p.smi).toBe('readings');
@@ -160,7 +242,9 @@ describe('employment events', () => {
     expect(period('2021-06-01')).toBe('before_reform');
     expect(period('2022-03-29')).toBe('before_reform');
     expect(period('2022-03-30')).toBe('2022-2023');
+    expect(period('2023-12-31')).toBe('2022-2023');
     expect(period('2024-01-01')).toBe('2024-2025');
+    expect(period('2025-12-31')).toBe('2024-2025');
     expect(period('2026-01-01')).toBe('2026+');
   });
 
@@ -241,6 +325,58 @@ describe('employment events', () => {
     expect(isValidEvent('employment_review_completed', { ...p, agreement: 'oficinas' })).toBe(
       false,
     );
+  });
+
+  it('counts payslips of any number in a bucket', () => {
+    const slips = (n: number) =>
+      props(
+        contract({
+          payslips: Array.from({ length: n }, (_, i) => ({
+            month: `2026-0${i + 1}`,
+            wholeMonth: true,
+            incidents: false,
+            salaryInMoney: 1500,
+            inKind: 0,
+            proratedExtraPay: 0,
+            overtimeHours: null,
+            complementaryHours: null,
+          })),
+        }),
+      ).payslips;
+    expect([0, 1, 3, 4].map(slips)).toEqual(['0', '1-3', '1-3', '4+']);
+  });
+
+  it('says «unknown» of an answer left open, and yes or no of the rest', () => {
+    const answered = (change: Partial<EmploymentInput>) => {
+      const { written, technical, small_company } = props(contract(change));
+      return [written, technical, small_company];
+    };
+    expect(answered({ writtenContract: null, technical: null, smallCompany: null })).toEqual([
+      'unknown',
+      'unknown',
+      'unknown',
+    ]);
+    expect(answered({ writtenContract: false, technical: true, smallCompany: true })).toEqual([
+      'no',
+      'yes',
+      'yes',
+    ]);
+  });
+
+  it('never reports a rejected answer about a disability, nor one that is no question', () => {
+    const sent: unknown[] = [];
+    const events = employmentAnalytics(
+      ((name: string, p: unknown) => void sent.push([name, p])) as Track,
+      () => 0,
+      () => 'none',
+    );
+    events.fieldRejected('relacion', 'disability', 'missing_choice');
+    events.fieldRejected('relacion', 'Familia Ficticia', 'missing_choice');
+    expect(sent).toEqual([]);
+    events.fieldRejected('relacion', 'startDate', 'invalid_date');
+    expect(sent).toEqual([
+      ['validation_error', { section: 'relacion', field: 'startDate', code: 'invalid_date' }],
+    ]);
   });
 
   it('employmentAnalytics names each event as the catalogue does', () => {
