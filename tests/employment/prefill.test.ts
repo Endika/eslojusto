@@ -760,6 +760,11 @@ describe('what the form does not take', () => {
     expect(p).toMatchObject({ entries: [['hasOffer', 'yes']], marks: [], count: 0, notes: [] });
   });
 
+  it('reads the effective work of the first year as an amount, even a nought', () => {
+    const p = prefill({ documents: [], fields: { effectiveWorkPercent: f(0) } });
+    expect(entry(p, 'effectiveYear1')).toBe('0,00');
+  });
+
   it('quotes the documents’ words trimmed, and none that are blank', () => {
     const quoted = prefill({
       fields: { ...contract, modalityText: f('  Contrato temporal  '), causeText: f('   ') },
