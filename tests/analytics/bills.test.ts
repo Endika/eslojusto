@@ -176,6 +176,25 @@ describe('bills events', () => {
     expect(p.undercharged).toBe(false);
   });
 
+  it('never names the social bonus among the lines that do not match', () => {
+    const p = electricityBillProps(
+      electricity(
+        juneBill({
+          socialBonus: {
+            category: 'vulnerable',
+            members: 3,
+            discountedKwh: null,
+            kwhSoFar: 500,
+            amount: 9,
+          },
+        }),
+      ),
+      'claim',
+    );
+    expect(JSON.stringify(p)).not.toContain('social_bonus');
+    expect(p.findings).not.toEqual([]);
+  });
+
   it('says when something is charged short, without the figure', () => {
     // The meter at 1,00 with VAT left at 10,55: 0,04 short of (47,02 + 2,40 + 1,00) × 21 %.
     const p = electricityBillProps(electricity(juneBill({ meter: meter({ amount: 1 }) })), 'claim');
@@ -208,6 +227,26 @@ describe('bills events', () => {
       after_exit: 'none',
       pass: 'claim',
     });
+    const left = telecomReviewProps(
+      telecomReview(
+        telecom({
+          exitRequestedOn: parseDate('2026-04-02'),
+          penaltyCharged: 90,
+          changeNotice: {
+            sentOn: parseDate('2026-03-05'),
+            appliesOn: parseDate('2026-05-01'),
+            change: 'price_up',
+            index: 'none',
+          },
+          lines: [
+            { from: parseDate('2026-03-01'), to: parseDate('2026-03-31'), amount: 30 },
+            { from: parseDate('2026-04-01'), to: parseDate('2026-04-30'), amount: 30 },
+          ],
+        }),
+      ),
+      'claim',
+    );
+    expect(left).toMatchObject({ change_exit: 'paid_over', after_exit: 'charged_after_exit' });
     const none = telecomReviewProps(
       telecomReview(telecom({ commitment: null, penaltyCharged: null, lines: [] })),
       'quiet',
@@ -287,6 +326,49 @@ describe('bills events', () => {
     events.wentBack('bono-social-consumo', 'bono-social');
     expect(sent.join()).not.toMatch(/bono-social-consumo|bonus(Category|Amount|KwhSoFar)/);
     expect(sent).toHaveLength(2);
+  });
+
+  it('reports a way back between the ordinary sheets, never from or to the bonus-only one', () => {
+    const sent: unknown[] = [];
+    const events = electricityAnalytics(
+      ((name: string, p: unknown) => void sent.push([name, p])) as Track,
+      () => 0,
+      () => 'locked',
+      () => 'none',
+    );
+    events.wentBack('suministro', 'bono-social');
+    events.wentBack('bono-social-consumo', 'bono-social');
+    events.wentBack('bono-social', 'bono-social-consumo');
+    events.fieldRejected('bono-social-consumo', 'postcode', 'postcode');
+    events.fieldRejected('bono-social', 'bonusAmount', 'missing_value');
+    events.fieldRejected('suministro', 'postcode', 'postcode');
+    expect(sent).toEqual([
+      ['went_back', { from: 'suministro', to: 'bono-social' }],
+      ['validation_error', { section: 'suministro', field: 'postcode', code: 'postcode' }],
+    ]);
+  });
+
+  it('times a year from the first sheet shown, and counts none before a review', () => {
+    const sent: [string, Record<string, unknown>][] = [];
+    let clock = 40_000;
+    const events = electricityAnalytics(
+      ((name: string, p: Record<string, unknown>) => void sent.push([name, p])) as Track,
+      () => clock,
+      () => 'locked',
+      () => 'claim',
+    );
+    const basket = reviewBasket([meterOver()], { passPrice: 4.99 });
+    clock = 100_000;
+    events.basketCompleted(basket);
+    events.stepShown('suministro');
+    clock = 130_000;
+    events.basketCompleted(basket);
+    expect(
+      sent.filter(([n]) => n === 'basket_completed').map(([, p]) => [p['pass'], p['seconds']]),
+    ).toEqual([
+      ['none', '<60'],
+      ['none', '<60'],
+    ]);
   });
 
   it('electricityAnalytics names each event as the catalogue does and counts each year', () => {
@@ -417,6 +499,33 @@ describe('the renewal review', () => {
       exit: 'not_checked_before',
     });
     expect(isValidEvent('renewal_review_completed', odd)).toBe(true);
+  });
+
+  it('says a letter that matches its own recalculation and has tables to compare with', () => {
+    expect(renewalReviewProps(renewal(), 'manual')).toMatchObject({
+      mismatch: false,
+      regulated_change: false,
+      vs_pvpc: 'above',
+    });
+  });
+
+  it('leaves what it cannot work out as none, and says nothing of the regulated terms', () => {
+    expect(renewalReviewProps(renewal(naturgy({ annualKwh: null })), 'manual')).toMatchObject({
+      mismatch: false,
+      vs_pvpc: 'none',
+    });
+    const old = naturgy({ letterDate: '2024-01-10', renewalDate: '2024-02-10' });
+    expect(renewalReviewProps(renewal(old), 'manual').regulated_change).toBeNull();
+  });
+
+  it('puts a PVPC difference of nothing on neither side', () => {
+    const { review } = renewal(naturgy(), pvpcAt(400));
+    const { pvpc } = review;
+    if (pvpc.kind !== 'ok') throw new Error('expected a comparison');
+    const versus = (difference: number) =>
+      renewalReviewProps({ review: { ...review, pvpc: { ...pvpc, difference } } }, 'manual')
+        .vs_pvpc;
+    expect([versus(1), versus(0), versus(-1)]).toEqual(['above', 'none', 'below']);
   });
 
   it('leaves the exit as free, unchanged or not checked, and nothing else', () => {
