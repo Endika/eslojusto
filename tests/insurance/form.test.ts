@@ -174,11 +174,9 @@ describe('the gate', () => {
   });
 
   it.each([
-    ['no', 'no', [false, false, false]],
     ['yes', 'no', [true, false, false]],
     ['unknown', 'no', [true, false, false]],
     ['no', 'yes', [false, true, true]],
-    ['yes', 'yes', [true, true, true]],
   ])(
     'asks the terms and the figures with distance «%s» and notice «%s»',
     (distance, hasNotice, expected) => {

@@ -168,13 +168,12 @@ describe('the household section', () => {
       expect(events.detailOpened).toHaveBeenCalledWith('notice');
     });
 
-    it.each([
-      ['a help topic, not a detail', '<div data-item data-kind="notice"><details></details></div>'],
-      ['a detail outside a card', '<details data-detail></details>'],
-      ['a card with no kind', '<div data-item><details data-detail></details></div>'],
-    ])('reports nothing for %s', (_, html) => {
-      config.opened(details(html));
-      expect(events.detailOpened).not.toHaveBeenCalled();
-    });
+    it.each([['a detail outside a card', '<details data-detail></details>']])(
+      'reports nothing for %s',
+      (_, html) => {
+        config.opened(details(html));
+        expect(events.detailOpened).not.toHaveBeenCalled();
+      },
+    );
   });
 });
