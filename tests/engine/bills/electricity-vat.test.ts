@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { billsPhrase as say } from '../../../src/engine/bills/calculation';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
@@ -6,6 +7,7 @@ import { checkVat, type VatDeps } from '../../../src/engine/bills/electricity-va
 import { countedAmount, findingsOf, type BillItem } from '../../../src/engine/bills/finding';
 import type { ElectricityBillInput, SocialBonus, VatLine } from '../../../src/engine/bills/types';
 import { parseDate } from '../../../src/engine/date';
+import type { VatRate } from '../../../src/engine/bills/tables';
 import { juneBill, mayBill, only } from './input';
 
 const deps: VatDeps = { norms: BILLS_NORMS, tables: BILLS_TABLES };
@@ -198,5 +200,206 @@ describe('VAT on a day with no rate loaded', () => {
 
   it('a bill with no VAT line says so', () => {
     expect(only(check(juneBill({ vat: null }))).status).toBe('not_on_bill');
+  });
+});
+
+// The May bill's day against a table of this one reduced rate and the general one beside it.
+const reducedRate = (change: Partial<Extract<VatRate, { kind: 'reduced' }>> = {}): VatDeps => {
+  const row = BILLS_TABLES.vat.find((r) => r.from === '2026-03-22');
+  if (row === undefined) throw new Error('no reduced row');
+  return {
+    norms: BILLS_NORMS,
+    tables: {
+      vat: [
+        {
+          ...row,
+          value: {
+            kind: 'reduced',
+            percent: 10,
+            generalPercent: 21,
+            powerLimitKw: 10,
+            powerLimitIncluded: true,
+            severeVulnerable: true,
+            ...change,
+          },
+        },
+      ],
+    },
+  };
+};
+const withRate = (
+  change: Partial<Extract<VatRate, { kind: 'reduced' }>>,
+  input: ElectricityBillInput,
+) => checkVat(input, reducedRate(change));
+const at = (kw: [number, number], line: VatLine, more: Partial<ElectricityBillInput> = {}) =>
+  mayBill({ contractedPower: { p1: kw[0], p2: kw[1] }, vat: line, ...more });
+
+describe('which VAT rate a supply gets', () => {
+  it.each([
+    ['at the limit with it included', { powerLimitIncluded: true }, [10, 10], 4.47],
+    ['under a limit that leaves itself out', { powerLimitIncluded: false }, [9.9, 9.9], 4.47],
+    ['over the limit', {}, [12, 12], 9.39],
+    [
+      'over a limit that leaves itself out, on one period',
+      { powerLimitIncluded: false },
+      [10, 12],
+      9.39,
+    ],
+    ['over a limit that leaves itself out, on both', { powerLimitIncluded: false }, [12, 12], 9.39],
+  ] as const)('one rate for a supply %s', (_, change, kw, amount) => {
+    const item = withRate(change, at([kw[0], kw[1]], vat(amount)));
+    expect(item.kind).toBe('single');
+    expect(only(item).status).toBe('matches');
+  });
+
+  it('says the highest power of a supply at a limit that leaves itself out', () => {
+    const item = withRate({ powerLimitIncluded: false }, at([10, 9.5], vat(4.47)));
+    expect(findingsOf(item)[0]?.calculation).toContainEqual(
+      say('vat.power_at_limit', { kw: { kw: 10 } }),
+    );
+  });
+
+  describe('for a holder of the social bonus', () => {
+    const run = (
+      rate: Partial<Extract<VatRate, { kind: 'reduced' }>>,
+      kw: number,
+      b: SocialBonus | null,
+    ) => withRate(rate, at([kw, kw], vat(3.97), { socialBonus: b }));
+
+    it.each([
+      ['with no bonus', { severeVulnerable: true }, 12, null, 'single'],
+      [
+        'a severe one where the decree does not say',
+        { severeVulnerable: null },
+        12,
+        bonus('severe'),
+        'readings',
+      ],
+      [
+        'a severe one where the decree says no',
+        { severeVulnerable: false },
+        12,
+        bonus('severe'),
+        'single',
+      ],
+      [
+        'another category where the decree does not say',
+        { severeVulnerable: null },
+        12,
+        bonus('vulnerable'),
+        'single',
+      ],
+      [
+        'one with no category, under the limit',
+        { severeVulnerable: true },
+        9.9,
+        bonus(null),
+        'single',
+      ],
+    ] as const)('a supply over the limit %s', (_, rate, kw, b, kind) => {
+      expect(run(rate, kw, b).kind).toBe(kind);
+    });
+
+    it('says the bonus may be a severe one', () => {
+      const item = run({ severeVulnerable: null }, 12, bonus('severe'));
+      expect(findingsOf(item)[0]?.calculation).toContainEqual(say('vat.severe_unknown'));
+      expect(findingsOf(item).map((f) => f.status)).toEqual(['matches', 'wrong_rate_for_date']);
+    });
+  });
+});
+
+describe('the words of the VAT', () => {
+  const billed = (item: BillItem) => only(item).calculation.slice(0, 3);
+  const full = mayBill({
+    discounts: [2],
+    excessPower: { amount: 3, maximeter: true },
+    services: [{ label: 'maintenance', amount: 5, requested: 'yes' }],
+    exitPenalty: { amount: 7, priceType: 'variable', firstRenewalPassed: false },
+    regularizations: [4],
+    vat: vat(1),
+  });
+
+  // 43,52 + 0,60 funding is in, with the tax 0,40 and the meter 0,80: 44,72 − 2 + 3 + 5 + 7 + 4 = 61,72.
+  it('works the base out of every part, the discounts off', () => {
+    const rate = say('vat.rate', {
+      date: { date: '2026-05-25' },
+      percent: { percent: 10 },
+      euros: { euros: 6.17 },
+    });
+    expect(billed(check(full))).toEqual([
+      say('vat.base', { euros: { euros: 61.72 } }),
+      say('tax.parts_either'),
+      rate,
+    ]);
+  });
+
+  it('leaves out the open parts when the bill has none', () => {
+    expect(only(check(mayBill())).calculation.slice(0, 2)).toEqual([
+      say('vat.base', { euros: { euros: 44.72 } }),
+      say('vat.rate', {
+        date: { date: '2026-05-25' },
+        percent: { percent: 10 },
+        euros: { euros: 4.47 },
+      }),
+    ]);
+  });
+
+  it.each([
+    ['a discount', { discounts: [2] }],
+    ['an excess of power', { excessPower: { amount: 3, maximeter: true } }],
+    ['a service', { services: [{ label: 'm', amount: 5, requested: 'yes' }] }],
+    [
+      'an exit penalty',
+      { exitPenalty: { amount: 7, priceType: 'variable', firstRenewalPassed: false } },
+    ],
+    ['a settlement in favour', { regularizations: [4] }],
+    ['a settlement against', { regularizations: [-4] }],
+  ] as const)('says the parts may be in or out when there is %s', (_, change) => {
+    expect(
+      only(check(mayBill({ ...change } as Partial<ElectricityBillInput>))).calculation,
+    ).toContainEqual(say('tax.parts_either'));
+  });
+
+  it('works a bill with no electricity tax and no meter', () => {
+    const f = only(check(mayBill({ electricityTax: null, meter: null, vat: vat(4.35) })));
+    expect(f.status).toBe('matches');
+    expect(f.calculation[0]).toEqual(say('vat.base', { euros: { euros: 43.52 } }));
+  });
+
+  it('says what a bill with no VAT line and a day with no rate are about', () => {
+    const none = only(check(juneBill({ vat: null })));
+    expect(none).toMatchObject({ id: 'vat', line: null });
+    expect(none.calculation).toEqual([say('vat.not_on_bill')]);
+    expect(only(check(juneBill({ dueOn: parseDate('2027-01-08') }))).id).toBe('vat');
+  });
+
+  it('tells a bill charged at the other rate of a reduced row when it prints none', () => {
+    expect(only(withRate({}, at([4.6, 4.6], vat(9.39)))).status).toBe('wrong_rate_for_date');
+  });
+
+  it('tells a bill charged at a general rate of another day when it prints none', () => {
+    const deps = reducedRate();
+    const [reduced] = deps.tables.vat;
+    if (reduced === undefined) throw new Error('no row');
+    const general = {
+      ...reduced,
+      from: '2026-06-01',
+      until: null,
+      value: { kind: 'general', percent: 5 },
+    } as const;
+    const item = checkVat(at([4.6, 4.6], vat(2.24)), {
+      ...deps,
+      tables: { vat: [reduced, general] },
+    });
+    expect(only(item).status).toBe('wrong_rate_for_date');
+  });
+
+  it('reads the lowest rate first whatever the order of the table', () => {
+    const tables = { vat: [...BILLS_TABLES.vat].reverse() };
+    const item = checkVat(juneBill({ dueOn: parseDate('2026-11-10') }), {
+      norms: NORMS_BEFORE_FIGURE,
+      tables,
+    });
+    expect(statuses(item)).toEqual(['wrong_rate_for_date:5.44', 'matches:null']);
   });
 });

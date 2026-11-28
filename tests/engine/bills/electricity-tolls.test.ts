@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { billsPhrase as say } from '../../../src/engine/bills/calculation';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import { checkTollsAndCharges, type TollsDeps } from '../../../src/engine/bills/electricity-tolls';
@@ -22,10 +23,26 @@ describe('tolls and charges of the 2.0TD tariff', () => {
     const { power, energy } = check(juneBill());
     expect(only(power)).toMatchObject({ id: 'tolls_and_charges_power', status: 'matches' });
     expect(only(energy)).toMatchObject({ id: 'tolls_and_charges_energy', status: 'matches' });
-    expect(only(power).calculation[0]).toEqual({
-      key: 'tolls.power',
-      vars: { p1: { kw: 4.6 }, p2: { kw: 4.6 }, euros: { euros: 10.75 } },
-    });
+    expect(only(power).calculation).toEqual([
+      say('tolls.power', { p1: { kw: 4.6 }, p2: { kw: 4.6 }, euros: { euros: 10.75 } }),
+      say('arithmetic.billed', { euros: { euros: 10.75 } }),
+    ]);
+    expect(only(energy).calculation).toEqual([
+      say('tolls.energy', { euros: { euros: 8.3 } }),
+      say('arithmetic.billed', { euros: { euros: 8.3 } }),
+    ]);
+  });
+
+  it('leave the energy unchecked when any line is for all of it', () => {
+    const { energy } = check(
+      juneBill({
+        energy: [
+          { period: 'all', kwh: 100, price: 0.1, amount: 10 },
+          { period: 'p1', kwh: 150, price: 0.1, amount: 15 },
+        ],
+      }),
+    );
+    expect(only(energy).calculation).toEqual([say('tolls.energy_one_price')]);
   });
 
   it('leave the energy unchecked when one price covers all of it, as no kWh go to a period', () => {
@@ -78,7 +95,10 @@ describe('tolls and charges of the 2.0TD tariff', () => {
 
   it('say so when the bill does not itemise them', () => {
     const { power, energy } = check(juneBill({ tollsAndCharges: { power: null, energy: 8.3 } }));
-    expect(only(power).status).toBe('not_on_bill');
+    expect(only(power)).toMatchObject({ status: 'not_on_bill', amount: null });
+    expect(only(power).calculation).toEqual([say('tolls.not_on_bill')]);
+    expect(only(power).sources.map((r) => r.id)).toEqual(['tolls', 'charges']);
+    expect(only(power).rows).toHaveLength(2);
     expect(only(energy).status).toBe('matches');
     expect(only(check(juneBill({ tollsAndCharges: null })).energy).status).toBe('not_on_bill');
   });
@@ -119,6 +139,8 @@ describe('tolls and charges of the 2.0TD tariff', () => {
       tables: { ...BILLS_TABLES, tolls: split },
     });
     expect(only(energy).status).toBe('not_checkable');
+    expect(only(energy)).toMatchObject({ id: 'tolls_and_charges_energy', status: 'not_checkable' });
+    expect(only(energy).calculation).toEqual([say('tolls.energy_price_change')]);
     // The power term is still worked out day by day.
     expect(only(power).status).toBe('matches');
   });
@@ -128,7 +150,7 @@ describe('tolls and charges of the 2.0TD tariff', () => {
       ...BILLS_NORMS,
       cnmc_tolls_2026: { ...BILLS_NORMS.cnmc_tolls_2026, status: 'pending_validation' },
     };
-    const { power } = check(juneBill({ tollsAndCharges: { power: 11.75, energy: 8.3 } }), {
+    const { power, energy } = check(juneBill({ tollsAndCharges: { power: 11.75, energy: 8.3 } }), {
       ...deps,
       norms,
     });
@@ -138,5 +160,7 @@ describe('tolls and charges of the 2.0TD tariff', () => {
       pendingOn: ['cnmc_tolls_2026'],
     });
     expect(only(power).calculation.at(-1)).toEqual({ key: 'official.pending' });
+    expect(only(energy).pendingOn).toEqual(['cnmc_tolls_2026']);
+    expect(only(energy).rows.map((r) => r.norm)).toEqual(['cnmc_tolls_2026', 'order_ted1524_2025']);
   });
 });

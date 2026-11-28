@@ -71,8 +71,7 @@ export function checkElectricityTax(
     // Stryker disable next-line ConditionalExpression,MethodExpression: its own rate gives the expected sums, which did not match when they are read
     const otherRates = tableRates.filter((p) => p !== rate.percent);
     const atOthers = otherRates.flatMap((p) => bases.map((b) => Math.max((p / 100) * b, floor)));
-    // Stryker disable next-line ConditionalExpression,EqualityOperator,ArrayDeclaration: with no rent the sums are the expected ones, which did not match when they are read
-    const unsettled = meter > 0 ? bases.map((b) => tax(b + meter)) : [];
+    const unsettled = bases.map((b) => tax(b + meter));
     return {
       percent: rate.percent,
       expected: bases.map(tax),

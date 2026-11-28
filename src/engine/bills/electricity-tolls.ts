@@ -117,6 +117,7 @@ function accessEnergy(
     for (const id of span.deciding) deciding.add(id);
   }
   const range = { low, high };
+  // Stryker disable next-line StringLiteral: the kind is only ever read against 'missing'
   return { kind: 'ok', byBase: [range, range], rows, deciding: [...deciding] };
 }
 
