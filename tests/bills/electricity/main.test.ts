@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { setUpElectricity } from '../../../src/bills/electricity/main';
 import { gate } from '../../../src/bills/electricity/conditions';
 import { readElectricityForm } from '../../../src/bills/electricity/form';
@@ -61,11 +61,9 @@ function config(extra: { detail?: () => string; offered?: (r: unknown) => boolea
 
 let c: Config;
 let rootGiven: unknown;
-beforeAll(() => {
+beforeEach(() => {
   c = config();
   rootGiven = vi.mocked(setUpSection).mock.calls[0]?.[0];
-});
-beforeEach(() => {
   vi.clearAllMocks();
 });
 

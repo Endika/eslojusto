@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { gate } from '../../../src/bills/telecom/conditions';
 import {
   SHEETS,
@@ -52,11 +52,11 @@ const config = (detail?: () => string): Config =>
 
 let c: Config;
 let rootGiven: unknown;
-beforeAll(() => {
+beforeEach(() => {
   c = config();
   rootGiven = vi.mocked(setUpSection).mock.calls[0]?.[0];
+  vi.clearAllMocks();
 });
-beforeEach(() => vi.clearAllMocks());
 
 describe('the telecom section', () => {
   it('sets the section up with its form, flow, sheets and questions', () => {
