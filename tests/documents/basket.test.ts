@@ -50,6 +50,8 @@ describe('a basket kept in memory', () => {
     basket.next();
     expect(basket.entriesWith('july')).toEqual(['june', 'july']);
     expect(basket.entries()).toEqual(['june']);
+    basket.put('july');
+    expect(basket.entriesWith('july, corrected')).toEqual(['june', 'july, corrected']);
   });
 
   it('gives a copy of what it keeps', () => {
@@ -93,6 +95,21 @@ describe('a paid review built from a basket', () => {
     expect(paid.report(tr, today).title).toBe('2');
     expect(paid.letterKinds).toEqual([]);
     expect(paid.filename?.('report')).toBe('client.bills.electricity.report.filename');
+  });
+
+  it('names a letter by the section’s letters, and the report otherwise', () => {
+    const letters = {
+      paid: () => ['claim' as const],
+      letter: () => model,
+      filename: () => 'client.bills.electricity.letter.filename' as never,
+    };
+    const withLetters = basketCase([2], { ...section, letters }).filename;
+    expect(withLetters?.('letter', 'claim')).toBe('client.bills.electricity.letter.filename');
+    expect(withLetters?.('letter')).toBe('client.bills.electricity.report.filename');
+    expect(withLetters?.('report', 'claim')).toBe('client.bills.electricity.report.filename');
+    expect(basketCase([2], section).filename?.('letter', 'claim')).toBe(
+      'client.bills.electricity.report.filename',
+    );
   });
 });
 

@@ -63,6 +63,13 @@ describe('admit', () => {
   });
 });
 
+describe('admit, at the PDF size limit', () => {
+  it('opens a PDF of exactly the limit', () => {
+    const atLimit = { ...pdf, size: MAX_PDF_BYTES };
+    expect(admit([], 15, [atLimit]).pdfs).toEqual([atLimit]);
+  });
+});
+
 describe('admit, with the same file twice', () => {
   const file = (name: string, lastModified = 1) => ({ ...jpeg, name, lastModified });
   it('leaves out a file already in the list, or picked twice at once, without refusing it', () => {
@@ -76,6 +83,8 @@ describe('admit, with the same file twice', () => {
   });
   it('tells apart two files of one name that differ in time or size', () => {
     expect(admit([file('a.jpg')], 14, [file('a.jpg', 2)]).photos).toEqual([file('a.jpg', 2)]);
+    const bigger = { ...file('a.jpg'), size: jpeg.size + 1 };
+    expect(admit([file('a.jpg')], 14, [bigger]).photos).toEqual([bigger]);
   });
 });
 
@@ -85,6 +94,7 @@ describe('filesBucket', () => {
     [2, '2-4'],
     [4, '2-4'],
     [5, '5-9'],
+    [9, '5-9'],
     [10, '10-15'],
     [15, '10-15'],
     [16, '16-25'],
@@ -97,7 +107,7 @@ describe('filesBucket', () => {
 describe('fitExactly', () => {
   it('draws a PDF page with its long side at 1568 px, enlarging if need be', () => {
     expect(fitExactly(595, 842)).toEqual({ width: 1108, height: 1568, scale: 1568 / 842 });
-    expect(fitExactly(842, 595).width).toBe(1568);
+    expect(fitExactly(842, 595)).toMatchObject({ width: 1568, height: 1108 });
   });
 });
 
@@ -127,6 +137,10 @@ describe('encodingSteps', () => {
       '825×1100@0.4',
       '825×1100@0.3',
     ]);
+  });
+  it('keeps a step that differs from another in one side only', () => {
+    expect(steps(1, 2000).slice(3, 6)).toEqual(['1×1568@0.5', '1×1280@0.65', '1×1280@0.5']);
+    expect(steps(2000, 1).slice(3, 6)).toEqual(['1568×1@0.5', '1280×1@0.65', '1280×1@0.5']);
   });
   it('tries each size and quality once and never enlarges a small image', () => {
     expect(steps(1200, 900).slice(4)).toEqual([
@@ -183,6 +197,10 @@ describe('the request size', () => {
       LIMITS.requestBudgetBytes,
     );
     expect(photoShare(LIMITS.requestBudgetBytes, 1)).toBe(0);
+  });
+  it('weighs a file once in base64, with its overhead', () => {
+    expect(encodedSize(3)).toBe(68);
+    expect(encodedSize(4)).toBe(72);
   });
   it('adds up the encoded files', () => {
     expect(requestBytes([{ data: 'a'.repeat(100) }])).toBe(4096 + 164);

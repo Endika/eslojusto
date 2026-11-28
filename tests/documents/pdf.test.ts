@@ -1,7 +1,8 @@
 import { inflateSync } from 'node:zlib';
-import { describe, expect, it } from 'vitest';
-import { renderPdf, unprintable } from '../../src/documents/pdf';
-import { PdfDocument, pdfString } from '../../src/documents/pdf-writer';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { pdfMaker, renderPdf, STYLES, unprintable } from '../../src/documents/pdf';
+import { INK, PdfDocument, pdfString, SOFT } from '../../src/documents/pdf-writer';
+import type { Block } from '../../src/documents/ports';
 import { sans } from '../../src/documents/fonts/sans';
 import { serif } from '../../src/documents/fonts/serif';
 import { letterModel, reportModel } from '../../src/documents/report';
@@ -179,5 +180,106 @@ describe('the PDF writer', () => {
   it('writes titles as PDF strings', () => {
     expect(pdfString('Report (1)')).toBe('(Report \\(1\\))');
     expect(pdfString('Recibí')).toBe('<FEFF0052006500630069006200ED>');
+  });
+});
+
+describe('how each block is laid out', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  const VIOLET = [0.478, 0.247, 0.82];
+  const width = new PdfDocument({ sans, serif }, 'x').width;
+
+  const laidOut = async (block: Block) => {
+    const calls: unknown[][] = [];
+    for (const method of ['paragraph', 'space', 'rule', 'row', 'blank'] as const)
+      vi.spyOn(PdfDocument.prototype, method).mockImplementation(((...args: unknown[]) => {
+        calls.push([method, ...args]);
+      }) as never);
+    await renderPdf({ title: 'x', footer: null, blocks: [block] });
+    return calls;
+  };
+
+  it.each<[Block, unknown[][]]>([
+    [{ type: 'title', text: 'T' }, [['paragraph', 'T', STYLES.title, { after: 2 }]]],
+    [{ type: 'meta', text: 'M' }, [['paragraph', 'M', STYLES.meta, { after: 8 }]]],
+    [
+      { type: 'heading', text: 'H' },
+      [
+        ['space', 14],
+        ['paragraph', 'H', STYLES.heading, { after: 2, keepWithNext: 40 }],
+        ['rule', VIOLET, 1, 8],
+      ],
+    ],
+    [
+      { type: 'subheading', text: 'S' },
+      [
+        ['space', 8],
+        ['paragraph', 'S', STYLES.subheading, { after: 2, keepWithNext: 50 }],
+      ],
+    ],
+    [{ type: 'text', text: 'X' }, [['paragraph', 'X', STYLES.text, { after: 6 }]]],
+    [{ type: 'note', text: 'N' }, [['paragraph', 'N', STYLES.note, { after: 4 }]]],
+    [
+      { type: 'row', label: 'L', value: 'V' },
+      [['row', 'L', 'V', { ...STYLES.row, color: SOFT }, { ...STYLES.row, color: INK }]],
+    ],
+    [{ type: 'bullet', text: 'B' }, [['paragraph', '•  B', STYLES.text, { indent: 8, after: 4 }]]],
+    [
+      { type: 'source', text: 'U', url: 'https://a.test' },
+      [['paragraph', 'U', STYLES.source, { after: 2, link: 'https://a.test' }]],
+    ],
+    [
+      { type: 'blank', label: 'L' },
+      [['blank', 'L', STYLES.label, width * 0.7, undefined, STYLES.row, false]],
+    ],
+    [
+      { type: 'blank', label: 'L', value: 'v', wrap: true },
+      [['blank', 'L', STYLES.label, width * 0.7, 'v', STYLES.row, true]],
+    ],
+    [{ type: 'rule' }, [['rule', VIOLET, 1.5, 12]]],
+  ])('%j', async (block, expected) => {
+    expect(await laidOut(block)).toEqual(expected);
+  });
+});
+
+describe('the footer of each page', () => {
+  const text = async (footer: string | null) =>
+    extractText(
+      latin1(await renderPdf({ title: 'x', footer, blocks: [{ type: 'text', text: 'hola' }] })),
+    );
+
+  it('numbers the pages after its text, when it has one', async () => {
+    expect(await text('Pie de página')).toContain('Pie de página · 1 / 1');
+    expect(await text(null)).toBe('hola');
+  });
+});
+
+describe('a character only one font can draw', () => {
+  it('is flagged, whichever font lacks it', () => {
+    for (const [has, lacks] of [
+      [sans, serif],
+      [serif, sans],
+    ]) {
+      const original = has.glyphs;
+      Object.assign(has, { glyphs: { ...original, '1078': [1, 500] } });
+      try {
+        expect(unprintable({ name: 'ж', id: '', company: '', place: '' })).toEqual(['name']);
+      } finally {
+        Object.assign(has, { glyphs: original });
+      }
+      expect(lacks.glyphs).not.toHaveProperty('1078');
+    }
+  });
+});
+
+describe('the PDF as a download', () => {
+  it('is a PDF blob', async () => {
+    const blob = await pdfMaker.render({
+      title: 'x',
+      footer: null,
+      blocks: [{ type: 'text', text: 'hola' }],
+    });
+    expect(blob.type).toBe('application/pdf');
+    expect(latin1(new Uint8Array(await blob.arrayBuffer())).startsWith('%PDF-1.7')).toBe(true);
   });
 });

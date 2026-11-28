@@ -32,7 +32,10 @@ describe('mergeRead', () => {
     const m = mergeRead(r, [], new Map(), LISTS);
     expect(m.entries).toEqual(r.entries);
     expect(m.marks).toEqual(r.marks);
-    expect(m.applied.map(([name]) => name)).toEqual(['startDate', 'receipts.0.month']);
+    expect(m.applied).toEqual([
+      ['startDate', { value: '2024-01-01', derived: false }],
+      ['receipts.0.month', { value: '2025-01', derived: false }],
+    ]);
     expect([m.differ, m.typedDiffers, m.recalculated, m.full]).toEqual([
       false,
       false,
@@ -95,7 +98,118 @@ describe('mergeRead', () => {
       LISTS,
     );
     expect(m.entries).toEqual([['hasReceipts', 'yes']]);
-    expect(m.differ).toBe(false);
+    expect([m.differ, m.recalculated]).toEqual([false, false]);
+  });
+
+  it('treats a name that is no value of a listed row as any other value', () => {
+    const m = mergeRead(
+      {
+        entries: [
+          ['other.0.rent', '1'],
+          ['receipts.0', '2'],
+        ],
+        marks: [],
+      },
+      [
+        ['other.0.rent', '0'],
+        ['receipts.0', '0'],
+      ],
+      new Map(),
+      LISTS,
+    );
+    expect(m.entries).toEqual([
+      ['other.0.rent', '1'],
+      ['receipts.0', '2'],
+    ]);
+  });
+
+  it('numbers the rows it adds in the order of the rows read', () => {
+    const m = mergeRead(
+      read([
+        ['receipts.2.month', '2025-03'],
+        ['receipts.0.month', '2025-01'],
+        ['receipts.1.month', '2025-02'],
+      ]),
+      [],
+      new Map(),
+      LISTS,
+    );
+    expect(m.entries).toEqual([
+      ['receipts.0.month', '2025-01'],
+      ['receipts.1.month', '2025-02'],
+      ['receipts.2.month', '2025-03'],
+    ]);
+  });
+
+  it('matches a row on the values both rows have, skipping one that lacks the other', () => {
+    const specs: ListSpecs = { receipts: { identity: ['month', 'tenant'], max: 4 } };
+    const m = mergeRead(
+      read([
+        ['receipts.0.month', '2025-01'],
+        ['receipts.0.tenant', 'Ana'],
+      ]),
+      [['receipts.0.month', '2025-01']],
+      new Map(),
+      specs,
+    );
+    expect(m.entries).toEqual([
+      ['receipts.0.month', '2025-01'],
+      ['receipts.0.tenant', 'Ana'],
+    ]);
+    const held: FormEntries = [
+      ['receipts.0.month', '2025-01'],
+      ['receipts.0.tenant', 'Ana'],
+    ];
+    const again = mergeRead(read([['receipts.0.month', '2025-01']]), held, new Map(), specs);
+    expect(again.entries).toEqual(held);
+  });
+
+  it('gives each row read its own row, even when several look like the same document', () => {
+    const m = mergeRead(
+      read([
+        ['receipts.0.month', '2025-01'],
+        ['receipts.0.rent', '500,00'],
+        ['receipts.1.month', '2025-01'],
+        ['receipts.1.rent', '600,00'],
+      ]),
+      [['receipts.0.month', '2025-01']],
+      new Map(),
+      LISTS,
+    );
+    expect(m.entries).toEqual([
+      ['receipts.0.month', '2025-01'],
+      ['receipts.0.rent', '500,00'],
+      ['receipts.1.month', '2025-01'],
+      ['receipts.1.rent', '600,00'],
+    ]);
+  });
+
+  it('marks a whole row where it lands, as a conflict if a value of it was kept', () => {
+    const before: FormEntries = [
+      ['jobs.0.startDate', '2020-01-01'],
+      ['jobs.0.role', 'dev'],
+    ];
+    const rowMark: ReadMark = { id: 'jobs.0', container: '[data-job="0"]', confidence: 'medium' };
+    const m = mergeRead(
+      {
+        entries: [
+          ['jobs.0.startDate', '2020-01-01'],
+          ['jobs.0.role', 'ops'],
+        ],
+        marks: [rowMark],
+      },
+      before,
+      earlier(before),
+      LISTS,
+    );
+    expect(m.marks).toEqual([{ ...rowMark, confidence: 'low', conflict: true }]);
+    const plain = mergeRead(
+      { entries: [['receipts.0.month', '2025-01']], marks: [{ ...rowMark, id: 'receipts.0' }] },
+      [],
+      new Map(),
+      LISTS,
+    );
+    expect(plain.marks).toEqual([{ ...rowMark, id: 'receipts.0' }]);
   });
 
   it('adds new rows after the ones there, the same document once, and keeps typed rows', () => {
@@ -154,13 +268,16 @@ describe('mergeRead', () => {
       LISTS,
     );
     expect(m.entries).toEqual(before);
-    expect(m.marks).toContainEqual({
-      id: 'receipts.0.rent',
-      container: '[data-field="receipts.0.rent"]',
-      confidence: 'low',
-      conflict: true,
-    });
-    expect(m.differ).toBe(true);
+    expect(m.marks).toEqual([
+      mark('receipts.0.month'),
+      {
+        id: 'receipts.0.rent',
+        container: '[data-field="receipts.0.rent"]',
+        confidence: 'low',
+        conflict: true,
+      },
+    ]);
+    expect([m.differ, m.recalculated]).toEqual([true, false]);
   });
 
   it('on a full list, keeps every row there, adds what fits and says the rest did not', () => {
@@ -207,6 +324,21 @@ describe('mergeRead', () => {
   it('passes on a mark about no value the read sets', () => {
     const lone: ReadMark = { id: 'note', container: '[data-note]', confidence: 'high' };
     expect(mergeRead({ entries: [], marks: [lone] }, [], new Map(), LISTS).marks).toEqual([lone]);
+  });
+});
+
+describe('heldEntries, beyond the lists', () => {
+  it('takes a name of an unlisted row, or of a row with no key, for a plain value', () => {
+    const entries: FormEntries = [
+      ['other.0.a', '1'],
+      ['other.0.b', 'default'],
+      ['jobs.0', 'x'],
+      ['jobs.0.startDate', 'default'],
+    ];
+    expect(heldEntries(entries, new Map(), (_n, v) => v === 'default', LISTS)).toEqual([
+      ['other.0.a', '1'],
+      ['jobs.0', 'x'],
+    ]);
   });
 });
 

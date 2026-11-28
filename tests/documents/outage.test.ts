@@ -16,6 +16,13 @@ describe('the memory of an unavailable reading', () => {
     expect(store.get(OUTAGE_KEY)).toBeNull();
   });
 
+  it('has nothing to remember before anything was written, even early in the clock’s count', () => {
+    expect(createOutageMemory(memoryStore(), () => 100).active()).toBe(false);
+    const store = memoryStore();
+    store.set(OUTAGE_KEY, '0');
+    expect(createOutageMemory(store, () => 100).active()).toBe(false);
+  });
+
   it('ignores a value it did not write, or one from the future', () => {
     const now = Date.UTC(2026, 9, 7, 10);
     for (const value of ['soon', '-1', String(now + 60_000)]) {

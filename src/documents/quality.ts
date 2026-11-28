@@ -63,15 +63,15 @@ export function measureQuality(
         (grey[i - width] as number) +
         (grey[i + width] as number) -
         4 * (grey[i] as number);
+      // Stryker disable next-line AssignmentOperator: the total is only squared, so its sign does not matter
       total += l;
       squares += l * l;
       n += 1;
     }
   }
-  const mean = n > 0 ? total / n : 0;
   return {
     brightness: size > 0 ? sum / size : 0,
-    sharpness: n > 0 ? squares / n - mean * mean : 0,
+    sharpness: n > 0 ? squares / n - (total / n) ** 2 : 0,
     longSide,
   };
 }

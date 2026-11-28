@@ -171,6 +171,7 @@ export function cannotFit(usedBytes: number, imagesLeft: number, lastBytes: numb
 export function bytesToBase64(bytes: Uint8Array): string {
   let binary = '';
   const chunk = 0x8000;
+  // Stryker disable next-line EqualityOperator: one more pass at the end reads an empty slice and adds nothing
   for (let i = 0; i < bytes.length; i += chunk)
     binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
   return btoa(binary);

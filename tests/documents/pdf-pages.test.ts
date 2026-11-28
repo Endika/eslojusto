@@ -108,6 +108,84 @@ describe('the PDF-to-pages adapter, drawing', () => {
   });
 });
 
+describe('the PDF-to-pages adapter, in what it asks of pdf.js', () => {
+  afterEach(() => vi.useRealTimers());
+
+  const documentOf = (numPages: number, calls: unknown[]) => ({
+    numPages,
+    getPage: async () => ({
+      getViewport: (params: { scale: number }) => ({ width: 595 * params.scale, height: 842 }),
+      render: (params: object) => {
+        calls.push(['render', params]);
+        return { promise: Promise.resolve(), cancel: () => void calls.push('cancel') };
+      },
+      cleanup: () => {},
+    }),
+    destroy: async () => void calls.push('destroy'),
+  });
+  const pdfjsOf = (numPages: number, calls: unknown[]): PdfJs => ({
+    getDocument: (params) => {
+      calls.push(['getDocument', params]);
+      return { promise: Promise.resolve(documentOf(numPages, calls)), destroy: async () => {} };
+    },
+  });
+
+  it('opens with no eval, no WebAssembly and no tolerance for a damaged file', async () => {
+    const calls: unknown[] = [];
+    await createPdfPages(pdfjsOf(1, calls), recordingRaster().raster).open(
+      pdfFile(syntheticPdf(1)),
+    );
+    expect(calls[0]).toEqual([
+      'getDocument',
+      {
+        data: expect.any(Uint8Array),
+        isEvalSupported: false,
+        useWasm: false,
+        stopAtErrors: true,
+      },
+    ]);
+  });
+
+  it.each([0, -1, 1.5, Number.NaN])(
+    'answers unreadable for a document of %s pages, and frees it',
+    async (n) => {
+      const calls: unknown[] = [];
+      const opened = await createPdfPages(pdfjsOf(n, calls), recordingRaster().raster).open(
+        pdfFile(syntheticPdf(1)),
+      );
+      expect(opened).toBe('pdf_unreadable');
+      expect(calls).toContain('destroy');
+    },
+  );
+
+  it('draws onto the canvas at the scale that fits, and cancels nothing that finished', async () => {
+    const calls: unknown[] = [];
+    const { raster } = recordingRaster();
+    const opened = await createPdfPages(pdfjsOf(1, calls), raster).open(pdfFile(syntheticPdf(1)));
+    if (typeof opened === 'string') throw new Error(opened);
+    await opened.render(1, 100_000);
+    const scale = 1568 / 842;
+    expect(calls).toContainEqual([
+      'render',
+      {
+        canvas: { width: 1108, height: 1568 },
+        canvasContext: {},
+        viewport: { width: 595 * scale, height: 842 },
+      },
+    ]);
+    expect(calls).not.toContain('cancel');
+  });
+
+  it('leaves no timer running once it has opened and drawn', async () => {
+    vi.useFakeTimers();
+    const { raster } = recordingRaster();
+    const opened = await createPdfPages(pdfjsOf(1, []), raster).open(pdfFile(syntheticPdf(1)));
+    if (typeof opened === 'string') throw new Error(opened);
+    await opened.render(1, 100_000);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
 describe('the PDF-to-pages adapter, against a PDF that never finishes', () => {
   afterEach(() => vi.useRealTimers());
 
