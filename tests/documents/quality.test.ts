@@ -107,6 +107,25 @@ describe('photo quality', () => {
     expect(perPhoto).toBeLessThan(15);
   });
 
+  it('measures the mean and the variance of the Laplacian of each inner pixel', () => {
+    // Two inner pixels, 10 and 30, among zeros: their Laplacians are -10 and -110.
+    const grey = new Float32Array([0, 0, 0, 0, 0, 10, 30, 0, 0, 0, 0, 0]);
+    const signals = measureQuality(rgba(grey), 4, 3, 4);
+    expect(signals.brightness).toBeCloseTo(40 / 12, 5);
+    expect(signals.sharpness).toBeCloseTo(2500, 3);
+  });
+
+  it('has no brightness for an image with no pixels', () => {
+    expect(measureQuality(new Uint8ClampedArray(0), 0, 0, 0).brightness).toBe(0);
+  });
+
+  it('calls a photo at exactly the minimum brightness or sharpness fine', () => {
+    const fine = { brightness: MIN_BRIGHTNESS, sharpness: MIN_SHARPNESS, longSide: MIN_LONG_SIDE };
+    expect(qualityProblem(fine)).toBeNull();
+    expect(qualityProblem({ ...fine, brightness: MIN_BRIGHTNESS - 1 })).toBe('dark');
+    expect(qualityProblem({ ...fine, sharpness: MIN_SHARPNESS - 1 })).toBe('blurry');
+  });
+
   it('survives an image too small to have an inside', () => {
     expect(measureQuality(new Uint8ClampedArray(4), 1, 1, 1)).toEqual({
       brightness: 0,

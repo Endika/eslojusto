@@ -89,6 +89,7 @@ export function unprintable(details: TypedDetails): LetterField[] {
       const code = String(c.codePointAt(0));
       return code in sans.glyphs && code in serif.glyphs;
     });
+  // Stryker disable next-line StringLiteral: any drawable text stands for a field left out
   return ALL_LETTER_FIELDS.filter((f) => !drawable(details[f] ?? ''));
 }
 

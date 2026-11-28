@@ -25,6 +25,7 @@ const ENV_NAMES: Readonly<Record<Operation, string>> = {
 type Env = Readonly<Record<string, string | boolean | undefined>>;
 
 function endpoint(value: string | boolean | undefined): URL | null {
+  // Stryker disable next-line ConditionalExpression,LogicalOperator: a non-string or empty value makes new URL throw, which returns null just below
   if (typeof value !== 'string' || !value) return null;
   try {
     const url = new URL(value);

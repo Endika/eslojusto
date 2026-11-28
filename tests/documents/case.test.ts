@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { finalPayCase, hasShortfall, letterKind } from '../../src/documents/case';
 import type { LetterDetails } from '../../src/documents/letter';
 import { letterModel, reportModel } from '../../src/documents/report';
+import type { Review } from '../../src/engine/review';
 import { completed, today, tr, unfairDismissal } from './fixtures';
 
 const details: LetterDetails = {
@@ -34,5 +35,22 @@ describe('the final pay as a paid review', () => {
     const clear = finalPayCase(completed(unfairDismissal, { severance: 41000, holiday_pay: 1500 }));
     expect([clear.offer, clear.quiet, clear.letterKinds]).toEqual([false, true, ['general']]);
     expect(finalPayCase(completed(unfairDismissal, {})).quiet).toBe(false);
+  });
+});
+
+describe('which item statuses count as short', () => {
+  const reviewOf = (status: string, range: object | null) =>
+    ({ items: [{ status, item: { range } }] }) as unknown as Review;
+  const range = { min: 1, max: 2 };
+
+  it.each([
+    ['below_minimum', range, true, 'items'],
+    ['deduction_too_high', range, true, 'items'],
+    ['below_minimum', null, true, 'general'],
+    ['deduction_too_high', null, true, 'general'],
+    ['ok', range, false, 'general'],
+  ])('%s with range %j: shortfall %s, letter %s', (status, r, short, kind) => {
+    expect(hasShortfall(reviewOf(status, r))).toBe(short);
+    expect(letterKind(reviewOf(status, r))).toBe(kind);
   });
 });

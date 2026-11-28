@@ -15,6 +15,8 @@ describe('documentsConfig', () => {
     expect(documentsConfig({})).toBeNull();
     expect(documentsConfig(urls)).toBeNull();
     expect(documentsConfig({ PUBLIC_TURNSTILE_SITE_KEY: key })).toBeNull();
+    expect(documentsConfig({ ...urls, PUBLIC_TURNSTILE_SITE_KEY: '' })).toBeNull();
+    expect(documentsConfig({ ...urls, PUBLIC_TURNSTILE_SITE_KEY: true })).toBeNull();
     for (const name of Object.keys(urls)) {
       expect(
         documentsConfig({ ...urls, [name]: undefined, PUBLIC_TURNSTILE_SITE_KEY: key }),

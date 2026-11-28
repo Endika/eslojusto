@@ -38,6 +38,20 @@ interface Merged {
 const ROW = /^(\w+)\.(\d+)(?:\.(\w+))?$/;
 type Row = Map<string, string>;
 
+interface ListField {
+  readonly list: string;
+  readonly index: string;
+  readonly key: string;
+}
+
+// The list, row and key a name stands for, when it is one value of a row of a list.
+function listField(lists: ListSpecs, name: string): ListField | null {
+  const m = ROW.exec(name);
+  // Stryker disable next-line StringLiteral: groups 1 and 2 always take part in a match
+  const [list, index, key] = [m?.[1] ?? '', m?.[2] ?? '', m?.[3]];
+  return key !== undefined && lists[list] ? { list, index, key } : null;
+}
+
 function sameDocument(identity: readonly string[], a: Row, b: Row): boolean {
   let shared = false;
   for (const key of identity) {
@@ -60,8 +74,8 @@ export function heldEntries(
   lists: ListSpecs,
 ): FormEntries {
   const rowOf = (name: string) => {
-    const m = ROW.exec(name);
-    return m && m[3] !== undefined && lists[m[1] ?? ''] ? `${m[1]}.${m[2]}` : null;
+    const field = listField(lists, name);
+    return field && `${field.list}.${field.index}`;
   };
   const read = (name: string, value: string) => applied.get(name)?.value === value;
   const typed = (name: string, value: string) => !read(name, value) && !atDefault(name, value);
@@ -113,6 +127,7 @@ export function mergeRead(
     if (mark && held !== undefined && held !== value && !(fromRead && earlier.derived)) {
       if (fromRead) differ = true;
       else typedDiffers = true;
+      // Stryker disable next-line StringLiteral: callers tell only 'set' and 'kept' apart
       return fromRead ? 'kept' : 'typed';
     }
     if (mark && held !== undefined && held !== value) recalculated = true;
@@ -124,13 +139,13 @@ export function mergeRead(
   const rowsOf = (entriesIn: FormEntries) => {
     const out = new Map<string, Map<number, Row>>();
     for (const [name, value] of entriesIn) {
-      const m = ROW.exec(name);
-      const [, list = '', i = '0', key] = m ?? [];
-      if (!m || key === undefined || !lists[list]) continue;
+      const field = listField(lists, name);
+      if (!field) continue;
+      const { list, index, key } = field;
       const rows = out.get(list) ?? new Map<number, Row>();
-      const row = rows.get(Number(i)) ?? new Map<string, string>();
+      const row = rows.get(Number(index)) ?? new Map<string, string>();
       row.set(key, value);
-      rows.set(Number(i), row);
+      rows.set(Number(index), row);
       out.set(list, rows);
     }
     return out;
@@ -143,8 +158,7 @@ export function mergeRead(
   });
 
   for (const [name, value] of read.entries) {
-    const m = ROW.exec(name);
-    if (m && lists[m[1] ?? ''] && m[3] !== undefined) continue;
+    if (listField(lists, name)) continue;
     const mark = marks.get(name);
     const taken = take(name, value, mark);
     if (mark && taken === 'set') outMarks.push(mark);
@@ -154,6 +168,7 @@ export function mergeRead(
   const held = rowsOf(current);
   for (const [list, incoming] of rowsOf(read.entries)) {
     const spec = lists[list];
+    // Stryker disable next-line ConditionalExpression: rowsOf only keeps the lists that are listed
     if (!spec) continue;
     const rows = held.get(list) ?? new Map<number, Row>();
     for (const [i, row] of rows)
@@ -175,12 +190,12 @@ export function mergeRead(
       }
       matched.add(k);
       const rowMark = marks.get(`${list}.${i}`);
-      const outcomes: string[] = [];
+      let kept = false;
       for (const [key, value] of row) {
         const mark = marks.get(`${list}.${i}.${key}`);
         const target = `${list}.${k}.${key}`;
         const taken = take(target, value, mark ?? rowMark);
-        outcomes.push(taken);
+        if (taken === 'kept') kept = true;
         if (!mark) continue;
         if (taken === 'set') outMarks.push(moved(mark, target));
         if (taken === 'kept') outMarks.push(conflictMark(moved(mark, target)));
@@ -188,8 +203,7 @@ export function mergeRead(
       if (rowMark) {
         const id = `${list}.${k}`;
         const at = moved(rowMark, id, spec.rowContainer?.(k) ?? rowMark.container);
-        if (outcomes.includes('kept')) outMarks.push(conflictMark(at));
-        else if (outcomes.includes('set')) outMarks.push(at);
+        outMarks.push(kept ? conflictMark(at) : at);
       }
     }
   }
@@ -198,8 +212,8 @@ export function mergeRead(
   const owned = new Set<string>();
   for (const [name] of read.entries) {
     owned.add(name);
-    const m = ROW.exec(name);
-    if (m && m[3] !== undefined && lists[m[1] ?? '']) owned.add(`${m[1]}.${m[2]}`);
+    const field = listField(lists, name);
+    if (field) owned.add(`${field.list}.${field.index}`);
   }
   return {
     entries: [...entries],

@@ -12,7 +12,8 @@ const MONTHLY: Partial<Record<RecognisedDocument['kind'], ClientKey>> = {
 function documentName(d: RecognisedDocument, tr: Translate): string {
   const monthly = d.month ? MONTHLY[d.kind] : undefined;
   const name = monthly
-    ? tr(monthly, { mes: monthName(Number(d.month?.slice(5, 7)), tr) })
+    ? // Stryker disable next-line OptionalChaining: monthly is set only when d.month is
+      tr(monthly, { mes: monthName(Number(d.month?.slice(5, 7)), tr) })
     : tr(`client.documents.kind.${d.kind}` as ClientKey);
   return d.pages > 1 ? tr('client.documents.kind.pages', { nombre: name, n: d.pages }) : name;
 }

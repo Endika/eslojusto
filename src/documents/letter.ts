@@ -140,6 +140,7 @@ export function looksLikeDniOrNie(text: string): boolean {
   const t = text.toUpperCase().replace(/[\s.-]/g, '');
   const m = /^([XYZ]?)(\d{7,8})([A-Z])$/.exec(t);
   if (!m) return false;
+  // Stryker disable next-line StringLiteral: the regex always captures all three groups, so no default is read
   const [, prefix = '', digits = '', letter] = m;
   if (digits.length !== (prefix ? 7 : 8)) return false;
   const number = Number(`${prefix ? 'XYZ'.indexOf(prefix) : ''}${digits}`);
