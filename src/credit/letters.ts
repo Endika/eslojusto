@@ -26,8 +26,10 @@ export function repaymentLine(review: CreditReview): RepaymentLine | null {
   const findings = findingsOf(item);
   const amounts = findings.map((f) => f.amount ?? 0);
   const least = Math.min(...amounts);
+  if (least <= 0) return null;
   const finding = findings[amounts.indexOf(least)];
-  if (finding === undefined || least <= 0) return null;
+  // Stryker disable next-line ConditionalExpression: `least` is one of the amounts, so the index always finds a finding; the guard only narrows the type.
+  if (finding === undefined) return null;
   return { finding, lowest: findings.length > 1 };
 }
 
@@ -108,7 +110,7 @@ const varOf = (f: CreditFinding, key: CreditPhraseKey, name: string): CreditFigu
   f.calculation.find((p) => p.key === key)?.vars?.[name];
 
 const euros = (f: CreditFigure | undefined): string =>
-  f !== undefined && typeof f === 'object' && 'euros' in f ? formatEuros(f.euros) : '';
+  typeof f === 'object' && 'euros' in f ? formatEuros(f.euros) : '';
 
 const has = (f: CreditFinding, key: CreditPhraseKey) => f.calculation.some((p) => p.key === key);
 
