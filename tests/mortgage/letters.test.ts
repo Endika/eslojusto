@@ -429,22 +429,23 @@ describe('the letters', () => {
       DEPS,
     ],
   ];
-  const models = cases.flatMap(([input, deps]) => {
-    const c = mortgageCase(completed(input, deps), LEGAL_INTEREST);
-    const kinds: LetterKind[] = [...c.letterKinds, ...(c.freeLetterKinds ?? [])];
-    return [...kinds.map((kind) => c.letter(kind, DETAILS, tr)), c.report(tr, TODAY)];
-  });
+  const models = () =>
+    cases.flatMap(([input, deps]) => {
+      const c = mortgageCase(completed(input, deps), LEGAL_INTEREST);
+      const kinds: LetterKind[] = [...c.letterKinds, ...(c.freeLetterKinds ?? [])];
+      return [...kinds.map((kind) => c.letter(kind, DETAILS, tr)), c.report(tr, TODAY)];
+    });
 
   it('inform without advising, asserting or pressing', () => {
-    expect(models.length).toBeGreaterThan(12);
-    for (const model of models) expect(forbiddenIn('client.mortgage.', text(model))).toEqual([]);
+    expect(models().length).toBeGreaterThan(12);
+    for (const model of models()) expect(forbiddenIn('client.mortgage.', text(model))).toEqual([]);
     // A letter never speaks of courts, lawyers or the Supreme Court's split.
-    for (const model of models.filter((m) => m.footer === null))
+    for (const model of models().filter((m) => m.footer === null))
       expect(text(model).toLowerCase()).not.toMatch(/tribunal|juzgado|juez|abogad|servicio de/);
   });
 
   it("end with the person's name and no line to sign on", () => {
-    for (const model of models.filter((m) => m.footer === null)) {
+    for (const model of models().filter((m) => m.footer === null)) {
       expect(model.blocks.at(-1)).toEqual({
         type: 'blank',
         label: 'Nombre y apellidos',
@@ -456,7 +457,7 @@ describe('the letters', () => {
   });
 
   it('draw with the letter fonts', async () => {
-    for (const model of models) expect((await renderPdf(model)).length).toBeGreaterThan(1000);
+    for (const model of models()) expect((await renderPdf(model)).length).toBeGreaterThan(1000);
   });
 });
 

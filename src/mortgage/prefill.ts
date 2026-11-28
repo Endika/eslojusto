@@ -73,38 +73,47 @@ const ANSWER_OF: Readonly<Partial<Record<ClauseLabel, readonly [MortgageFormFiel
 
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
 const lowest = (...cs: Confidence[]): Confidence =>
+  // Stryker disable next-line EqualityOperator: equal ranks are the same confidence, whichever is kept
   cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
 
-const isNumber = (v: ExtractedValue | undefined): v is number =>
-  typeof v === 'number' && Number.isFinite(v);
+const isNumber = (v: ExtractedValue | undefined): v is number => Number.isFinite(v);
 const amountOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
 const positiveOf = (v: ExtractedValue | undefined): number | null => {
   const n = amountOf(v);
-  return n !== null && n > 0 ? n : null;
+  return (n ?? 0) > 0 ? n : null;
 };
 // A rate keeps the three decimals a deed may give (Euríbor + 0,875).
 const rateOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && v >= 0 ? Math.round(v * 1000) / 1000 : null;
+// A rate with how surely it was read, or nothing when the field or its figure is missing.
+function sourcedRate(
+  f: SourcedField | undefined,
+): { value: number; confidence: Confidence } | null {
+  const value = rateOf(f?.value);
+  // Stryker disable next-line ConditionalExpression,LogicalOperator: a rate that reads implies its field, and a missing figure is never above 0
+  return f && value !== null ? { value, confidence: f.confidence } : null;
+}
 const wholeOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && Number.isInteger(v) && v > 0 ? v : null;
-const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' && v.trim() !== '' ? v.trim() : null;
+// Blank when there is no text.
+const textOf = (v: ExtractedValue | undefined): string => (typeof v === 'string' ? v.trim() : '');
 const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
-  typeof v === 'string' && (options as readonly string[]).includes(v) ? (v as T) : null;
+  (options as readonly (ExtractedValue | undefined)[]).includes(v) ? (v as T) : null;
 const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
   v === true ? 'yes' : v === false ? 'no' : null;
 
 function dateOf(v: ExtractedValue | undefined): CivilDate | null {
-  if (typeof v !== 'string') return null;
   try {
-    return parseDate(v);
+    return parseDate(String(v));
   } catch {
     return null;
   }
 }
 
 const cents = (n: number): number => Math.round(n * 100);
+// Stryker disable next-line StringLiteral: an empty string counts as zero cents, as the 0 does
+const centsOf = (v: ExtractedValue | undefined): number => cents(amountOf(v) ?? 0);
 const sum = (ns: readonly number[]): number => cents(ns.reduce((s, n) => s + n, 0)) / 100;
 
 // A rate as the form takes it: «2,875», keeping the decimals a deed may give.
@@ -133,8 +142,6 @@ class Answers {
 
   // An answer that only opens what was read, such as «Sí» above the figures it asks for.
   open(name: MortgageFormField, value: string) {
-    if (this.given.has(name)) return;
-    this.given.add(name);
     this.entries.push([name, value]);
   }
 
@@ -228,16 +235,21 @@ function figures(a: Answers, fields: Fields, tr: Translate) {
   }
 
   const fee = amountOf(fields.openingFee?.value);
-  const percent = rateOf(fields.openingFeePercent?.value);
+  const percent = sourcedRate(fields.openingFeePercent);
   const principal = positiveOf(fields.principal?.value);
   if (fields.openingFee && fee !== null) {
     a.read('openingFee', fee > 0 ? 'yes' : 'no', fields.openingFee.confidence);
     if (fee > 0) a.read('openingFeeAmount', amountText(fee), fields.openingFee.confidence);
-  } else if (fields.openingFeePercent && percent !== null && percent > 0) {
-    a.read('openingFee', 'yes', fields.openingFeePercent.confidence);
+  } else if (percent !== null && percent.value > 0) {
+    a.read('openingFee', 'yes', percent.confidence);
     if (fields.principal && principal !== null) {
-      const sure = lowest(fields.openingFeePercent.confidence, fields.principal.confidence);
-      a.read('openingFeeAmount', amountText(cents((principal * percent) / 100) / 100), sure, true);
+      const sure = lowest(percent.confidence, fields.principal.confidence);
+      a.read(
+        'openingFeeAmount',
+        amountText(cents((principal * percent.value) / 100) / 100),
+        sure,
+        true,
+      );
       a.notes.push(tr('client.mortgage.documents.opening_percent'));
     }
   }
@@ -249,10 +261,15 @@ function figures(a: Answers, fields: Fields, tr: Translate) {
   );
 }
 
-interface Pot {
-  readonly amounts: number[];
-  readonly confidences: Confidence[];
+interface Reading {
+  readonly amount: number;
+  readonly confidence: Confidence;
+  // One invoice for the purchase and the loan together.
+  readonly mixed: boolean;
 }
+
+// The question that tells whether what was read for another came on one invoice with the purchase's.
+const MIXED_OF = { notaryLoan: 'notaryMixed', registryMortgage: 'registryMixed' } as const;
 
 interface Outlay {
   readonly field: 'agencyTax' | 'agencyRegistry';
@@ -286,10 +303,7 @@ function loanAgency(e: MortgageExtraction): {
   });
   const room = invoices.reduce(
     (sum, row) =>
-      sum +
-      cents(amountOf(row.values['total']) ?? 0) -
-      cents(amountOf(row.values['base']) ?? 0) -
-      cents(amountOf(row.values['vat']) ?? 0),
+      sum + centsOf(row.values['total']) - centsOf(row.values['base']) - centsOf(row.values['vat']),
     0,
   );
   const inside = cents(sum(outlays.map((o) => o.amount))) <= room;
@@ -301,23 +315,19 @@ function loanAgency(e: MortgageExtraction): {
 // notarial act billed. What the purchase cost, a copy or a cancellation, this review does not
 // count; a return the lender paid was not the person's to pay. Several of one concept add up.
 function invoices(a: Answers, e: MortgageExtraction, tr: Translate) {
-  const pots = new Map<MortgageFormField, Pot>();
-  const put = (field: MortgageFormField, amount: number | null, confidence: Confidence) => {
-    if (amount === null) return;
-    const pot = pots.get(field) ?? { amounts: [], confidences: [] };
-    pot.amounts.push(amount);
-    pot.confidences.push(confidence);
-    pots.set(field, pot);
+  const pots = new Map<MortgageFormField, readonly Reading[]>();
+  const put = (
+    field: MortgageFormField,
+    amount: number | null,
+    confidence: Confidence,
+    // Stryker disable next-line BooleanLiteral: only the notary's and the registry's readings are asked whether they are mixed, and both say
+    mixed = false,
+  ) => {
+    if (amount !== null)
+      pots.set(field, [...(pots.get(field) ?? []), { amount, confidence, mixed }]);
   };
   let leftOut = false;
-  const mixed = new Map<MortgageFormField, Confidence[]>();
-  const unmixed = new Map<MortgageFormField, Confidence[]>();
-  const both = (
-    rows: readonly ExtractedRow[],
-    loanConcept: string,
-    field: MortgageFormField,
-    mixedField: MortgageFormField,
-  ) => {
+  const both = (rows: readonly ExtractedRow[], loanConcept: string, field: MortgageFormField) => {
     for (const row of rows) {
       const total = positiveOf(row.values['total']);
       if (total === null) continue;
@@ -326,13 +336,11 @@ function invoices(a: Answers, e: MortgageExtraction, tr: Translate) {
         leftOut = true;
         continue;
       }
-      put(field, total, row.confidence);
-      const marks = together ? mixed : unmixed;
-      marks.set(mixedField, [...(marks.get(mixedField) ?? []), row.confidence]);
+      put(field, total, row.confidence, together);
     }
   };
-  both(e.notaryInvoices, 'loan', 'notaryLoan', 'notaryMixed');
-  both(e.registryInvoices, 'mortgage', 'registryMortgage', 'registryMixed');
+  both(e.notaryInvoices, 'loan', 'notaryLoan');
+  both(e.registryInvoices, 'mortgage', 'registryMortgage');
   const agency = loanAgency(e);
   leftOut ||= agency.leftOut;
   for (const row of agency.invoices) put('agency', positiveOf(row.values['total']), row.confidence);
@@ -362,15 +370,23 @@ function invoices(a: Answers, e: MortgageExtraction, tr: Translate) {
   }
   a.open('hasInvoices', 'yes');
   let added = false;
-  for (const [field, pot] of pots) {
-    added ||= pot.amounts.length > 1;
-    a.read(field, amountText(sum(pot.amounts)), lowest(...pot.confidences), pot.amounts.length > 1);
+  for (const [field, readings] of pots) {
+    const several = readings.length > 1;
+    added ||= several;
+    a.read(
+      field,
+      amountText(sum(readings.map((r) => r.amount))),
+      lowest(...readings.map((r) => r.confidence)),
+      several,
+    );
   }
-  for (const field of ['notaryMixed', 'registryMixed'] as const) {
-    const together = mixed.get(field);
-    const apart = unmixed.get(field);
-    if (together) a.read(field, 'yes', lowest(...together));
-    else if (apart) a.read(field, 'no', lowest(...apart));
+  for (const [field, mixedField] of Object.entries(MIXED_OF)) {
+    const readings = pots.get(field as MortgageFormField) ?? [];
+    const together = readings.filter((r) => r.mixed);
+    if (together.length > 0)
+      a.read(mixedField, 'yes', lowest(...together.map((r) => r.confidence)));
+    else if (readings.length > 0)
+      a.read(mixedField, 'no', lowest(...readings.map((r) => r.confidence)));
   }
   a.notes.push(tr('client.mortgage.documents.invoices'));
   if (added) a.notes.push(tr('client.mortgage.documents.invoices_added'));
@@ -407,7 +423,7 @@ function operation(a: Answers, rows: readonly ExtractedRow[], tr: Translate) {
 export function mortgagePrefill(
   e: MortgageExtraction,
   tr: Translate,
-  checks: readonly FailedCheck[] = [],
+  checks: readonly FailedCheck[],
 ): MortgagePrefill {
   const a = new Answers();
   loan(a, e.fields);

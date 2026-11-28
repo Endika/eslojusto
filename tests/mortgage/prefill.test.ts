@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import type {
   Confidence,
   ExtractedRow,
@@ -104,7 +104,10 @@ function readAnswers(p: P, added: Record<string, string>) {
 }
 
 describe('a mortgage deed', () => {
-  const p = prefill({ fields: DEED, clauses: CLAUSES });
+  let p: P;
+  beforeEach(() => {
+    p = prefill({ fields: DEED, clauses: CLAUSES });
+  });
 
   it('fills the loan, its date, its capital and its rate', () => {
     expect(entry(p, 'loanKind')).toBe('standard');
@@ -448,5 +451,396 @@ describe('the summary', () => {
 
   it('says when the documents held more rows than one read takes', () => {
     expect(prefill({ truncated: true }).notes).toContain(tr('client.mortgage.documents.rows_cut'));
+  });
+});
+
+// What a reading is worth, value by value, with the words of the notes as their keys.
+describe('what the prefill takes from each value', () => {
+  type Fields = MortgageExtraction['fields'];
+  const echo: Translate = (key, vars) => (vars ? `${key} ${JSON.stringify(vars)}` : key);
+  const read = (e: Partial<MortgageExtraction>) => mortgagePrefill(extraction(e), echo, []);
+  const answers = (e: Partial<MortgageExtraction>) => Object.fromEntries(read(e).entries);
+  const KEEPS_NOTHING = {};
+
+  const fields: [string, Fields, Record<string, string>][] = [
+    ['a capital as text', { principal: f('150000') }, KEEPS_NOTHING],
+    ['a capital that is not a number', { principal: f(Number.NaN) }, KEEPS_NOTHING],
+    ['a capital with no end', { principal: f(Infinity) }, KEEPS_NOTHING],
+    ['a capital of nothing', { principal: f(0) }, KEEPS_NOTHING],
+    ['a negative capital', { principal: f(-5) }, KEEPS_NOTHING],
+    ['a capital to the cent', { principal: f(150_000.456) }, { loanAmount: '150.000,46' }],
+    ['months that are half', { rateRevisionMonths: f(12.5) }, KEEPS_NOTHING],
+    ['no months', { rateRevisionMonths: f(0) }, KEEPS_NOTHING],
+    ['months as text', { rateRevisionMonths: f('12') }, KEEPS_NOTHING],
+    ['a loan kind that is none', { loanKind: f('weird') }, KEEPS_NOTHING],
+    ['a loan kind as a number', { loanKind: f(3) }, KEEPS_NOTHING],
+    ['a date that is none', { deedOn: f('31/12/2014') }, KEEPS_NOTHING],
+    ['a date that never was', { deedOn: f('2014-02-30') }, KEEPS_NOTHING],
+    ['a date as a number', { deedOn: f(20_140_320) }, KEEPS_NOTHING],
+    ['a floor of nothing', { floorPercent: f(0) }, { floor: 'yes', floorPercent: '0' }],
+    ['a negative floor', { floorPercent: f(-1) }, KEEPS_NOTHING],
+    ['a floor as text', { floorPercent: f('3') }, KEEPS_NOTHING],
+    [
+      'a floor to three decimals',
+      { floorPercent: f(2.8754) },
+      { floor: 'yes', floorPercent: '2,875' },
+    ],
+    [
+      'a floor of thousands',
+      { floorPercent: f(12_345.5) },
+      { floor: 'yes', floorPercent: '12345,5' },
+    ],
+    ['half an instalment', { earlyTerminationInstalments: f(2.5) }, KEEPS_NOTHING],
+    ['no instalments', { earlyTerminationInstalments: f(0) }, KEEPS_NOTHING],
+    ['another fee', { otherSetUpFee: f(true) }, { duplicateFee: 'yes' }],
+    ['no other fee', { otherSetUpFee: f(false) }, { duplicateFee: 'no' }],
+    ['another fee as text', { otherSetUpFee: f('yes') }, KEEPS_NOTHING],
+    ['an opening fee of nothing', { openingFee: f(0) }, { openingFee: 'no' }],
+    ['a negative opening fee', { openingFee: f(-5) }, KEEPS_NOTHING],
+    [
+      'an opening fee over its percent',
+      { openingFee: f(1_500), openingFeePercent: f(1), principal: f(100_000) },
+      { loanAmount: '100.000,00', openingFee: 'yes', openingFeeAmount: '1.500,00' },
+    ],
+    [
+      'an opening percent of nothing',
+      { openingFeePercent: f(0), principal: f(1_000) },
+      { loanAmount: '1.000,00' },
+    ],
+    [
+      'a negative opening percent',
+      { openingFeePercent: f(-1), principal: f(1_000) },
+      { loanAmount: '1.000,00' },
+    ],
+    ['an opening percent with no capital', { openingFeePercent: f(1) }, { openingFee: 'yes' }],
+    [
+      'an opening percent of a capital of nothing',
+      { openingFeePercent: f(1), principal: f(0) },
+      { openingFee: 'yes' },
+    ],
+    [
+      'an option of the deed',
+      { prepaymentOption: f('a_015_5y') },
+      { prepaymentOption: 'a_015_5y' },
+    ],
+    ['an option that is none', { prepaymentOption: f('x') }, KEEPS_NOTHING],
+    ['a default rate', { defaultRate: f(18) }, { defaultInterest: 'yes', defaultRate: '18' }],
+    [
+      'a default rate on a variable rate with an initial one',
+      { rateType: f('variable'), initialRate: f(3), defaultRate: f(18) },
+      { rateType: 'variable', defaultInterest: 'yes', defaultRate: '18' },
+    ],
+    [
+      'a default rate on a fixed rate with an initial one that is none',
+      { rateType: f('fixed'), initialRate: f(-1), defaultRate: f(5) },
+      { rateType: 'fixed', defaultInterest: 'yes', defaultRate: '5' },
+    ],
+    [
+      'a default rate on a fixed rate with no initial one',
+      { rateType: f('fixed'), defaultRate: f(5) },
+      { rateType: 'fixed', defaultInterest: 'yes', defaultRate: '5' },
+    ],
+    [
+      'points when the default rate is none',
+      { defaultRate: f(-1), defaultMarginPoints: f(2), initialRate: f(3) },
+      { defaultInterest: 'yes', ordinaryRate: '3', defaultRate: '5' },
+    ],
+    ['points with no initial rate', { defaultMarginPoints: f(2) }, { defaultInterest: 'yes' }],
+    [
+      'points with an initial rate that is none',
+      { defaultMarginPoints: f(2), initialRate: f(-1) },
+      { defaultInterest: 'yes' },
+    ],
+    ['points that are none', { defaultMarginPoints: f(-2), initialRate: f(3) }, KEEPS_NOTHING],
+    ['an initial rate alone', { initialRate: f(3) }, KEEPS_NOTHING],
+  ];
+
+  it.each(fields)('reads %s', (_name, given, expected) => {
+    expect(answers({ fields: given })).toStrictEqual(expected);
+  });
+
+  it('keeps the first answer of a question, with the surety it was read with', () => {
+    const p = read({
+      fields: { floorPercent: f(3, 'high') },
+      clauses: [clause('floor_clause', FLOOR, 'low')],
+    });
+    expect(p.entries).toEqual([
+      ['floor', 'yes'],
+      ['floorPercent', '3'],
+    ]);
+    expect(p.marks).toEqual([
+      { id: 'floor', container: '[data-field="floor"]', confidence: 'low' },
+      { id: 'floorPercent', container: '[data-field="floorPercent"]', confidence: 'high' },
+    ]);
+    expect(p.count).toBe(2);
+  });
+
+  it('marks as worked out only what is, with the least sure of what it came from', () => {
+    const p = read({
+      fields: {
+        initialRate: f(2, 'medium'),
+        defaultMarginPoints: f(1, 'low'),
+        principal: f(1_000),
+        openingFeePercent: f(1, 'high'),
+      },
+    });
+    expect(p.marks.map((m) => [m.id, m.confidence, m.derived])).toEqual([
+      ['loanAmount', 'high', undefined],
+      ['defaultInterest', 'low', undefined],
+      ['ordinaryRate', 'medium', undefined],
+      ['defaultRate', 'low', true],
+      ['openingFee', 'high', undefined],
+      ['openingFeeAmount', 'high', true],
+    ]);
+    expect(p.notes).toEqual([
+      'client.documents.done_low',
+      'client.mortgage.documents.default_points',
+      'client.mortgage.documents.opening_percent',
+    ]);
+  });
+
+  it('says nothing of surety when every answer was read for sure', () => {
+    const p = read({ fields: { principal: f(1_000) } });
+    expect(p.lowConfidence).toBe(false);
+    expect(p.notes).toEqual([]);
+  });
+
+  describe('the clauses', () => {
+    it('lists each kind found once, in the order of the form, and quotes them trimmed', () => {
+      const p = read({
+        clauses: [
+          clause('irph', ' Índice IRPH. '),
+          clause('floor_clause', FLOOR),
+          clause('irph', 'Otra vez.'),
+        ],
+      });
+      expect(p.notes).toEqual([
+        'client.mortgage.documents.clauses {"clausulas":"client.mortgage.documents.clause.floor_clause, client.mortgage.documents.clause.irph"}',
+      ]);
+      expect(p.quotes).toEqual({ irph: 'Índice IRPH.\n\nOtra vez.', floor: FLOOR });
+    });
+
+    it.each([
+      ['a text of spaces', row({ label: 'irph', text: '   ' }, 'mortgage_deed')],
+      ['no text', row({ label: 'irph' }, 'mortgage_deed')],
+      ['a text that is a number', row({ label: 'irph', text: 5 }, 'mortgage_deed')],
+      ['a label that is none', row({ label: 'nope', text: 'Algo.' }, 'mortgage_deed')],
+      ['no label', row({ text: 'Algo.' }, 'mortgage_deed')],
+    ])('leaves out a clause with %s', (_name, bad) => {
+      const p = read({ clauses: [bad] });
+      expect(p).toMatchObject({ entries: [], notes: [] });
+      expect(p.quotes).toStrictEqual({});
+    });
+  });
+
+  describe('the invoices', () => {
+    const notary = (values: Record<string, ExtractedValue>, c: Confidence = 'high') =>
+      row({ concept: 'loan', mixed: false, ...values }, 'notary_invoice', c);
+    const agency = (values: Record<string, ExtractedValue>) =>
+      row(values, 'agency_invoice_mortgage');
+    const BILL = agency({ concept: 'loan', total: 1_000, base: 800, vat: 168 });
+    const INVOICES = 'client.mortgage.documents.invoices';
+    const LEFT_OUT = 'client.mortgage.documents.invoices_left_out';
+    const ADDED = 'client.mortgage.documents.invoices_added';
+    const LENDER = 'client.mortgage.documents.ajd_lender_paid';
+    const APART = 'client.mortgage.documents.agency_supplied_apart';
+    const outlay = (concept: string, amount: number, deed?: string) =>
+      agency({ concept, amount, ...(deed === undefined ? {} : { deed }) });
+    const PAID_TAX = row({ concept: 'loan', amountPaid: 100, paidByLender: false }, 'ajd_form');
+    const PAID_REGISTRY = row({ concept: 'mortgage', total: 100 }, 'registry_invoice');
+
+    it('says only what it did: one invoice read, nothing added, left out or apart', () => {
+      const p = read({ valuationInvoices: [row({ total: 300 }, 'valuation_invoice')] });
+      expect(p.entries).toEqual([
+        ['hasInvoices', 'yes'],
+        ['valuation', '300,00'],
+      ]);
+      expect(p.marks).toEqual([
+        { id: 'valuation', container: '[data-field="valuation"]', confidence: 'high' },
+      ]);
+      expect(p.notes).toEqual([INVOICES]);
+    });
+
+    it('answers for what is read nothing the invoices do not give', () => {
+      const none = Object.assign(row({ concept: 'loan' }, 'ajd_form'), {});
+      expect(
+        read({
+          valuationInvoices: [row({}, 'valuation_invoice'), row({ total: 0 }, 'valuation_invoice')],
+          ajdForms: [none],
+          fields: { transparencyActCharged: f('x', 'high', 'transparency_deed') },
+        }),
+      ).toMatchObject({ entries: [], notes: [] });
+    });
+
+    it('takes the least sure of several invoices of one concept, and of those mixed or not', () => {
+      const p = read({
+        notaryInvoices: [
+          notary({ total: 100 }, 'medium'),
+          notary({ total: 200 }, 'high'),
+          notary({ total: 90, mixed: true, concept: 'purchase' }, 'low'),
+          notary({ concept: 'purchase' }, 'low'),
+        ],
+      });
+      expect(Object.fromEntries(p.entries)).toMatchObject({
+        notaryLoan: '390,00',
+        notaryMixed: 'yes',
+      });
+      expect(p.marks.map((m) => [m.id, m.confidence, m.derived])).toEqual([
+        ['notaryLoan', 'low', true],
+        ['notaryMixed', 'low', undefined],
+      ]);
+      expect(p.notes).toEqual(['client.documents.done_low', INVOICES, ADDED]);
+    });
+
+    it('takes the least sure of the invoices that are not mixed', () => {
+      const p = read({
+        notaryInvoices: [notary({ total: 100 }, 'medium'), notary({ total: 200 }, 'high')],
+      });
+      expect(p.marks.find((m) => m.id === 'notaryMixed')).toMatchObject({ confidence: 'medium' });
+    });
+
+    it('does not count an invoice without a figure as left out', () => {
+      const p = read({
+        notaryInvoices: [notary({ total: 100 }), notary({ concept: 'purchase', total: 0 })],
+      });
+      expect(p.notes).toEqual([INVOICES]);
+    });
+
+    it.each([
+      ['left out', { notaryInvoices: [notary({ concept: 'purchase', total: 9 })] }, [LEFT_OUT]],
+      [
+        'paid by the lender',
+        { ajdForms: [row({ concept: 'loan', paidByLender: true }, 'ajd_form')] },
+        [LENDER],
+      ],
+      ['paid apart', { agencySupplied: [outlay('ajd', 40, 'loan')] }, [APART]],
+    ] as const)('says alone what was %s when nothing else was read', (_name, given, notes) => {
+      expect(read({ ...given } as Partial<MortgageExtraction>)).toMatchObject({
+        entries: [],
+        notes,
+      });
+    });
+
+    it('says all three, after the invoices, when they hold', () => {
+      const p = read({
+        notaryInvoices: [notary({ total: 9 }), notary({ concept: 'purchase', total: 9 })],
+        ajdForms: [row({ concept: 'loan', paidByLender: true }, 'ajd_form')],
+        agencyInvoices: [BILL],
+        agencySupplied: [outlay('ajd', 40, 'loan')],
+      });
+      expect(p.notes).toEqual([INVOICES, LEFT_OUT, LENDER, APART]);
+    });
+
+    describe('the outlays of an agency', () => {
+      const entries = (e: Partial<MortgageExtraction>) => answers(e);
+      const apart = (e: Partial<MortgageExtraction>) => read(e).notes.includes(APART);
+
+      it.each([
+        ['less than', 30, { agencyTax: '30,00' }],
+        ['as much as', 32, { agencyTax: '32,00' }],
+      ])('passes an outlay of %s what the invoice bills beyond base and VAT', (_n, amount, tax) => {
+        const e = { agencyInvoices: [BILL], agencySupplied: [outlay('ajd', amount, 'loan')] };
+        expect(entries(e)).toMatchObject(tax);
+        expect(apart(e)).toBe(false);
+      });
+
+      it('holds back one that does not fit, saying where it goes unless its line was read', () => {
+        const e = { agencyInvoices: [BILL], agencySupplied: [outlay('ajd', 40, 'loan')] };
+        expect(entries(e)).not.toHaveProperty('agencyTax');
+        expect(apart(e)).toBe(true);
+        expect(apart({ ...e, ajdForms: [PAID_TAX] })).toBe(false);
+        const registry = {
+          agencyInvoices: [BILL],
+          agencySupplied: [outlay('registry', 40, 'loan')],
+        };
+        expect(apart(registry)).toBe(true);
+        expect(apart({ ...registry, registryInvoices: [PAID_REGISTRY] })).toBe(false);
+      });
+
+      it('says so when only one of the outlays has its line unread', () => {
+        const both = [outlay('ajd', 20, 'loan'), outlay('registry', 20, 'loan')];
+        const e = { agencyInvoices: [BILL], agencySupplied: both };
+        expect(apart({ ...e, ajdForms: [PAID_TAX] })).toBe(true);
+        expect(apart({ ...e, registryInvoices: [PAID_REGISTRY] })).toBe(true);
+        expect(apart({ ...e, ajdForms: [PAID_TAX], registryInvoices: [PAID_REGISTRY] })).toBe(
+          false,
+        );
+      });
+
+      it('counts an outlay with no figure as unread, though it adds nothing to what is passed', () => {
+        const e = {
+          registryInvoices: [PAID_REGISTRY],
+          agencySupplied: [
+            agency({ concept: 'ajd', deed: 'loan' }),
+            outlay('registry', 40, 'loan'),
+          ],
+        };
+        expect(apart(e)).toBe(false);
+      });
+
+      it('reads the room of an invoice without its base and VAT as all of it', () => {
+        const e = {
+          agencyInvoices: [agency({ concept: 'loan', total: 1_000 })],
+          agencySupplied: [outlay('ajd', 500, 'loan')],
+        };
+        expect(entries(e)).toMatchObject({ agencyTax: '500,00' });
+      });
+
+      it('takes an outlay that names no deed only when every invoice priced is the loan’s', () => {
+        const nameless = [outlay('ajd', 30)];
+        const only = { agencyInvoices: [BILL], agencySupplied: nameless };
+        expect(entries(only)).toMatchObject({ agencyTax: '30,00' });
+        const unpriced = agency({ concept: 'purchase' });
+        expect(entries({ ...only, agencyInvoices: [BILL, unpriced] })).toMatchObject({
+          agencyTax: '30,00',
+        });
+        const purchase = agency({ concept: 'purchase', total: 100 });
+        expect(entries({ ...only, agencyInvoices: [BILL, purchase] })).not.toHaveProperty(
+          'agencyTax',
+        );
+        const none = { agencySupplied: nameless };
+        expect(apart(none)).toBe(false);
+        expect(entries(none)).toEqual({});
+      });
+
+      it.each([
+        ['an outlay of the purchase', outlay('ajd', 30, 'purchase')],
+        ['an outlay of something else', outlay('notary', 30, 'loan')],
+        ['an outlay with no figure', agency({ concept: 'ajd', deed: 'loan' })],
+        ['an outlay of nothing', outlay('ajd', 0, 'loan')],
+      ])('leaves out %s', (_name, supplied) => {
+        const e = { agencyInvoices: [BILL], agencySupplied: [supplied] };
+        expect(entries(e)).toEqual({ hasInvoices: 'yes', agency: '1.000,00' });
+        expect(apart(e)).toBe(false);
+      });
+    });
+  });
+
+  describe('an early repayment', () => {
+    const op = (values: Record<string, ExtractedValue>) =>
+      row({ on: '2024-06-15', kind: 'partial_prepayment', ...values }, 'prepayment_statement');
+
+    it.each([
+      ['a date that is none', op({ on: 'ayer' })],
+      ['no date', op({ on: 0 })],
+      ['a kind that is none', op({ kind: 'weird' })],
+      ['the kind of no repayment', op({ kind: 'none' })],
+    ])('leaves out one with %s', (_name, bad) => {
+      expect(read({ operations: [bad] })).toMatchObject({ entries: [], notes: [] });
+    });
+
+    it('takes the figures it has and says nothing of others when there is one', () => {
+      expect(read({ operations: [op({ principal: -1 })] })).toMatchObject({
+        entries: [
+          ['operation', 'partial_prepayment'],
+          ['operationOn', '2024-06-15'],
+        ],
+        notes: [],
+      });
+      expect(answers({ operations: [op({ principal: 5_000, feeCharged: 0 })] })).toMatchObject({
+        operationPrincipal: '5.000,00',
+        operationFee: '0,00',
+      });
+    });
   });
 });
