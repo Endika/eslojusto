@@ -141,11 +141,21 @@ describe('the credit review on its page', () => {
     expect(document.querySelector('[data-error-for="nominalRate"]')?.textContent).not.toBe('');
   });
 
-  it('words a locked review as it completes', () => {
-    const { section } = setUp(() => 'locked');
-    section.fill(LOAN);
-    section.review();
-    expect(count()?.hidden).toBe(false);
+  it('words a locked review and shows it unlocked unless told otherwise', () => {
+    {
+      const { section } = setUp(() => 'locked');
+      section.fill(LOAN);
+      section.review();
+      expect(count()?.hidden).toBe(false);
+    }
+
+    {
+      const { section } = setUp();
+      section.fill(LOAN);
+      section.review();
+      section.refreshResult();
+      expect(count()?.hidden).toBe(true);
+    }
   });
 
   it('shows the review again as the pass leaves its detail, and forgets it on starting over', () => {
@@ -165,13 +175,5 @@ describe('the credit review on its page', () => {
     detail = 'unlocked';
     section.refreshResult();
     expect(document.querySelector('[data-items]')?.innerHTML).toBe(before);
-  });
-
-  it('shows the review unlocked unless told otherwise', () => {
-    const { section } = setUp();
-    section.fill(LOAN);
-    section.review();
-    section.refreshResult();
-    expect(count()?.hidden).toBe(true);
   });
 });

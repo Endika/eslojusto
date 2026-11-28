@@ -45,74 +45,74 @@ describe('the gate', () => {
 describe('the sheets a credit is asked', () => {
   const IN_SCOPE_ALWAYS: Sheet[] = ['uso', 'importe', 'contrato', 'interes', 'desistimiento'];
 
-  it.each([
-    ['a mortgage skips every sheet but the product and the result', MORTGAGE, ['producto']],
-    [
-      'a card of before the 2011 law is asked only what its indicator needs',
-      OLD_CARD,
-      ['producto', 'uso', 'importe', 'contrato', 'interes', 'tae', 'tarjeta'],
-    ],
-    [
-      'a loan stating its APR is not asked the card',
-      { ...LOAN, aprStated: 'yes' },
+  it('asks each credit only the sheets its answers call for, and shows the result whatever they are', () => {
+    const rows: [string, Answers, Sheet[]][] = [
+      ['a mortgage skips every sheet but the product and the result', MORTGAGE, ['producto']],
       [
-        ...IN_SCOPE_ALWAYS,
-        'producto',
-        'tae',
-        'cuotas',
-        'cuota-final',
-        'apertura',
-        'otros-gastos',
-        'seguro',
-        'amortizacion',
-        'comparar',
+        'a card of before the 2011 law is asked only what its indicator needs',
+        OLD_CARD,
+        ['producto', 'uso', 'importe', 'contrato', 'interes', 'tae', 'tarjeta'],
       ],
-    ],
-    [
-      'a loan without an APR stated skips the comparison',
-      { ...LOAN, aprStated: 'no' },
       [
-        ...IN_SCOPE_ALWAYS,
-        'producto',
-        'tae',
-        'cuotas',
-        'cuota-final',
-        'apertura',
-        'otros-gastos',
-        'seguro',
-        'amortizacion',
+        'a loan stating its APR is not asked the card',
+        { ...LOAN, aprStated: 'yes' },
+        [
+          ...IN_SCOPE_ALWAYS,
+          'producto',
+          'tae',
+          'cuotas',
+          'cuota-final',
+          'apertura',
+          'otros-gastos',
+          'seguro',
+          'amortizacion',
+          'comparar',
+        ],
       ],
-    ],
-    [
-      'a loan with insurance and an early repayment is asked about both',
-      { ...LOAN, aprStated: 'no', hasInsurance: 'yes', repaid: 'yes' },
       [
-        ...IN_SCOPE_ALWAYS,
-        'producto',
-        'tae',
-        'cuotas',
-        'cuota-final',
-        'apertura',
-        'otros-gastos',
-        'seguro',
-        'seguro-pago',
-        'amortizacion',
-        'compensacion',
-        'fin-pactado',
-        'detalles',
+        'a loan without an APR stated skips the comparison',
+        { ...LOAN, aprStated: 'no' },
+        [
+          ...IN_SCOPE_ALWAYS,
+          'producto',
+          'tae',
+          'cuotas',
+          'cuota-final',
+          'apertura',
+          'otros-gastos',
+          'seguro',
+          'amortizacion',
+        ],
       ],
-    ],
-    [
-      'a card of after the law is asked its figures and no loan sheet',
-      { ...CARD, aprStated: 'no' },
-      [...IN_SCOPE_ALWAYS, 'producto', 'tae', 'tarjeta'],
-    ],
-  ] as [string, Answers, Sheet[]][])('%s', (_, answers, asked) => {
-    const f = form(answers);
-    expect(SHEETS.filter((s) => applies(f, s))).toEqual(SHEETS.filter((s) => asked.includes(s)));
-  });
-
-  it('shows the result whatever the answers', () => {
+      [
+        'a loan with insurance and an early repayment is asked about both',
+        { ...LOAN, aprStated: 'no', hasInsurance: 'yes', repaid: 'yes' },
+        [
+          ...IN_SCOPE_ALWAYS,
+          'producto',
+          'tae',
+          'cuotas',
+          'cuota-final',
+          'apertura',
+          'otros-gastos',
+          'seguro',
+          'seguro-pago',
+          'amortizacion',
+          'compensacion',
+          'fin-pactado',
+          'detalles',
+        ],
+      ],
+      [
+        'a card of after the law is asked its figures and no loan sheet',
+        { ...CARD, aprStated: 'no' },
+        [...IN_SCOPE_ALWAYS, 'producto', 'tae', 'tarjeta'],
+      ],
+    ];
+    for (const [, answers, asked] of rows) {
+      const f = form(answers);
+      expect(SHEETS.filter((s) => applies(f, s))).toEqual(SHEETS.filter((s) => asked.includes(s)));
+    }
     expect(applies(form(MORTGAGE), 'resultado')).toBe(true);
     expect(applies(form({}), 'resultado')).toBe(true);
   });
@@ -121,11 +121,8 @@ describe('the sheets a credit is asked', () => {
 describe('the flow of the credit review', () => {
   const today = parseDate('2026-10-09');
 
-  it('completes the result without reading any sheet', () => {
+  it('completes the result without reading any sheet, and a sheet only once its answers read', () => {
     expect(CREDIT_FLOW.complete(form({ product: 'boat' }), 'resultado', today)).toBe(true);
-  });
-
-  it('completes a sheet only once its answers read', () => {
     expect(CREDIT_FLOW.complete(form({ product: 'boat' }), 'producto', today)).toBe(false);
     expect(CREDIT_FLOW.complete(form({ product: 'personal_loan' }), 'producto', today)).toBe(true);
   });

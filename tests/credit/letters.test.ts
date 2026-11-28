@@ -285,20 +285,22 @@ describe('the credit review as the pass sees it', () => {
       creditCase({ ...calm, review: { ...calm.review, ...review } }, CREDIT_NORMS).quiet;
     const charged = completed(repaid({ compensationCharged: 120 })).review;
 
-    it('needs no indicator read, or a calm one', () => {
-      const { indicator } = calm.review;
-      expect(indicator).not.toBeNull();
-      expect(quiet({ indicator: null })).toBe(true);
-      expect(quiet({ indicator: indicator && { ...indicator, status: 'above' } })).toBe(false);
-    });
+    it('needs a calm indicator, nothing over a cap and every finding settled', () => {
+      {
+        const { indicator } = calm.review;
+        expect(indicator).not.toBeNull();
+        expect(quiet({ indicator: null })).toBe(true);
+        expect(quiet({ indicator: indicator && { ...indicator, status: 'above' } })).toBe(false);
+      }
 
-    it('needs nothing charged over a cap', () => {
-      const overCharged = { counted: 0, upTo: 5 };
-      expect(quiet({ totals: { ...calm.review.totals, overCharged } })).toBe(false);
-    });
+      {
+        const overCharged = { counted: 0, upTo: 5 };
+        expect(quiet({ totals: { ...calm.review.totals, overCharged } })).toBe(false);
+      }
 
-    it('needs every finding settled, not just one', () => {
-      expect(quiet({ items: [...calm.review.items, ...charged.items] })).toBe(false);
+      {
+        expect(quiet({ items: [...calm.review.items, ...charged.items] })).toBe(false);
+      }
     });
   });
 
@@ -316,46 +318,49 @@ const shape = (model: DocumentModel) => model.blocks.map((b) => b.type).join(' '
 const HEADER = 'title blank blank blank blank';
 
 describe('the blocks of a letter', () => {
-  it.each([
-    [
-      'the request for information',
-      () => informationLetter(completed(loan()), CREDIT_NORMS, DETAILS, tr),
-      `${HEADER} text text source text text text blank`,
-    ],
-    [
-      'the early repayment over a cap, with the lowest reading noted',
-      () => repaymentLetter(completed(repaid({ compensationCharged: 120 })), DETAILS, tr),
-      `${HEADER} text text text text text text note source source source text text blank`,
-    ],
-    [
-      'the early repayment over the interest left',
-      () =>
-        repaymentLetter(
-          completed(
-            repaid({ compensationCharged: 120, interestSettled: null, remainingInterest: 30 }),
+  it('gives each letter the blocks its text calls for', () => {
+    const rows: [string, () => DocumentModel, string][] = [
+      [
+        'the request for information',
+        () => informationLetter(completed(loan()), CREDIT_NORMS, DETAILS, tr),
+        `${HEADER} text text source text text text blank`,
+      ],
+      [
+        'the early repayment over a cap, with the lowest reading noted',
+        () => repaymentLetter(completed(repaid({ compensationCharged: 120 })), DETAILS, tr),
+        `${HEADER} text text text text text text note source source source text text blank`,
+      ],
+      [
+        'the early repayment over the interest left',
+        () =>
+          repaymentLetter(
+            completed(
+              repaid({ compensationCharged: 120, interestSettled: null, remainingInterest: 30 }),
+            ),
+            DETAILS,
+            tr,
           ),
-          DETAILS,
-          tr,
-        ),
-      `${HEADER} text text text text text text text source source source source text text blank`,
-    ],
-    [
-      'the early repayment charged without a basis',
-      () =>
-        repaymentLetter(
-          completed(loan({ rateType: 'variable', earlyRepayment: repayment() })),
-          DETAILS,
-          tr,
-        ),
-      `${HEADER} text text text text source text text blank`,
-    ],
-    [
-      'the early repayment within the cap, with nothing to ask',
-      () => repaymentLetter(completed(repaid({ compensationCharged: 50 })), DETAILS, tr),
-      `${HEADER} text text text blank`,
-    ],
-  ])('%s', (_, letter, expected) => {
-    expect(shape(letter())).toBe(expected);
+        `${HEADER} text text text text text text text source source source source text text blank`,
+      ],
+      [
+        'the early repayment charged without a basis',
+        () =>
+          repaymentLetter(
+            completed(loan({ rateType: 'variable', earlyRepayment: repayment() })),
+            DETAILS,
+            tr,
+          ),
+        `${HEADER} text text text text source text text blank`,
+      ],
+      [
+        'the early repayment within the cap, with nothing to ask',
+        () => repaymentLetter(completed(repaid({ compensationCharged: 50 })), DETAILS, tr),
+        `${HEADER} text text text blank`,
+      ],
+    ];
+    for (const [, letter, expected] of rows) {
+      expect(shape(letter())).toBe(expected);
+    }
   });
 });
 
@@ -370,27 +375,29 @@ describe('a letter built from a review that carries less than it should', () => 
   const phrase = (vars?: Record<string, CreditFigure>) =>
     creditPhrase('early_repayment.base_principal', vars);
 
-  it('skips an item with no findings when looking for the early repayment', () => {
-    const none: CreditItem = { kind: 'readings', question: 'repayment_base', readings: [] };
-    expect(repaymentLine({ ...real.review, items: [none, ...real.review.items] })).not.toBeNull();
-  });
+  it('builds the letters from a review that carries less than it should', () => {
+    {
+      const none: CreditItem = { kind: 'readings', question: 'repayment_base', readings: [] };
+      expect(repaymentLine({ ...real.review, items: [none, ...real.review.items] })).not.toBeNull();
+    }
 
-  it('leaves a figure blank that the review did not work out as euros', () => {
-    const base = (vars?: Record<string, CreditFigure>) =>
-      text(repaymentLetter(withCalculation([phrase(vars)]), NO_DETAILS, tr));
-    const blank = 'Sobre , el capital devuelto, el tope es de .';
-    expect(base()).toContain(blank);
-    expect(base({ base: { percent: 1 }, cap: 7 })).toContain(blank);
-    expect(base({ base: { euros: 5 }, cap: { euros: 1 } })).toContain(
-      'Sobre 5,00 €, el capital devuelto, el tope es de 1,00 €.',
-    );
-    expect(text(repaymentLetter(withCalculation([]), NO_DETAILS, tr))).toContain(blank);
-  });
+    {
+      const base = (vars?: Record<string, CreditFigure>) =>
+        text(repaymentLetter(withCalculation([phrase(vars)]), NO_DETAILS, tr));
+      const blank = 'Sobre , el capital devuelto, el tope es de .';
+      expect(base()).toContain(blank);
+      expect(base({ base: { percent: 1 }, cap: 7 })).toContain(blank);
+      expect(base({ base: { euros: 5 }, cap: { euros: 1 } })).toContain(
+        'Sobre 5,00 €, el capital devuelto, el tope es de 1,00 €.',
+      );
+      expect(text(repaymentLetter(withCalculation([]), NO_DETAILS, tr))).toContain(blank);
+    }
 
-  it('writes no body when the repayment is missing from the answers', () => {
-    const noRepayment = { ...real, input: { ...real.input, earlyRepayment: null } };
-    expect(shape(repaymentLetter(noRepayment, NO_DETAILS, tr))).toBe(
-      `${HEADER} text text text blank`,
-    );
+    {
+      const noRepayment = { ...real, input: { ...real.input, earlyRepayment: null } };
+      expect(shape(repaymentLetter(noRepayment, NO_DETAILS, tr))).toBe(
+        `${HEADER} text text text blank`,
+      );
+    }
   });
 });
