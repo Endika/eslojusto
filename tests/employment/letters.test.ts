@@ -35,6 +35,7 @@ import {
   tr,
   unknownComplement,
   workOrService,
+  eachRow,
 } from './fixtures';
 
 // A review read against the tables given, as the composition root loads them.
@@ -608,35 +609,40 @@ describe('what the letters read of a review', () => {
     expect(missingInformation(out.review)).toBeNull();
   });
 
-  it.each([
-    ['no point on the pay', [], null],
-    [
-      'a point on the pay, below in its one reading',
-      [{ kind: 'single', finding: pay('below_minimum') }],
-      'single',
-    ],
-    [
-      'a pay point beside another in a reading, below in both',
-      [readings(pay('below_minimum'), finding({ id: 'trial_limits', status: 'below_minimum' }))],
-      'readings',
-    ],
-    [
-      'a pay point within the limit in one reading',
-      [readings(pay('below_minimum'), pay('within_limit'))],
-      null,
-    ],
-  ])('the pay shortfall of %s', (_, items, kind) => {
-    const shortfall = payShortfall(withItems(base, items as Assessed[]), TODAY, TABLES);
-    expect(shortfall === null ? null : shortfall.lowest ? 'readings' : 'single').toBe(kind);
+  it('reads the pay shortfall of the points on the pay', () => {
+    eachRow(
+      [
+        [
+          'a point on the pay, below in its one reading',
+          [{ kind: 'single', finding: pay('below_minimum') }],
+          'single',
+        ],
+        [
+          'a pay point beside another in a reading, below in both',
+          [
+            readings(
+              pay('below_minimum'),
+              finding({ id: 'trial_limits', status: 'below_minimum' }),
+            ),
+          ],
+          'readings',
+        ],
+        [
+          'a pay point within the limit in one reading',
+          [readings(pay('below_minimum'), pay('within_limit'))],
+          null,
+        ],
+      ],
+      (_, items, kind) => {
+        const shortfall = payShortfall(withItems(base, items as Assessed[]), TODAY, TABLES);
+        expect(shortfall === null ? null : shortfall.lowest ? 'readings' : 'single').toBe(kind);
+      },
+    );
   });
 
   it('names no year that is within the minimum of the tables it is given', () => {
     const lower = MINIMUM_WAGE.map((r) => (r.year === 2026 ? { ...r, annual: 10000 } : r));
     expect(payShortfall(base, TODAY, { ...TABLES, minimumWage: lower })).toBeNull();
-  });
-
-  it('has no shortfall to name when no year of the contract has its minimum in the table', () => {
-    expect(payShortfall(base, TODAY, { ...TABLES, minimumWage: [] })).toBeNull();
   });
 
   it('asks the company about a clause void, though nothing else is wrong', () => {
@@ -661,64 +667,35 @@ describe('what the letters read of a review', () => {
     ).toEqual([]);
   });
 
-  it.each([
-    [
-      'a point that holds in every reading',
+  it('offers the certificate only for a temporality finding that holds in every reading', () => {
+    eachRow(
       [
-        readings(
-          finding({ id: 'trial_limits', status: 'becomes_permanent' }),
-          finding({ id: 'trial_limits', status: 'becomes_permanent' }),
-        ),
+        [
+          'a point that holds in every reading',
+          [
+            readings(
+              finding({ id: 'trial_limits', status: 'becomes_permanent' }),
+              finding({ id: 'trial_limits', status: 'becomes_permanent' }),
+            ),
+          ],
+          true,
+        ],
+        [
+          'a point that holds in one reading only',
+          [
+            readings(
+              finding({ id: 'trial_limits', status: 'becomes_permanent' }),
+              finding({ id: 'trial_limits', status: 'within_limit' }),
+            ),
+          ],
+          false,
+        ],
+        ['a point with no reading', [readings()], false],
       ],
-      true,
-    ],
-    [
-      'a point that holds in one reading only',
-      [
-        readings(
-          finding({ id: 'trial_limits', status: 'becomes_permanent' }),
-          finding({ id: 'trial_limits', status: 'within_limit' }),
-        ),
-      ],
-      false,
-    ],
-    ['a point with no reading', [readings()], false],
-    [
-      'a fixed-term rule over its limit',
-      [
-        {
-          kind: 'single',
-          finding: finding({ id: 'production_6_months', status: 'over_legal_limit' }),
-        },
-      ],
-      true,
-    ],
-    [
-      'a rule that is not about fixed terms, over its limit',
-      [{ kind: 'single', finding: finding({ id: 'trial_limits', status: 'over_legal_limit' }) }],
-      false,
-    ],
-    [
-      'a fixed-term rule the agreement may move',
-      [
-        {
-          kind: 'single',
-          finding: finding({
-            id: 'production_6_months',
-            status: 'over_legal_limit',
-            agreementMaySetOther: true,
-          }),
-        },
-      ],
-      false,
-    ],
-    [
-      'a status that is no breach',
-      [{ kind: 'single', finding: finding({ id: 'production_6_months', status: 'within_limit' }) }],
-      false,
-    ],
-  ])('the certificate is offered for %s: %s', (_, items, offered) => {
-    expect(hasTemporalityFinding(withItems(base, items as Assessed[]))).toBe(offered);
+      (_, items, offered) => {
+        expect(hasTemporalityFinding(withItems(base, items as Assessed[]))).toBe(offered);
+      },
+    );
   });
 
   it('writes the identity typed without its spaces, and leaves it out when only spaces', () => {

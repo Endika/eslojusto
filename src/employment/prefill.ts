@@ -73,11 +73,13 @@ const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
 function dateOf(v: ExtractedValue | undefined): CivilDate | null {
   // Stryker disable next-line ConditionalExpression: parseDate rejects whatever is not a date string, caught below
   if (typeof v !== 'string') return null;
+  // Stryker disable BlockStatement: callers only test the date for truth, so a catch that returns undefined reads as null
   try {
     return parseDate(v);
   } catch {
     return null;
   }
+  // Stryker restore BlockStatement
 }
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;

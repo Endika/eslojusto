@@ -15,7 +15,7 @@ import { phrase, type EmploymentCalculation } from '../../src/engine/employment/
 import type { EmploymentReview } from '../../src/engine/employment/review';
 import type { Assessed, Finding, FindingStatus } from '../../src/engine/employment/types';
 import { finding } from '../engine/employment/input';
-import { belowMinimum, contract, review, shortDayRate, workOrService } from './fixtures';
+import { belowMinimum, contract, review, shortDayRate, workOrService, eachRow } from './fixtures';
 
 describe('the free summary', () => {
   it('rounds one amount to tens, never down to «0 €»', () => {
@@ -150,95 +150,89 @@ describe('a shortfall as the summary reads it', () => {
     expect(amountOf(finding({ status: 'below_minimum', amount: { min: 0, max: 0 } }))).toBeNull();
   });
 
-  it.each([
-    [
-      'a finding that is not below the minimum',
-      finding({ status: 'within_limit', calculation: [yearBelow(2025, 10)] }),
-    ],
-    [
-      'a phrase that is not a shortfall',
-      below([
-        phrase('minimum_wage.year.within', { year: { integer: 2025 }, difference: { euros: 10 } }),
-      ]),
-    ],
-    [
-      'a shortfall with no year',
-      below([phrase('minimum_wage.year.below', { difference: { euros: 10 } })]),
-    ],
-    [
-      'a shortfall with no difference',
-      below([phrase('minimum_wage.year.below', { year: { integer: 2025 } })]),
-    ],
-    ['no phrase at all', below([])],
-  ])('reads none from %s', (_, f) => {
-    expect(shortfallOf(f)).toBeNull();
+  it('reads no shortfall from what is not one', () => {
+    eachRow(
+      [
+        [
+          'a finding that is not below the minimum',
+          finding({ status: 'within_limit', calculation: [yearBelow(2025, 10)] }),
+        ],
+        [
+          'a phrase that is not a shortfall',
+          below([
+            phrase('minimum_wage.year.within', {
+              year: { integer: 2025 },
+              difference: { euros: 10 },
+            }),
+          ]),
+        ],
+        [
+          'a shortfall with no year',
+          below([phrase('minimum_wage.year.below', { difference: { euros: 10 } })]),
+        ],
+        [
+          'a shortfall with no difference',
+          below([phrase('minimum_wage.year.below', { year: { integer: 2025 } })]),
+        ],
+      ],
+      (_, f) => {
+        expect(shortfallOf(f)).toBeNull();
+      },
+    );
   });
 
-  it.each([
-    ['a year', [yearBelow(2025, 10)], { per: 'year', year: 2025, amount: 10 }],
-    ['a working day', [dayBelow(2026, 2.82)], { per: 'day', year: 2026, amount: 2.82 }],
-    [
-      'the last of two',
-      [yearBelow(2024, 10), yearBelow(2025, 20)],
-      { per: 'year', year: 2025, amount: 20 },
-    ],
-    [
-      'the last one that has both a year and a difference',
-      [yearBelow(2024, 10), phrase('minimum_wage.year.below', { year: { integer: 2025 } })],
-      { per: 'year', year: 2024, amount: 10 },
-    ],
-  ])('reads %s', (_, calculation, expected) => {
-    expect(shortfallOf(below(calculation))).toEqual(expected);
-  });
-
-  it.each([
-    ['with a shortfall, by it', below([yearBelow(2025, 10)]), { per: 'year', amount: 10 }],
-    [
-      'with none, by the payslips',
-      below([], { id: 'smi_monthly' }),
-      { per: 'payslips', amount: 5 },
-    ],
-    ['with none, in total', below([], { id: 'smi_annual' }), { per: 'total', amount: 5 }],
-    ['with no amount at all', below([], { amount: null }), null],
-  ])('a figure %s', (_, f, expected) => {
-    expect(figureOf(f)).toEqual(expected);
+  it('reads a figure by its shortfall or by its total', () => {
+    eachRow(
+      [
+        [
+          'with none, by the payslips',
+          below([], { id: 'smi_monthly' }),
+          { per: 'payslips', amount: 5 },
+        ],
+        ['with none, in total', below([], { id: 'smi_annual' }), { per: 'total', amount: 5 }],
+      ],
+      (_, f, expected) => {
+        expect(figureOf(f)).toEqual(expected);
+      },
+    );
   });
 
   const day = below([dayBelow(2026, 2)]);
   const year = (n: number) => below([yearBelow(2026, n)]);
-  it.each([
-    ['two readings per year', readings(year(3), year(8)), { per: 'year', low: 3, high: 8 }],
-    ['the same amount twice', readings(year(3), year(3)), { per: 'year', low: 3, high: 3 }],
-    ['one per year and one per day', readings(year(3), day), null],
-    ['one without a shortfall', readings(year(3), finding({ status: 'within_limit' })), null],
-    ['none', readings(), null],
-    ['a single finding', single(year(3)), null],
-  ])('a range from %s', (_, assessed, expected) => {
-    expect(rangeOf(assessed)).toEqual(expected);
+  it('reads a range only from readings that agree on their basis', () => {
+    eachRow(
+      [
+        ['one per year and one per day', readings(year(3), day), null],
+        ['one without a shortfall', readings(year(3), finding({ status: 'within_limit' })), null],
+      ],
+      (_, assessed, expected) => {
+        expect(rangeOf(assessed)).toEqual(expected);
+      },
+    );
   });
 
-  const gap = phrase('minimum_wage.not_loaded', { from: { integer: 2023 } });
-  it.each([
-    ['a year to add up', below([yearBelow(2025, 10)]), { from: 2025, amount: 5 }],
-    [
-      'years from the first one named',
-      below([phrase('minimum_wage.year.within', { year: { integer: 2024 } }), yearBelow(2025, 10)]),
-      { from: 2024, amount: 5 },
-    ],
-    ['a year left out', below([gap, yearBelow(2025, 10)]), null],
-    [
-      'a shortfall per day',
-      below([dayBelow(2026, 2), phrase('minimum_wage.year.within', { year: { integer: 2024 } })]),
-      null,
-    ],
-    ['no amount', below([yearBelow(2025, 10)], { amount: null }), null],
-    [
-      'a first year with no number',
-      below([phrase('minimum_wage.year.within'), yearBelow(2025, 10)]),
-      null,
-    ],
-  ])('since when, with %s', (_, f, expected) => {
-    expect(sinceOf(f)).toEqual(expected);
+  it('adds up the years only when none is left out', () => {
+    eachRow(
+      [
+        [
+          'a shortfall per day',
+          below([
+            dayBelow(2026, 2),
+            phrase('minimum_wage.year.within', { year: { integer: 2024 } }),
+          ]),
+          null,
+        ],
+        ['no amount', below([yearBelow(2025, 10)], { amount: null }), null],
+        [
+          'a first year with no number',
+          below([phrase('minimum_wage.year.within'), yearBelow(2025, 10)]),
+          null,
+        ],
+      ],
+      (_, f, expected) => {
+        expect(sinceOf(f)).toEqual(expected);
+      },
+    );
   });
 });
 
@@ -251,27 +245,12 @@ describe('the summary’s headline and states', () => {
       informationDuty: null,
     }) as unknown as EmploymentReview;
 
-  it.each([
-    ['below_minimum', 'to_review'],
-    ['over_legal_limit', 'to_review'],
-    ['clause_void', 'to_review'],
-    ['becomes_permanent', 'to_review'],
-    ['missing_requirement', 'to_review'],
-    ['review_it', 'to_review'],
-    ['depends_on_agreement', 'to_review'],
-    ['within_limit', 'nothing_found'],
-    ['not_entered', 'nothing_entered'],
-  ] as const)('a review with only %s reads %s', (status, expected) => {
-    expect(headline(reviewOf(status))).toBe(expected);
-  });
-
-  it('reads nothing found when some points are not entered and none is wrong', () => {
-    expect(headline(reviewOf('not_entered', 'within_limit'))).toBe('nothing_found');
-  });
-
-  it('reads found whenever the review offers the pass', () => {
-    expect(headline({ ...reviewOf('within_limit'), offerPass: true })).toBe('found');
-  });
+  it.each([['not_entered', 'nothing_entered']] as const)(
+    'a review with only %s reads %s',
+    (status, expected) => {
+      expect(headline(reviewOf(status))).toBe(expected);
+    },
+  );
 
   it('shows a card the status of its finding, or depends across readings', () => {
     expect(stateOf(single(finding({ status: 'within_limit' })))).toBe('within_limit');

@@ -311,3 +311,11 @@ export function malformed(blocks: readonly Block[]): Block[] {
     }
   });
 }
+
+// Runs `check` on each row of a table inside one test, with the types an `it.each` row gets.
+export function eachRow<T extends unknown[] | [unknown]>(
+  rows: readonly T[],
+  check: (...row: T) => void,
+): void {
+  for (const row of rows) check(...row);
+}

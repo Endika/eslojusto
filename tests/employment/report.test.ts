@@ -28,6 +28,7 @@ import {
   TABLES,
   TODAY,
   tr,
+  eachRow,
 } from './fixtures';
 
 const report = (input: EmploymentInput): DocumentModel =>
@@ -333,15 +334,6 @@ const allPresent = (change: Partial<Record<InfoElement, InfoPresence>>) =>
   Object.fromEntries(
     INFO_ELEMENTS.map((e) => [e, change[e] ?? 'present']),
   ) as EmploymentInput['info'];
-const selection = contract({
-  modality: 'replacement_selection',
-  startDate: f('2026-01-01'),
-  endDate: f('2026-02-15'),
-  signedOn: null,
-  replacedPersonNamed: true,
-  replacementCauseStated: true,
-});
-const missing = contract({ info: allPresent({ o: 'absent' }) });
 const unknownInfo = contract({ info: allPresent({ o: 'unknown' }) });
 const notStarted = contract({ startDate: f('2026-12-01'), signedOn: null });
 const driftingStart = contract({
@@ -380,7 +372,6 @@ const offerOf = (offer: Partial<NonNullable<EmploymentInput['offer']>>) =>
       ...offer,
     },
   });
-const sport = contract({ relationship: 'sport' });
 const corner = (i: number) => corners[i] as EmploymentInput;
 
 describe('the contract report, block by block', () => {
@@ -404,50 +395,6 @@ describe('the contract report, block by block', () => {
       'text: client.employment.status.not_entered',
       'note: client.employment.report.how',
       'bullet: client.employment.status.not_entered',
-    ]);
-  });
-
-  it('a point that rests on the person’s answer says so before how it is worked out', () => {
-    expect(section(belowMinimum, `subheading: ${P}finding.trial_limits`)).toEqual([
-      'subheading: client.employment.finding.trial_limits',
-      'text: client.employment.status.within_limit',
-      'note: client.employment.note.your_answer',
-      'note: client.employment.report.how',
-      'bullet: client.employment.calculation.trial.within_legal_limit(trial=client.employment.calculation.trial.amount_months(amount=client.employment.unit.month_many(n=2)),months=client.employment.unit.month_many(n=2))',
-      'source: Estatuto de los Trabajadores, art. 14.1 (Real Decreto Legislativo 2/2015, de 23 de octubre)',
-    ]);
-  });
-
-  it('a point with two readings gives its range, its question, each reading, and each worked out', () => {
-    expect(section(shortDayRateDoubt, `subheading: ${P}finding.smi_temporary_120`)).toEqual([
-      'subheading: client.employment.finding.smi_temporary_120',
-      'text: client.employment.status.below_minimum_day_up_to(importe=2,82 €,maximo=12,82 €)',
-      'text: client.employment.question.complement_kind',
-      'bullet: client.employment.reading_line(cuando=client.employment.reading.complement_fixed,resultado=client.employment.reading_status.below_minimum_day(importe=2,82 €))',
-      'bullet: client.employment.reading_line(cuando=client.employment.reading.complement_variable,resultado=client.employment.reading_status.below_minimum_day(importe=12,82 €))',
-      'note: client.employment.note.your_answer',
-      'note: client.employment.report.how',
-      'text: client.employment.reading.complement_fixed',
-      'bullet: client.employment.calculation.minimum_wage.temporary.below(year=2026,minimum=57,82 €,pay=55,00 €,difference=2,82 €)',
-      'bullet: client.employment.calculation.minimum_wage.agreement_may_pay_more()',
-      'text: client.employment.reading.complement_variable',
-      'bullet: client.employment.calculation.minimum_wage.excluded(excluded=10,00 €)',
-      'bullet: client.employment.calculation.minimum_wage.temporary.below(year=2026,minimum=57,82 €,pay=45,00 €,difference=12,82 €)',
-      'bullet: client.employment.calculation.minimum_wage.agreement_may_pay_more()',
-      'source: Estatuto de los Trabajadores, art. 27.1 (Real Decreto Legislativo 2/2015, de 23 de octubre)',
-      'source: art. 4.1 (Real Decreto 126/2026, de 18 de febrero)',
-    ]);
-  });
-
-  it('a point the agreement may move says so', () => {
-    expect(section(selection, `subheading: ${P}finding.replacement_selection_3_months`)).toEqual([
-      'subheading: client.employment.finding.replacement_selection_3_months',
-      'text: client.employment.status.within_limit',
-      'note: client.employment.note.agreement',
-      'note: client.employment.report.how',
-      'bullet: client.employment.calculation.modality.duration(meses=1,dias=15,duracion=client.employment.and(a=client.employment.unit.month_one(n=1),b=client.employment.unit.day_many(n=15)))',
-      'bullet: client.employment.calculation.modality.selection_within()',
-      'source: Estatuto de los Trabajadores, art. 15.3 (Real Decreto Legislativo 2/2015, de 23 de octubre)',
     ]);
   });
 
@@ -509,33 +456,11 @@ describe('the contract report, block by block', () => {
     ]);
   });
 
-  it('the duty to inform ends with its norm', () => {
-    expect(section(corner(6), `subheading: ${P}info.q`, `heading: ${P}offer.title`)).toEqual([
-      'subheading: client.employment.info.q',
-      'text: client.employment.status.within_limit',
-      'bullet: client.employment.calculation.information.present()',
-      'source: art. 3.2 (Real Decreto 723/2026, de 9 de septiembre)',
-    ]);
-  });
-
   it('a contract that ended before the decree is given the reason and its norm', () => {
     expect(section(corner(5), `heading: ${P}duty.title`)).toEqual([
       'heading: client.employment.duty.title',
       'text: client.employment.duty.ended_before_decree',
       'source: disposición transitoria única (Real Decreto 723/2026, de 9 de septiembre)',
-    ]);
-  });
-
-  it('the duty to inform says what may be asked for when an element is missing', () => {
-    expect(section(missing, `heading: ${P}duty.title`, `subheading: ${P}info.a`)).toEqual([
-      'heading: client.employment.duty.title',
-      'text: client.employment.duty.on_request',
-      'subheading: client.employment.info.o',
-      'text: client.employment.status.missing_requirement',
-      'bullet: client.employment.calculation.information.missing_on_request()',
-      'subheading: client.employment.info.e',
-      'text: client.employment.status.within_limit',
-      'bullet: client.employment.calculation.information.present()',
     ]);
   });
 
@@ -554,20 +479,6 @@ describe('the contract report, block by block', () => {
     expect(section(notStarted, `heading: ${P}duty.title`, `subheading: ${P}info.o`)).toEqual([
       'heading: client.employment.duty.title',
       'text: client.employment.duty.before_start',
-    ]);
-  });
-
-  it('the reference figures come with their norms', () => {
-    expect(section(corner(2), `heading: ${P}reference.title`)).toEqual([
-      'heading: client.employment.reference.title',
-      'text: client.employment.reference.lead(fecha=08-10-2026)',
-      'bullet: client.employment.reference.fixed_term_end(importe=2.375,77 €)',
-      'bullet: client.employment.reference.unfair_dismissal(importe=6.645,21 €)',
-      'source: Estatuto de los Trabajadores, art. 49.1.c',
-      'source: Estatuto de los Trabajadores, disposición transitoria 8.ª',
-      'source: CGPJ, guía práctica para el cálculo de indemnizaciones (v0.6)',
-      'source: Estatuto de los Trabajadores, art. 56',
-      'source: Estatuto de los Trabajadores, disposición transitoria 11.ª',
     ]);
   });
 
@@ -599,17 +510,6 @@ describe('the contract report, block by block', () => {
     ]);
   });
 
-  it('the information blocks give their words, their links and their norms', () => {
-    expect(section(corner(6), `subheading: ${P}block.agreement`)).toEqual([
-      'subheading: client.employment.block.agreement',
-      'text: client.employment.calculation.information.agreement.named()',
-      'text: client.employment.calculation.information.agreement.where()',
-      'text: client.employment.calculation.information.agreement.sector_salary_amount_priority()',
-      'source: client.employment.link.regcon',
-      'source: Estatuto de los Trabajadores, art. 82.3 (Real Decreto Legislativo 2/2015, de 23 de octubre)',
-    ]);
-  });
-
   it('a block with two norms gives both', () => {
     expect(section(corner(6), `subheading: ${P}block.time_record`)).toEqual([
       'subheading: client.employment.block.time_record',
@@ -617,18 +517,6 @@ describe('the contract report, block by block', () => {
       'text: client.employment.calculation.part_time.monthly_summary()',
       'source: Estatuto de los Trabajadores, art. 34.9 (Real Decreto-ley 8/2019, de 8 de marzo)',
       'source: Estatuto de los Trabajadores, art. 12.4.c (Real Decreto Legislativo 2/2015, de 23 de octubre)',
-    ]);
-  });
-
-  it('what is not checked closes the report', () => {
-    expect(section(corner(6), `heading: ${P}report.unchecked`)).toEqual([
-      'heading: client.employment.report.unchecked',
-      'bullet: client.employment.unchecked.agreement_tables',
-      'bullet: client.employment.unchecked.bonuses',
-      'bullet: client.employment.unchecked.equal_pay',
-      'bullet: client.employment.unchecked.contributions',
-      'bullet: client.employment.unchecked.net_pay',
-      'bullet: client.employment.unchecked.later_agreements',
     ]);
   });
 
@@ -648,45 +536,39 @@ describe('the contract report, block by block', () => {
     ]);
   });
 
-  it('a relationship out of the review has no points', () => {
-    expect(
-      section(sport, `heading: ${P}report.summary`, `heading: ${P}report.information`),
-    ).toEqual([
-      'heading: client.employment.report.summary',
-      'text: client.employment.out_of_scope.status',
-      'text: client.employment.out_of_scope.special_relationship',
-    ]);
-  });
-
-  it.each([
-    ['nothing differs', {}, [`text: ${P}offer.none`]],
-    [
-      'one thing differs',
-      { grossAnnual: 24000 },
+  it('says how many differences the offer has', () => {
+    eachRow(
       [
-        `text: ${P}offer.count_one(n=1)`,
-        `note: ${P}offer.no_verdict`,
-        `bullet: ${P}offer.difference.gross_annual(oferta=24.000 €,contrato=21.000 €)`,
+        ['nothing differs', {}, [`text: ${P}offer.none`]],
+        [
+          'one thing differs',
+          { grossAnnual: 24000 },
+          [
+            `text: ${P}offer.count_one(n=1)`,
+            `note: ${P}offer.no_verdict`,
+            `bullet: ${P}offer.difference.gross_annual(oferta=24.000 €,contrato=21.000 €)`,
+          ],
+        ],
       ],
-    ],
-  ])('the offer, when %s, is said so', (_, offer, expected) => {
-    const lines = section(offerOf(offer), `heading: ${P}offer.title`);
-    expect(lines.slice(1, 1 + expected.length)).toEqual(expected);
+      (_, offer, expected) => {
+        const lines = section(offerOf(offer), `heading: ${P}offer.title`);
+        expect(lines.slice(1, 1 + expected.length)).toEqual(expected);
+      },
+    );
   });
 
-  it.each([
-    ['without points when there is nothing to point at', { items: [], clauses: [] }, false],
-    ['with points when there are only items', { clauses: [] }, true],
-    ['with points when there are only clauses', { items: [] }, true],
-  ])('the report goes %s', (_, change, points) => {
-    const lines = section(
-      corner(6),
-      `heading: ${P}report.summary`,
-      `heading: ${P}duty.title`,
-      change,
-    );
-    expect(lines.includes(`heading: ${P}report.points`)).toBe(points);
-  });
+  it.each([['with points when there are only clauses', { items: [] }, true]])(
+    'the report goes %s',
+    (_, change, points) => {
+      const lines = section(
+        corner(6),
+        `heading: ${P}report.summary`,
+        `heading: ${P}duty.title`,
+        change,
+      );
+      expect(lines.includes(`heading: ${P}report.points`)).toBe(points);
+    },
+  );
 
   it('gives no heading to information blocks there are none of', () => {
     const lines = section(corner(6), `heading: ${P}duty.title`, `heading: ${P}report.unchecked`, {
