@@ -547,13 +547,16 @@ describe('more cases of the taxes of a renewal', () => {
       return result.kind === 'ok' ? result.vatPercent : result.kind;
     };
 
-    it.each([
-      [true, 10, 10],
-      [true, 10.1, 21],
-      [false, 10, 21],
-      [false, 9.9, 10],
-    ])('a limit included %s and a supply of %s kW pays %s', (included, kw, percent) => {
-      expect(vatFor(included, kw)).toBe(percent);
+    it('pays the reduced VAT only up to the power limit, included or not', () => {
+      const cases: [boolean, number, number][] = [
+        [true, 10, 10],
+        [true, 10.1, 21],
+        [false, 10, 21],
+        [false, 9.9, 10],
+      ];
+      for (const [included, kw, percent] of cases) {
+        expect(vatFor(included, kw), String(included)).toBe(percent);
+      }
     });
   });
 

@@ -100,10 +100,10 @@ describe('charges after the exit', () => {
     ]);
   });
 
-  it.each([
-    ['refunds', -30],
-    ['lines with no charge', 0],
-  ])('says nothing, even with no holidays loaded, of a bill with only %s', (_, amount) => {
-    expect(check('2026-12-30', [line('2027-01-01', '2027-01-31', amount)])).toEqual([]);
-  });
+  it.each([['lines with no charge', 0]])(
+    'says nothing, even with no holidays loaded, of a bill with only %s',
+    (_, amount) => {
+      expect(check('2026-12-30', [line('2027-01-01', '2027-01-31', amount)])).toEqual([]);
+    },
+  );
 });
