@@ -116,6 +116,7 @@ export class PdfDocument {
 
   private get page(): Page {
     const page = this.pages[this.pages.length - 1];
+    // Stryker disable next-line ConditionalExpression,CallExpression,StringLiteral: the constructor adds a page, so one always exists; the check narrows the type
     if (!page) throw new Error('No page');
     return page;
   }

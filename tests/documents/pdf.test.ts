@@ -1,29 +1,14 @@
-import { inflateSync } from 'node:zlib';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { pdfMaker, renderPdf, STYLES, unprintable } from '../../src/documents/pdf';
 import { INK, PdfDocument, pdfString, SOFT } from '../../src/documents/pdf-writer';
 import type { Block } from '../../src/documents/ports';
+import { streams } from '../support/pdf-streams';
 import { sans } from '../../src/documents/fonts/sans';
 import { serif } from '../../src/documents/fonts/serif';
 import { letterModel, reportModel } from '../../src/documents/report';
 import { completed, today, tr, unfairDismissal } from './fixtures';
 
 const latin1 = (bytes: Uint8Array) => Buffer.from(bytes).toString('latin1');
-
-// Every stream, inflated, with its dictionary.
-function streams(pdf: string): { dict: string; data: string }[] {
-  const out: { dict: string; data: string }[] = [];
-  const re = /<<([^]*?)>>\nstream\n/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(pdf))) {
-    const dict = m[1] ?? '';
-    const length = Number(/\/Length (\d+)/.exec(dict)?.[1]);
-    const start = m.index + m[0].length;
-    const raw = Buffer.from(pdf.slice(start, start + length), 'latin1');
-    out.push({ dict, data: inflateSync(raw).toString('latin1') });
-  }
-  return out;
-}
 
 // The text a viewer would extract: glyph ids mapped back through each ToUnicode map.
 function extractText(pdf: string): string {
