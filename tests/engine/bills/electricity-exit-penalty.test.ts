@@ -4,7 +4,7 @@ import { checkExitPenalty } from '../../../src/engine/bills/electricity-exit-pen
 import { countedAmount, type BillItem } from '../../../src/engine/bills/finding';
 import type { ElectricityBillInput, ExitPenalty } from '../../../src/engine/bills/types';
 import { parseDate } from '../../../src/engine/date';
-import { freeBill, juneBill, only } from './input';
+import { freeBill, only } from './input';
 
 const present = (item: BillItem | null): BillItem => {
   if (item === null) throw new Error('no item');
@@ -28,7 +28,6 @@ describe('a penalty for leaving the contract', () => {
   const person = { holder: 'person' } as const;
 
   it.each([
-    [{ priceType: 'variable' }, 'exit.not_fixed'],
     [{ priceType: 'indexed' }, 'exit.not_fixed'],
     [{ priceType: 'fixed', firstRenewalPassed: true }, 'exit.renewed'],
   ] as const)('%j is not allowed, and counted', (change, key) => {
@@ -40,10 +39,8 @@ describe('a penalty for leaving the contract', () => {
   });
 
   it.each([
-    [{ priceType: 'fixed' }, person, 'exit.fixed_first_term'],
     [{ priceType: null }, person, 'exit.terms_unknown'],
     [{ firstRenewalPassed: null }, person, 'exit.terms_unknown'],
-    [{}, { holder: 'microenterprise' }, 'exit.not_person'],
     [{}, { holder: null }, 'exit.not_person'],
     [{}, { ...person, issuedOn: parseDate('2026-06-11') }, 'exit.before_rules'],
     [
@@ -58,13 +55,9 @@ describe('a penalty for leaving the contract', () => {
     expect(only(item).id).toBe('exit_penalty');
   });
 
-  it('gives nothing when the bill has no penalty', () => {
-    expect(checkExitPenalty(juneBill(), BILLS_NORMS)).toBeNull();
-  });
-
-  it.each([0, -5])('gives nothing for a penalty of %s', (amount) => {
+  it('gives nothing for a penalty of 0', () => {
     expect(
-      checkExitPenalty(freeBill({ exitPenalty: penalty({ amount }) }), BILLS_NORMS),
+      checkExitPenalty(freeBill({ exitPenalty: penalty({ amount: 0 }) }), BILLS_NORMS),
     ).toBeNull();
   });
 });

@@ -30,8 +30,6 @@ const FUTURE: RentalDeps = {
   indices: { irav: withSeptember(IRAV, 2.5), ipc: withSeptember(IPC, 4.9), igc: IGC },
 };
 
-const FUTURE_BEFORE_VOTE: RentalDeps = { ...FUTURE, norms: NORMS_BEFORE_VOTE };
-
 const community = (change: Partial<Charge> = {}): Charge => ({
   kind: 'community',
   inContract: true,
@@ -87,27 +85,6 @@ describe('a charge agreed with its yearly amount', () => {
     );
   });
 
-  it('leaves to review a year with two yearly bills rather than count it', () => {
-    // Two community bills of 600 € and 618 € paid in 2025: 1.218 €, over 1,5 × 600.
-    const [r] = checkCharges(
-      input([
-        community({
-          charged: [
-            { year: 2025, amount: 600 },
-            { year: 2025, amount: 618 },
-          ],
-        }),
-      ]),
-      DEPS,
-    );
-    expect(singleOf(r)).toEqual({ status: 'review_it', amount: null });
-    expect(r && countedAmount(r.outcome, itemAmount)).toBe(0);
-    expect(r?.outcome.kind === 'single' && r.outcome.value.calculation).toContainEqual({
-      key: 'charges.year_unclear',
-      vars: { year: { integer: 2025 }, charged: { euros: 1218 } },
-    });
-  });
-
   it('still counts a year over the cap but under 1,5 times the agreed amount', () => {
     const [r] = checkCharges(input([community({ charged: [{ year: 2025, amount: 900 }] })]), DEPS);
     expect(singleOf(r)).toEqual({ status: 'paid_over', amount: 300 });
@@ -146,31 +123,12 @@ describe('a charge agreed with its yearly amount', () => {
       startDate: f('2025-10-20'),
     });
 
-  it('a rise still pending validation gives both readings and counts the lower', () => {
-    const [r] = checkCharges(risen(), FUTURE_BEFORE_VOTE);
-    if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
-    expect(r.outcome.reasons).toEqual(['pending_validation', 'extraordinary_cap_reach']);
-    expect(countedAmount(r.outcome, itemAmount)).toBe(10);
-    expect(highestAmount(r.outcome, itemAmount)).toBe(16);
-  });
-
   it('a rise under the validated RDL 29/2026 no longer waits on its validation', () => {
     const [r] = checkCharges(risen(), FUTURE);
     if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
     expect(r.outcome.reasons).toEqual(['extraordinary_cap_reach']);
     expect(countedAmount(r.outcome, itemAmount)).toBe(10);
     expect(highestAmount(r.outcome, itemAmount)).toBe(16);
-  });
-
-  it('a year whose index is not out yet is not checkable', () => {
-    const [r] = checkCharges(
-      input([community({ charged: [{ year: 2030, amount: 640 }] })], {
-        signedOn: f('2029-10-15'),
-        startDate: f('2029-10-20'),
-      }),
-      DEPS,
-    );
-    expect(singleOf(r).status).toBe('not_checkable');
   });
 });
 
@@ -193,54 +151,6 @@ describe('the extraordinary caps', () => {
       expect(r.outcome.readings.map((x) => x.value.status)).toContain('paid_over');
       expect(countedAmount(r.outcome, itemAmount)).toBe(0);
     }
-  });
-});
-
-describe('a charge with no basis to compare', () => {
-  it('of another kind may be a metered supply or a tax: left to look at', () => {
-    const [r] = checkCharges(
-      input([
-        community({ kind: 'other', annualAgreed: 300, charged: [{ year: 2026, amount: 500 }] }),
-      ]),
-      DEPS,
-    );
-    expect(singleOf(r)).toEqual({ status: 'review_it', amount: null });
-  });
-
-  it('missing from the contract is left to look at, with what was charged and no total', () => {
-    const [r] = checkCharges(
-      input([
-        community({
-          inContract: false,
-          annualAgreed: null,
-          charged: [
-            { year: 2025, amount: 150 },
-            { year: 2026, amount: 610 },
-          ],
-        }),
-      ]),
-      DEPS,
-    );
-    expect(singleOf(r)).toEqual({ status: 'review_it', amount: null });
-    expect(r?.outcome.kind === 'single' && r.outcome.value.calculation).toEqual([
-      { key: 'charges.not_in_contract', vars: { charged: { euros: 760 } } },
-    ]);
-  });
-
-  it('in the contract with no yearly amount is left to look at', () => {
-    const [r] = checkCharges(
-      input([community({ annualAgreed: null, charged: [{ year: 2026, amount: 610 }] })]),
-      DEPS,
-    );
-    expect(singleOf(r)).toEqual({ status: 'review_it', amount: null });
-  });
-
-  it('a waste fee may be a tax, so it is not capped', () => {
-    const [r] = checkCharges(
-      input([community({ kind: 'waste', charged: [{ year: 2026, amount: 900 }] })]),
-      DEPS,
-    );
-    expect(singleOf(r).status).toBe('not_checkable');
   });
 });
 

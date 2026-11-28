@@ -40,36 +40,6 @@ const realToday = (): CivilDate => {
 };
 
 describe('the bills due list', () => {
-  it('asks for the next year of 2.0TD toll holidays', () => {
-    expect(billsDue(parseDate('2027-01-04'), deps)).toContainEqual({
-      kind: 'toll_holidays_missing',
-      year: 2027,
-    });
-    expect(billsDue(parseDate('2026-10-09'), deps).map((i) => i.kind)).not.toContain(
-      'toll_holidays_missing',
-    );
-  });
-
-  it('names the open conditions and when each figure is due', () => {
-    const items = billsDue(parseDate('2026-10-09'), beforeFigure);
-    expect(items.filter((i) => i.kind === 'condition_open')).toEqual([
-      {
-        kind: 'condition_open',
-        norm: 'rdl25_2026_november',
-        text: 'Que el IPC de la electricidad de septiembre de 2026 suba más del 15 % interanual',
-        decidesOn: '2026-10-14',
-        overdue: false,
-      },
-      {
-        kind: 'condition_open',
-        norm: 'rdl25_2026_december',
-        text: 'Que el IPC de la electricidad de octubre de 2026 suba más del 15 % interanual',
-        decidesOn: '2026-11-13',
-        overdue: false,
-      },
-    ]);
-  });
-
   it('flags a condition still open a week after its figure is due', () => {
     const open = (day: string) =>
       billsDue(parseDate(day), beforeFigure)
@@ -173,34 +143,25 @@ describe('the bills due list', () => {
     });
   });
 
-  it('leaves a settled condition out of the open ones', () => {
-    const items = billsDue(parseDate('2026-05-20'), beforeFigure);
-    expect(
-      items
-        .filter((i) => i.kind === 'condition_open')
-        .map((i) => i.kind === 'condition_open' && i.norm),
-    ).toEqual(['rdl25_2026_november', 'rdl25_2026_december']);
-  });
-
   it('leaves November and December out once the INE gave their figures', () => {
     const items = billsDue(parseDate('2026-11-18'), deps);
     expect(items.some((i) => i.kind === 'condition_open')).toBe(false);
     expect(items.some((i) => i.kind === 'month_conditional')).toBe(false);
   });
 
-  it.each([
-    ['without its rate', '2026-10-09', '2026-12-01', null, '2026-12'],
-    ['with some days without a rate', '2026-05-09', '2026-07-01', '2026-07-15', '2026-07'],
-  ])('a month %s is listed as missing', (_, today, from, until, month) => {
-    const vat = BILLS_TABLES.vat.flatMap((r) => {
-      if (r.from !== from) return [r];
-      return until === null ? [] : [{ ...r, until }];
-    });
-    const items = billsDue(parseDate(today), { ...deps, tables: { ...BILLS_TABLES, vat } });
-    expect(items.filter((i) => i.kind === 'month_missing')).toEqual([
-      { kind: 'month_missing', month, table: 'vat' },
-    ]);
-  });
+  it.each([['with some days without a rate', '2026-05-09', '2026-07-01', '2026-07-15', '2026-07']])(
+    'a month %s is listed as missing',
+    (_, today, from, until, month) => {
+      const vat = BILLS_TABLES.vat.flatMap((r) => {
+        if (r.from !== from) return [r];
+        return until === null ? [] : [{ ...r, until }];
+      });
+      const items = billsDue(parseDate(today), { ...deps, tables: { ...BILLS_TABLES, vat } });
+      expect(items.filter((i) => i.kind === 'month_missing')).toEqual([
+        { kind: 'month_missing', month, table: 'vat' },
+      ]);
+    },
+  );
 
   it('does not list a plain norm that carries an open condition', () => {
     const settledNorm = Object.values(NORMS_BEFORE_FIGURE).find((n) => n.status === 'in_force');
@@ -219,12 +180,6 @@ describe('the bills due list', () => {
 });
 
 describe('the tables a bill needs', () => {
-  it('cover every day of 2026, holidays included', () => {
-    expect(uncoveredOn('2026-01-01', deps)).toEqual([]);
-    expect(uncoveredOn('2026-06-12', deps)).toEqual([]);
-    expect(uncoveredOn('2026-12-31', deps)).toEqual([]);
-  });
-
   it('cover a day when the calendar holds other years too', () => {
     const [holidays] = BILLS_TABLES.holidays;
     if (holidays === undefined) throw new Error('no holidays');

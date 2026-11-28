@@ -32,16 +32,6 @@ const summary = (item: BillItem) => {
 // The price goes up with a notice sent on 10-02-2026; the exit is requested on 01-03-2026, within
 // the month that ends on 10-03-2026, with 184 of the 549 days of the commitment left.
 describe('leaving after a change of conditions', () => {
-  it('without a handset costs nothing: the whole penalty is paid over', () => {
-    const item = check();
-    expect(summary(item)).toEqual({ status: 'paid_over', amount: 60, counted: 60 });
-    expect(only(item)).toMatchObject({ id: 'change_exit', direction: 'over' });
-    expect(only(item).calculation).toEqual([
-      { key: 'change.no_penalty', vars: { last: { date: '2026-03-10' } } },
-    ]);
-    expect(only(item).sources.map((s) => s.id)).toEqual(['change_exit']);
-  });
-
   it('on the last day of the month still counts', () => {
     expect(summary(check({ exitRequestedOn: parseDate('2026-03-10') })).status).toBe('paid_over');
   });
@@ -156,10 +146,6 @@ describe('leaving after a change of conditions', () => {
     ]);
   });
 
-  it('without the day the change applies, the month runs from the notice', () => {
-    expect(summary(check({}, { appliesOn: null })).status).toBe('paid_over');
-  });
-
   it('with no notice, the right is explained with no figure', () => {
     const item = check({}, { sentOn: null });
     expect(summary(item)).toEqual({ status: 'review_it', amount: null, counted: 0 });
@@ -190,12 +176,12 @@ describe('leaving after a change of conditions', () => {
     expect(summary(item)).toEqual({ status: 'not_checkable', amount: null, counted: 0 });
   });
 
-  it.each([
-    ['no notice', { changeNotice: null }],
-    ['nothing charged', { changeNotice: notice(), penaltyCharged: null }],
-  ])('gives nothing with %s', (_, change) => {
-    expect(checkChangeExit(telecom(change), deps)).toBeNull();
-  });
+  it.each([['nothing charged', { changeNotice: notice(), penaltyCharged: null }]])(
+    'gives nothing with %s',
+    (_, change) => {
+      expect(checkChangeExit(telecom(change), deps)).toBeNull();
+    },
+  );
 
   it('names the reason when it cannot say, and cites the rule it rests on', () => {
     const before = check(

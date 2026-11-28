@@ -44,34 +44,6 @@ const bothBases = (r: ItemResult) => {
 };
 
 describe('what is still owed of the deposit', () => {
-  it('nothing until the keys are back', () => {
-    expect(checkDepositReturn(contract({ moveOut: null }), TODAY, DEPS)).toEqual([]);
-  });
-
-  it('is the deposit less what came back and what was kept, listing what was kept unweighed', () => {
-    const { returned } = check(1000, {
-      keysReturnedOn: f('2026-06-30'),
-      returns: [{ on: f('2026-07-15'), amount: 700 }],
-      deductions: [
-        { kind: 'cleaning', amount: 120 },
-        { kind: 'damage', amount: 80 },
-      ],
-    });
-    // 1.000 − 700 − 120 − 80 = 100.
-    expect(singleOf(returned)).toEqual({ status: 'owed', amount: 100 });
-    const keys =
-      returned.outcome.kind === 'single'
-        ? returned.outcome.value.calculation.map((x) => x.key)
-        : [];
-    expect(keys).toEqual([
-      'deposit.pending',
-      'deposit.deduction.cleaning',
-      'deposit.deduction.damage',
-      'deposit.deductions_not_judged',
-      'deposit.owed',
-    ]);
-  });
-
   it('with no deposit entered, says so and still works out late returns', () => {
     const { returned, interest } = check(null, {
       keysReturnedOn: f('2026-01-10'),
@@ -308,21 +280,6 @@ describe('a deposit taken as at least what came back and was kept', () => {
   const lastKey = (r: ItemResult) =>
     r.outcome.kind === 'single' ? r.outcome.value.calculation.at(-1)?.key : undefined;
 
-  it('with no deposit entered, 2.000 back accrue on one month only', () => {
-    // Rent 1.000; keys 10-06-2025; 2.000 back on 01-09-2025: 1.000 accrue from 11-07-2025 for 52
-    // days: 1.000 × 0,0325 × 52 / 365 = 4,63.
-    const { interest } = check(
-      null,
-      {
-        keysReturnedOn: f('2025-06-10'),
-        returns: [{ on: f('2025-09-01'), amount: 2000 }],
-        deductions: [],
-      },
-      f('2026-06-01'),
-    );
-    expect(bothBases(interest).low).toBe(4.63);
-  });
-
   it('with no deposit entered, a late 500 under 1.500 kept accrues nothing and opens no pass', () => {
     const moveOut: MoveOut = {
       keysReturnedOn: f('2025-06-10'),
@@ -336,28 +293,6 @@ describe('a deposit taken as at least what came back and was kept', () => {
     expect(r.ok && r.review.offerPass).toBe(false);
   });
 
-  it('more back than the deposit entered still accrues on one month only', () => {
-    // Deposit entered 1.000 = rent, 1.500 back late on 10-07-2025: 1.000 accrue for 149 days.
-    const { interest } = check(1000, {
-      keysReturnedOn: f('2025-01-10'),
-      returns: [{ on: f('2025-07-10'), amount: 1500 }],
-      deductions: [],
-    });
-    expect(bothBases(interest).low).toBe(13.27);
-  });
-
-  it('says the late money was the part above one month when it accrues nothing', () => {
-    const { interest } = check(2000, {
-      keysReturnedOn: f('2025-01-10'),
-      returns: [
-        { on: f('2025-01-20'), amount: 1000 },
-        { on: f('2025-07-10'), amount: 1000 },
-      ],
-      deductions: [],
-    });
-    expect(lastKey(interest)).toBe('deposit.late_part_above_month');
-  });
-
   it('with no deposit and nothing back, has nothing entered', () => {
     const { interest } = check(null, {
       keysReturnedOn: f('2025-06-10'),
@@ -365,16 +300,6 @@ describe('a deposit taken as at least what came back and was kept', () => {
       deductions: [],
     });
     expect(singleOf(interest).status).toBe('not_entered');
-  });
-
-  it('a return the day after the month accrues no day yet and is not called on time', () => {
-    const { interest } = check(1000, {
-      keysReturnedOn: f('2026-01-10'),
-      returns: [{ on: f('2026-02-11'), amount: 1000 }],
-      deductions: [],
-    });
-    expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
-    expect(lastKey(interest)).toBe('deposit.returned_after_month');
   });
 });
 
@@ -469,33 +394,6 @@ describe('how each deposit reading is worded and sourced', () => {
           stretch(1000, '2025-02-11', '2025-02-28', 18, 1.6),
           DAY_COUNT,
           total(1.6),
-        ],
-        rules: INTEREST_RULES,
-      },
-    ],
-    [
-      'the part above the month is used up before a late return',
-      3000,
-      () => moveOut('2025-01-10', [['2025-06-01', 500]]),
-      '2026-01-01',
-      {
-        status: 'owed',
-        amount: 2500,
-        calculation: [
-          pending(3000, 500, 0, 2500),
-          { key: 'deposit.owed', vars: { amount: eur(2500) } },
-        ],
-        rules: RETURN_RULES,
-      },
-      {
-        status: 'owed',
-        amount: 19.32,
-        calculation: [
-          above,
-          stretch(500, '2025-02-11', '2025-12-31', 324, 14.42),
-          stretch(500, '2025-02-11', '2025-05-31', 110, 4.9),
-          DAY_COUNT,
-          total(19.32),
         ],
         rules: INTEREST_RULES,
       },

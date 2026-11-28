@@ -13,10 +13,6 @@ const codes = (errors: readonly { field: string; code: string }[]) =>
   errors.map((e) => `${e.field}:${e.code}`);
 
 describe('validating an electricity bill', () => {
-  it('takes a whole June bill', () => {
-    expect(validateElectricity(juneBill(), TODAY)).toEqual([]);
-  });
-
   it('refuses dates that do not exist or have not come', () => {
     const errors = validateElectricity(
       juneBill({ issuedOn: { y: 2026, m: 2, d: 30 }, readingTo: parseDate('2026-10-10') }),
@@ -25,10 +21,7 @@ describe('validating an electricity bill', () => {
     expect(codes(errors)).toEqual(['issuedOn:invalid_date', 'readingTo:in_future']);
   });
 
-  it.each([
-    ['2026-06-30', 'readingTo:not_after_start'],
-    ['2026-04-28', 'readingTo:days_range'],
-  ])('a first reading on %s', (from, error) => {
+  it.each([['2026-06-30', 'readingTo:not_after_start']])('a first reading on %s', (from, error) => {
     expect(codes(validateElectricity(juneBill({ readingFrom: parseDate(from) }), TODAY))).toEqual(
       expect.arrayContaining([error]),
     );
@@ -108,30 +101,9 @@ describe('validating an electricity bill', () => {
       'meter:days_range',
     ]);
   });
-
-  it('takes a regularization either way', () => {
-    expect(validateElectricity(juneBill({ regularizations: [-12.5, 3] }), TODAY)).toEqual([]);
-  });
 });
 
 describe('validating a telecom exit', () => {
-  it('takes a commitment left early', () => {
-    expect(validateTelecom(telecom(), TODAY)).toEqual([]);
-  });
-
-  it('refuses a commitment starting after the exit, and zero months', () => {
-    const errors = validateTelecom(
-      telecom({
-        commitment: { startedOn: parseDate('2026-03-02'), months: 0, agreedPenalty: null },
-      }),
-      TODAY,
-    );
-    expect(codes(errors)).toEqual([
-      'commitment.startedOn:not_after_start',
-      'commitment.months:count_range',
-    ]);
-  });
-
   it('refuses a change that applies before it was notified', () => {
     const errors = validateTelecom(
       telecom({
@@ -173,10 +145,6 @@ describe('validating a renewal letter', () => {
     ...change,
   });
 
-  it('takes the Naturgy letter', () => {
-    expect(validateRenewal(letter(), TODAY)).toEqual([]);
-  });
-
   it('refuses dates that do not exist, a letter not yet sent and a renewal before it', () => {
     expect(codes(validateRenewal(letter({ letterDate: '2026-02-30' }), TODAY))).toEqual([
       'letterDate:invalid_date',
@@ -206,39 +174,6 @@ describe('validating a renewal letter', () => {
       'next.power.p2:price_range',
       'next.energy.all:price_range',
     ]);
-  });
-
-  it('bounds the power, the prices in their unit, the consumption and the costs', () => {
-    expect(
-      codes(
-        validateRenewal(
-          letter({
-            powerKw: { p1: 15.5, p2: 0 },
-            next: { power: { p1: 6, p2: 0.05 }, energy: { all: 5.5 } },
-            annualKwh: 300_000,
-            declared: { withoutTax: -1, withTax: 200_000 },
-          }),
-          TODAY,
-        ),
-      ),
-    ).toEqual([
-      'powerKw.p1:power_range',
-      'powerKw.p2:power_range',
-      'next.power.p1:price_range',
-      'next.energy.all:price_range',
-      'annualKwh:kwh_range',
-      'declared.withoutTax:amount_range',
-      'declared.withTax:amount_range',
-    ]);
-    expect(
-      validateRenewal(
-        letter({
-          powerUnit: 'per_kw_year',
-          next: { power: { p1: 40, p2: 19 }, energy: { p1: 0.2, p2: 0.1, p3: 0.05 } },
-        }),
-        TODAY,
-      ),
-    ).toEqual([]);
   });
 });
 

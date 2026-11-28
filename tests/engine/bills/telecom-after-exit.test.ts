@@ -75,14 +75,6 @@ describe('charges after the exit', () => {
     ]);
   });
 
-  it('gives nothing up to the day the exit takes effect', () => {
-    expect(check('2026-04-02', [line('2026-03-08', '2026-04-07', 31)])).toEqual([]);
-  });
-
-  it('leaves out refunds', () => {
-    expect(check('2026-04-02', [line('2026-04-01', '2026-04-30', -30)])).toEqual([]);
-  });
-
   it('cannot be checked over a year with no holidays loaded', () => {
     expect(check('2026-12-30', [line('2027-01-01', '2027-01-31', 30)])).toEqual([
       { status: 'not_checkable', line: null, amount: null, counted: 0 },

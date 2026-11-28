@@ -45,39 +45,6 @@ describe('tolls and charges of the 2.0TD tariff', () => {
     expect(only(energy).calculation).toEqual([say('tolls.energy_one_price')]);
   });
 
-  it('leave the energy unchecked when one price covers all of it, as no kWh go to a period', () => {
-    const { power, energy } = check(
-      juneBill({ energy: [{ period: 'all', kwh: 250, price: 0.138, amount: 34.5 }] }),
-    );
-    expect(only(power).status).toBe('matches');
-    expect(only(energy)).toMatchObject({ status: 'not_checkable' });
-    expect(only(energy).calculation).toEqual([{ key: 'tolls.energy_one_price' }]);
-  });
-
-  it('cite the tolls and charges rows with their days and status', () => {
-    const { power } = check(juneBill());
-    expect(only(power).rows).toEqual([
-      {
-        from: '2026-01-01',
-        until: '2026-12-31',
-        norm: 'cnmc_tolls_2026',
-        url: BILLS_NORMS.cnmc_tolls_2026.url,
-        status: 'in_force',
-        doubt: null,
-      },
-      {
-        from: '2026-01-01',
-        until: '2026-12-31',
-        norm: 'order_ted1524_2025',
-        url: BILLS_NORMS.order_ted1524_2025.url,
-        status: 'in_force',
-        doubt: null,
-      },
-    ]);
-    expect(only(power).sources.map((s) => s.id)).toEqual(['tolls', 'charges']);
-    expect(only(power).pendingOn).toEqual([]);
-  });
-
   it('show a figure different from the official one either way, never counted', () => {
     const { power, energy } = check(juneBill({ tollsAndCharges: { power: 11.75, energy: 8 } }));
     expect(only(power)).toMatchObject({

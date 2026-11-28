@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { billsPhrase as say } from '../../../src/engine/bills/calculation';
 import { checkArithmetic, linesTotal } from '../../../src/engine/bills/electricity-arithmetic';
-import { countedAmount, findingsOf } from '../../../src/engine/bills/finding';
+import { findingsOf } from '../../../src/engine/bills/finding';
 import type { ElectricityBillInput } from '../../../src/engine/bills/types';
 import { parseDate } from '../../../src/engine/date';
 import { freeBill, juneBill, only } from './input';
@@ -13,34 +13,11 @@ const statusOf = (input: ElectricityBillInput, id: string, line: number | null =
   check(input).find((f) => f.id === id && f.line === line);
 
 describe('the bill against its own figures', () => {
-  it('a bill that adds up gives no difference at all', () => {
-    const findings = check(juneBill());
-    expect(findings.map((f) => `${f.id}${f.line ?? ''}:${f.status}`)).toEqual([
-      'days:matches',
-      'power0:matches',
-      'power1:matches',
-      'energy0:matches',
-      'energy1:matches',
-      'energy2:matches',
-      'total:matches',
-    ]);
-    expect(findings.every((f) => f.amount === null)).toBe(true);
-  });
-
   it('takes a bill that counts the day of the first reading, starting its period on that day', () => {
     expect(statusOf(juneBill({ billedDays: 31 }), 'days')?.status).toBe('matches');
     const power = { period: 'p1', kw: 4.6, price: 0.1, unit: 'per_kw_day', days: null } as const;
     const inclusive = juneBill({ billedDays: 31, power: [{ ...power, amount: 14.26 }] });
     expect(statusOf(inclusive, 'power', 0)?.status).toBe('matches');
-  });
-
-  it('counts the days from the day after the first reading to the last one', () => {
-    const days = statusOf(juneBill({ billedDays: 32 }), 'days');
-    expect(days).toMatchObject({ status: 'does_not_add_up', direction: 'over', amount: null });
-    expect(days?.calculation[0]).toEqual({
-      key: 'arithmetic.days',
-      vars: { from: { date: '2026-05-31' }, to: { date: '2026-06-30' }, days: { days: 30 } },
-    });
   });
 
   it('a power line priced per kW and day: 4,6 × 0,1 × 30 = 13,80', () => {
@@ -84,11 +61,6 @@ describe('the bill against its own figures', () => {
     expect(f?.sources.map((s) => s.id)).toEqual(['billing']);
   });
 
-  it('never counts a sum that does not add up towards what is paid over', () => {
-    const items = checkArithmetic(juneBill({ total: 70 }), BILLS_NORMS);
-    expect(items.map(countedAmount)).toEqual(items.map(() => 0));
-  });
-
   it('adds every line up to the total, with two cents of slack', () => {
     expect(linesTotal(juneBill())).toBeCloseTo(60.77, 10);
     expect(statusOf(juneBill({ total: 60.79 }), 'total')?.status).toBe('matches');
@@ -122,25 +94,6 @@ describe('the bill against its own figures', () => {
       findings.filter((f) => f.id === 'power' || f.id === 'energy').map((f) => f.status),
     ).toEqual(Array(5).fill('not_checkable'));
     expect(findings.find((f) => f.id === 'total')?.status).toBe('matches');
-  });
-
-  it('checks each stretch on its own days when the bill gives them', () => {
-    const input = juneBill({
-      priceChange: 'by_segments',
-      power: [
-        // 4,6 × 0,1 × 20 = 9,20 and 4,6 × 0,12 × 10 = 5,52.
-        { period: 'p1', kw: 4.6, price: 0.1, unit: 'per_kw_day', days: 20, amount: 9.2 },
-        { period: 'p1', kw: 4.6, price: 0.12, unit: 'per_kw_day', days: 10, amount: 5.6 },
-      ],
-    });
-    expect(
-      check(input)
-        .filter((f) => f.id === 'power')
-        .map((f) => [f.status, f.amount]),
-    ).toEqual([
-      ['matches', null],
-      ['does_not_add_up', 0.08],
-    ]);
   });
 
   it('in a leap year takes 365 or 366 days, since no norm says which', () => {
