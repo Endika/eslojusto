@@ -15,6 +15,7 @@ import { telecomLabels } from './render';
 export const telecomCase = (r: CompletedTelecomReview, norms: NormTable): PaidReview =>
   basketCase([r], {
     offer: (kept) => offersPass(kept.map((k) => k.review)),
+    // Stryker disable next-line MethodExpression: the basket holds the one review, so every and some agree
     quiet: (kept) => kept.every(({ review }) => allClear(review.items, review.totals)),
     report: (kept, tr, today) =>
       billsReport(

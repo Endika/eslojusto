@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { applies } from '../../src/bills/renewal/conditions';
 import { renewalPrefill } from '../../src/bills/renewal/prefill';
+import { renewalReading } from '../../src/bills/renewal/reading';
 import type { RenewalExtraction, SourcedField } from '../../src/documents/contract';
+import type { Translate } from '../../src/i18n/client';
 import { pageTranslator } from '../support/page-strings';
 
 const tr = pageTranslator('bills');
@@ -107,5 +110,61 @@ describe('what a read of the renewal letter fills in', () => {
     expect(renewalPrefill(read({ isRenewal: field(false) }), tr).notes).toEqual([
       'El documento no parece una renovación de precios: comprueba que es la carta que querías revisar.',
     ]);
+  });
+});
+
+describe('what a read of the renewal letter leaves out, and what it says of itself', () => {
+  const echo: Translate = (key) => key;
+
+  it('reads a cost declared as an amount, and a flag only from a yes or a no', () => {
+    const p = renewalPrefill(
+      read({
+        declaredWithTax: field(1362.36),
+        declaredWithoutTax: field('x'),
+        separateFromBill: field(false),
+      }),
+      tr,
+    );
+    expect(p.entries).toEqual([
+      ['declaredWithTax', '1.362,36'],
+      ['separateFromBill', 'no'],
+    ]);
+    expect(renewalPrefill(read({ separateFromBill: field('yes') }), tr).entries).toEqual([]);
+  });
+
+  it('opens the energy of a side only for the prices of that side', () => {
+    const names = (fields: RenewalExtraction['fields']) =>
+      renewalPrefill(read(fields), tr).entries.map(([name]) => name);
+    expect(names({ currentPowerP1: field(0.1), nextPowerP1: field(0.1) })).toEqual([
+      'currentPowerP1',
+      'nextPowerP1',
+    ]);
+    expect(names({ nextEnergyP1: field(0.2) })).toEqual(['nextEnergyP1', 'nextEnergyPricing']);
+    expect(names({ currentEnergyP2: field(0.2) })).toEqual([
+      'currentEnergyP2',
+      'currentEnergyPricing',
+    ]);
+  });
+
+  it('says a low answer, a document that is no renewal and a read cut off, in that order', () => {
+    const p = renewalPrefill(
+      read({ annualKwh: field(100, 'low'), isRenewal: field(false) }, { truncated: true }),
+      echo,
+    );
+    expect(p.notes).toEqual([
+      'client.documents.done_low',
+      'client.bills.renewal.documents.not_renewal',
+      'client.bills.documents.truncated',
+    ]);
+    expect(
+      renewalPrefill(read({ isRenewal: field(true), annualKwh: field(1) }), echo).notes,
+    ).toEqual([]);
+    expect(renewalPrefill(read({}), echo).notes).toEqual([]);
+  });
+
+  it('is how the review reads a letter, with every question asked', () => {
+    const letter = read({ annualKwh: field(100), isRenewal: field(false) });
+    expect(renewalReading(tr).prefill(letter, {}, [])).toEqual(renewalPrefill(letter, tr));
+    expect(applies()).toBe(true);
   });
 });

@@ -23,6 +23,7 @@ interface ElectricityReading extends DocumentReading<ElectricityFieldName, Elect
 export function electricityReading(form: HTMLFormElement, tr: Translate): ElectricityReading {
   let waiting: BillRead[] = [];
   let current: BillRead | null = null;
+  // Stryker disable next-line BooleanLiteral: read only with a bill in the form, which sets it first
   let reviewed = false;
   return {
     prefill(extraction, _answers, checks) {
@@ -50,7 +51,6 @@ export function electricityReading(form: HTMLFormElement, tr: Translate): Electr
     },
     typed() {
       current = null;
-      reviewed = false;
     },
   };
 }

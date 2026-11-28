@@ -115,6 +115,24 @@ describe('the electricity result', () => {
     );
   });
 
+  it('brings back what the gate hid, and lists what the review does not look at', () => {
+    const root = result();
+    const input = juneBill();
+    const gate = root.querySelector<HTMLElement>('[data-out-of-scope]');
+    if (gate) gate.hidden = false;
+    for (const part of root.querySelectorAll<HTMLElement>('[data-in-scope]')) part.hidden = true;
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, false, tr);
+    expect(root.querySelector<HTMLElement>('[data-out-of-scope]')?.hidden).toBe(true);
+    expect([...root.querySelectorAll<HTMLElement>('[data-in-scope]')].map((p) => p.hidden)).toEqual(
+      [false, false],
+    );
+    const unchecked = [...root.querySelectorAll('[data-unchecked] li')].map((li) => li.textContent);
+    expect(unchecked).toEqual(
+      electricity(input).unchecked.map((code) => tr(`client.bills.unchecked.electricity.${code}`)),
+    );
+    expect(unchecked.length).toBeGreaterThan(0);
+  });
+
   it('gives the power used as a figure, never as advice', () => {
     const root = result();
     const input = juneBill();
