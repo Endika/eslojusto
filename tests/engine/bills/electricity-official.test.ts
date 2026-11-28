@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { TOLL_HOLIDAYS } from '../../../src/engine/bills/data/holidays-20td';
 import { officialFigures, type PvpcHourly } from '../../../src/engine/bills/electricity-official';
+import { pvpcTable } from '../../../src/engine/bills/data/pvpc-hourly';
+import raw from '../../../src/engine/bills/data/pvpc-hourly.json';
 import { parseDate } from '../../../src/engine/date';
 import { freeBill, juneBill } from './input';
 
@@ -141,9 +143,7 @@ describe('the official figures of the paid report', () => {
 });
 
 describe('the PVPC table as the report loads it', () => {
-  it('takes the table in the repo and refuses one that is off', async () => {
-    const { pvpcTable } = await import('../../../src/engine/bills/data/pvpc-hourly');
-    const { default: raw } = await import('../../../src/engine/bills/data/pvpc-hourly.json');
+  it('takes the table in the repo and refuses one that is off', () => {
     expect(pvpcTable(raw)?.days['2026-03-29']).toHaveLength(23);
     const ok = { source: 's', url: 'u', coveredUntil: '2026-10-13', days: { '2026-10-13': day } };
     expect(pvpcTable(ok)).not.toBeNull();
