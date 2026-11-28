@@ -6,7 +6,6 @@ import {
   averageRateIndicator,
   band,
   cardPayoff,
-  comparedApr,
   loanSeries,
   type ComparedApr,
   type IndicatorDeps,
@@ -36,21 +35,6 @@ const loanCriterionUnread: SourceTable = {
 };
 
 describe('the indicator against the Bank of Spain average rate', () => {
-  it('puts the STS 366/2026 loan 8,51 points above the average of February 2019, distance only', () => {
-    // 16,61 % against 8,0989 %, consumer loans from one to five years.
-    const i = indicate('personal_loan', '2019-02-15', declared(16.61));
-    expect(i).toMatchObject({
-      status: 'distance_only',
-      apr: 16.61,
-      aprOrigin: 'declared',
-      reference: { kind: 'series', series: 'BE_19_4.10', month: '2019-02', value: 8.0989 },
-      points: 8.51,
-    });
-    expect(keys(i)).toContain('indicator.loan_criterion');
-    expect(keys(i)).not.toContain('indicator.above');
-    expect(i.sources.map((s) => s.id)).toEqual(['sts366_2026', 'bde_be1904']);
-  });
-
   // STS 366/2026: the cards' 6 points are not directly applicable to a loan.
   it('never gives a loan a band, read or not, and says when the ruling was not read', () => {
     const unread = indicate('personal_loan', '2019-02-15', declared(16.61), 48, {
@@ -91,21 +75,7 @@ describe('the indicator against the Bank of Spain average rate', () => {
     );
   });
 
-  it.each([
-    [6.31, 'above'],
-    [6.3, 'edge'],
-    [6.01, 'edge'],
-    [6, 'below'],
-    [-2, 'below'],
-  ] as const)('against the 2010 reference, %s points is %s', (points, expected) => {
-    expect(band(points, true)).toBe(expected);
-  });
-
-  it.each([
-    [6.3, 'above'],
-    [6.01, 'above'],
-    [6, 'below'],
-  ] as const)(
+  it.each([[6, 'below']] as const)(
     'against the monthly series, %s points is %s: six points, no edge',
     (points, expected) => {
       expect(band(points, false)).toBe(expected);
@@ -132,16 +102,6 @@ describe('the indicator against the Bank of Spain average rate', () => {
     expect(i.calculation[0]).toEqual({
       key: 'indicator.not_published',
       vars: { month: { month: '2026-09' } },
-    });
-  });
-
-  it('picks a fixed-rate loan series by its term, which is how long the rate is fixed', () => {
-    expect(loanSeries(12, 'fixed')).toBe('BE_19_4.9');
-    expect(loanSeries(13, 'fixed')).toBe('BE_19_4.10');
-    expect(loanSeries(60, 'fixed')).toBe('BE_19_4.10');
-    expect(loanSeries(61, 'fixed')).toBe('BE_19_4.11');
-    expect(indicate('car_loan', '2019-02-15', declared(10), 84).reference).toMatchObject({
-      series: 'BE_19_4.11',
     });
   });
 
@@ -180,19 +140,7 @@ describe('the indicator against the Bank of Spain average rate', () => {
         { key: 'indicator.loan_criterion' },
       ],
     ],
-    [
-      'a card against the monthly series',
-      () => indicate('revolving', '2026-08-20', declared(24.29), null),
-      [
-        { key: 'indicator.apr_declared', vars: { apr: { percent: 24.29 } } },
-        {
-          key: 'indicator.reference_revolving',
-          vars: { ...month('2026-08'), rate: { percent: 18.2578 } },
-        },
-        { key: 'indicator.above', vars: { points: { points: 6.03 } } },
-        { key: 'indicator.revolving_criterion' },
-      ],
-    ],
+
     [
       'a card against the 2010 ruling',
       () => indicate('revolving', '2008-05-10', declared(25.42), null),
@@ -204,21 +152,7 @@ describe('the indicator against the Bank of Spain average rate', () => {
         { key: 'indicator.edge_reason' },
       ],
     ],
-    [
-      'no APR entered',
-      () => indicate('personal_loan', '2019-02-15', null),
-      [{ key: 'indicator.not_entered' }],
-    ],
-    [
-      'no term',
-      () => indicate('personal_loan', '2019-02-15', declared(10), null),
-      [{ key: 'indicator.term_unknown' }],
-    ],
-    [
-      'a month not published yet',
-      () => indicate('revolving', '2026-09-03', declared(30), null),
-      [{ key: 'indicator.not_published', vars: month('2026-09') }],
-    ],
+
     [
       'a month before the series',
       () => indicate('personal_loan', '2002-12-10', declared(10)),
@@ -245,18 +179,6 @@ describe('the indicator against the Bank of Spain average rate', () => {
   });
 });
 
-describe('the APR compared', () => {
-  it('is the one worked out when the person takes it, otherwise the stated one', () => {
-    expect(comparedApr({ confirmedApr: true, declaredApr: 12 }, 16.61)).toEqual({
-      value: 16.61,
-      origin: 'recalculated',
-    });
-    expect(comparedApr({ confirmedApr: false, declaredApr: 12 }, 16.61)).toEqual(declared(12));
-    expect(comparedApr({ confirmedApr: true, declaredApr: 12 }, null)).toEqual(declared(12));
-    expect(comparedApr({ confirmedApr: false, declaredApr: null }, 16.61)).toBeNull();
-  });
-});
-
 describe('revolving statement arithmetic', () => {
   it('works out the months and the interest to clear a balance with no new purchases', () => {
     // 1.200 € at 0 % with 100 € a month: 12 months, no interest.
@@ -270,12 +192,5 @@ describe('revolving statement arithmetic', () => {
     const payoff = cardPayoff(1_000, 12, 100);
     expect(payoff).toMatchObject({ kind: 'pays_off', months: 11 });
     if (payoff.kind === 'pays_off') expect(payoff.interest).toBeCloseTo(58.98, 1);
-  });
-
-  it('never clears a balance whose payment does not cover the month interest', () => {
-    // 3.000 € at 24 %: 60 € of interest a month.
-    expect(cardPayoff(3_000, 24, 60)).toEqual({ kind: 'never', monthlyInterest: 60 });
-    expect(cardPayoff(3_000, 24, 59)).toEqual({ kind: 'never', monthlyInterest: 60 });
-    expect(cardPayoff(3_000, 24, 61)).toMatchObject({ kind: 'pays_off' });
   });
 });

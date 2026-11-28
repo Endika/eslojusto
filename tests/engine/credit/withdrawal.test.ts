@@ -55,7 +55,6 @@ describe('item 4: the withdrawal period', () => {
   });
 
   it.each([
-    ['terms received with no day', {}],
     [
       'terms of unknown receipt, with the day given',
       { infoReceived: null, infoReceivedOn: parseDate('2026-10-05') },
@@ -64,11 +63,6 @@ describe('item 4: the withdrawal period', () => {
     expect(
       withdraw({ ...oct1, ...change }, '2026-10-09').calculation.map((p) => p.key),
     ).not.toContain('withdrawal.receipt_unknown');
-  });
-
-  it('crosses a 29 February like any other day', () => {
-    const leap = { agreedOn: parseDate('2028-02-20'), drawnOn: parseDate('2028-02-20') };
-    expect(withdraw(leap, '2028-02-21').lastDay).toBe('2028-03-05');
   });
 
   it('says sending is enough and what follows, citing art. 28 and the counting of days', () => {

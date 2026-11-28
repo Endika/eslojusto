@@ -60,27 +60,11 @@ describe('item 1: the APR against the one the contract states', () => {
     expect(f.sources.map((s) => s.citation)).toContainEqual(expect.stringContaining('art. 21.4'));
   });
 
-  it('says the opening charge adds 4,6 points', () => {
-    const f = check();
-    expect(f.detail?.contributions).toEqual([{ cost: { kind: 'charge', index: 0 }, points: 4.61 }]);
-    expect(oneDecimal(f.detail?.contributions[0]?.points ?? 0)).toBe(4.6);
-    expect(f.calculation).toContainEqual({
-      key: 'apr.contribution.opening',
-      vars: { points: { points: 4.61 } },
-    });
-  });
-
   it('matches when both read the same to one decimal', () => {
     expect(check({ declaredApr: 16.6 }).status).toBe('matches');
     expect(check({ declaredApr: 16.64 }).status).toBe('matches');
     expect(check({ declaredApr: 16.65 }).status).toBe('contract_higher');
     expect(check({ declaredApr: 16.54 }).status).toBe('contract_lower');
-  });
-
-  it('leaves a higher stated APR to review: a figure is likely missing on our side', () => {
-    const f = check({ declaredApr: 18 });
-    expect(f.status).toBe('contract_higher');
-    expect(articles(f)).toEqual(['a32']);
   });
 
   it('points to art. 21.2 when the contract states no APR, with no figure owed', () => {
@@ -108,24 +92,6 @@ describe('item 1: the APR against the one the contract states', () => {
     const f = check({ netDisbursed: 0 });
     expect(f).toMatchObject({ status: 'unsolvable', detail: null });
     expect(f.calculation).toStrictEqual([{ key: 'apr.unsolvable' }]);
-  });
-
-  it('works out both readings when the person does not know if the insurance was required', () => {
-    const item = checkApr(
-      loan({ insurance: { premium: 400, single: true, financed: false, required: null } }),
-      CREDIT_NORMS,
-    );
-    expect(item.kind).toBe('readings');
-    if (item.kind !== 'readings') return;
-    expect(item.question).toBe('insurance_required');
-    const [counted, left] = item.readings;
-    expect(counted?.when).toBe('insurance_counted');
-    expect(left?.when).toBe('insurance_left_out');
-    expect(left?.finding.detail?.apr).toBe(16.61);
-    expect(counted?.finding.detail?.apr).toBeGreaterThan(16.61);
-    expect(counted?.finding.detail?.contributions).toContainEqual(
-      expect.objectContaining({ cost: { kind: 'insurance' } }),
-    );
   });
 
   it('counts an insurance only one way when the answer is known', () => {

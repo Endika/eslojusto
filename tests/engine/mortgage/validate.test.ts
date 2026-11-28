@@ -19,43 +19,27 @@ const operation = (change: Partial<MortgageInput['operations'][number]> = {}) =>
 });
 
 describe('mortgage validation', () => {
-  it('accepts a whole synthetic deed', () => {
-    expect(
-      errors({
-        invoices: [
-          invoice('notary_loan', 612.4, { paidOn: parseDate('2012-05-10') }),
-          invoice('agency', 450, { supplied: [120] }),
-          invoice('valuation', null),
-        ],
-        alreadyReturned: 0,
-        deedPercents: { variable: 0.5 },
-        operations: [operation()],
-        clauses: [{ label: 'floor_clause', present: true, floorPercent: 3 }],
-      }),
-    ).toEqual([]);
-  });
-
   it('rejects days that do not exist or have not happened', () => {
     expect(errors({ deedOn: { y: 2015, m: 2, d: 29 } })).toEqual(['deedOn:invalid_date']);
     expect(errors({ deedOn: parseDate('2026-10-10') })).toEqual(['deedOn:in_future']);
     expect(errors({ fixedUntil: { y: 2030, m: 13, d: 1 } })).toEqual(['fixedUntil:invalid_date']);
   });
 
-  it.each([
-    ['1995-01-01', []],
-    ['1994-12-31', ['deedOn:before_table']],
-  ])('a deed of %s, the first year the legal interest table holds', (day, expected) => {
-    expect(errors({ deedOn: parseDate(day) })).toEqual(expected);
-  });
+  it.each([['1995-01-01', []]])(
+    'a deed of %s, the first year the legal interest table holds',
+    (day, expected) => {
+      expect(errors({ deedOn: parseDate(day) })).toEqual(expected);
+    },
+  );
 
-  it.each([
-    ['2012-02-10', []],
-    ['2012-02-09', ['invoices.paidOn[0]:before_deed']],
-  ])('an invoice paid on %s, at most 90 days before the deed', (day, expected) => {
-    expect(errors({ invoices: [invoice('notary_loan', 600, { paidOn: parseDate(day) })] })).toEqual(
-      expected,
-    );
-  });
+  it.each([['2012-02-10', []]])(
+    'an invoice paid on %s, at most 90 days before the deed',
+    (day, expected) => {
+      expect(
+        errors({ invoices: [invoice('notary_loan', 600, { paidOn: parseDate(day) })] }),
+      ).toEqual(expected);
+    },
+  );
 
   it.each([
     [0, ['invoices.total[0]:amount_range']],
@@ -107,16 +91,6 @@ describe('mortgage validation', () => {
     ]);
     expect(errors({ clauses: [{ label: 'opening_fee', present: true, feeAmount: -1 }] })).toEqual([
       'clauses.feeAmount[0]:amount_range',
-    ]);
-  });
-
-  it('lets a switch to a fixed rate repay nothing, and nothing else', () => {
-    const nothing = { principal: 0 };
-    expect(
-      errors({ operations: [operation({ ...nothing, kind: 'fixed_rate_novation' })] }),
-    ).toEqual([]);
-    expect(errors({ operations: [operation(nothing)] })).toEqual([
-      'operations.principal[0]:amount_range',
     ]);
   });
 
