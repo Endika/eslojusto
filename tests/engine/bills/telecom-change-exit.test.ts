@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { BILLS_SOURCES } from '../../../src/engine/bills/data/sources';
 import { countedAmount, findingsOf, type BillItem } from '../../../src/engine/bills/finding';
-import { checkChangeExit } from '../../../src/engine/bills/telecom-change-exit';
+import { billsPhrase as say } from '../../../src/engine/bills/calculation';
+import { changeExitDeadline, checkChangeExit } from '../../../src/engine/bills/telecom-change-exit';
 import type { ChangeNotice, TelecomInput } from '../../../src/engine/bills/types';
-import { parseDate } from '../../../src/engine/date';
+import { parseDate, toIso } from '../../../src/engine/date';
 import { only, telecom } from './input';
 
 const deps = { norms: BILLS_NORMS, sources: BILLS_SOURCES };
@@ -34,6 +35,7 @@ describe('leaving after a change of conditions', () => {
   it('without a handset costs nothing: the whole penalty is paid over', () => {
     const item = check();
     expect(summary(item)).toEqual({ status: 'paid_over', amount: 60, counted: 60 });
+    expect(only(item)).toMatchObject({ id: 'change_exit', direction: 'over' });
     expect(only(item).calculation).toEqual([
       { key: 'change.no_penalty', vars: { last: { date: '2026-03-10' } } },
     ]);
@@ -53,6 +55,7 @@ describe('leaving after a change of conditions', () => {
     const item = check({}, { change: 'other', index: 'none' });
     expect(summary(item).status).toBe('review_it');
     expect(only(item).calculation).toEqual([{ key: 'change.other_unsettled' }]);
+    expect(only(item).direction).toBeNull();
     expect(countedAmount(item)).toBe(0);
   });
 
@@ -64,6 +67,10 @@ describe('leaving after a change of conditions', () => {
     it('gives two readings, and counts only what holds in both', () => {
       const item = check({ handset });
       expect(item.kind === 'readings' && item.question).toBe('handset_share');
+      expect(item.kind === 'readings' && item.readings.map((r) => r.when)).toEqual([
+        'whole_value',
+        'prorated_value',
+      ]);
       expect(findingsOf(item).map((f) => [f.status, f.amount])).toEqual([
         ['within_limit', null],
         ['paid_over', 19.78],
@@ -72,6 +79,24 @@ describe('leaving after a change of conditions', () => {
       expect(findingsOf(item)[1]?.sources.map((s) => s.id)).toEqual([
         'change_exit',
         'handset_after_change',
+      ]);
+    });
+
+    it('words each reading with the handset and the days of the commitment left', () => {
+      const [whole, share] = findingsOf(check({ handset }));
+      const noPenalty = say('change.no_penalty', { last: { date: '2026-03-10' } });
+      expect(whole?.calculation).toEqual([
+        noPenalty,
+        say('change.handset_whole', { euros: { euros: 120 } }),
+      ]);
+      expect(share?.calculation).toEqual([
+        noPenalty,
+        say('change.handset_prorated', {
+          value: { euros: 120 },
+          left: { days: 184 },
+          total: { days: 549 },
+          euros: { euros: 40.22 },
+        }),
       ]);
     });
 
@@ -84,6 +109,13 @@ describe('leaving after a change of conditions', () => {
     it('without a commitment, its whole value only', () => {
       const item = check({ handset, commitment: null, penaltyCharged: 150 });
       expect(summary(item)).toEqual({ status: 'paid_over', amount: 30, counted: 30 });
+    });
+
+    it('worth nothing owes nothing either', () => {
+      const item = check({ handset: { value: 0, kept: true } });
+      expect(only(item).calculation).toEqual([
+        say('change.no_penalty', { last: { date: '2026-03-10' } }),
+      ]);
     });
 
     it('given back owes nothing', () => {
@@ -159,5 +191,66 @@ describe('leaving after a change of conditions', () => {
     ['nothing charged', { changeNotice: notice(), penaltyCharged: null }],
   ])('gives nothing with %s', (_, change) => {
     expect(checkChangeExit(telecom(change), deps)).toBeNull();
+  });
+
+  it('names the reason when it cannot say, and cites the rule it rests on', () => {
+    const before = check(
+      { commitment: null, exitRequestedOn: parseDate('2022-06-29') },
+      { sentOn: parseDate('2022-06-01') },
+    );
+    expect(only(before).calculation).toEqual([say('change.before_rules')]);
+    expect(only(check({}, { sentOn: null })).calculation).toEqual([say('change.no_notice')]);
+    expect(only(check({ exitRequestedOn: parseDate('2026-02-09') })).calculation).toEqual([
+      say('change.exit_before_notice'),
+    ]);
+    for (const item of [before, check({}, { sentOn: null }), check({}, { index: 'other' })])
+      expect(only(item).sources.map((r) => r.id)).toEqual(['change_exit']);
+  });
+
+  it('applies from the day Ley 11/2022 took effect and from the day of the notice', () => {
+    const first = check(
+      { commitment: null, exitRequestedOn: parseDate('2022-06-30') },
+      { sentOn: parseDate('2022-06-01'), appliesOn: null },
+    );
+    expect(only(first).status).toBe('paid_over');
+    expect(summary(check({ exitRequestedOn: parseDate('2026-02-10') })).status).toBe('paid_over');
+  });
+
+  it('gives nothing for a penalty of no euros', () => {
+    expect(
+      checkChangeExit(telecom({ changeNotice: notice(), penaltyCharged: 0 }), deps),
+    ).toBeNull();
+  });
+});
+
+describe('the last day to leave after a change of conditions', () => {
+  const deadline = (change: Partial<ChangeNotice> = {}, exit = '2026-03-01') => {
+    const d = changeExitDeadline(
+      telecom({ changeNotice: notice(change), exitRequestedOn: parseDate(exit) }),
+    );
+    return d === null ? null : toIso(d);
+  };
+
+  it('is a month after the notice', () => {
+    expect(deadline()).toBe('2026-03-10');
+    expect(deadline({ change: 'service_worse', index: 'ipc' })).toBe('2026-03-10');
+    expect(deadline({ appliesOn: null })).toBe('2026-03-10');
+    expect(deadline({ appliesOn: parseDate('2026-03-10') })).toBe('2026-03-10');
+  });
+
+  it.each([
+    ['a notice with no day sent', { sentOn: null }],
+    ['a change that is no price rise or worse service', { change: 'other' }],
+    ['a rise under an index clause', { index: 'ipc' }],
+    ['a notice that applies the change sooner', { appliesOn: parseDate('2026-03-09') }],
+  ] as const)('is none for %s', (_, change) => {
+    expect(deadline(change)).toBeNull();
+  });
+
+  it('is none with no notice, or for an exit before the law took effect, and from that day it is', () => {
+    expect(changeExitDeadline(telecom({ changeNotice: null }))).toBeNull();
+    const early = { sentOn: parseDate('2022-06-01'), appliesOn: null };
+    expect(deadline(early, '2022-06-29')).toBeNull();
+    expect(deadline(early, '2022-06-30')).toBe('2022-07-01');
   });
 });

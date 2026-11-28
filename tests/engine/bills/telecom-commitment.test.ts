@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { billsPhrase as say } from '../../../src/engine/bills/calculation';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { countedAmount, type BillItem } from '../../../src/engine/bills/finding';
 import {
@@ -57,13 +58,19 @@ describe('a commitment penalty', () => {
       },
     ]);
     expect(only(item).sources.map((s) => s.id)).toEqual(['commitment_proportional']);
+    expect(only(item)).toMatchObject({ id: 'commitment_penalty', direction: null });
   });
 
   it('a cent over the cap still matches', () => {
     expect(summary(penalty({ penaltyCharged: 60.34 })).status).toBe('within_limit');
   });
 
+  it('gives nothing without a commitment', () => {
+    expect(checkCommitmentPenalty(telecom({ commitment: null }), BILLS_NORMS)).toBeNull();
+  });
+
   it('above the cap is paid over, and counted', () => {
+    expect(only(penalty({ penaltyCharged: 90 }))).toMatchObject({ direction: 'over' });
     expect(summary(penalty({ penaltyCharged: 90 }))).toEqual({
       status: 'paid_over',
       amount: 29.67,
@@ -82,6 +89,7 @@ describe('a commitment penalty', () => {
   it('cannot be checked without the agreed penalty', () => {
     const item = penalty({ commitment: commitment({ agreedPenalty: null }) });
     expect(summary(item)).toEqual({ status: 'not_checkable', amount: null, counted: 0 });
+    expect(only(item).calculation).toEqual([say('commitment.agreed_unknown')]);
   });
 
   it.each([[null], [0]])('gives nothing when %s was charged', (charged) => {
@@ -107,6 +115,10 @@ describe('the length of a commitment', () => {
     expect(items.map(summary)).toEqual([
       { status: 'above_legal_maximum', amount: null, counted: 0 },
     ]);
+    expect(only(items[0] as BillItem).id).toBe('commitment_length');
+    expect(only(items[0] as BillItem).calculation).toEqual([
+      say('commitment.over_maximum', { months: { integer: 30 }, maximum: { integer: 24 } }),
+    ]);
     expect(only(items[0] as BillItem).sources.map((s) => s.citation)).toEqual([
       `Ley 11/2022, art. 67.7 (${BILLS_NORMS.lgtel.citation})`,
     ]);
@@ -124,6 +136,9 @@ describe('the length of a commitment', () => {
       'commitment.proportional',
       'commitment.over_maximum_penalty',
     ]);
+    expect(only(items[1] as BillItem).calculation.at(-1)).toEqual(
+      say('commitment.over_maximum_penalty', { maximum: { integer: 24 } }),
+    );
   });
 
   it('over 24 months still counts what is over the cap on its agreed length', () => {

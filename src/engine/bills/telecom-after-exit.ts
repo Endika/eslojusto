@@ -19,6 +19,7 @@ const RULES = ['exit_effective'] as const;
 // What a line accrues over the days it shares with `from` onwards, spread evenly over its days.
 const accruedFrom = (line: TelecomLine, from: CivilDate): number => {
   const start = max(line.from, from);
+  // Stryker disable next-line ConditionalExpression: a line over before `from` comes to a negative amount, which every caller reads as nothing too
   if (compareDates(start, line.to) > 0) return 0;
   return (line.amount * calendarDays(start, line.to)) / calendarDays(line.from, line.to);
 };
