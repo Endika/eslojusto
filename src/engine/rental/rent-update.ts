@@ -187,7 +187,9 @@ function frameOf(
     const clause = input.updateClause;
     if (clause === 'ipc' || clause === 'irav' || clause === 'igc') needed.add(clause);
     if (clause === 'unspecified_index') {
+      // Stryker disable next-line ConditionalExpression: an index looked up and not used opens only doubts that change no reading
       if (active.has('update_clause')) needed.add('igc');
+      // Stryker disable next-line ConditionalExpression: an index looked up and not used opens only doubts that change no reading
       if (active.has('update_clause_rdl26') || active.has('update_clause_rdl29'))
         needed.add('irav');
     }

@@ -397,10 +397,7 @@ describe('the cap in force on each anniversary', () => {
   it('2028: a clause naming no index follows the IRAV even once the IRAV caps no more', () => {
     // RDL 29/2026 reads the clause as the IRAV whatever the cap: synthetic February 2028 2,30 %.
     const uncapped: RentalDeps = {
-      norms: {
-        ...NORMS,
-        ineIravResolution: { ...NORMS.ineIravResolution, inForceUntil: '2027-12-31' },
-      },
+      norms: withNorm('ineIravResolution', { inForceUntil: '2027-12-31' }),
       indices: FUTURE,
     };
     const v = single(
@@ -420,6 +417,28 @@ describe('the cap in force on each anniversary', () => {
     expect(v.agreed).toMatchObject({ kind: 'index', figure: { index: 'irav', rate: 2.3 } });
     expect(v.rules).toContain('update_clause_rdl29');
     expect(v.cap).toBeNull();
+  });
+
+  it('01-10-2026: RDL 26/2026 read a clause naming no index as the IRAV, cap or no cap', () => {
+    const uncapped: RentalDeps = {
+      norms: withNorm('ineIravResolution', { inForceUntil: '2026-09-30' }),
+      indices: INDICES,
+    };
+    const r = first(
+      check(
+        contract({
+          signedOn: f('2024-09-25'),
+          startDate: f('2024-10-01'),
+          updateClause: 'unspecified_index',
+          updates: [update('2026-10-01', 1000, 1020)],
+        }),
+        f('2026-12-20'),
+        uncapped,
+      ),
+    );
+    const { low } = depends(r);
+    expect(low.agreed).toMatchObject({ kind: 'index', figure: { index: 'irav' } });
+    expect(low.rules).toContain('update_clause_rdl26');
   });
 
   it('2028: the IRAV alone, the same in every reading for a contract from 2024', () => {
