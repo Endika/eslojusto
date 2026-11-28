@@ -53,16 +53,15 @@ const isRecord = (v: unknown): v is Record<string, unknown> =>
 const isScalar = (v: unknown): v is string | number | boolean =>
   typeof v === 'string' || typeof v === 'boolean' || (typeof v === 'number' && Number.isFinite(v));
 
-const isConfidence = (v: unknown) =>
-  typeof v === 'string' && (CONFIDENCES as readonly string[]).includes(v);
-
-const isPageKind = (v: unknown): v is RecognisedDocument['kind'] =>
-  typeof v === 'string' && (PAGE_KINDS as readonly string[]).includes(v);
-const isSource = (v: unknown): v is SourceKind => isPageKind(v) && v !== 'other';
 const isOneOf =
   <T extends string>(names: readonly T[]) =>
   (v: unknown): v is T =>
-    typeof v === 'string' && (names as readonly string[]).includes(v);
+    (names as readonly unknown[]).includes(v);
+
+const isConfidence = isOneOf(CONFIDENCES);
+const isPageKind = isOneOf<RecognisedDocument['kind']>(PAGE_KINDS);
+const isReadability = isOneOf(READABILITY);
+const isSource = (v: unknown): v is SourceKind => isPageKind(v) && v !== 'other';
 
 function parseField(v: unknown): SourcedField | null {
   if (!isRecord(v) || !isScalar(v['value']) || !isConfidence(v['confidence'])) return null;
@@ -95,13 +94,8 @@ function parsePage(v: unknown): ReadPage | null {
   const readability = v['readability']['value'];
   if (!Number.isInteger(page) || (page as number) < 1 || (page as number) > LIMITS.maxImages)
     return null;
-  if (typeof readability !== 'string' || !(READABILITY as readonly string[]).includes(readability))
-    return null;
-  return {
-    page: page as number,
-    kind: v['kind'],
-    readability: readability as ReadPage['readability'],
-  };
+  if (!isReadability(readability)) return null;
+  return { page: page as number, kind: v['kind'], readability };
 }
 
 function parseConflict<F extends string>(
@@ -114,6 +108,7 @@ function parseConflict<F extends string>(
 }
 
 const present = <T>(v: T | null): v is T => v !== null;
+// Stryker disable next-line ArrayDeclaration: a stand-in element is no record, so every parser drops it just as it drops nothing
 const list = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
 
 // Keeps what has the contract's shape for the review; anything else in the answer is left out,
@@ -146,8 +141,7 @@ export function parseExtraction<F extends string, L extends string>(
 
 const fail = (code: ErrorCode): Failure => ({ ok: false, code });
 
-const isApiError = (v: unknown): v is ErrorCode =>
-  typeof v === 'string' && (API_ERROR_CODES as readonly string[]).includes(v);
+const isApiError = isOneOf(API_ERROR_CODES as readonly ErrorCode[]);
 
 const isToken = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
 const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0;
@@ -195,6 +189,7 @@ export function createApi<F extends string, L extends string>(
     let json: unknown;
     try {
       json = await response.json();
+      // Stryker disable next-line BlockStatement: with no JSON read, the check just below answers the same
     } catch {
       return withoutCode();
     }
@@ -220,6 +215,7 @@ export function createApi<F extends string, L extends string>(
           pages: list(r['pages']).map(parsePage).filter(present),
         };
       const extraction = parseExtraction(r['extraction'], shape);
+      // Stryker disable next-line ArrayDeclaration: a stand-in check is none the contract knows, so the filter drops it
       const checks = Array.isArray(r['failedChecks']) ? r['failedChecks'] : [];
       const allowance = isToken(r['allowance']) ? r['allowance'] : null;
       const readsLeft = isCount(r['readsLeft']) ? r['readsLeft'] : null;

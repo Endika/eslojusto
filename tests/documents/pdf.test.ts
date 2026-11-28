@@ -259,7 +259,7 @@ describe('a character only one font can draw', () => {
     for (const [has, lacks] of [
       [sans, serif],
       [serif, sans],
-    ]) {
+    ] as const) {
       const original = has.glyphs;
       Object.assign(has, { glyphs: { ...original, '1078': [1, 500] } });
       try {

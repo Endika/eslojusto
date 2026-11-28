@@ -610,3 +610,310 @@ describe('verify', () => {
     });
   });
 });
+
+describe('what the page sends, and sends nowhere else', () => {
+  it('posts JSON with no credentials, no cache and no referrer', async () => {
+    const inits: RequestInit[] = [];
+    const spy: Fetch = async (_url, init) => {
+      inits.push(init);
+      return new Response('{}');
+    };
+    await finalPayApi(spy).extract(request);
+    expect(inits[0]).toMatchObject({
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      credentials: 'omit',
+      cache: 'no-store',
+      referrerPolicy: 'no-referrer',
+    });
+    expect(inits[0]?.signal).toBeInstanceOf(AbortSignal);
+  });
+  it('a 500 without a code means the service is down', async () => {
+    expect(await finalPayApi(fakeFetch(500, '')).extract(request)).toEqual({
+      ok: false,
+      code: 'service_unavailable',
+    });
+    expect(await finalPayApi(fakeFetch(499, '')).extract(request)).toEqual({
+      ok: false,
+      code: 'unexpected_response',
+    });
+  });
+  it.each(['null', '[]', '5', '{}'])('an answer of %s is unexpected', async (body) => {
+    expect(await finalPayApi(fakeFetch(200, body)).extract(request)).toEqual({
+      ok: false,
+      code: 'unexpected_response',
+    });
+  });
+  it('hands back the reads left of a pass read, and the quota of a free read', async () => {
+    const paid = fakeFetch(200, { code: 'ok', extraction: sent, failedChecks: [], readsLeft: 11 });
+    expect(await finalPayApi(paid).extract({ ...request, pass: 'p1' })).toMatchObject({
+      ok: true,
+      allowance: null,
+      readsLeft: 11,
+    });
+    const free = fakeFetch(200, { code: 'ok', extraction: sent, allowance: 'q', readsLeft: 3 });
+    expect(await finalPayApi(free).extract(request)).toMatchObject({
+      ok: true,
+      allowance: 'q',
+      readsLeft: 3,
+      failedChecks: [],
+    });
+    const none = fakeFetch(200, { code: 'ok', extraction: sent, allowance: '' });
+    expect(await finalPayApi(none).extract(request)).toEqual({
+      ok: false,
+      code: 'unexpected_response',
+    });
+    const negative = fakeFetch(200, { code: 'ok', extraction: sent, readsLeft: -1 });
+    expect(await finalPayApi(negative).extract({ ...request, pass: 'p' })).toEqual({
+      ok: false,
+      code: 'unexpected_response',
+    });
+    const zero = fakeFetch(200, { code: 'ok', extraction: sent, readsLeft: 0 });
+    expect(await finalPayApi(zero).extract({ ...request, pass: 'p' })).toMatchObject({
+      ok: true,
+      readsLeft: 0,
+    });
+  });
+});
+
+describe('the shape of what the API answers, field by field', () => {
+  const field = (extra: object) => ({ value: 1, confidence: 'high', source: 'payslip', ...extra });
+  const fieldsOf = (value: unknown) => parseFinalPay({ fields: { endDate: value } })?.fields;
+
+  it('is nothing unless it is an object with fields', () => {
+    for (const v of [null, undefined, 'x', 5, [], { fields: null }, { fields: [] }, { fields: 5 }])
+      expect(parseFinalPay(v), JSON.stringify(v)).toBeNull();
+  });
+  it.each([
+    ['null', null],
+    ['an array', []],
+    ['a value that is null', field({ value: null })],
+    ['a value that is undefined', field({ value: undefined })],
+    ['a value that is not finite', field({ value: Number.NaN })],
+    ['a value that is infinite', field({ value: Number.POSITIVE_INFINITY })],
+    ['no confidence', field({ confidence: undefined })],
+    ['a confidence that is no text', field({ confidence: 5 })],
+    ['a confidence it does not know', field({ confidence: 'sure' })],
+    ['no source', field({ source: undefined })],
+    ['a source that is no text', field({ source: 7 })],
+    ['a source it does not know', field({ source: 'napkin' })],
+  ])('drops a field with %s', (_name, value) => {
+    expect(fieldsOf(value)).toEqual({});
+  });
+  it.each([
+    ['a text', 'x'],
+    ['a boolean', false],
+    ['zero', 0],
+  ])('keeps a field whose value is %s', (_name, value) => {
+    expect(fieldsOf(field({ value }))).toEqual({ endDate: field({ value }) });
+  });
+
+  const rowsOf = (rows: unknown[]) => parseFinalPay({ fields: {}, lists: { contracts: rows } });
+  const row = (extra: object) => ({ values: { a: 'x' }, confidence: 'high', ...extra });
+  it.each([
+    ['null', null],
+    ['values that are no object', row({ values: [] })],
+    ['values with an object in them', row({ values: { a: 'x', b: { n: 1 } } })],
+    ['no confidence', row({ confidence: undefined })],
+    ['a confidence it does not know', row({ confidence: 'sure' })],
+  ])('drops a row with %s', (_name, value) => {
+    expect(rowsOf([value])?.contracts).toEqual([]);
+  });
+  it('keeps a row with no source, and with one it knows, but not one it does not', () => {
+    expect(rowsOf([row({})])?.contracts).toEqual([row({})]);
+    expect(rowsOf([row({ source: 'payslip' })])?.contracts).toEqual([row({ source: 'payslip' })]);
+    expect(rowsOf([row({ source: 'other' })])?.contracts).toEqual([row({})]);
+  });
+
+  const documentOf = (d: unknown) => parseFinalPay({ fields: {}, documents: [d] })?.documents;
+  it.each([
+    ['null', null],
+    ['no kind', { pages: [1] }],
+    ['a kind it does not know', { kind: 'napkin', pages: [1] }],
+    ['a kind that is no text', { kind: 5, pages: [1] }],
+    ['pages that are no list', { kind: 'payslip', pages: 3 }],
+    ['no page', { kind: 'payslip', pages: [] }],
+  ])('drops a document with %s', (_name, d) => {
+    expect(documentOf(d)).toEqual([]);
+  });
+  it.each([
+    ['2026-08', true],
+    ['2026-01', true],
+    ['2026-12', true],
+    ['2026-00', false],
+    ['2026-13', false],
+    ['2026-19', false],
+    ['2026-8', false],
+    ['12026-08', false],
+    ['x2026-08', false],
+    ['2026-08-01', false],
+    ['2026-08x', false],
+    [202608, false],
+  ])('the month %j is %s', (month, kept) => {
+    expect(documentOf({ kind: 'payslip', pages: [1], month })).toEqual([
+      kept ? { kind: 'payslip', pages: 1, month } : { kind: 'payslip', pages: 1 },
+    ]);
+  });
+
+  const pagesOf = (p: unknown) => parseFinalPay({ fields: {}, pages: [p] })?.pages;
+  const page = (extra: object) => ({
+    page: 1,
+    kind: 'payslip',
+    readability: { value: 'ok', confidence: 'high' },
+    ...extra,
+  });
+  it.each([
+    ['null', null],
+    ['no kind', page({ kind: undefined })],
+    ['a kind it does not know', page({ kind: 'napkin' })],
+    ['a readability that is no object', page({ readability: 'ok' })],
+    ['a readability with no value', page({ readability: {} })],
+    ['a readability with a value that is no text', page({ readability: { value: 5 } })],
+    ['a page number that is a fraction', page({ page: 1.5 })],
+    ['a page number that is zero', page({ page: 0 })],
+    ['a page number beyond the limit', page({ page: LIMITS.maxImages + 1 })],
+  ])('drops a page with %s', (_name, p) => {
+    expect(pagesOf(p)).toEqual([]);
+  });
+  it('keeps the first and the last page the API takes', () => {
+    expect(pagesOf(page({ page: 1 }))).toHaveLength(1);
+    expect(pagesOf(page({ page: LIMITS.maxImages }))).toHaveLength(1);
+  });
+
+  const conflictsOf = (c: unknown) => parseFinalPay({ fields: {}, conflicts: [c] })?.conflicts;
+  it.each([
+    ['null', null],
+    ['no field', { sources: ['payslip'] }],
+    ['a field it does not know', { field: 'nope', sources: ['payslip'] }],
+    ['sources that are no list', { field: 'endDate', sources: 'payslip' }],
+    ['no source it knows', { field: 'endDate', sources: ['other', 'napkin'] }],
+  ])('drops a conflict with %s', (_name, c) => {
+    expect(conflictsOf(c)).toEqual([]);
+  });
+
+  it('keeps a cut list marked only when the API says it is true', () => {
+    expect(parseFinalPay({ fields: {}, truncated: true })).toHaveProperty('truncated', true);
+    expect(parseFinalPay({ fields: {}, truncated: 'yes' })).not.toHaveProperty('truncated');
+  });
+});
+
+describe('the answers of checkout, pass and verify, figure by figure', () => {
+  const checkout = (body: object) =>
+    finalPayApi(fakeFetch(200, { code: 'ok', ...body })).checkout('n'.repeat(32), 't');
+  const pass = (body: object) =>
+    finalPayApi(fakeFetch(200, { code: 'ok', ...body })).pass('cs_test_1', 'n'.repeat(32));
+  const verify = (body: object) =>
+    finalPayApi(fakeFetch(200, { code: 'ok', ...body })).verify('v1.p.s');
+  const unexpected = { ok: false, code: 'unexpected_response' };
+
+  it.each([
+    ['no session', { url: 'https://c.test/1' }],
+    ['an empty session', { sessionId: '', url: 'https://c.test/1' }],
+    ['a session that is no text', { sessionId: ['cs_test_1'], url: 'https://c.test/1' }],
+    ['no url', { sessionId: 'cs_test_1' }],
+    ['an empty url', { sessionId: 'cs_test_1', url: '' }],
+    ['a url that is no text', { sessionId: 'cs_test_1', url: ['https://c.test/1'] }],
+  ])('a checkout with %s is unexpected', async (_name, body) => {
+    expect(await checkout(body)).toEqual(unexpected);
+  });
+  it('a checkout refused comes back with its code', async () => {
+    const refused = fakeFetch(429, { code: 'daily_limit_reached' });
+    expect(await finalPayApi(refused).checkout('n'.repeat(32), 't')).toEqual({
+      ok: false,
+      code: 'daily_limit_reached',
+    });
+  });
+
+  const good = { pass: 'v1.p.s', expiresAt: 1_800_000_000, readsLeft: 15 };
+  it.each([
+    ['no pass', { ...good, pass: undefined }],
+    ['an empty pass', { ...good, pass: '' }],
+    ['a pass that is no text', { ...good, pass: ['v1.p.s'] }],
+    ['an expiry that is negative', { ...good, expiresAt: -1 }],
+    ['an expiry that is a fraction', { ...good, expiresAt: 1.5 }],
+    ['an expiry that is text', { ...good, expiresAt: '5' }],
+    ['reads left that are negative', { ...good, readsLeft: -1 }],
+    ['reads left that are a fraction', { ...good, readsLeft: 1.5 }],
+    ['reads left that are text', { ...good, readsLeft: '5' }],
+  ])('a pass with %s is unexpected', async (_name, body) => {
+    expect(await pass(body)).toEqual(unexpected);
+  });
+  it('a pass with nothing left or no time left to run is still a pass answer', async () => {
+    expect(await pass({ ...good, readsLeft: 0 })).toMatchObject({ ok: true, readsLeft: 0 });
+    expect(await pass({ ...good, expiresAt: 0 })).toMatchObject({ ok: true, expiresAt: 0 });
+  });
+  it('asks the pass function, and reports its refusal', async () => {
+    const fetch = fakeFetch(200, { code: 'ok', ...good });
+    await finalPayApi(fetch).pass('cs_test_1', 'n'.repeat(32));
+    expect(fetch.calls[0]?.url).toBe(ENDPOINTS.pass);
+    const refused = fakeFetch(402, { code: 'payment_not_complete' });
+    expect(await finalPayApi(refused).pass('cs_test_1', 'n')).toEqual({
+      ok: false,
+      code: 'payment_not_complete',
+    });
+  });
+
+  it.each([
+    ['an expiry that is negative', { expiresAt: -1, readsLeft: 1 }],
+    ['an expiry that is text', { expiresAt: '5', readsLeft: 1 }],
+    ['no expiry', { readsLeft: 1 }],
+    ['reads left that are negative', { expiresAt: 5, readsLeft: -1 }],
+    ['reads left that are text', { expiresAt: 5, readsLeft: '1' }],
+    ['no reads left', { expiresAt: 5 }],
+  ])('a verify with %s is unexpected', async (_name, body) => {
+    expect(await verify(body)).toEqual(unexpected);
+  });
+  it('a verify with nothing left is still an answer', async () => {
+    expect(await verify({ expiresAt: 0, readsLeft: 0 })).toEqual({
+      ok: true,
+      expiresAt: 0,
+      readsLeft: 0,
+    });
+  });
+});
+
+describe('the locate step, in what it sends and takes', () => {
+  const files = Array.from({ length: 30 }, () => ({
+    mediaType: 'image/jpeg' as const,
+    data: 'AA==',
+  }));
+  const ask = (fetchFn: Fetch, extra: object = { quota: null }) =>
+    createApi(ENDPOINTS, fetchFn, MORTGAGE_EXTRACTION).locate?.({
+      files,
+      captchaToken: 'captcha',
+      maxPages: 24,
+      ...extra,
+    });
+
+  it('sends the quota it has, or the pass instead of it', async () => {
+    const withQuota = fakeFetch(200, { code: 'ok', pages: [1] });
+    await ask(withQuota, { quota: 'q1' });
+    expect(withQuota.calls[0]?.body).toMatchObject({ quota: 'q1' });
+    const withPass = fakeFetch(200, { code: 'ok', pages: [1] });
+    await ask(withPass, { pass: 'p1', quota: 'q1' });
+    expect(withPass.calls[0]?.body).toMatchObject({ pass: 'p1' });
+    expect(withPass.calls[0]?.body).not.toHaveProperty('quota');
+    const none = fakeFetch(200, { code: 'ok', pages: [1] });
+    await ask(none, {});
+    expect(none.calls[0]?.body).toMatchObject({ quota: null });
+  });
+  it('takes as many pages as it asked for, in range, and not one that is not', async () => {
+    const all = Array.from({ length: 24 }, (_, i) => i + 1);
+    expect(await ask(fakeFetch(200, { code: 'ok', pages: all }))).toEqual({ ok: true, pages: all });
+    expect(await ask(fakeFetch(200, { code: 'ok', pages: [30, 1] }))).toEqual({
+      ok: true,
+      pages: [1, 30],
+    });
+    for (const pages of [[0, 5], [5, 31], [1, 99], [1.5, 2], ['3']])
+      expect(await ask(fakeFetch(200, { code: 'ok', pages }))).toEqual({
+        ok: false,
+        code: 'unexpected_response',
+      });
+  });
+  it('reports a refusal with its code', async () => {
+    expect(await ask(fakeFetch(429, { code: 'daily_limit_reached' }))).toEqual({
+      ok: false,
+      code: 'daily_limit_reached',
+    });
+  });
+});
