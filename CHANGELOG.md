@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.7](https://github.com/Endika/eslojusto/compare/v1.118.6...v1.118.7) (2026-11-28)
+
+
+### Bug Fixes
+
+* **analytics:** drop a page address that is not text ([e596527](https://github.com/Endika/eslojusto/commit/e596527d37040f03c021e47472d64bcdd820e362))
+
 ## [1.118.6](https://github.com/Endika/eslojusto/compare/v1.118.5...v1.118.6) (2026-11-28)
 
 
