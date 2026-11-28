@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BE1904 } from '../../src/engine/credit/data/be1904';
 import { CREDIT_NORMS } from '../../src/engine/credit/data/norms';
-import { CREDIT_SOURCES } from '../../src/engine/credit/data/sources';
 import type { CreditCalculation, CreditFigure } from '../../src/engine/credit/calculation';
 import { creditPhrase } from '../../src/engine/credit/calculation';
 import {
@@ -29,19 +27,9 @@ import type { Translate } from '../../src/i18n/client';
 import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
 import { loan, repayment, TODAY } from '../engine/credit/input';
 import { pageTranslator } from '../support/page-strings';
+import { card, DEPS } from './fixtures';
 
 const tr: Translate = pageTranslator('credit');
-
-const DEPS = {
-  norms: CREDIT_NORMS,
-  sources: CREDIT_SOURCES,
-  rates: {
-    'BE_19_4.7': BE1904['BE_19_4.7'],
-    'BE_19_4.9': BE1904['BE_19_4.9'],
-    'BE_19_4.10': BE1904['BE_19_4.10'],
-    'BE_19_4.11': BE1904['BE_19_4.11'],
-  },
-};
 
 const completed = (input: CreditInput): CompletedCreditReview => {
   const r = reviewCredit(input, TODAY, DEPS);
@@ -61,23 +49,6 @@ const text = (model: DocumentModel) =>
     )
     .join('\n')
     .replace(/[\u00a0\u202f]/g, ' ');
-
-// A synthetic revolving card with a balance, on the assumptions of annex I, part II.
-const card = (change: Partial<CreditInput> = {}): CreditInput =>
-  loan({
-    product: 'revolving',
-    agreedOn: parseDate('2024-03-10'),
-    drawnOn: parseDate('2024-03-10'),
-    principal: 1_500,
-    netDisbursed: null,
-    nominalRate: 21.94,
-    declaredApr: 24.29,
-    declaredTotalPayable: null,
-    instalments: null,
-    charges: [],
-    card: { limit: 1_500, nominalRate: 21.94, annualFee: 0, minimumPayment: 60, balance: 1_200 },
-    ...change,
-  });
 
 // 5.000 € repaid on 15-02-2021 with exactly two years left and 40 € of interest settled that day:
 // the cap is 1 % of 5.040 € (50,40 €) or of 5.000 € (50 €), whichever base art. 30.2 means.
@@ -242,22 +213,23 @@ describe('the letters', () => {
     loan({ rateType: 'variable', earlyRepayment: repayment() }),
     repaid({ paidByInsurance: true }),
   ];
-  const models = cases.flatMap((input) => {
-    const c = creditCase(completed(input), CREDIT_NORMS);
-    const kinds: LetterKind[] = [...c.letterKinds, ...(c.freeLetterKinds ?? [])];
-    return [...kinds.map((kind) => c.letter(kind, DETAILS, tr)), c.report(tr, TODAY)];
-  });
+  const models = () =>
+    cases.flatMap((input) => {
+      const c = creditCase(completed(input), CREDIT_NORMS);
+      const kinds: LetterKind[] = [...c.letterKinds, ...(c.freeLetterKinds ?? [])];
+      return [...kinds.map((kind) => c.letter(kind, DETAILS, tr)), c.report(tr, TODAY)];
+    });
 
   it('inform without advising, asserting or pressing', () => {
-    expect(models.length).toBeGreaterThan(10);
-    for (const model of models) expect(forbiddenIn('client.credit.', text(model))).toEqual([]);
+    expect(models().length).toBeGreaterThan(10);
+    for (const model of models()) expect(forbiddenIn('client.credit.', text(model))).toEqual([]);
     // A letter never speaks of usury, courts or lawyers.
-    for (const model of models.filter((m) => m.footer === null))
+    for (const model of models().filter((m) => m.footer === null))
       expect(text(model).toLowerCase()).not.toMatch(/usura|tribunal|juzgado|abogad|servicio de/);
   });
 
   it("end with the person's name and no line to sign on", () => {
-    for (const model of models.filter((m) => m.footer === null)) {
+    for (const model of models().filter((m) => m.footer === null)) {
       expect(model.blocks.at(-1)).toEqual({
         type: 'blank',
         label: 'Nombre y apellidos',
@@ -269,7 +241,7 @@ describe('the letters', () => {
   });
 
   it('draw with the letter fonts', async () => {
-    for (const model of models) expect((await renderPdf(model)).length).toBeGreaterThan(1000);
+    for (const model of models()) expect((await renderPdf(model)).length).toBeGreaterThan(1000);
   });
 });
 
