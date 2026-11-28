@@ -71,6 +71,11 @@ const asExpected = (item: RentalItemResult): ExpectedItem =>
     : shape(idOf(item), item.outcome, itemAmount, (v) => v.amount !== null);
 
 describe('the synthetic bank of lease packs', () => {
+  it('holds 30 to 40 cases', () => {
+    expect(CASES.length).toBeGreaterThanOrEqual(30);
+    expect(CASES.length).toBeLessThanOrEqual(40);
+  });
+
   it.each(CASES.map((c) => [c.id, c] as const))('%s', (_, c) => {
     const result = reviewRental(toInput(c.expected.input), f(c.today), RENTAL_TABLES);
     if (!result.ok) throw new Error(`invalid input: ${JSON.stringify(result.errors)}`);
