@@ -158,6 +158,11 @@ describe('each kind of rule in the catalogue guard', () => {
       expect(isValidEvent(event, { ...valid, [key]: value }), String(value)).toBe(false);
   });
 
+  it('refuses a frame that is not text even when it reads as one', () => {
+    const asText = { toString: () => 'a.js:1:2' };
+    expect(isValidEvent('js_error', { ...JS_ERROR, frames: [asText] })).toBe(false);
+  });
+
   it('takes the edges of a range and of a list of frames', () => {
     expect(isValidEvent('upload_started', { ...upload, pdfs: 0 })).toBe(true);
     expect(isValidEvent('upload_started', { ...upload, pdfs: 25 })).toBe(true);
