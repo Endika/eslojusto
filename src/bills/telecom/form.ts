@@ -109,9 +109,10 @@ function read(form: HTMLFormElement): Reading {
   const lineTo = chargedAfter === 'yes' ? date('lineTo', true) : null;
   const lineAmount = chargedAfter === 'yes' ? figure('lineAmount', true) : null;
 
-  if (errors.length > 0) return { errors, exitRequestedOn, input: null };
+  const unread = { errors, exitRequestedOn, input: null };
+  if (errors.length > 0) return unread;
   // Stryker disable ConditionalExpression,LogicalOperator: each pair of answers below is null together, and a missing one is an error, which leaves no input; the checks only narrow the types
-  if (exitRequestedOn === null) return { errors, exitRequestedOn, input: null };
+  if (exitRequestedOn === null) return unread;
   const changeNotice: ChangeNotice | null =
     changeKind !== null && priceIndex !== null
       ? { sentOn, appliesOn, change: changeKind, index: priceIndex }
