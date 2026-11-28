@@ -6,6 +6,7 @@ import {
   lastSheet,
   resultStep,
   stepAt,
+  stepOfHash,
   stepFrom,
   type Flow,
 } from '../../src/calculator/flow';
@@ -71,6 +72,19 @@ describe('a flow', () => {
     expect(indexOfHash(demo, '#sheet-b')).toBe(2);
   });
 
+  it('reads the step only from the start of an address', () => {
+    expect(stepOfHash('#sheet-b')).toBe('b');
+    expect(stepOfHash('#b')).toBe('b');
+    expect(stepOfHash('x#sheet-b')).toBe('x#sheet-b');
+  });
+
+  it('stops at the first sheet and at the result even when they are not asked', () => {
+    const { form } = page();
+    const noneAsked: Flow<Demo> = { ...demo, applies: () => false };
+    expect(stepFrom(noneAsked, form, 0, 1)).toBe(3);
+    expect(stepFrom(noneAsked, form, 2, -1)).toBe(0);
+  });
+
   it('skips the sheets that are not asked, both ways', () => {
     const { form } = page();
     expect(stepFrom(demo, form, 0, 1)).toBe(2);
@@ -89,6 +103,8 @@ describe('a flow', () => {
     expect(firstIncomplete(demo, form, today)).toBe(1);
     fill(form, { extra: 'x', b: 'y' });
     expect(firstIncomplete(demo, form, today)).toBe(lastSheet(demo));
+    const resultUnanswered: Flow<Demo> = { ...demo, complete: (_f, step) => step !== 'end' };
+    expect(firstIncomplete(resultUnanswered, form, today)).toBe(lastSheet(demo));
   });
 
   it('drives navigation and the tabs without knowing the review', () => {
@@ -186,5 +202,14 @@ describe('the final pay flow', () => {
     expect(FINAL_PAY_FLOW.steps).toEqual(STEPS);
     expect(FINAL_PAY_FLOW.steps.at(-1)).toBe('resultado');
     expect(FINAL_PAY_FLOW.sectionOfStep).toBe(SECTION_OF_STEP);
+  });
+
+  it('counts a sheet complete once it answers cleanly, and the result always', () => {
+    const form = document.createElement('form');
+    form.innerHTML = '<input type="radio" name="cause" value="resignation">';
+    expect(FINAL_PAY_FLOW.complete(form, 'causa', today)).toBe(false);
+    (form.querySelector('input') as HTMLInputElement).checked = true;
+    expect(FINAL_PAY_FLOW.complete(form, 'causa', today)).toBe(true);
+    expect(FINAL_PAY_FLOW.complete(form, 'resultado', today)).toBe(true);
   });
 });
