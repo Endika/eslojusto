@@ -716,8 +716,6 @@ describe('the shape of what the API answers, field by field', () => {
     expect(pagesOf(page({ page: 1 }))).toHaveLength(1);
     expect(pagesOf(page({ page: LIMITS.maxImages }))).toHaveLength(1);
   });
-
-  const conflictsOf = (c: unknown) => parseFinalPay({ fields: {}, conflicts: [c] })?.conflicts;
 });
 
 describe('the answers of checkout, pass and verify, figure by figure', () => {
