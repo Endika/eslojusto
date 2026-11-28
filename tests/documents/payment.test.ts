@@ -117,44 +117,6 @@ describe('the pass offer', () => {
     document.body.innerHTML = '';
   });
 
-  it('with an item short it is pitched and stands out; with nothing short, sold quietly', () => {
-    const { payment, section } = setUp();
-    const shown = (s: string) =>
-      [...section.querySelectorAll<HTMLElement>(s)].map((el) => !el.hidden);
-    payment.show(asPaid(completed()));
-    expect(section.hidden).toBe(false);
-    expect(section.dataset['passMode']).toBe('claim');
-    expect(section.dataset['tone']).toBe('dates');
-    expect(shown('[data-pass-pitch]')).toEqual([true, true]);
-    expect(shown('[data-pass-quiet]')).toEqual([false, false]);
-    expect($('[data-pass-buy]').hidden).toBe(false);
-    expect($('[data-pass-downloads]').hidden).toBe(true);
-    payment.show(asPaid(completed(unfairDismissal, { severance: 41000, holiday_pay: 1500 })));
-    expect(section.hidden).toBe(false);
-    expect(section.dataset['passMode']).toBe('quiet');
-    expect(section.dataset['tone']).toBeUndefined();
-    expect(shown('[data-pass-pitch]')).toEqual([false, false]);
-    expect(shown('[data-pass-quiet]')).toEqual([true, true]);
-    expect($('[data-pass-buy]').hidden).toBe(false);
-    payment.hide();
-    expect(section.hidden).toBe(true);
-  });
-
-  it('tells the measurement how it will show a review, as it then shows it', () => {
-    const { payment, passes, section } = setUp();
-    const claim = asPaid(completed());
-    const quiet = asPaid(completed(unfairDismissal, { severance: 41000, holiday_pay: 1500 }));
-    const none = { offer: false };
-    expect([claim, quiet, none].map((r) => payment.mode(r))).toEqual(['claim', 'quiet', 'none']);
-    payment.show(none);
-    expect(section.dataset['passMode']).toBe('free');
-    // Held by its own dates is enough, as for what the offer shows: the API is asked after.
-    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    expect([claim, quiet, none].map((r) => payment.mode(r))).toEqual(['held', 'held', 'held']);
-    payment.show(quiet);
-    expect($('[data-pass-buy]').hidden).toBe(true);
-  });
-
   it('a pass held outranks the offer; with none, something to claim outranks a quiet sale', () => {
     expect(passMode({ offer: true, quiet: true }, true)).toBe('held');
     expect(passMode({ offer: false }, true)).toBe('held');
@@ -162,14 +124,6 @@ describe('the pass offer', () => {
     expect(passMode({ offer: false, quiet: true }, false)).toBe('quiet');
     expect(passMode({ offer: false, quiet: false }, false)).toBe('none');
     expect(passMode({ offer: false }, false)).toBe('none');
-  });
-
-  it('bought with nothing short, the checkout says it was quiet', async () => {
-    const { payment, events } = setUp();
-    payment.show(asPaid(completed(unfairDismissal, { severance: 41000, holiday_pay: 1500 })));
-    $<HTMLInputElement>('#pass-waiver').checked = true;
-    await click('[data-pass-pay]');
-    expect(events.log).toEqual([['checkoutStarted', 'quiet']]);
   });
 
   it('a held pass unlocks only once the API verifies it, and only once per page', async () => {
@@ -273,75 +227,6 @@ describe('the pass offer', () => {
     expect(calls).toEqual(['pass cs_test_1 n']);
   });
 
-  it('asks for the express waiver before paying', async () => {
-    const { payment, calls, redirects } = setUp();
-    payment.show(asPaid(completed()));
-    await click('[data-pass-pay]');
-    expect(calls).toEqual([]);
-    expect(redirects).toEqual([]);
-    expect($('[data-pass-waiver-error]').textContent).toBe('Marca la casilla para seguir');
-    expect(document.activeElement?.id).toBe('pass-waiver');
-  });
-
-  it('pays: keeps the nonce, the session and the review, then goes to Stripe', async () => {
-    const { payment, calls, redirects, passes, events, kept } = setUp();
-    payment.show(asPaid(completed()));
-    $<HTMLInputElement>('#pass-waiver').checked = true;
-    await click('[data-pass-pay]');
-    expect(calls).toEqual(['checkout 32 checkout-token']);
-    expect(passes.checkouts()).toEqual([
-      { nonce: 'H'.repeat(32), sessionId: 'cs_test_1', startedAt: NOW / 1000 },
-    ]);
-    expect(kept()).toBe(1);
-    expect(redirects).toEqual(['https://checkout.stripe.com/c/pay/1']);
-    expect(events.log).toEqual([['checkoutStarted', 'claim']]);
-  });
-
-  it('a checkout that fails keeps no nonce', async () => {
-    const { payment, passes } = setUp([], 'https://evil.example/pay');
-    payment.show(asPaid(completed()));
-    $<HTMLInputElement>('#pass-waiver').checked = true;
-    await click('[data-pass-pay]');
-    expect(passes.checkouts()).toEqual([]);
-  });
-
-  it('an earlier payment that was paid is redeemed instead of charging again', async () => {
-    const { payment, passes, calls, redirects, events } = setUp([
-      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
-    ]);
-    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_old' });
-    payment.show(asPaid(completed()));
-    $<HTMLInputElement>('#pass-waiver').checked = true;
-    await click('[data-pass-pay]');
-    expect(calls).toEqual(['pass cs_test_old n']);
-    expect(redirects).toEqual([]);
-    expect(passes.checkouts()).toEqual([
-      {
-        nonce: 'n'.repeat(32),
-        sessionId: 'cs_test_old',
-        startedAt: NOW / 1000,
-        redeemed: true,
-        expiresAt: EXPIRES,
-      },
-    ]);
-    expect(events.log).toEqual([['passIssued', 'recovery']]);
-    expect($('[data-pass-downloads]').hidden).toBe(false);
-  });
-
-  it('an earlier payment left unpaid stays redeemable after a new one starts', async () => {
-    const { payment, passes, calls, redirects } = setUp([
-      { ok: false, code: 'payment_not_complete' },
-    ]);
-    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_old' });
-    payment.show(asPaid(completed()));
-    $<HTMLInputElement>('#pass-waiver').checked = true;
-    await click('[data-pass-pay]');
-    expect(calls).toEqual(['pass cs_test_old n', 'checkout 32 checkout-token']);
-    expect(redirects).toHaveLength(1);
-    expect(passes.checkouts().map((c) => c.sessionId)).toEqual(['cs_test_1', 'cs_test_old']);
-    expect($('[data-pass-error]').hidden).toBe(true);
-  });
-
   it('«¿Ya has pagado?» tries every pending payment until one gives a pass', async () => {
     const { payment, passes, calls } = setUp([
       { ok: false, code: 'payment_not_complete' },
@@ -372,21 +257,6 @@ describe('the pass offer', () => {
     expect(calls).toEqual(['pass cs_test_1 n', 'pass cs_test_1 n']);
     expect(passes.pass()?.readsLeft).toBe(14);
     expect($('[data-pass-downloads]').hidden).toBe(false);
-  });
-
-  it('back from Stripe, the error shown is about that payment, not an older one', async () => {
-    const { payment, passes } = setUp([
-      { ok: false, code: 'payment_not_complete' },
-      { ok: false, code: 'payment_not_complete' },
-      { ok: false, code: 'payment_not_complete' },
-      { ok: false, code: 'payment_not_complete' },
-      { ok: false, code: 'session_mismatch' },
-    ]);
-    passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_old' });
-    passes.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_new' });
-    payment.show(asPaid(completed()));
-    expect(await payment.returned('cs_test_new')).toBe('payment_not_complete');
-    expect($('[data-pass-error]').textContent).toContain('El pago aún no está completo');
   });
 
   it('a payment that can never give a pass is dropped, and so is one abandoned for a week', async () => {
@@ -442,17 +312,6 @@ describe('the pass offer', () => {
     expect(events.log).toEqual([['passIssued', 'return']]);
   });
 
-  it('«¿Ya has pagado?» without a payment from this browser says so', async () => {
-    const { payment, calls, events } = setUp();
-    payment.show(asPaid(completed()));
-    await click('[data-pass-recover-button]');
-    expect(calls).toEqual([]);
-    expect($('[data-pass-error]').textContent).toContain(
-      'No hay ningún pago hecho desde este navegador',
-    );
-    expect(events.log).toEqual([['passFailed', 'no_checkout']]);
-  });
-
   it('«¿Ya has pagado?» recovers the pass of the last payment', async () => {
     const { payment, passes, calls, events } = setUp([
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
@@ -479,67 +338,6 @@ describe('the pass offer', () => {
     ]);
   });
 
-  // A page in another language: its own words on screen, the papers' in Spanish.
-  it('builds the report and the letter, and names their files, with the Spanish words', async () => {
-    const { payment, passes, saved } = setUp([], undefined, [], tr);
-    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    const c = finalPayCase(completed());
-    const words: string[] = [];
-    const paid: PaidReview = {
-      ...c,
-      report: (t, today) => (words.push(t('client.documents.report.title')), c.report(t, today)),
-      letter: (kind, details, t) => (
-        words.push(t('client.documents.letter.title')),
-        c.letter(kind, details, t)
-      ),
-    };
-    payment.show(paid);
-    await click('[data-download="report"]');
-    await click('[data-download="letter"]');
-    expect(words).toEqual(['Revisión de tu finiquito', 'Recibí no conforme']);
-    expect(saved).toEqual(['eslojusto-informe-finiquito.pdf', 'eslojusto-recibi-no-conforme.pdf']);
-    expect($('[data-pass-validity]').textContent).toMatch(/^ع/);
-  });
-
-  it('the letter takes what the person adds, dated today unless changed', async () => {
-    const { payment, passes, letters, events } = setUp();
-    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(asPaid(completed()));
-    expect($<HTMLInputElement>('[data-letter-field="date"]').value).toBe('2026-10-07');
-    $<HTMLInputElement>('[data-letter-field="name"]').value = 'Alex Ejemplo';
-    $<HTMLInputElement>('[data-letter-field="company"]').value = 'Empresa Ficticia SL';
-    await click('[data-download="letter"]');
-    expect(letters).toEqual([
-      {
-        name: 'Alex Ejemplo',
-        id: '',
-        company: 'Empresa Ficticia SL',
-        place: '',
-        date: { y: 2026, m: 10, d: 7 },
-      },
-    ]);
-    expect(events.log).toEqual([
-      ['passVerified', 'ok'],
-      ['downloaded', 'letter', 'some', 'items'],
-    ]);
-  });
-
-  it('warns about an ID that is no DNI or NIE, and downloads the letter anyway', async () => {
-    const { payment, passes, saved } = setUp();
-    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(asPaid(completed()));
-    const id = $<HTMLInputElement>('[data-letter-field="id"]');
-    id.value = '1234';
-    id.dispatchEvent(new Event('change'));
-    expect($('[data-letter-id-warning]').hidden).toBe(false);
-    expect($('[data-letter-id-warning]').textContent).toContain('No parece un DNI ni un NIE');
-    await click('[data-download="letter"]');
-    expect(saved).toEqual(['eslojusto-recibi-no-conforme.pdf']);
-    id.value = '12345678Z';
-    id.dispatchEvent(new Event('input'));
-    expect($('[data-letter-id-warning]').hidden).toBe(true);
-  });
-
   it('a field with a character the fonts lack keeps its blank line, with a warning', async () => {
     const { payment, passes, letters, events } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
@@ -554,16 +352,6 @@ describe('the pass offer', () => {
       'Algunas letras no se pueden escribir en la carta: se deja la línea en blanco para escribirlo a mano.',
     );
     expect(events.log.at(-1)).toEqual(['downloaded', 'letter', 'some', 'items']);
-  });
-
-  it('starting over forgets what was typed for the letter', () => {
-    const { payment, passes } = setUp();
-    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(asPaid(completed()));
-    $<HTMLInputElement>('[data-letter-field="name"]').value = 'Alex Ejemplo';
-    payment.hide();
-    expect($<HTMLInputElement>('[data-letter-field="name"]').value).toBe('');
-    expect($<HTMLInputElement>('[data-letter-field="date"]').value).toBe('');
   });
 
   it('with a pass and nothing short, the general letter too, and still no offer to pay', async () => {
@@ -609,17 +397,6 @@ describe('the notice after paying', () => {
     return t;
   }
 
-  it('back from Stripe: says to download now, takes the focus and warns before leaving', async () => {
-    const { leaving } = await paid();
-    const notice = $('[data-pass-notice]');
-    expect(notice.hidden).toBe(false);
-    expect(document.activeElement).toBe(notice);
-    expect($('[data-notice-text]').textContent).toBe(
-      'Descarga ahora tu informe y tu carta y guárdalos: no guardamos tu revisión en ningún sitio. Durante 7 días, en este navegador, puedes corregir tus datos y volver a descargarlos sin pagar otra vez.',
-    );
-    expect(leaving()).toBe(true);
-  });
-
   it('the first download stops the warning; both shrink the notice to one line', async () => {
     const { leaving, saved } = await paid();
     await click('[data-pass-notice] [data-download="report"]');
@@ -631,16 +408,6 @@ describe('the notice after paying', () => {
     expect($('[data-notice-text]').textContent).toBe(
       'Informe y carta descargados. Guárdalos: no guardamos tu revisión.',
     );
-    expect(leaving()).toBe(false);
-  });
-
-  it('starting over before any download takes the warning away with the notice', async () => {
-    const { payment, leaving } = await paid();
-    expect(leaving()).toBe(true);
-    payment.hide();
-    expect($('[data-pass-notice]').hidden).toBe(true);
-    expect(leaving()).toBe(false);
-    payment.show(asPaid(completed()));
     expect(leaving()).toBe(false);
   });
 

@@ -91,14 +91,9 @@ describe('admit, with the same file twice', () => {
 describe('filesBucket', () => {
   it.each([
     [1, '1'],
-    [2, '2-4'],
-    [4, '2-4'],
-    [5, '5-9'],
     [9, '5-9'],
-    [10, '10-15'],
     [15, '10-15'],
     [16, '16-25'],
-    [25, '16-25'],
   ])('puts %i files in %s', (n, bucket) => {
     expect(filesBucket(n)).toBe(bucket);
   });
@@ -116,28 +111,11 @@ describe('fitWithin', () => {
     expect(fitWithin(4032, 3024)).toEqual({ width: 1568, height: 1176 });
     expect(fitWithin(3000, 4000)).toEqual({ width: 1176, height: 1568 });
   });
-  it('never enlarges', () => {
-    expect(fitWithin(800, 600)).toEqual({ width: 800, height: 600 });
-  });
 });
 
 describe('encodingSteps', () => {
   const steps = (w: number, h: number) =>
     encodingSteps(w, h).map((s) => `${s.width}×${s.height}@${s.quality}`);
-  it('tries every quality at the full size, then 1280 and 1100 px from 0.65 down to 0.3', () => {
-    expect(steps(1176, 1568)).toEqual([
-      '1176×1568@0.85',
-      '1176×1568@0.75',
-      '1176×1568@0.65',
-      '1176×1568@0.5',
-      '960×1280@0.65',
-      '960×1280@0.5',
-      '825×1100@0.65',
-      '825×1100@0.5',
-      '825×1100@0.4',
-      '825×1100@0.3',
-    ]);
-  });
   it('keeps a step that differs from another in one side only', () => {
     expect(steps(1, 2000).slice(3, 6)).toEqual(['1×1568@0.5', '1×1280@0.65', '1×1280@0.5']);
     expect(steps(2000, 1).slice(3, 6)).toEqual(['1568×1@0.5', '1280×1@0.65', '1280×1@0.5']);

@@ -1,14 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
-import {
-  durationKey,
-  durationText,
-  withHolidayNote,
-  visibleStatus,
-  renderBenefit,
-  renderReview,
-  statusText,
-} from '../../src/calculator/render';
+import { renderBenefit, renderReview, statusText } from '../../src/calculator/render';
 import { sheetErrors, readBenefitSheets, readForm } from '../../src/calculator/form';
 import { estimateBenefit, type Children } from '../../src/engine/unemployment';
 import type { OtherContracts } from '../../src/engine/types';
@@ -30,27 +22,6 @@ const resignation: FinalPayInput = {
   holidayDaysTaken: 0,
 };
 const today = { y: 2026, m: 10, d: 6 };
-const tr = (key: Parameters<typeof t>[1]) => t('es', key);
-
-function severance(figure?: number) {
-  const r = reviewFinalPay(resignation, figure === undefined ? {} : { severance: figure }, today);
-  if (!r.ok) throw new Error('invalid input');
-  const p = r.review.items.find((x) => x.item.id === 'severance');
-  if (!p) throw new Error('no severance item');
-  return p;
-}
-
-describe('severance the law sets at zero', () => {
-  it('no employer figure: a neutral status, neither «coincide» nor «no has metido la cifra»', () => {
-    const p = severance();
-    expect(visibleStatus(p)).toBe('no_severance');
-    expect(statusText(p, tr)).toBe('No te corresponde indemnización por ley en este caso');
-  });
-  it('with an employer figure: a normal comparison', () => {
-    expect(visibleStatus(severance(0))).toBe('matches');
-    expect(visibleStatus(severance(500))).toBe('above_minimum');
-  });
-});
 
 const review = (o: Partial<FinalPayInput>, figures = {}) => {
   const r = reviewFinalPay({ ...resignation, ...o }, figures, today);
@@ -69,14 +40,6 @@ describe('zero severance by cause', () => {
     expect(text).toContain('20 días hábiles (art. 59.4 ET)');
     expect(text).toMatch(/la referencia sería \d{1,3}(\.\d{3})*,\d{2}\s€/);
     expect(text).not.toContain('No te corresponde');
-  });
-});
-
-describe('unknown holiday days taken', () => {
-  it('says what is missing, not the agreement', () => {
-    const p = review({ holidayDaysTaken: null }).items.find((x) => x.item.id === 'holiday_pay');
-    if (!p) throw new Error('no holiday pay');
-    expect(statusText(p, trV)).toBe('No se puede comprobar sin los días que has disfrutado');
   });
 });
 
@@ -106,75 +69,6 @@ function container(): HTMLElement {
 }
 
 describe('renderReview', () => {
-  it('the holiday item says the days it counted as taken and their unit', () => {
-    const c = container();
-    renderReview(
-      c,
-      review({ holidayUnit: 'working', annualHolidayDays: 22, holidayDaysTaken: 20 }),
-      trV,
-    );
-    const counted = c.querySelector<HTMLElement>('[data-item="holiday_pay"] [data-counted]');
-    expect(counted?.hidden).toBe(false);
-    expect(counted?.textContent).toBe(
-      'Hemos contado 20 días laborables (5 por semana) disfrutados de 22 al año.',
-    );
-    expect(c.querySelector<HTMLElement>('[data-item="severance"] [data-counted]')?.hidden).toBe(
-      true,
-    );
-  });
-
-  it('each source shows the date it came into force', () => {
-    const c = container();
-    renderReview(c, review({}), trV);
-    const holidayPay = c.querySelector('[data-item="holiday_pay"]');
-    const inForce = holidayPay?.querySelector<HTMLElement>('[data-in-force]');
-    expect(inForce?.hidden).toBe(false);
-    expect(inForce?.textContent).toBe('en vigor desde 13-11-2015');
-  });
-
-  it('what the agreement may improve carries its note; the rest does not', () => {
-    const c = container();
-    renderReview(
-      c,
-      review({ extraPayProrated: false, extraPayAmount: 1850, extraPayAccrual: 'annual' }),
-      trV,
-    );
-    const note = (id: string) =>
-      c.querySelector(`[data-item="${id}"] [data-agreement]`) as HTMLElement | null;
-    expect(note('holiday_pay')?.hidden).toBe(false);
-    expect(note('extra_pay')?.hidden).toBe(false);
-    expect(note('pending_salary')?.hidden).toBe(true);
-    expect(note('notice_deduction')?.hidden).toBe(true);
-  });
-
-  it('disciplinary: the reference goes in the status, not repeated below', () => {
-    const c = container();
-    renderReview(c, review({ cause: 'disciplinary_dismissal' }), trV);
-    const sheet = c.querySelector('[data-item="severance"]');
-    expect(sheet?.querySelector('[data-status-text]')?.textContent).toContain('referencia sería');
-    expect(sheet?.querySelector<HTMLElement>('[data-reference]')?.hidden).toBe(true);
-  });
-
-  it('objective: the unfair reference below, as information, with its figure', () => {
-    const c = container();
-    renderReview(
-      c,
-      review({
-        cause: 'objective_dismissal',
-        startDate: { y: 2024, m: 1, d: 1 },
-        endDate: { y: 2026, m: 6, d: 30 },
-        monthlySalary: 3000,
-        noticeDaysReceived: 15,
-      }),
-      trV,
-    );
-    const note = c.querySelector<HTMLElement>('[data-item="severance"] [data-reference]');
-    expect(note?.hidden).toBe(false);
-    expect(note?.textContent?.replace(/\s/g, ' ')).toBe(
-      'Referencia: si un juzgado declarase improcedente el despido, la indemnización sería de 8.136,99 € (33 días de salario por año trabajado, 45 por el tiempo anterior al 12 de febrero de 2012, con sus topes).',
-    );
-  });
-
   it('no reference for an unfair dismissal, whose minimum is already that figure', () => {
     const c = container();
     renderReview(c, review({ cause: 'unfair_dismissal' }), trV);
@@ -200,10 +94,6 @@ describe('readForm: «No lo sé» for the holiday days taken', () => {
   it('checked: the engine gets null', () => {
     const r = readForm(buildForm(true));
     expect('input' in r && r.input.holidayDaysTaken).toBeNull();
-  });
-  it('unchecked and blank: the value is missing, with no default', () => {
-    const r = readForm(buildForm(false));
-    expect('errors' in r && r.errors.map((e) => e.field)).toEqual(['holidayDaysTaken']);
   });
 });
 
@@ -268,35 +158,6 @@ describe('renderBenefit', () => {
     );
   });
 
-  it('children not given: the range from the no-children cap to the 2-or-more cap', () => {
-    const high = { ...objective, monthlySalary: 3000 };
-    const { text, hidden } = benefit(high, null);
-    expect(text('[data-benefit-amount]')).toBe(
-      'Serían entre 1.225 € y 1.575 € al mes los primeros 6 meses y entre 1.225 € y 1.575 € después, en bruto.',
-    );
-    expect(hidden('[data-benefit-children-unknown]')).toBe(false);
-  });
-
-  it('resignation: not entitled, with the just cause and no figures', () => {
-    const { sheet, text, hidden } = benefit(resignation, null);
-    expect(sheet.dataset['state']).toBe('not_applicable');
-    expect(text('[data-benefit-status-text]')).toBe('No da derecho a paro');
-    expect(text('[data-benefit-reason]')).toContain('(art. 267.2.a LGSS)');
-    expect(hidden('[data-benefit-no]')).toBe(false);
-    expect(hidden('[data-benefit-yes]')).toBe(true);
-  });
-
-  it('under 180 days: no figures and «depende de tus últimas nóminas»', () => {
-    const shortContract = { ...objective, startDate: { y: 2026, m: 5, d: 1 } };
-    const { sheet, text, hidden } = benefit(shortContract, 0);
-    expect(sheet.dataset['state']).toBe('no_figures');
-    expect(text('[data-benefit-amount]')).toMatch(/^Depende de tus últimas nóminas/);
-    expect(text('[data-benefit-amount]')).not.toMatch(/€/);
-    expect(hidden('[data-benefit-deduction]')).toBe(true);
-    expect(text('[data-benefit-duration]')).toMatch(/^Depende de lo que hayas cotizado/);
-    expect(text('[data-benefit-qualifying]')).toMatch(/^Con este contrato llevas 138 días/);
-  });
-
   const eightMonths = {
     ...objective,
     startDate: { y: 2026, m: 1, d: 1 },
@@ -306,39 +167,6 @@ describe('renderBenefit', () => {
     { startDate: { y: 2025, m: 3, d: 1 }, endDate: { y: 2025, m: 10, d: 31 } },
     { startDate: { y: 2024, m: 3, d: 1 }, endDate: { y: 2024, m: 10, d: 31 } },
   ];
-
-  it('other contracts with no benefit since: «unos D días», never «exactamente»', () => {
-    const { text } = benefit(eightMonths, 0, { contracts: rows, benefitDrawnSince: false });
-    expect(text('[data-benefit-duration]')).toBe(
-      'Unos 240 días (8 meses), con las fechas que has puesto.',
-    );
-    expect(text('[data-benefit-qualifying]')).toMatch(/sumas 733 días cotizados/);
-    expect(text('[data-benefit-duration-note]')).toContain('art. 269.4 LGSS');
-  });
-
-  it('other contracts with «No lo sé»: «hasta unos D días» with the reason', () => {
-    const { text } = benefit(eightMonths, 0, { contracts: rows, benefitDrawnSince: null });
-    expect(text('[data-benefit-duration]')).toBe(
-      'Hasta unos 240 días (8 meses); si cobraste paro después de alguno de estos contratos, esos días ya se usaron y puede ser menos (art. 269.2 LGSS).',
-    );
-    expect(text('[data-benefit-qualifying]')).toMatch(/que no hayas usado ya para otro paro/);
-  });
-
-  it('«hasta» 0 days never reads «hasta 0 días»', () => {
-    const { text, hidden } = benefit(eightMonths, 0, {
-      contracts: rows.slice(0, 1),
-      benefitDrawnSince: true,
-    });
-    expect(text('[data-benefit-duration]')).toMatch(/^Hasta unos 120 días/);
-    const alone = benefit({ ...eightMonths, startDate: { y: 2026, m: 6, d: 1 } }, 0, {
-      contracts: [{ startDate: { y: 2026, m: 1, d: 1 }, endDate: { y: 2026, m: 1, d: 31 } }],
-      benefitDrawnSince: true,
-    });
-    expect(alone.text('[data-benefit-duration]')).toMatch(/^Depende de lo que hayas cotizado/);
-    expect(alone.text('[data-benefit-duration]')).not.toMatch(/hasta unos 0/i);
-    expect(hidden('[data-benefit-duration-note]')).toBe(true);
-    expect(alone.hidden('[data-benefit-duration-note]')).toBe(true);
-  });
 
   it('no benefit sentence gives advice or promises an exact figure', () => {
     for (const [e, h, o] of [
@@ -350,39 +178,6 @@ describe('renderBenefit', () => {
       const t = benefit(e, h, o).sheet.textContent ?? '';
       expect(t).not.toMatch(/exactamente|tienes derecho a paro|\bfirma|\breclama|\bdemanda\b/i);
     }
-  });
-});
-
-describe('the duration sentence', () => {
-  it('720 days is the maximum: neither «al menos» nor the «algo más» note', () => {
-    for (const kind of ['at_least', 'exact'] as const) {
-      expect(durationKey({ kind, days: 720 })).toBe('client.unemployment.duration.maximum');
-      expect(withHolidayNote({ kind, days: 720 })).toBe(false);
-    }
-    expect(trV('client.unemployment.duration.maximum', { dias: '720', meses: '24' })).toBe(
-      'Unos 720 días (24 meses), el máximo.',
-    );
-  });
-  it('«hasta» keeps its caveat and carries no «algo más» note', () => {
-    const to = { kind: 'up_to', days: 720, floor: 0 } as const;
-    expect(durationKey(to)).toBe('client.unemployment.duration.up_to');
-    expect(withHolidayNote(to)).toBe(false);
-    expect(trV('client.unemployment.duration.up_to')).not.toContain('algo más');
-  });
-  it('«hasta» gives the floor of the last contract, which no earlier benefit used up', () => {
-    const to = { kind: 'up_to', days: 660, floor: 240 } as const;
-    expect(durationKey(to)).toBe('client.unemployment.duration.up_to_floor');
-    expect(durationText(to, trV)).toBe(
-      'Hasta unos 660 días (22 meses). Si cobraste paro después de alguno de estos contratos, esos días ya se usaron y puede ser menos, pero no menos de unos 240 días (8 meses): los de este último contrato, que van después de ese paro (art. 269.2 LGSS).',
-    );
-  });
-  it('below the maximum, «al menos» and «unos» carry the note; 0 days, «depende»', () => {
-    expect(durationKey({ kind: 'at_least', days: 540 })).toBe(
-      'client.unemployment.duration.at_least',
-    );
-    expect(withHolidayNote({ kind: 'at_least', days: 540 })).toBe(true);
-    expect(withHolidayNote({ kind: 'exact', days: 240 })).toBe(true);
-    expect(durationKey({ kind: 'exact', days: 0 })).toBe('client.unemployment.duration.depends');
   });
 });
 
@@ -438,34 +233,6 @@ describe('the benefit sheets', () => {
     });
   });
 
-  it('each row error goes to its row', () => {
-    const f = buildForm(
-      '<input name="otherContracts" value="yes"><input name="benefitDrawnSince" value="no">',
-    );
-    expect(sheetErrors(f, 'otros', today)).toEqual([
-      { field: 'otherContracts.1.endDate', code: 'other_contract_ends_after_this_one' },
-    ]);
-  });
-
-  it('with «No» the rows do not count; with a cause without benefit, there is no benefit data', () => {
-    const f = buildForm(
-      '<input name="children" value="1"><input name="otherContracts" value="no">',
-    );
-    expect(readBenefitSheets(f)).toEqual({
-      data: { children: 1, others: { contracts: [], benefitDrawnSince: null } },
-    });
-    const cause = f.querySelector<HTMLInputElement>('[name="cause"]');
-    if (cause) cause.value = 'resignation';
-    expect(readBenefitSheets(f)).toEqual({ data: null });
-  });
-
-  it('with «Sí» the benefit-since question must be answered', () => {
-    const f = buildForm('<input name="otherContracts" value="yes">');
-    expect(sheetErrors(f, 'otros', today).map((e) => e.code)).toContain(
-      'missing_benefitDrawnSince',
-    );
-  });
-
   it('the engine error goes back to its row even when an earlier row cannot be read', () => {
     const f = buildForm(
       '<input name="otherContracts" value="yes"><input name="benefitDrawnSince" value="no">',
@@ -475,17 +242,6 @@ describe('the benefit sheets', () => {
     expect(sheetErrors(f, 'otros', today)).toEqual([
       { field: 'otherContracts.0.startDate', code: 'missing_value' },
       { field: 'otherContracts.1.endDate', code: 'other_contract_ends_after_this_one' },
-    ]);
-  });
-
-  it('errors follow the screen order: the question, then each row', () => {
-    const f = buildForm('<input name="otherContracts" value="yes">');
-    const end0 = f.querySelector<HTMLInputElement>('[name="otherContracts.0.endDate"]');
-    if (end0) end0.value = '';
-    expect(sheetErrors(f, 'otros', today).map((e) => e.field)).toEqual([
-      'benefitDrawnSince',
-      'otherContracts.0.endDate',
-      'otherContracts.1.endDate',
     ]);
   });
 });

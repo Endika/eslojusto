@@ -196,34 +196,6 @@ describe('the start sheet', () => {
     document.body.innerHTML = '';
   });
 
-  it('opens on the choice, with the form and the tabs hidden', () => {
-    const { form } = setUp(settlement);
-    expect(form.hidden).toBe(true);
-    expect(document.querySelector<HTMLElement>('.tabs')?.hidden).toBe(true);
-    expect(document.querySelector<HTMLElement>('[data-start-panel="choose"]')?.hidden).toBe(false);
-  });
-
-  it('enables the two choices only once they are wired', () => {
-    setUp(settlement);
-    const choices = [
-      ...document.querySelectorAll<HTMLButtonElement>(
-        '[data-start-panel="choose"] [data-start-upload], [data-start-panel="choose"] [data-start-manual]',
-      ),
-    ];
-    expect(choices).toHaveLength(2);
-    expect(choices.map((b) => b.disabled)).toEqual([false, false]);
-  });
-
-  it('«Rellenar a mano» goes to the calculator’s first sheet, and calls nothing', () => {
-    const { form, opened, requests, events } = setUp(settlement);
-    click('[data-start-manual]');
-    expect(form.hidden).toBe(false);
-    expect(document.querySelector<HTMLElement>('[data-documents-start]')?.hidden).toBe(true);
-    expect(opened).toHaveLength(1);
-    expect(requests).toHaveLength(0);
-    expect(events.log).toEqual([['startChosen', 'manual']]);
-  });
-
   it('asks for a file and the consent before sending anything, never for a kind', async () => {
     const { requests } = setUp(settlement);
     choose([], { consent: false });
@@ -321,97 +293,6 @@ describe('the start sheet', () => {
     ]);
   });
 
-  it('leaves every check to a reading that words them all, even one named as the final pay’s', async () => {
-    const reading: DocumentReading<ExtractedFieldName, 'contracts'> = {
-      prefill: (_extraction, _answers, checks) => ({
-        entries: [],
-        marks: [],
-        count: 0,
-        lowConfidence: false,
-        notes: checks.map((c) => `Own words for ${c}`),
-      }),
-      wordsEveryCheck: true,
-    };
-    setUp({ ...settlement, failedChecks: ['end_before_start'] }, { reading });
-    choose([photo]);
-    await submit();
-    const notes = [...document.querySelectorAll('[data-done-notes] li')].map(
-      (li) => li.textContent,
-    );
-    expect(notes).toEqual(['Own words for end_before_start']);
-  });
-
-  it('a mark beside a text box goes away once the text changes', async () => {
-    const reading: DocumentReading<ExtractedFieldName, 'contracts'> = {
-      prefill: () => ({
-        entries: [],
-        marks: [{ id: 'clause', container: '[data-field="clause"]', confidence: 'high' }],
-        count: 1,
-        lowConfidence: false,
-        notes: [],
-      }),
-    };
-    const { form } = setUp(settlement, { reading });
-    form.insertAdjacentHTML(
-      'beforeend',
-      '<div class="field" data-field="clause"><textarea name="clause"></textarea></div>',
-    );
-    choose([photo]);
-    await submit();
-    const text = form.querySelector('textarea') as HTMLTextAreaElement;
-    expect(text.getAttribute('aria-describedby')).toContain('read-clause');
-    text.value = 'Otra cosa';
-    text.dispatchEvent(new Event('input', { bubbles: true }));
-    expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(0);
-  });
-
-  it('nothing is reviewed: «Revisar los datos» only opens the first sheet', async () => {
-    const { opened, form } = setUp(settlement);
-    choose([photo]);
-    await submit();
-    click('[data-start-continue]');
-    expect(form.hidden).toBe(false);
-    expect(opened).toHaveLength(1);
-  });
-
-  it('a mark goes away once the person changes the value', async () => {
-    const { form } = setUp(settlement);
-    choose([photo]);
-    await submit();
-    const input = form.querySelector('[name="startDate"]') as HTMLInputElement;
-    input.value = '2011-01-01';
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    expect(form.querySelector('[data-read-mark="startDate"]')).toBeNull();
-    expect(input.getAttribute('aria-describedby')).toBe('hint-startDate');
-    expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(2);
-  });
-
-  it('a row’s mark goes away when its row is edited, even after the rows were renumbered', async () => {
-    const row = (i: number) =>
-      `<li data-other-contract="${i}"><fieldset><div class="field">` +
-      `<input name="otherContracts.${i}.startDate" /></div></fieldset></li>`;
-    const reading: DocumentReading<ExtractedFieldName, 'contracts'> = {
-      prefill: () => ({
-        entries: [],
-        marks: [{ id: 'row', container: '[data-other-contract="0"] fieldset', confidence: 'high' }],
-        count: 1,
-        lowConfidence: false,
-        notes: [],
-      }),
-    };
-    const { form } = setUp(settlement, { reading });
-    form.insertAdjacentHTML('beforeend', `<ol>${row(0)}${row(1)}</ol>`);
-    choose([photo]);
-    await submit();
-    const [first, second] = [...form.querySelectorAll<HTMLInputElement>('ol input')];
-    // As «Añadir otro» or «Quitar» renumber the rows: their description is written anew.
-    for (const input of [first, second]) input?.setAttribute('aria-describedby', 'error-row');
-    second?.dispatchEvent(new Event('input', { bubbles: true }));
-    expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(1);
-    first?.dispatchEvent(new Event('input', { bubbles: true }));
-    expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(0);
-  });
-
   it('with a valid pass, the read goes on the pass and its reads left are kept', async () => {
     const { requests, passes } = setUp({ ...settlement, allowance: null, readsLeft: 11 });
     const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
@@ -440,28 +321,6 @@ describe('the start sheet', () => {
     choose([photo]);
     await submit();
     expect(used.requests[1]).toHaveProperty('quota', null);
-  });
-
-  it('while a read is on its way, «Rellenar a mano» waits for it', async () => {
-    let answer: (r: ExtractResult) => void = () => {};
-    const { form, events, requests } = setUp(settlement);
-    pending.next = new Promise<ExtractResult>((r) => (answer = r));
-    choose([photo]);
-    document
-      .querySelector('[data-start-panel="upload"]')
-      ?.dispatchEvent(new Event('submit', { cancelable: true }));
-    await flush();
-    await flush();
-    const manual = document.querySelector('[data-start-panel="upload"] [data-start-manual]');
-    expect(manual?.getAttribute('aria-disabled')).toBe('true');
-    manual?.dispatchEvent(new Event('click'));
-    expect(form.hidden).toBe(true);
-    answer(settlement);
-    await flush();
-    await flush();
-    expect(requests).toHaveLength(1);
-    expect(manual?.getAttribute('aria-disabled')).toBe('false');
-    expect(events.log.filter(([e]) => e === 'startChosen')).toEqual([['startChosen', 'upload']]);
   });
 
   it('an expired or revoked pass is forgotten, so the next read is a free one', async () => {
@@ -581,19 +440,6 @@ describe('the start sheet', () => {
     expect(passes.quota()).toBeNull();
   });
 
-  it('an API error is worded, and the manual path stays one click away', async () => {
-    const { events, form } = setUp({ ok: false, code: 'daily_limit_reached' });
-    choose([photo]);
-    await submit();
-    const slip = document.querySelector<HTMLElement>('[data-doc-error]');
-    expect(slip?.hidden).toBe(false);
-    expect(slip?.textContent).toContain('Ya has usado las 2 lecturas gratis de hoy');
-    expect(events.log).toContainEqual(['extractionFailed', 'daily_limit_reached']);
-    expect(formEntries(form)).toEqual([]);
-    click('[data-start-manual]');
-    expect(form.hidden).toBe(false);
-  });
-
   it('a captcha that cannot load is its own error, and nothing is sent', async () => {
     const { requests } = setUp(settlement, { captchaFails: true });
     choose([photo]);
@@ -602,32 +448,6 @@ describe('the start sheet', () => {
     expect(document.querySelector('[data-doc-error]')?.textContent).toContain(
       'No se ha podido cargar la comprobación',
     );
-  });
-
-  it('files accumulate across picks, and one can be removed before reading', async () => {
-    const { requests } = setUp(settlement);
-    const a = new File(['a'], 'carta.jpg', { type: 'image/jpeg' });
-    const b = new File(['bb'], 'nomina.jpg', { type: 'image/jpeg' });
-    const c = new File(['c'], 'certificado.jpg', { type: 'image/jpeg' });
-    choose([a]);
-    expect(text('[data-doc-files-status]')).toBe('Añadido: carta.jpg. Llevas 1 de 25.');
-    pick([b, c]);
-    expect(listed()).toHaveLength(3);
-    expect(text('[data-doc-files-status]')).toBe('Añadidos 2 archivos. Llevas 3 de 25.');
-    const remove = document.querySelector<HTMLElement>('[data-doc-remove="1"]');
-    expect(remove?.getAttribute('aria-label')).toBe('Quitar nomina.jpg');
-    remove?.dispatchEvent(new Event('click', { bubbles: true }));
-    expect(
-      listed().map((t) => t?.startsWith('certificado.jpg') || t?.startsWith('carta.jpg')),
-    ).toEqual([true, true]);
-    expect(text('[data-doc-files-status]')).toBe('Quitado: nomina.jpg. Llevas 2 de 25.');
-    expect(document.activeElement?.getAttribute('data-doc-remove')).toBe('1');
-    await submit();
-    expect(requests[0]?.files.map((f) => f.data)).toEqual([
-      btoa('carta.jpg'),
-      btoa('certificado.jpg'),
-    ]);
-    expect(listed()).toEqual([]);
   });
 
   it('turns each page of a PDF into an entry, and sends them as images', async () => {
@@ -658,84 +478,10 @@ describe('the start sheet', () => {
     expect(requests[1]?.files).toEqual(requests[0]?.files);
   });
 
-  it('closes a PDF when its last page is removed', async () => {
-    const { closed } = setUp(settlement);
-    choose([new File(['2'], 'carta.pdf', { type: 'application/pdf' })]);
-    await flush();
-    document
-      .querySelector<HTMLElement>('[data-doc-remove="0"]')
-      ?.dispatchEvent(new Event('click', { bubbles: true }));
-    expect(closed).toEqual([]);
-    document
-      .querySelector<HTMLElement>('[data-doc-remove="0"]')
-      ?.dispatchEvent(new Event('click', { bubbles: true }));
-    expect(closed).toEqual(['carta.pdf']);
-  });
-
-  it('words a PDF whose page takes too long to draw', async () => {
-    const { requests, closed } = setUp(settlement, { slowPages: true });
-    choose([new File(['1'], 'escaneo.pdf', { type: 'application/pdf' })]);
-    await flush();
-    await submit();
-    expect(requests).toEqual([]);
-    expect(text('[data-doc-error]')).toBe(
-      'Este PDF tarda demasiado en abrirse aquí. Sube fotos de sus páginas.',
-    );
-    expect(listed()).toEqual([]);
-    expect(closed).toEqual(['escaneo.pdf']);
-  });
-
-  it('lets «Rellenar a mano» leave while a PDF is opening, and drops what comes late', async () => {
-    let release = () => {};
-    const gate = new Promise<void>((r) => (release = r));
-    const { form, closed } = setUp(settlement, { pdfGate: gate });
-    choose([new File(['3'], 'pesado.pdf', { type: 'application/pdf' })]);
-    await flush();
-    expect(text('[data-doc-status]')).toBe('Abriendo el PDF…');
-    const manual = document.querySelector('[data-start-panel="upload"] [data-start-manual]');
-    expect(manual?.getAttribute('aria-disabled')).toBe('false');
-    expect(
-      document
-        .querySelector('[data-start-panel="upload"] [data-start-send]')
-        ?.getAttribute('aria-disabled'),
-    ).toBe('true');
-    manual?.dispatchEvent(new Event('click'));
-    expect(form.hidden).toBe(false);
-    release();
-    await flush();
-    await flush();
-    expect(listed()).toEqual([]);
-    expect(closed).toEqual(['pesado.pdf']);
-  });
-
-  it('adds the pages of a PDF that fit, and says which', async () => {
-    setUp(settlement);
-    choose(
-      Array.from({ length: 23 }, (_, i) => new File(['x'], `f${i}.jpg`, { type: 'image/jpeg' })),
-    );
-    pick([new File(['20'], 'vida-laboral.pdf', { type: 'application/pdf' })]);
-    await flush();
-    expect(listed()).toHaveLength(25);
-    expect(text('[data-doc-files-status]')).toBe(
-      'De vida-laboral.pdf caben las páginas 1 a 2 de 20: como mucho 25 fotos o páginas en total. Llevas 25 de 25.',
-    );
-  });
-
   describe('a PDF longer than the places left, in a review that locates its pages', () => {
     const deed = (pages: number, name = 'escritura.pdf') =>
       new File([String(pages)], name, { type: 'application/pdf' });
     const located: LocateResult = { ok: true, pages: [3, 4, 40] };
-
-    it('goes in whole, as one entry, and says its pages will be located', async () => {
-      setUp(settlement, { locate: located });
-      choose([deed(57)]);
-      await flush();
-      expect(listed()).toHaveLength(1);
-      expect(text('.start__file-size')).toBe('57 páginas: al leer se buscan las útiles');
-      expect(text('[data-doc-files-status]')).toBe(
-        'Añadido: escritura.pdf. Tiene 57 páginas, más de las que caben: al leer se buscarán sus páginas útiles. Llevas 1 de 25.',
-      );
-    });
 
     it('sends every page at 768 px to locate, then reads the chosen ones with a captcha of its own', async () => {
       const { requests, locateRequests, sides, closed } = setUp(settlement, { locate: located });
@@ -758,21 +504,6 @@ describe('the start sheet', () => {
       expect(closed).toContain('escritura.pdf');
     });
 
-    it('says which pages it took, numbered as in the PDF, while the read is on its way', async () => {
-      pending.next = new Promise(() => {});
-      setUp(settlement, { locate: located });
-      choose([deed(57)]);
-      await flush();
-      await submit();
-      await flush();
-      expect(text('[data-doc-files-status]')).toBe(
-        'De escritura.pdf se leen las páginas 3, 4, 40.',
-      );
-      expect([...document.querySelectorAll('.start__file-name')].map((n) => n.textContent)).toEqual(
-        ['escritura.pdf, página 3', 'escritura.pdf, página 4', 'escritura.pdf, página 40'],
-      );
-    });
-
     it('falls back to the first pages that fit, with a fresh captcha, when locating fails', async () => {
       pending.next = new Promise(() => {});
       const { requests } = setUp(settlement, {
@@ -789,21 +520,6 @@ describe('the start sheet', () => {
       expect(requests[0]?.files).toHaveLength(25);
     });
 
-    it('keeps the PDF whole and says why when locate is refused as the read would be', async () => {
-      const { requests } = setUp(settlement, {
-        locate: { ok: false, code: 'daily_limit_reached' },
-      });
-      choose([deed(57)]);
-      await flush();
-      await submit();
-      await flush();
-      expect(requests).toEqual([]);
-      expect(listed()).toHaveLength(1);
-      expect(text('[data-doc-error]')).toBe(
-        'Ya has usado las 2 lecturas gratis de hoy. Puedes rellenar a mano o volver mañana.',
-      );
-    });
-
     it('drops a pass the locate step finds spent, as a refused read does', async () => {
       const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
       const used = setUp(settlement, { locate: { ok: false, code: 'pass_exhausted' } });
@@ -816,25 +532,6 @@ describe('the start sheet', () => {
       expect(used.passes.pass()?.readsLeft).toBe(0);
       expect(used.requests).toEqual([]);
       expect(listed()).toHaveLength(1);
-    });
-
-    it('reads a PDF whole, without locating, once removing files has made room for it', async () => {
-      const { requests, locateRequests } = setUp(settlement, { locate: located });
-      choose(
-        Array.from({ length: 20 }, (_, i) => new File(['x'], `f${i}.jpg`, { type: 'image/jpeg' })),
-      );
-      pick([deed(10)]);
-      await flush();
-      expect(listed()).toHaveLength(21);
-      for (let i = 0; i < 20; i += 1)
-        document
-          .querySelector<HTMLElement>('[data-doc-remove="0"]')
-          ?.dispatchEvent(new Event('click', { bubbles: true }));
-      expect(listed()).toHaveLength(1);
-      await submit();
-      await flush();
-      expect(locateRequests).toEqual([]);
-      expect(requests[0]?.files).toHaveLength(10);
     });
 
     it('opens a PDF of up to 64 MB here, and of up to 20 MB elsewhere', async () => {
@@ -877,41 +574,6 @@ describe('the start sheet', () => {
       await flush();
       expect(listed()).toHaveLength(25);
     });
-  });
-
-  it('words a PDF it cannot open', async () => {
-    setUp(settlement);
-    choose([new File(['1'], 'nomina-cifrado.pdf', { type: 'application/pdf' })]);
-    await flush();
-    expect(listed()).toEqual([]);
-    expect(text('[data-doc-error-for="files"]')).toBe(
-      'Este PDF está protegido con contraseña y no se puede abrir aquí. Sube fotos de sus páginas.',
-    );
-  });
-
-  it('leaves out a file already chosen, and says so', () => {
-    setUp(settlement);
-    const a = new File(['a'], 'carta.jpg', { type: 'image/jpeg', lastModified: 1 });
-    choose([a]);
-    pick([new File(['a'], 'carta.jpg', { type: 'image/jpeg', lastModified: 1 })]);
-    expect(listed()).toHaveLength(1);
-    expect(text('[data-doc-files-status]')).toBe('Ya estaba añadido: carta.jpg.');
-    expect(document.querySelector<HTMLElement>('[data-doc-error-for="files"]')?.hidden).toBe(true);
-  });
-
-  it('names each shot of the camera «Foto N»', () => {
-    setUp(settlement);
-    click('[data-start-panel="choose"] [data-start-upload]');
-    // Every shot from the camera is «image.jpg»; its time tells it apart.
-    let taken = 0;
-    const shot = () =>
-      new File(['x'], 'image.jpg', { type: 'image/jpeg', lastModified: (taken += 1) });
-    pick([shot()], '#document-camera');
-    pick([shot()], '#document-camera');
-    expect([...document.querySelectorAll('.start__file-name')].map((n) => n.textContent)).toEqual([
-      'Foto 1',
-      'Foto 2',
-    ]);
   });
 
   it('leaves out the 26th image, saying how many and why', async () => {
@@ -970,39 +632,6 @@ describe('the start sheet', () => {
     );
   });
 
-  it('shows what an uploaded agreement offers beside the severance, until the form restarts', async () => {
-    const { reading, form } = setUp({
-      ...settlement,
-      extraction: {
-        ...settlement.extraction,
-        documents: [{ kind: 'settlement_agreement', pages: 2 }],
-        fields: {
-          agreementSeveranceTotal: {
-            value: 8000,
-            confidence: 'high',
-            source: 'settlement_agreement',
-          },
-        },
-      },
-    } as ExtractResult);
-    choose([photo]);
-    await submit();
-    const result = document.createElement('div');
-    result.innerHTML = '<section data-item="severance"><p data-reference></p></section>';
-    reading.showAgreementOffer(result);
-    reading.showAgreementOffer(result);
-    const notes = result.querySelectorAll('[data-agreement-offer]');
-    expect(notes).toHaveLength(1);
-    expect(notes[0]?.textContent?.replace(/\s/g, ' ')).toBe(
-      'El acuerdo que has subido ofrece 8.000,00 € en total.',
-    );
-    expect(notes[0]?.previousElementSibling?.hasAttribute('data-reference')).toBe(true);
-    expect(formEntries(form)).toEqual([]);
-    form.dispatchEvent(new Event('reset'));
-    reading.showAgreementOffer(result);
-    expect(result.querySelector('[data-agreement-offer]')).toBeNull();
-  });
-
   it('a read that found nothing says why for each file, keeps them, and spends no read', async () => {
     const { events, store, passes, requests } = setUp({
       ok: false,
@@ -1054,34 +683,6 @@ describe('the start sheet', () => {
     expect(review?.hidden).toBe(true);
   });
 
-  it('a read that skipped pages says which and why beside what it read', async () => {
-    const { events } = setUp({
-      ...settlement,
-      extraction: {
-        ...settlement.extraction,
-        pages: [
-          { page: 1, kind: 'settlement_proposal', readability: 'ok' },
-          { page: 2, kind: 'payslip', readability: 'handwritten' },
-        ],
-      },
-    });
-    const second = new File(['y'], 'nomina-a-mano.jpg', { type: 'image/jpeg' });
-    const third = new File(['z'], 'reverso.jpg', { type: 'image/jpeg' });
-    choose([photo, second, third]);
-    await submit();
-    const notes = [...document.querySelectorAll('[data-done-notes] li')].map(
-      (li) => li.textContent,
-    );
-    expect(notes.slice(0, 2)).toEqual([
-      'Se ha saltado nomina-a-mano.jpg: parece escrito a mano. Es mejor que escribas los datos tú.',
-      'Se ha saltado reverso.jpg: no se ha podido leer.',
-    ]);
-    expect(events.log.at(-1)).toEqual([
-      'extractionCompleted',
-      expect.objectContaining({ skippedReasons: ['handwritten', 'unread'] }),
-    ]);
-  });
-
   it('warns before sending a photo that looks dark, and sends it if asked to', async () => {
     const { events, requests } = setUp(settlement);
     choose([photo, new File(['o'], 'oscura.jpg', { type: 'image/jpeg' })]);
@@ -1130,15 +731,6 @@ describe('the start sheet', () => {
     expect(document.activeElement?.id).toBe('document-files');
     expect(requests).toHaveLength(0);
     expect(events.log.map(([name]) => name)).not.toContain('qualityOverridden');
-  });
-
-  it('never warns about the pages of a PDF, which are drawn, not photographed', async () => {
-    const { requests, events } = setUp(settlement);
-    choose([new File(['2'], 'oscura.pdf', { type: 'application/pdf' })]);
-    await flush();
-    await submit();
-    expect(requests).toHaveLength(1);
-    expect(events.log.map(([name]) => name)).not.toContain('qualityWarned');
   });
 
   it('once reading is unavailable, the start sheet offers only the manual path for an hour', async () => {

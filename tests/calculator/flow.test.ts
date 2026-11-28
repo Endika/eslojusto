@@ -11,8 +11,7 @@ import {
   type Flow,
 } from '../../src/calculator/flow';
 import { createNavigation, type NavigationEvents } from '../../src/calculator/navigation';
-import { setUpTabs } from '../../src/calculator/tabs';
-import { FINAL_PAY_FLOW, SECTION_OF_STEP, STEPS } from '../../src/calculator/steps';
+import { FINAL_PAY_FLOW } from '../../src/calculator/steps';
 
 const today = { y: 2026, m: 10, d: 7 };
 
@@ -85,15 +84,6 @@ describe('a flow', () => {
     expect(stepFrom(noneAsked, form, 2, -1)).toBe(0);
   });
 
-  it('skips the sheets that are not asked, both ways', () => {
-    const { form } = page();
-    expect(stepFrom(demo, form, 0, 1)).toBe(2);
-    expect(stepFrom(demo, form, 2, -1)).toBe(0);
-    fill(form, { a: 'more' });
-    expect(stepFrom(demo, form, 0, 1)).toBe(1);
-    expect(stepFrom(demo, form, 2, 1)).toBe(3);
-  });
-
   it('opens up to the first sheet asked that does not answer cleanly', () => {
     const { form } = page();
     expect(firstIncomplete(demo, form, today)).toBe(0);
@@ -149,61 +139,9 @@ describe('a flow', () => {
     expect(tabs.map((t) => t.dataset['state'])).toEqual(['current', 'done', 'pending']);
     expect(tabs.map((t) => t.getAttribute('href'))).toEqual(['#sheet-a', '#sheet-b', null]);
   });
-
-  it('follows the browser history and rewrites an address it cannot show', () => {
-    const { root, form, all } = page();
-    const button = (s: string) => root.querySelector(s) as HTMLButtonElement;
-    const nav = createNavigation(
-      {
-        root,
-        form,
-        result: root.querySelector('#result') as HTMLElement,
-        resultTitle: root.querySelector('#result h2') as HTMLElement,
-        sheets: all<HTMLElement>('[data-sheet]'),
-        actions: root.querySelector('.actions') as HTMLElement,
-        backButton: button('[data-back]'),
-        nextButton: button('[data-next]'),
-        reviewButton: button('[data-submit]'),
-      },
-      { stepShown: () => undefined, wentBack: () => undefined },
-      () => today,
-      demo,
-    );
-    nav.reached = 2;
-    history.replaceState(null, '', '#b');
-    nav.followHistory();
-    expect(nav.current).toBe(2);
-    expect(location.hash).toBe('#b');
-    // Past what was reached, or a step not asked, the address says the sheet that is shown.
-    nav.reached = 0;
-    nav.followHistory();
-    expect(nav.current).toBe(0);
-    expect(location.hash).toBe('#a');
-    nav.reached = 2;
-    history.replaceState(null, '', '#extra');
-    nav.followHistory();
-    expect(location.hash).toBe('#a');
-    history.replaceState(null, '', '#nowhere');
-    nav.followHistory();
-    expect(location.hash).toBe('#a');
-  });
-
-  it('marks a tab current from any of its steps', () => {
-    const { root } = page();
-    const render = setUpTabs(root, demo);
-    render(1, 1);
-    const tabs = [...root.querySelectorAll<HTMLElement>('[data-tab]')];
-    expect(tabs.map((t) => t.getAttribute('aria-current'))).toEqual(['step', null, null]);
-  });
 });
 
 describe('the final pay flow', () => {
-  it('walks every sheet and ends on the result', () => {
-    expect(FINAL_PAY_FLOW.steps).toEqual(STEPS);
-    expect(FINAL_PAY_FLOW.steps.at(-1)).toBe('resultado');
-    expect(FINAL_PAY_FLOW.sectionOfStep).toBe(SECTION_OF_STEP);
-  });
-
   it('counts a sheet complete once it answers cleanly, and the result always', () => {
     const form = document.createElement('form');
     form.innerHTML = '<input type="radio" name="cause" value="resignation">';

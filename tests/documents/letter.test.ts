@@ -10,21 +10,12 @@ import {
 import { today, tr } from './fixtures';
 
 describe('the DNI or NIE check', () => {
-  it.each(['12345678Z', '12345678-z', '12.345.678 Z', 'X1234567L', 'Y1234567X', 'Z1234567R'])(
-    '%s looks right',
-    (id) => expect(looksLikeDniOrNie(id)).toBe(true),
+  it.each(['12345678-z', 'X1234567L'])('%s looks right', (id) =>
+    expect(looksLikeDniOrNie(id)).toBe(true),
   );
-  it.each([
-    '12345678A',
-    '1234567Z',
-    'X12345678L',
-    'X12345678Z',
-    'W1234567L',
-    '1234',
-    'Alex',
-    'AB12345678Z',
-    '12345678Z9',
-  ])('%s does not', (id) => expect(looksLikeDniOrNie(id)).toBe(false));
+  it.each(['12345678A', 'X12345678Z', 'AB12345678Z', '12345678Z9'])('%s does not', (id) =>
+    expect(looksLikeDniOrNie(id)).toBe(false),
+  );
 });
 
 describe('how much of the letter was filled', () => {

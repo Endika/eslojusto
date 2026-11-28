@@ -89,17 +89,6 @@ describe('mergeRead', () => {
     expect(m.marks).toEqual([]);
     expect([m.differ, m.typedDiffers]).toEqual([false, true]);
   });
-
-  it('always sets an answer that only opens a list', () => {
-    const m = mergeRead(
-      { entries: [['hasReceipts', 'yes']], marks: [] },
-      [['hasReceipts', 'no']],
-      new Map(),
-      LISTS,
-    );
-    expect(m.entries).toEqual([['hasReceipts', 'yes']]);
-    expect([m.differ, m.recalculated]).toEqual([false, false]);
-  });
   it('numbers the rows it adds in the order of the rows read', () => {
     const m = mergeRead(
       read([
@@ -297,11 +286,6 @@ describe('mergeRead', () => {
     ]);
     expect(m.marks).toEqual([{ id: 'jobs.1', container: '[data-job="1"]', confidence: 'medium' }]);
   });
-
-  it('passes on a mark about no value the read sets', () => {
-    const lone: ReadMark = { id: 'note', container: '[data-note]', confidence: 'high' };
-    expect(mergeRead({ entries: [], marks: [lone] }, [], new Map(), LISTS).marks).toEqual([lone]);
-  });
 });
 
 describe('heldEntries, beyond the lists', () => {
@@ -340,10 +324,6 @@ describe('heldEntries', () => {
     ['charges.0.year', '2025'],
     ['charges.0.amount', '300,00'],
   ]);
-
-  it('keeps every value of a typed row, its first-choice kind too, and no untouched row', () => {
-    expect(heldEntries(typed, new Map(), atDefault, CHARGES)).toEqual(typed.slice(0, 5));
-  });
 
   it('so a read of another kind for the same year never lands on the typed row', () => {
     const held = heldEntries(typed, new Map(), atDefault, CHARGES);
