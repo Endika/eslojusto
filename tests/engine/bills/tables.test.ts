@@ -87,6 +87,29 @@ describe('looking a value up by day', () => {
     expect(valueOn(table, '2030-01-31', norms)).toEqual({ kind: 'ok', row: table[0] });
   });
 
+  it('covers its first and its last day, and every day after the first when it has no end', () => {
+    expect(valueOn(table, '2030-01-01', norms)).toEqual({ kind: 'ok', row: table[0] });
+    const open = [row({ until: null })];
+    expect(valueOn(open, '2031-06-01', norms)).toEqual({ kind: 'ok', row: open[0] });
+    expect(valueOn(open, '2029-12-31', norms)).toEqual({ kind: 'missing' });
+  });
+
+  it('reads the norm on the day asked, not on the day it came into force', () => {
+    const ended = { ...norms, law37_1992: { ...norms.law37_1992, inForceUntil: '2030-01-20' } };
+    expect(valueOn(table, '2030-01-20', ended)).toMatchObject({ kind: 'ok' });
+    expect(valueOn(table, '2030-01-25', ended)).toEqual({ kind: 'missing' });
+  });
+
+  it('gives the rows that hold with those that may, firm ones first', () => {
+    const firm = row({ from: '2030-02-01', until: '2030-02-28', value: 5 });
+    const rows = [table[1] as TableRow<number>, firm];
+    expect(valueOn(rows, '2030-02-10', norms)).toEqual({
+      kind: 'conditional',
+      rows: [firm, rows[0]],
+      norms: ['rdl25_2026_november'],
+    });
+  });
+
   it('never reaches for the row before: a day no row covers has no value', () => {
     expect(valueOn(table, '2030-03-01', norms)).toEqual({ kind: 'missing' });
     expect(valueOn(table, '2029-12-31', norms)).toEqual({ kind: 'missing' });
@@ -145,6 +168,21 @@ describe('looking a value up by day', () => {
     const inForce = { ...norms, rdl25_2026_november: settled(reduction, true) };
     expect(valueOf(valueOn([{ ...forward, appliesBack: true }], '2030-01-10', inForce))).toBe(1);
     expect(valueOn([forward], '2030-01-10', inForce)).toEqual({ kind: 'missing' });
+  });
+
+  it('reads a norm that reaches back on the day asked once it has come into force', () => {
+    const back = row({
+      from: '2030-01-01',
+      until: '2030-03-31',
+      norm: 'rdl25_2026_november',
+      appliesBack: true,
+    });
+    const ended = {
+      ...norms,
+      rdl25_2026_november: { ...settled(reduction, true), inForceUntil: '2030-02-10' },
+    };
+    expect(valueOn([back], '2030-02-05', ended)).toMatchObject({ kind: 'ok' });
+    expect(valueOn([back], '2030-02-20', ended)).toEqual({ kind: 'missing' });
   });
 
   it('refuses two rows that hold on the same day', () => {
