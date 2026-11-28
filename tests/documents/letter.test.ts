@@ -60,8 +60,9 @@ describe('the lines of the letter that take what the person typed', () => {
       type: 'text',
       text: 'En Teruel, a 7 de octubre de 2026',
     });
-    expect(at('  ', null).text).toBe(
-      'En ____________________, a ____ de ____________________ de ________',
-    );
+    expect(at('  ', null)).toEqual({
+      type: 'text',
+      text: 'En ____________________, a ____ de ____________________ de ________',
+    });
   });
 });

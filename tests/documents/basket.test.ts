@@ -99,15 +99,19 @@ describe('a paid review built from a basket', () => {
 
   it('names a letter by the section’s letters, and the report otherwise', () => {
     const letters = {
-      paid: () => ['claim' as const],
+      paid: () => ['bill_correction' as const],
       letter: () => model,
       filename: () => 'client.bills.electricity.letter.filename' as never,
     };
     const withLetters = basketCase([2], { ...section, letters }).filename;
-    expect(withLetters?.('letter', 'claim')).toBe('client.bills.electricity.letter.filename');
+    expect(withLetters?.('letter', 'bill_correction')).toBe(
+      'client.bills.electricity.letter.filename',
+    );
     expect(withLetters?.('letter')).toBe('client.bills.electricity.report.filename');
-    expect(withLetters?.('report', 'claim')).toBe('client.bills.electricity.report.filename');
-    expect(basketCase([2], section).filename?.('letter', 'claim')).toBe(
+    expect(withLetters?.('report', 'bill_correction')).toBe(
+      'client.bills.electricity.report.filename',
+    );
+    expect(basketCase([2], section).filename?.('letter', 'bill_correction')).toBe(
       'client.bills.electricity.report.filename',
     );
   });
