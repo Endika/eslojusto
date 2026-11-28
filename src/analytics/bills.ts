@@ -73,14 +73,16 @@ export function electricityBillProps(
   };
 }
 
+const carries = (item: BillItem, ids: readonly BillsItemId[]): boolean =>
+  // Stryker disable next-line MethodExpression: the readings of one item all carry its id, so `some` and `every` agree
+  findingsOf(item).some((f) => ids.includes(f.id));
+
 // The status that weighs most among the lines of some kinds; one whose readings disagree counts as
 // `readings`; none when the review did not reach them.
 function pointStatus(items: readonly BillItem[], ids: readonly BillsItemId[]): PointResult {
   const statuses = items
-    .filter((item) => findingsOf(item).some((f) => ids.includes(f.id)))
-    .map((item) => {
-      return soleStatus(new Set(findingsOf(item).map((f) => f.status)));
-    });
+    .filter((item) => carries(item, ids))
+    .map((item) => soleStatus(new Set(findingsOf(item).map((f) => f.status))));
   return BILLS_STATUSES.find((s) => statuses.includes(s)) ?? 'none';
 }
 
@@ -191,6 +193,7 @@ type RenewalCompleted = Props<'renewal_review_completed'>;
 
 // Which side of the PVPC the letter's new prices fall on; none when there is nothing to compare.
 function versusPvpc({ pvpc }: CompletedRenewalReview['review']): RenewalCompleted['vs_pvpc'] {
+  // Stryker disable next-line ConditionalExpression: a comparison that is not ok has no difference, and an undefined one is neither above nor below
   if (pvpc.kind !== 'ok') return 'none';
   return pvpc.difference > 0 ? 'above' : pvpc.difference < 0 ? 'below' : 'none';
 }
