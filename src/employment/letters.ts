@@ -72,11 +72,15 @@ export function payShortfall(
   if (assessed === undefined) return null;
   const findings = findingsOf(assessed);
   const [finding] = findings;
-  if (finding === undefined || findings.some((f) => f.status !== 'below_minimum')) return null;
+  // Stryker disable next-line ConditionalExpression: a point found holds a finding; the guard narrows the type
+  if (finding === undefined) return null;
+  if (findings.some((f) => f.status !== 'below_minimum')) return null;
   // Without a world, the comparison takes the one most favourable to the pay: the lowest shortfall.
-  const years = compareByYear(r.input, today, tables.minimumWage).flatMap((y) =>
-    y.kind === 'compared' && y.verdict === 'below' ? [y] : [],
-  );
+  const years = compareByYear(r.input, today, tables.minimumWage).flatMap((y) => {
+    // Stryker disable next-line ConditionalExpression: a year not compared has no verdict, so it is left out either way; the check narrows the type
+    if (y.kind !== 'compared') return [];
+    return y.verdict === 'below' ? [y] : [];
+  });
   return years.length === 0 ? null : { finding, years, lowest: assessed.kind === 'readings' };
 }
 
@@ -84,7 +88,7 @@ export function payShortfall(
 function pointsToReview(review: EmploymentReview): readonly Finding[] {
   const assessed: readonly Assessed[] = [
     ...review.items,
-    ...review.clauses.flatMap((c) => (c.assessed === null ? [] : [c.assessed])),
+    ...review.clauses.map((c) => c.assessed).filter((a): a is Assessed => a !== null),
   ];
   return assessed.flatMap((a) =>
     a.kind === 'single' && isConcrete(a.finding) && !CONTRACT_PAY.has(a.finding.id)

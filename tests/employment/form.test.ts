@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { contractAnnualPay } from '../../src/engine/employment/minimum-wage';
 import { INFO_ELEMENTS } from '../../src/engine/employment/types';
 import { applies, applyConditions, gate } from '../../src/employment/conditions';
+import { EMPLOYMENT_FLOW } from '../../src/employment/steps';
 import { readEmploymentForm, sheetApplies, sheetErrors } from '../../src/employment/form';
 import { TODAY } from './fixtures';
 
@@ -242,5 +243,21 @@ describe('the employment form', () => {
     expect(sheetErrors(el, 'nominas', TODAY)).toEqual([
       { field: 'payslips.0.month', code: 'invalid_month' },
     ]);
+  });
+});
+
+describe('the employment flow', () => {
+  it('asks a sheet to answer cleanly, and the result nothing', () => {
+    const wrong = form(
+      { modality: 'production', hasHistory: 'yes' },
+      {
+        history: [
+          { startDate: '2024-06-01', endDate: '2024-01-01', employer: 'same', kind: 'production' },
+        ],
+      },
+    );
+    expect(EMPLOYMENT_FLOW.complete(wrong, 'historial', TODAY)).toBe(false);
+    expect(EMPLOYMENT_FLOW.complete(wrong, 'salario', TODAY)).toBe(true);
+    expect(EMPLOYMENT_FLOW.complete(wrong, 'resultado', TODAY)).toBe(true);
   });
 });

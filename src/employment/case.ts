@@ -37,6 +37,7 @@ export function employmentCase(
         ? certificateRequest(tables, details, tr)
         : companyLetter(
             r,
+            // Stryker disable next-line StringLiteral: companyLetter only tests for 'full'; any other scope asks only for the information
             kind === 'employment' ? 'full' : 'information',
             today,
             tables,
