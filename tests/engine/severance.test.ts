@@ -70,14 +70,9 @@ describe('fixed-term contract end (guide §9)', () => {
       fixedTermType,
     });
 
-  it.each([['2001-03-04', '2002-03-03', 8]] as const)(
-    'a contract from %s to %s gets %i days per year (DT 8.ª.2)',
-    (startDate, endDate, n) => {
-      const r = fixedTerm(startDate, endDate);
-      expect(r.amount).toBe(Math.round(((100 * 365 * n) / 365) * 100) / 100);
-      if (n === 0) expect(text(r.calculation)).toContain('4 de marzo de 2001');
-    },
-  );
+  it('a contract from 2001-03-04 to 2002-03-03 gets 8 days per year (DT 8.ª.2)', () => {
+    expect(fixedTerm('2001-03-04', '2002-03-03').amount).toBe(800);
+  });
 });
 
 describe('no severance', () => {
