@@ -164,7 +164,8 @@ function powerFigures(input: ElectricityBillInput): readonly PowerAgainstUse[] |
     const contracted = input.contractedPower[period];
     const maxUsed = input.maxPowerUsed[period];
     const price = perKwYear(input, period);
-    const unusedKw = maxUsed === null ? 0 : Math.max(0, round6(contracted - maxUsed));
+    const used = maxUsed ?? contracted;
+    const unusedKw = Math.max(0, round6(contracted - used));
     return {
       period,
       contracted,
@@ -172,7 +173,7 @@ function powerFigures(input: ElectricityBillInput): readonly PowerAgainstUse[] |
       perKwYear: price === null ? null : round2(price),
       unusedKw,
       unusedPerYear: price === null || maxUsed === null ? null : round2(unusedKw * price),
-      aboveContracted: maxUsed !== null && maxUsed > contracted,
+      aboveContracted: used > contracted,
     };
   });
 }

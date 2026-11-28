@@ -13,8 +13,10 @@ const present = (item: BillItem | null): BillItem => {
 const summary = (item: BillItem) => {
   const f = only(item);
   return {
+    id: f.id,
     status: f.status,
     amount: f.amount,
+    direction: f.direction,
     counted: countedAmount(item),
     says: f.calculation.map((p) => p.key),
     rules: f.sources.map((r) => r.id),
@@ -27,8 +29,10 @@ describe('excess power on the 2.0TD tariff', () => {
 
   it('without a maximeter is sent to review with its figure, never counted', () => {
     expect(summary(check(false))).toEqual({
+      id: 'excess_power',
       status: 'review_it',
       amount: 4.2,
+      direction: 'over',
       counted: 0,
       says: ['excess.no_maximeter'],
       rules: [],
@@ -65,8 +69,10 @@ describe('services besides the supply', () => {
     const items = checkServices(juneBill({ services: [service('yes')] }), BILLS_NORMS);
     expect(items.map(summary)).toEqual([
       {
+        id: 'service',
         status: 'not_allowed_in_pvpc',
         amount: 4.5,
+        direction: 'over',
         counted: 4.5,
         says: ['service.pvpc'],
         rules: ['services_pvpc'],
@@ -81,22 +87,28 @@ describe('services besides the supply', () => {
       check(freeBill({ services: [service('yes'), service('no'), service('unknown')] })),
     ).toEqual([
       {
+        id: 'service',
         status: 'information',
         amount: 4.5,
+        direction: null,
         counted: 0,
         says: ['service.requested'],
         rules: ['additional_services'],
       },
       {
+        id: 'service',
         status: 'paid_over',
         amount: 4.5,
+        direction: 'over',
         counted: 4.5,
         says: ['service.not_requested'],
         rules: unrequested,
       },
       {
+        id: 'service',
         status: 'review_it',
         amount: 4.5,
+        direction: 'over',
         counted: 0,
         says: ['service.requested_unknown'],
         rules: unrequested,

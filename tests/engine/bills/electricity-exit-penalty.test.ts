@@ -35,6 +35,7 @@ describe('a penalty for leaving the contract', () => {
     const item = check(change, person);
     expect(summary(item)).toEqual({ status: 'not_allowed', amount: 30, counted: 30 });
     expect(only(item).calculation).toEqual([{ key }]);
+    expect(only(item).id).toBe('exit_penalty');
     expect(only(item).sources.map((s) => s.id)).toEqual(['exit_penalty']);
   });
 
