@@ -8,9 +8,7 @@ import { civilDayText as day } from './render';
 
 // The deadline to say the policy is not to be extended, while it is still open.
 const openNonRenewal = (review: InsuranceReview): Finding | null =>
-  review.findings.find(
-    (f) => f.id === 'non_renewal' && f.status === 'open' && f.lastDay !== null,
-  ) ?? null;
+  review.findings.find((f) => f.id === 'non_renewal' && f.status === 'open') ?? null;
 
 // The letter that says the policy is not to be extended only tells the insurer so: it is free, and
 // offered while there is still time to send it.

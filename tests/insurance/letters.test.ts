@@ -51,6 +51,13 @@ describe('the letter that says the policy is not to be extended', () => {
       [],
     );
     expect(insuranceLetterKinds(completed(policy({ renews: false })))).toEqual([]);
+    // Another deadline still open, the withdrawal, does not make the non-renewal one open.
+    const withdrawing = policy({
+      distance: true,
+      concludedOn: parseDate('2026-10-05'),
+      expiresOn: parseDate('2026-11-01'),
+    });
+    expect(insuranceLetterKinds(completed(withdrawing))).toEqual([]);
     expect(insuranceLetterKinds(completed(policy({ line: 'life' })))).toEqual([]);
   });
 
@@ -82,6 +89,47 @@ describe('the letter that says the policy is not to be extended', () => {
       value: 'Alex Ejemplo',
       wrap: true,
     });
+  });
+
+  it('lays its blocks out in order, with the rule and its source', () => {
+    const { title, blocks } = nonRenewalLetter(completed(policy()), DETAILS, tr);
+    expect(blocks.map((b) => b.type)).toEqual([
+      'title',
+      'blank',
+      'blank',
+      'blank',
+      'blank',
+      'text',
+      'text',
+      'source',
+      'text',
+      'text',
+      'text',
+      'blank',
+    ]);
+    expect(blocks[0]).toEqual({ type: 'title', text: title });
+    expect(blocks[7]).toMatchObject({ type: 'source', text: expect.stringContaining('art. 22.2') });
+    expect(blocks.slice(8, 11)).toEqual([
+      { type: 'text', text: tr('client.insurance.letter.confirm') },
+      { type: 'text', text: tr('client.insurance.letter.regards') },
+      expect.objectContaining({ type: 'text' }),
+    ]);
+  });
+
+  it('leaves out the rule and its source once the last day has passed', () => {
+    const late = completed(policy({ expiresOn: parseDate('2026-11-01') }));
+    expect(nonRenewalLetter(late, DETAILS, tr).blocks.map((b) => b.type)).toEqual([
+      'title',
+      'blank',
+      'blank',
+      'blank',
+      'blank',
+      'text',
+      'text',
+      'text',
+      'text',
+      'blank',
+    ]);
   });
 
   it('words a motor policy as such', () => {

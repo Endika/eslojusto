@@ -173,20 +173,31 @@ describe('the gate', () => {
     });
   });
 
-  it('asks the terms only after a distance sale, and the figures only with a notice', () => {
-    const el = document.createElement('form');
-    el.innerHTML = `
-      <input type="radio" name="line" value="home" checked />
-      <input name="expiresOn" value="2027-03-01" />
-      <input type="radio" name="distance" value="yes" />
-      <input type="radio" name="distance" value="no" checked />
-      <input type="radio" name="hasNotice" value="yes" />
-      <input type="radio" name="hasNotice" value="no" checked />`;
-    const asked = () => (['condiciones', 'primas', 'cambios'] as const).map((s) => applies(el, s));
-    expect(asked()).toEqual([false, false, false]);
-    for (const input of el.querySelectorAll<HTMLInputElement>('[value="yes"]'))
-      input.checked = true;
-    expect(asked()).toEqual([true, true, true]);
+  it.each([
+    ['no', 'no', [false, false, false]],
+    ['yes', 'no', [true, false, false]],
+    ['unknown', 'no', [true, false, false]],
+    ['no', 'yes', [false, true, true]],
+    ['yes', 'yes', [true, true, true]],
+  ])(
+    'asks the terms and the figures with distance «%s» and notice «%s»',
+    (distance, hasNotice, expected) => {
+      const el = form({ distance: null, hasNotice: null });
+      el.insertAdjacentHTML(
+        'beforeend',
+        `<input type="radio" name="distance" value="${distance}" checked />
+         <input type="radio" name="hasNotice" value="${hasNotice}" checked />`,
+      );
+      expect((['condiciones', 'primas', 'cambios'] as const).map((s) => applies(el, s))).toEqual(
+        expected,
+      );
+    },
+  );
+
+  it('always asks the policy sheet and the result, and the rest of a policy within the review', () => {
+    const outside = form({ line: 'life', expiresOn: null });
+    expect(applies(outside, 'poliza')).toBe(true);
+    expect(applies(form(), 'contratacion')).toBe(true);
   });
 
   it('lets a home policy through, and waits while the policy sheet does not read', () => {

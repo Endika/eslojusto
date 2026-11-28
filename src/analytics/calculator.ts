@@ -1,18 +1,7 @@
-import type { CalculatorEvents, CompletedReview, RevealArm } from '../calculator/ports';
+import type { CalculatorEvents, CompletedReview, RevealArm, Step } from '../calculator/ports';
 import type { PassMode } from '../documents/ports';
-import {
-  changedFields,
-  reviewProps,
-  sectionSecondsBucket,
-  snapshot,
-  type Props,
-  type Section,
-  type Snapshot,
-  type Track,
-  type TrackableField,
-  validationCode,
-  type ValidationCode,
-} from './events';
+import { changedFields, reviewProps, snapshot, type Snapshot, type Track } from './events';
+import { sectionAnalytics } from './section';
 
 // The calculator's events as catalogue events. The catalogue's «section» is the step. Kept for this
 // page view only: when each step and the whole run started, how many reviews were made, and the
@@ -23,49 +12,21 @@ export function calculatorAnalytics(
   pass: (r: CompletedReview) => PassMode,
   reveal: RevealArm = 'instant',
 ): CalculatorEvents {
-  let viewedSection: Section | null = null;
-  let sectionEnteredAt = 0;
-  let start: number | null = null;
-  let attempts = 0;
+  const { events, reviewed } = sectionAnalytics<Step>(track, now);
   let previous: Snapshot | null = null;
-  const secondsSince = (t: number) => (now() - t) / 1000;
 
   return {
-    stepShown(step) {
-      if (step === viewedSection) return;
-      viewedSection = step;
-      sectionEnteredAt = now();
-      start ??= sectionEnteredAt;
-      track('section_viewed', { section: viewedSection });
-    },
-    stepCompleted(step) {
-      track('section_completed', {
-        section: step,
-        seconds: sectionSecondsBucket(secondsSince(sectionEnteredAt)),
-      });
-    },
-    wentBack(from, to) {
-      track('went_back', { from, to });
-    },
-    fieldRejected(step, field, code) {
-      track('validation_error', {
-        section: step,
-        field: field as TrackableField,
-        code: validationCode(code) as ValidationCode,
-      });
-    },
+    ...events,
     reviewCompleted(completed) {
       const { review, input, figures, benefit, otherContracts, detail } = completed;
-      attempts += 1;
       const answers = snapshot(input, figures);
       track(
         'review_completed',
         reviewProps({
           review,
           input,
-          attempt: attempts,
+          ...reviewed(),
           changedFields: changedFields(previous, answers),
-          seconds: secondsSince(start ?? sectionEnteredAt),
           benefit,
           otherContracts,
           detail,
@@ -75,14 +36,8 @@ export function calculatorAnalytics(
       );
       previous = answers;
     },
-    helpOpened(topic) {
-      track('help_opened', { topic: topic as Props<'help_opened'>['topic'] });
-    },
     detailOpened(item) {
       track('detail_opened', { item });
-    },
-    startedOver() {
-      track('started_over', {});
     },
   };
 }
