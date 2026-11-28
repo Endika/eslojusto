@@ -36,6 +36,7 @@ const ITEM_IDS = [
 const HOLIDAY_FIELDS = ['annualHolidayDays', 'holidayDaysTaken'] as const;
 
 const leastSure = (...fields: (Typed<unknown> | false | null)[]): Confidence =>
+  // Stryker disable next-line ArrayDeclaration: lowest ranks only known confidences, so a stand-in for a missing field changes nothing
   lowest(...fields.flatMap((f) => (f ? [f.confidence] : [])));
 
 // A field read as one kind of value, or nothing when the reading gave another.
