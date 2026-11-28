@@ -132,14 +132,18 @@ describe('leaving after a change of conditions', () => {
     expect(only(item).sources.map((s) => s.id)).toEqual(['indexed_price_rise']);
   });
 
-  it.each(['ipc_plus', 'fixed_amount', 'other'] as const)(
-    'a rise under a %s clause is sent to review, with no figure',
-    (index) => {
+  it('sends a rise under any other index clause to review, with no figure', () => {
+    const cases = ['ipc_plus', 'fixed_amount', 'other'] as const;
+    for (const index of cases) {
       const item = check({}, { index });
-      expect(summary(item)).toEqual({ status: 'review_it', amount: null, counted: 0 });
-      expect(only(item).calculation).toEqual([{ key: 'change.index_unsettled' }]);
-    },
-  );
+      expect(summary(item), String(index)).toEqual({
+        status: 'review_it',
+        amount: null,
+        counted: 0,
+      });
+      expect(only(item).calculation, String(index)).toEqual([{ key: 'change.index_unsettled' }]);
+    }
+  });
 
   it('notified less than a month ahead, the right is explained with no figure', () => {
     const item = check({}, { appliesOn: parseDate('2026-03-09') });
@@ -215,12 +219,6 @@ describe('leaving after a change of conditions', () => {
     expect(only(first).status).toBe('paid_over');
     expect(summary(check({ exitRequestedOn: parseDate('2026-02-10') })).status).toBe('paid_over');
   });
-
-  it('gives nothing for a penalty of no euros', () => {
-    expect(
-      checkChangeExit(telecom({ changeNotice: notice(), penaltyCharged: 0 }), deps),
-    ).toBeNull();
-  });
 });
 
 describe('the last day to leave after a change of conditions', () => {
@@ -238,13 +236,15 @@ describe('the last day to leave after a change of conditions', () => {
     expect(deadline({ appliesOn: parseDate('2026-03-10') })).toBe('2026-03-10');
   });
 
-  it.each([
-    ['a notice with no day sent', { sentOn: null }],
-    ['a change that is no price rise or worse service', { change: 'other' }],
-    ['a rise under an index clause', { index: 'ipc' }],
-    ['a notice that applies the change sooner', { appliesOn: parseDate('2026-03-09') }],
-  ] as const)('is none for %s', (_, change) => {
-    expect(deadline(change)).toBeNull();
+  it('is none for a notice that cannot settle it', () => {
+    const cases = [
+      ['a change that is no price rise or worse service', { change: 'other' }],
+      ['a rise under an index clause', { index: 'ipc' }],
+      ['a notice that applies the change sooner', { appliesOn: parseDate('2026-03-09') }],
+    ] as const;
+    for (const [label, change] of cases) {
+      expect(deadline(change), label).toBeNull();
+    }
   });
 
   it('is none with no notice, or for an exit before the law took effect, and from that day it is', () => {

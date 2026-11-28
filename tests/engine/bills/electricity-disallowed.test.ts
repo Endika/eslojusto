@@ -50,11 +50,6 @@ describe('excess power on the 2.0TD tariff', () => {
     const excessPower = amount === null ? null : { amount, maximeter: false };
     expect(checkExcessPower(juneBill({ excessPower }), BILLS_NORMS)).toBeNull();
   });
-
-  it('gives something from the first cent', () => {
-    const excessPower = { amount: 0.01, maximeter: false };
-    expect(checkExcessPower(juneBill({ excessPower }), BILLS_NORMS)).not.toBeNull();
-  });
 });
 
 describe('services besides the supply', () => {

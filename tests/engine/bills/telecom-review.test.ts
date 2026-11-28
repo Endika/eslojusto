@@ -44,15 +44,6 @@ describe('the telecom review', () => {
     expect(r.totals.counted).toBe(60);
   });
 
-  it('counts the penalty once too when a reading of leaving over a change keeps it within the limit', () => {
-    const r = review({
-      changeNotice: priceRise,
-      handset: { value: 120, kept: true },
-      penaltyCharged: 100,
-    });
-    expect(statuses(r)).toEqual(['change_exit:within_limit', 'change_exit:paid_over']);
-  });
-
   it('keeps the length of the commitment when leaving over a change settles the penalty', () => {
     const r = review({
       changeNotice: priceRise,

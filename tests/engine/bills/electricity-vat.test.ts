@@ -235,21 +235,29 @@ const at = (kw: [number, number], line: VatLine, more: Partial<ElectricityBillIn
   mayBill({ contractedPower: { p1: kw[0], p2: kw[1] }, vat: line, ...more });
 
 describe('which VAT rate a supply gets', () => {
-  it.each([
-    ['at the limit with it included', { powerLimitIncluded: true }, [10, 10], 4.47],
-    ['under a limit that leaves itself out', { powerLimitIncluded: false }, [9.9, 9.9], 4.47],
-    ['over the limit', {}, [12, 12], 9.39],
-    [
-      'over a limit that leaves itself out, on one period',
-      { powerLimitIncluded: false },
-      [10, 12],
-      9.39,
-    ],
-    ['over a limit that leaves itself out, on both', { powerLimitIncluded: false }, [12, 12], 9.39],
-  ] as const)('one rate for a supply %s', (_, change, kw, amount) => {
-    const item = withRate(change, at([kw[0], kw[1]], vat(amount)));
-    expect(item.kind).toBe('single');
-    expect(only(item).status).toBe('matches');
+  it('gives one rate for a supply at, under or over the limit', () => {
+    const cases = [
+      ['at the limit with it included', { powerLimitIncluded: true }, [10, 10], 4.47],
+      ['under a limit that leaves itself out', { powerLimitIncluded: false }, [9.9, 9.9], 4.47],
+      ['over the limit', {}, [12, 12], 9.39],
+      [
+        'over a limit that leaves itself out, on one period',
+        { powerLimitIncluded: false },
+        [10, 12],
+        9.39,
+      ],
+      [
+        'over a limit that leaves itself out, on both',
+        { powerLimitIncluded: false },
+        [12, 12],
+        9.39,
+      ],
+    ] as const;
+    for (const [label, change, kw, amount] of cases) {
+      const item = withRate(change, at([kw[0], kw[1]], vat(amount)));
+      expect(item.kind, label).toBe('single');
+      expect(only(item).status, label).toBe('matches');
+    }
   });
 
   it('says the highest power of a supply at a limit that leaves itself out', () => {
@@ -266,38 +274,41 @@ describe('which VAT rate a supply gets', () => {
       b: SocialBonus | null,
     ) => withRate(rate, at([kw, kw], vat(3.97), { socialBonus: b }));
 
-    it.each([
-      ['with no bonus', { severeVulnerable: true }, 12, null, 'single'],
-      [
-        'a severe one where the decree does not say',
-        { severeVulnerable: null },
-        12,
-        bonus('severe'),
-        'readings',
-      ],
-      [
-        'a severe one where the decree says no',
-        { severeVulnerable: false },
-        12,
-        bonus('severe'),
-        'single',
-      ],
-      [
-        'another category where the decree does not say',
-        { severeVulnerable: null },
-        12,
-        bonus('vulnerable'),
-        'single',
-      ],
-      [
-        'one with no category, under the limit',
-        { severeVulnerable: true },
-        9.9,
-        bonus(null),
-        'single',
-      ],
-    ] as const)('a supply over the limit %s', (_, rate, kw, b, kind) => {
-      expect(run(rate, kw, b).kind).toBe(kind);
+    it('reads the social bonus of a supply over the limit', () => {
+      const cases = [
+        ['with no bonus', { severeVulnerable: true }, 12, null, 'single'],
+        [
+          'a severe one where the decree does not say',
+          { severeVulnerable: null },
+          12,
+          bonus('severe'),
+          'readings',
+        ],
+        [
+          'a severe one where the decree says no',
+          { severeVulnerable: false },
+          12,
+          bonus('severe'),
+          'single',
+        ],
+        [
+          'another category where the decree does not say',
+          { severeVulnerable: null },
+          12,
+          bonus('vulnerable'),
+          'single',
+        ],
+        [
+          'one with no category, under the limit',
+          { severeVulnerable: true },
+          9.9,
+          bonus(null),
+          'single',
+        ],
+      ] as const;
+      for (const [label, rate, kw, b, kind] of cases) {
+        expect(run(rate, kw, b).kind, label).toBe(kind);
+      }
     });
 
     it('says the bonus may be a severe one', () => {
@@ -344,20 +355,24 @@ describe('the words of the VAT', () => {
     ]);
   });
 
-  it.each([
-    ['a discount', { discounts: [2] }],
-    ['an excess of power', { excessPower: { amount: 3, maximeter: true } }],
-    ['a service', { services: [{ label: 'm', amount: 5, requested: 'yes' }] }],
-    [
-      'an exit penalty',
-      { exitPenalty: { amount: 7, priceType: 'variable', firstRenewalPassed: false } },
-    ],
-    ['a settlement in favour', { regularizations: [4] }],
-    ['a settlement against', { regularizations: [-4] }],
-  ] as const)('says the parts may be in or out when there is %s', (_, change) => {
-    expect(
-      only(check(mayBill({ ...change } as Partial<ElectricityBillInput>))).calculation,
-    ).toContainEqual(say('tax.parts_either'));
+  it('says the parts may be in or out when any of them is there', () => {
+    const cases = [
+      ['a discount', { discounts: [2] }],
+      ['an excess of power', { excessPower: { amount: 3, maximeter: true } }],
+      ['a service', { services: [{ label: 'm', amount: 5, requested: 'yes' }] }],
+      [
+        'an exit penalty',
+        { exitPenalty: { amount: 7, priceType: 'variable', firstRenewalPassed: false } },
+      ],
+      ['a settlement in favour', { regularizations: [4] }],
+      ['a settlement against', { regularizations: [-4] }],
+    ] as const;
+    for (const [label, change] of cases) {
+      expect(
+        only(check(mayBill({ ...change } as Partial<ElectricityBillInput>))).calculation,
+        label,
+      ).toContainEqual(say('tax.parts_either'));
+    }
   });
 
   it('works a bill with no electricity tax and no meter', () => {

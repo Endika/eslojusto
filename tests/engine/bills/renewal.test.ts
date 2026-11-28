@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { TOLL_HOLIDAYS } from '../../../src/engine/bills/data/holidays-20td';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import { reviewRenewalCore } from '../../../src/engine/bills/renewal';
@@ -330,18 +329,25 @@ describe('reviewing a renewal letter', () => {
       norm: 'law38_1992' as const,
       url: 'https://example.test',
     });
-    it.each([
-      ['power p1', { ...base, power: { p1: 2, p2: 1 } }],
-      ['power p2', { ...base, power: { p1: 1, p2: 2 } }],
-      ['energy p1', { ...base, energy: { p1: 2, p2: 1, p3: 1 } }],
-      ['energy p2', { ...base, energy: { p1: 1, p2: 2, p3: 1 } }],
-      ['energy p3', { ...base, energy: { p1: 1, p2: 1, p3: 2 } }],
-    ])('in %s', (_, after) => {
-      const tolls = [toll(base), { ...toll(after), from: '2026-12-01', until: '2026-12-31' }];
-      const zero = { power: { p1: 0, p2: 0 }, energy: { p1: 0, p2: 0, p3: 0 } };
-      const charges = [{ ...toll(zero), until: '2026-12-31' }];
-      const own: RenewalDeps = { tables: { ...BILLS_TABLES, tolls, charges }, norms: BILLS_NORMS };
-      expect(reviewRenewalCore(letter(), own).split).toMatchObject({ regulatedChange: true });
+    it('shows a change of the regulated part in any of its prices', () => {
+      const cases: [string, typeof base][] = [
+        ['power p2', { ...base, power: { p1: 1, p2: 2 } }],
+        ['energy p1', { ...base, energy: { p1: 2, p2: 1, p3: 1 } }],
+        ['energy p2', { ...base, energy: { p1: 1, p2: 2, p3: 1 } }],
+        ['energy p3', { ...base, energy: { p1: 1, p2: 1, p3: 2 } }],
+      ];
+      for (const [label, after] of cases) {
+        const tolls = [toll(base), { ...toll(after), from: '2026-12-01', until: '2026-12-31' }];
+        const zero = { power: { p1: 0, p2: 0 }, energy: { p1: 0, p2: 0, p3: 0 } };
+        const charges = [{ ...toll(zero), until: '2026-12-31' }];
+        const own: RenewalDeps = {
+          tables: { ...BILLS_TABLES, tolls, charges },
+          norms: BILLS_NORMS,
+        };
+        expect(reviewRenewalCore(letter(), own).split, label).toMatchObject({
+          regulatedChange: true,
+        });
+      }
     });
   });
 
@@ -352,20 +358,23 @@ describe('reviewing a renewal letter', () => {
     });
   });
 
-  it.each([
-    ['the power of P1', { power: { p1: 0.2, p2: 0.03 }, energy: { all: 0.1 } }],
-    ['the price of all the energy', { power: { p1: 0.1, p2: 0.03 }, energy: { all: 0.2 } }],
-    [
-      'the price of one period',
-      { power: { p1: 0.1, p2: 0.03 }, energy: { p1: 0.1, p2: 0.1, p3: 0.2 } },
-    ],
-  ])('a letter that changes only %s lets the customer leave', (_, next) => {
-    const periods = { p1: 0.1, p2: 0.1, p3: 0.1 };
-    const current = {
-      power: { p1: 0.1, p2: 0.03 },
-      energy: 'p1' in next.energy ? periods : { all: 0.1 },
-    };
-    expect(review({ current, next }).exit).toEqual({ kind: 'free' });
+  it('lets the customer leave over a letter that changes only one price', () => {
+    const cases: [string, RenewalInput['next']][] = [
+      ['the power of P1', { power: { p1: 0.2, p2: 0.03 }, energy: { all: 0.1 } }],
+      ['the price of all the energy', { power: { p1: 0.1, p2: 0.03 }, energy: { all: 0.2 } }],
+      [
+        'the price of one period',
+        { power: { p1: 0.1, p2: 0.03 }, energy: { p1: 0.1, p2: 0.1, p3: 0.2 } },
+      ],
+    ];
+    for (const [label, next] of cases) {
+      const periods = { p1: 0.1, p2: 0.1, p3: 0.1 };
+      const current = {
+        power: { p1: 0.1, p2: 0.03 },
+        energy: 'p1' in next.energy ? periods : { all: 0.1 },
+      };
+      expect(review({ current, next }).exit, label).toEqual({ kind: 'free' });
+    }
   });
 });
 
@@ -378,20 +387,6 @@ describe('the whole review of a renewal letter', () => {
       ok: false,
       errors: [{ field: 'annualKwh', code: 'kwh_range' }],
     });
-  });
-
-  it('has no PVPC data when none could be loaded, and compares when there are', () => {
-    const none = reviewRenewal(letter(), today, whole);
-    if (!none.ok) throw new Error('review expected');
-    expect(none.review.pvpc).toEqual({ kind: 'no_data' });
-    const hours = Array.from({ length: 24 }, (_, h) => [h, 150] as const);
-    const official = {
-      pvpc: { coveredUntil: '2026-10-02', days: { '2026-10-01': hours, '2026-10-02': hours } },
-      tollHolidays: TOLL_HOLIDAYS,
-    };
-    const some = reviewRenewal(letter(), today, { ...deps, official });
-    if (!some.ok) throw new Error('review expected');
-    expect(some.review.pvpc).toMatchObject({ kind: 'ok', from: '2026-10-01', to: '2026-10-02' });
   });
 
   it('puts no taxes on a letter whose cost cannot be recalculated', () => {

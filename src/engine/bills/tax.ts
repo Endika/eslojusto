@@ -78,10 +78,7 @@ function assess(line: TaxLine, reading: TaxReading, norms: NormTable): BillFindi
   ];
   const { matches } = compare(line.billed, reading.expected, LINE_TOLERANCE);
   if (matches) return billFinding(line.id, 'matches', calculation, line.rules, norms, parts);
-  if (
-    reading.unsettled.length > 0 &&
-    compare(line.billed, reading.unsettled, LINE_TOLERANCE).matches
-  )
+  if (compare(line.billed, reading.unsettled, LINE_TOLERANCE).matches)
     return billFinding(
       line.id,
       'review_it',

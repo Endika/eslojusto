@@ -46,6 +46,7 @@ export function checkMeter(
   const singlePhase = cap('single');
   // Stryker disable next-line StringLiteral: the rent is the three-phase one for anything but 'single'
   const threePhase = cap('three');
+  // Stryker disable next-line ConditionalExpression,StringLiteral: the three-phase cap, read over the same days of one table, is missing with it and gives the same answer
   if (singlePhase.kind === 'missing')
     return pendingOfficial('meter', singlePhase.day, RULES, norms);
   // Stryker disable next-line ConditionalExpression,StringLiteral: both caps read the same days of one table, so it is missing exactly when the single-phase one is

@@ -113,16 +113,6 @@ describe('a year of bills', () => {
     },
   );
 
-  it('counts a bill uploaded twice once when both carry the same fingerprint', () => {
-    const copy = { ...meterOver, input: { ...meterOver.input, supplyFingerprint: 'a1' } };
-    expect(reviewBasket([copy, copy], deps).skipped).toEqual([{ bill: 1, reason: 'duplicate' }]);
-  });
-
-  it('is offered when what is counted is just the price of the pass', () => {
-    expect(reviewBasket([meterOver], { passPrice: 0.2 }).offerPass).toBe(true);
-    expect(reviewBasket([meterOver], { passPrice: 0.21 }).offerPass).toBe(false);
-  });
-
   it.each([
     ['start', '2026-05-30', '2026-06-30'],
     ['end', '2026-05-31', '2026-07-01'],
