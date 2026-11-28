@@ -10,8 +10,19 @@ import {
   type SourcedField,
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
+import {
+  amountOf,
+  dateOf,
+  isNumber,
+  lowest,
+  oneOf,
+  positiveOf,
+  textOrBlank,
+  wholeOf,
+  yesNo,
+} from '../documents/read';
 import { MORTGAGE_CONFLICT_FIELDS, conflictLines } from '../documents/summary';
-import { compareDates, parseDate, toIso, type CivilDate } from '../engine/date';
+import { compareDates, toIso } from '../engine/date';
 import { CLAUSE_LABELS, type ClauseLabel } from '../engine/mortgage/types';
 import type { Translate } from '../i18n/client';
 import {
@@ -71,18 +82,6 @@ const ANSWER_OF: Readonly<Partial<Record<ClauseLabel, readonly [MortgageFormFiel
   insurance_required: ['insuranceRequired', 'yes'],
 };
 
-const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-const lowest = (...cs: Confidence[]): Confidence =>
-  // Stryker disable next-line EqualityOperator: equal ranks are the same confidence, whichever is kept
-  cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
-
-const isNumber = (v: ExtractedValue | undefined): v is number => Number.isFinite(v);
-const amountOf = (v: ExtractedValue | undefined): number | null =>
-  isNumber(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
-const positiveOf = (v: ExtractedValue | undefined): number | null => {
-  const n = amountOf(v);
-  return (n ?? 0) > 0 ? n : null;
-};
 // A rate keeps the three decimals a deed may give (Euríbor + 0,875).
 const rateOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && v >= 0 ? Math.round(v * 1000) / 1000 : null;
@@ -94,23 +93,6 @@ function sourcedRate(
   // Stryker disable next-line ConditionalExpression,LogicalOperator: a rate that reads implies its field, and a missing figure is never above 0
   return f && value !== null ? { value, confidence: f.confidence } : null;
 }
-const wholeOf = (v: ExtractedValue | undefined): number | null =>
-  isNumber(v) && Number.isInteger(v) && v > 0 ? v : null;
-// Blank when there is no text.
-const textOf = (v: ExtractedValue | undefined): string => (typeof v === 'string' ? v.trim() : '');
-const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
-  (options as readonly (ExtractedValue | undefined)[]).includes(v) ? (v as T) : null;
-const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
-  v === true ? 'yes' : v === false ? 'no' : null;
-
-function dateOf(v: ExtractedValue | undefined): CivilDate | null {
-  try {
-    return parseDate(String(v));
-  } catch {
-    return null;
-  }
-}
-
 const cents = (n: number): number => Math.round(n * 100);
 // Stryker disable next-line StringLiteral: an empty string counts as zero cents, as the 0 does
 const centsOf = (v: ExtractedValue | undefined): number => cents(amountOf(v) ?? 0);
@@ -160,7 +142,7 @@ const ownCheck = (c: MortgageCheck): c is Exclude<MortgageCheck, 'missing_key_pa
 function clausesOf(rows: readonly ExtractedRow[]) {
   return rows.flatMap((row) => {
     const label = oneOf(row.values['label'], CLAUSE_LABELS);
-    const text = textOf(row.values['text']);
+    const text = textOrBlank(row.values['text']);
     return label && text ? [{ label, text, confidence: row.confidence }] : [];
   });
 }
@@ -195,7 +177,7 @@ function loan(a: Answers, fields: Fields) {
   const principal = positiveOf(fields.principal?.value);
   a.field('loanAmount', fields.principal, principal === null ? null : amountText(principal));
   a.field('rateType', fields.rateType, oneOf(fields.rateType?.value, RATE_TYPES));
-  const months = wholeOf(fields.rateRevisionMonths?.value);
+  const months = wholeOf(fields.rateRevisionMonths?.value, 1);
   a.field('revisionMonths', fields.rateRevisionMonths, months === null ? null : String(months));
 }
 
@@ -228,7 +210,7 @@ function figures(a: Answers, fields: Fields, tr: Translate) {
     }
   }
 
-  const instalments = wholeOf(fields.earlyTerminationInstalments?.value);
+  const instalments = wholeOf(fields.earlyTerminationInstalments?.value, 1);
   if (fields.earlyTerminationInstalments && instalments !== null) {
     a.read('earlyTermination', 'yes', fields.earlyTerminationInstalments.confidence);
     a.read('missedInstalments', String(instalments), fields.earlyTerminationInstalments.confidence);

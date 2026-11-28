@@ -10,7 +10,8 @@ import {
 import type { ReadPrefill } from '../../documents/ports';
 import type { EnergyPeriod, PowerPeriod } from '../../engine/bills/types';
 import type { Translate } from '../../i18n/client';
-import { Answers, isoOf, lowest, numberOf } from '../read';
+import { isoOf, lowest, numberOf } from '../../documents/read';
+import { Answers } from '../read';
 import {
   BONUS_CATEGORIES,
   ENERGY_PERIODS,

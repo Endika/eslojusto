@@ -11,11 +11,20 @@ import {
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
 import {
+  amountOf,
+  dateOf,
+  isNumber,
+  lowest,
+  oneOf,
+  textOf,
+  wholeOf,
+  yesNo,
+} from '../documents/read';
+import {
   addDays,
   addMonthsClamped,
   compareDates,
   daysInMonth,
-  parseDate,
   toIso,
   type CivilDate,
 } from '../engine/date';
@@ -50,33 +59,6 @@ interface EmploymentPrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
   // The agreement as read, for the result to name it; the form never asks for it.
   readonly agreement: { readonly name: string | null; readonly code: string | null };
-}
-
-const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-const lowest = (...cs: Confidence[]): Confidence =>
-  // Stryker disable next-line EqualityOperator: on a tie both sides are the same confidence
-  cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
-
-const isNumber = (v: ExtractedValue | undefined): v is number => Number.isFinite(v);
-const amountOf = (v: ExtractedValue | undefined): number | null =>
-  isNumber(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
-const wholeOf = (v: ExtractedValue | undefined): number | null =>
-  isNumber(v) && Number.isInteger(v) && v >= 0 ? v : null;
-const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' && v.trim() !== '' ? v.trim() : null;
-const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
-  // Stryker disable next-line ConditionalExpression: the options hold no non-string, so includes alone gives the same answer
-  typeof v === 'string' && (options as readonly string[]).includes(v) ? (v as T) : null;
-const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
-  v === true ? 'yes' : v === false ? 'no' : null;
-
-function dateOf(v: ExtractedValue | undefined): CivilDate | null {
-  // Stryker disable next-line ConditionalExpression: parseDate rejects whatever is not a date string, caught below
-  if (typeof v !== 'string') return null;
-  // prettier-ignore
-  try { return parseDate(v); }
-  // Stryker disable next-line BlockStatement: callers only test the date for truth, so a catch that returns undefined reads as null
-  catch { return null; }
 }
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
@@ -187,7 +169,7 @@ function dates(
   // A duration in months ends the day before the same day that many months on.
   const months = fields.durationMonths;
   if (!start || !months) return { start, end: null };
-  const n = wholeOf(months.value) ?? 0;
+  const n = wholeOf(months.value, 0) ?? 0;
   if (n <= 0) return { start, end: null };
   const worked = addDays(addMonthsClamped(start, n), -1);
   a.read('endDate', toIso(worked), lowest(months.confidence, 'medium'), true);
@@ -224,7 +206,7 @@ function salary(a: Answers, fields: Fields, parts: readonly ExtractedRow[]): boo
   // Twelve monthly payments and the extra ones: the form asks for the extra ones. Twelve payments
   // with the extras prorated hold them inside, in a number the contract does not give.
   const payments = fields.payments;
-  const count = wholeOf(payments?.value) ?? 0;
+  const count = wholeOf(payments?.value, 0) ?? 0;
   const inTwelve = count === 12 && fields.prorated?.value === true;
   const extras = count >= 12 && !inTwelve ? count - 12 : null;
   if (payments && extras !== null) a.read('extraPays', String(extras), payments.confidence, true);
@@ -344,7 +326,7 @@ function wholeMonth(
     const whole = toIso(start) === isoOf(month, 1) && toIso(end) === isoOf(month, last);
     return { value: whole ? 'yes' : 'no', derived: false };
   }
-  const days = wholeOf(row.values['daysWorked']);
+  const days = wholeOf(row.values['daysWorked'], 0);
   if (days === null) return null;
   // A whole month is paid as 30 days or as its calendar days; 28 or 29 in February, or 30 in a
   // 31-day month, may be either a whole month or not, and is left to the person.
@@ -419,7 +401,7 @@ function time(a: Answers, fields: Fields) {
     a.read('overtimeKind', 'as_needed', overtime.confidence);
   }
   const hours = fields.overtimeHoursPerYear;
-  const perYear = wholeOf(hours?.value);
+  const perYear = wholeOf(hours?.value, 0);
   if (overtime && agreed === 'hours') {
     a.read('hasOvertime', 'yes', overtime.confidence);
     a.read('overtimeKind', 'hours', overtime.confidence);
@@ -431,7 +413,7 @@ function time(a: Answers, fields: Fields) {
       a.read('hasComplementary', 'yes', percent.confidence);
       read.figure('complementaryPercent', 'complementaryPercent');
       const notice = fields.complementaryNoticeDays;
-      const days = wholeOf(notice?.value);
+      const days = wholeOf(notice?.value, 0);
       if (notice && days !== null) a.read('complementaryNotice', String(days), notice.confidence);
     }
   }
@@ -481,7 +463,7 @@ function clauses(a: Answers, rows: readonly ExtractedRow[]) {
     const field = (key: string) => rowField('clauses', i, key);
     const v = row.values;
     a.read(field('label'), String(v['label']), row.confidence);
-    const months = wholeOf(v['months']);
+    const months = wholeOf(v['months'], 0);
     if (months !== null) a.read(field('months'), String(months), row.confidence);
     for (const [key, name] of [
       ['compensation', 'compensationStated'],

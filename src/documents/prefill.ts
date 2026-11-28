@@ -1,6 +1,7 @@
 import { daysInMonth, parseDate, toIso, type CivilDate } from '../engine/date';
 import { formatAmountInput } from '../calculator/number';
 import type { Confidence, Extraction, ExtractedField } from './contract';
+import { lowest } from './read';
 
 // One form control to set: its name, the value as the form writes it, and how sure the reading is.
 export interface PrefilledField {
@@ -34,13 +35,8 @@ const ITEM_IDS = [
 
 const HOLIDAY_FIELDS = ['annualHolidayDays', 'holidayDaysTaken'] as const;
 
-const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-const lowest = (...fields: (Typed<unknown> | false | null)[]): Confidence =>
-  fields.reduce<Confidence>(
-    // Stryker disable next-line EqualityOperator: equal ranks are the same confidence, so which one stays does not matter
-    (a, f) => (f && RANK[f.confidence] < RANK[a] ? f.confidence : a),
-    'high',
-  );
+const leastSure = (...fields: (Typed<unknown> | false | null)[]): Confidence =>
+  lowest(...fields.flatMap((f) => (f ? [f.confidence] : [])));
 
 // A field read as one kind of value, or nothing when the reading gave another.
 interface Typed<T> {
@@ -146,7 +142,7 @@ function payslip(fields: Fields, salaryStated: boolean): PrefilledField[] {
     out.push({
       name: 'monthlySalary',
       value: formatAmountInput(salary),
-      confidence: lowest(
+      confidence: leastSure(
         total,
         prorated,
         !prorated.value && paid,

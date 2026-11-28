@@ -9,6 +9,15 @@ import {
   type SourcedField,
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
+import {
+  dateOf,
+  isNumber,
+  lowest,
+  oneOf,
+  positiveAmountOf,
+  textOf,
+  wholeOf,
+} from '../documents/read';
 import { conflictLines, RENTAL_CONFLICT_FIELDS } from '../documents/summary';
 import { compareDates, parseDate, toIso, type CivilDate } from '../engine/date';
 import type { RegionCode } from '../engine/rental/types';
@@ -32,29 +41,6 @@ type Quoted = (typeof QUOTED)[number];
 
 interface RentalPrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
-}
-
-const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-const lowest = (...cs: Confidence[]): Confidence =>
-  // Stryker disable next-line EqualityOperator: two equal ranks are the same confidence, so either side gives the same result
-  cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
-
-const isNumber = (v: ExtractedValue | undefined): v is number => Number.isFinite(v);
-const amountOf = (v: ExtractedValue | undefined): number | null =>
-  isNumber(v) && v > 0 ? Math.round(v * 100) / 100 : null;
-const wholeOf = (v: ExtractedValue | undefined, least = Number.NEGATIVE_INFINITY): number | null =>
-  isNumber(v) && Number.isInteger(v) && v >= least ? v : null;
-const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' ? v.trim() || null : null;
-const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
-  (options as readonly (ExtractedValue | undefined)[]).includes(v) ? (v as T) : null;
-
-function dateOf(v: ExtractedValue | undefined): CivilDate | null {
-  try {
-    return parseDate(String(v));
-  } catch {
-    return null;
-  }
 }
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
@@ -180,7 +166,7 @@ function rentChanges(
   const first = start ? (start.d > 1 ? toMonth(start) : null) : null;
   const sorted = [...months.entries()]
     .flatMap(([month, row]) => {
-      const rent = amountOf(row.values['rent']);
+      const rent = positiveAmountOf(row.values['rent']);
       const before = start !== null && month < toMonth(start);
       return rent === null || before || month === first
         ? []
@@ -284,7 +270,7 @@ function contract(a: Answers, fields: RentalExtraction['fields']) {
     text,
     true,
   );
-  read('deposit', fields.deposit, amountOf, amountText);
+  read('deposit', fields.deposit, positiveAmountOf, amountText);
 
   // The contract counts the months paid beyond the first; the form counts the first too. Whether
   // the contract meant the first is not always plain, so this is never more than fairly sure.
@@ -292,7 +278,7 @@ function contract(a: Answers, fields: RentalExtraction['fields']) {
   if (advance)
     a.read('advanceMonths', String(advance.value + 1), lowest(advance.confidence, 'medium'), true);
 
-  read('initialRent', fields.initialRent, amountOf, amountText);
+  read('initialRent', fields.initialRent, positiveAmountOf, amountText);
   read('agreedMonths', fields.agreedMonths, (v) => wholeOf(v, 1), String);
   const clause = sourced(fields.updateClauseIndex, (v) => oneOf(v, UPDATE_CLAUSES));
   if (clause) a.read('updateClause', clause.value, clause.confidence);
@@ -310,7 +296,7 @@ function guarantees(a: Answers, rows: readonly ExtractedRow[], rent: number | nu
   read.forEach((row, i) => {
     const field = (key: string) => rowField('guarantees', i, key);
     a.read(field('kind'), String(row.values['kind']), row.confidence);
-    const amount = amountOf(row.values['amount']);
+    const amount = positiveAmountOf(row.values['amount']);
     const months = wholeOf(row.values['months']);
     if (amount !== null) a.read(field('amount'), amountText(amount), row.confidence);
     else if (months !== null && rent !== null)
@@ -344,9 +330,9 @@ function fees(a: Answers, invoices: readonly ExtractedRow[], mismatch: boolean) 
     if (kind) a.read(field('kind'), kind, row.confidence);
     const doubtful = mismatch && (!located || totalMismatch(row));
     const confidence = doubtful ? 'low' : row.confidence;
-    const total = amountOf(row.values['total']);
-    const base = amountOf(row.values['base']);
-    const vat = amountOf(row.values['vat']) ?? 0;
+    const total = positiveAmountOf(row.values['total']);
+    const base = positiveAmountOf(row.values['base']);
+    const vat = positiveAmountOf(row.values['vat']) ?? 0;
     if (total !== null) a.read(field('amount'), amountText(total), confidence);
     else if (base !== null) a.read(field('amount'), amountText(base + vat), confidence, true);
   });
@@ -395,9 +381,9 @@ function rises(notices: readonly ExtractedRow[], changes: readonly RentChange[])
   };
   const fromNotices = notices.map((row): Rise => {
     const v = row.values;
-    const previousRead = amountOf(v['previousRent']);
+    const previousRead = positiveAmountOf(v['previousRent']);
     const percent = isNumber(v['percent']) ? v['percent'] : null;
-    const nextRead = amountOf(v['newRent']);
+    const nextRead = positiveAmountOf(v['newRent']);
     const next =
       nextRead ??
       (previousRead !== null && percent !== null
@@ -501,10 +487,13 @@ function receiptCharges(months: ReadonlyMap<string, ExtractedRow>) {
   let otherLines = false;
   for (const [month, row] of months) {
     const year = Number(month.slice(0, 4));
-    if (amountOf(row.values['utilities']) !== null || amountOf(row.values['other']) !== null)
+    if (
+      positiveAmountOf(row.values['utilities']) !== null ||
+      positiveAmountOf(row.values['other']) !== null
+    )
       otherLines = true;
     for (const [line, kind] of Object.entries(RECEIPT_CHARGES)) {
-      const amount = amountOf(row.values[line]);
+      const amount = positiveAmountOf(row.values[line]);
       if (amount === null) continue;
       const years = sums.get(kind) ?? new Map<number, ChargeYear>();
       const sum = years.get(year);
@@ -545,7 +534,7 @@ function charges(
   const rows = CHARGE_KINDS.flatMap((kind): ChargeRow[] => {
     const inLease = lease.filter((r) => r.values['kind'] === kind);
     const agreed = inLease
-      .map((r) => amountOf(r.values['annualAmount']))
+      .map((r) => positiveAmountOf(r.values['annualAmount']))
       .filter((n): n is number => n !== null);
     const terms: ChargeTerms | null =
       inLease.length > 0
@@ -596,7 +585,7 @@ function moveOut(
   a.rows('returns', returns).forEach((row, i) => {
     const field = (key: string) => rowField('returns', i, key);
     const on = dateOf(row.values['on']);
-    const amount = amountOf(row.values['amount']);
+    const amount = positiveAmountOf(row.values['amount']);
     if (on) a.read(field('on'), toIso(on), row.confidence);
     if (amount !== null) a.read(field('amount'), amountText(amount), row.confidence);
   });
@@ -605,7 +594,7 @@ function moveOut(
     const kind = oneOf(row.values['kind'], DEDUCTION_KINDS);
     // The list has no blank choice: a deduction of no known kind is «Otro», to be checked.
     a.read(field('kind'), kind ?? 'other', kind ? row.confidence : 'low');
-    const amount = amountOf(row.values['amount']);
+    const amount = positiveAmountOf(row.values['amount']);
     if (amount !== null) a.read(field('amount'), amountText(amount), row.confidence);
   });
 }
@@ -622,7 +611,7 @@ export function rentalPrefill(
 ): RentalPrefill {
   const a = new Answers();
   contract(a, e.fields);
-  guarantees(a, e.guarantees, amountOf(e.fields.initialRent?.value));
+  guarantees(a, e.guarantees, positiveAmountOf(e.fields.initialRent?.value));
   fees(a, e.invoices, checks.includes('invoice_total_mismatch'));
   const start = dateOf(e.fields.startDate?.value) ?? dateOf(answers['startDate']);
   const receipts = receiptsByMonth(e.receipts);

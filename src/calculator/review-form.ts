@@ -1,5 +1,3 @@
-import { parseDate, type CivilDate } from '../engine/date';
-
 // What the review sections that walk the shared section flow ask the same way: questions shown
 // only while an earlier answer asks for them, and the answers read back from the form.
 
@@ -45,11 +43,3 @@ export const pick = <T extends string>(value: string | null, options: readonly T
 // «Sí», «No» and «No lo sé»; undefined while unanswered.
 export const triState = (value: string | null): boolean | null | undefined =>
   value === 'yes' ? true : value === 'no' ? false : value === 'unknown' ? null : undefined;
-
-export const tryDate = (text: string): CivilDate | null => {
-  try {
-    return parseDate(text);
-  } catch {
-    return null;
-  }
-};
