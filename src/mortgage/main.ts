@@ -12,6 +12,7 @@ import { MORTGAGE_FLOW as flow } from './steps';
 // the pass is verified or dropped.
 export function setUpMortgage(
   root: HTMLElement,
+  // Stryker disable next-line ArrowFunction,StringLiteral: only 'locked' is told apart, so any other default reads as unlocked
   { events, today, tr, tables, detail = () => 'unlocked' }: MortgageSetup,
 ): SectionForm {
   let shown: MortgageReview | null = null;
