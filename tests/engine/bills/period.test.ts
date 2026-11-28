@@ -28,8 +28,6 @@ const spanOver = (table: Table<number>, p: BillingPeriod, norms: NormTable = BIL
   return span;
 };
 
-describe('the days of a bill', () => {});
-
 describe('the rows over the days of a period', () => {
   it('start another stretch where one of the rows that hold is another', () => {
     const norms: NormTable = {
@@ -161,5 +159,3 @@ describe('two official figures added up', () => {
     });
   });
 });
-
-describe('the values the norms leave open', () => {});
