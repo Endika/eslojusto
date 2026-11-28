@@ -24,6 +24,10 @@ import {
   statusText,
 } from './render';
 
+const distinct = <T>(items: readonly T[], key: (item: T) => string): T[] => [
+  ...new Map(items.map((item) => [key(item), item])).values(),
+];
+
 const row = (label: string, value: string): Block => ({ type: 'row', label, value });
 
 const answer = (v: boolean | null, tr: Translate) =>
@@ -175,9 +179,10 @@ function itemBlocks(item: CreditItem, tr: Translate): Block[] {
   const findings = findingsOf(item);
   const [first] = findings;
   if (first === undefined) return [];
-  const sources = findings
-    .flatMap((f) => f.sources)
-    .filter((s, i, all) => all.findIndex((o) => o.id === s.id) === i);
+  const sources = distinct(
+    findings.flatMap((f) => f.sources),
+    (s) => s.id,
+  );
   return [
     { type: 'subheading', text: tr(`client.credit.item.${first.id}`) },
     { type: 'note', text: tr('client.credit.report.how') },
@@ -237,7 +242,7 @@ function norms(r: CompletedCreditReview): NormSource<NormStatus>[] {
     ...r.review.items.flatMap((i) => findingsOf(i).flatMap((f) => f.sources)),
     ...r.review.information.flatMap((b) => b.sources),
   ];
-  return all.filter((s, i) => all.findIndex((o) => o.citation === s.citation) === i);
+  return distinct(all, (s) => s.citation);
 }
 
 // The whole review, item by item with every reading, the flows its APR is solved on, the

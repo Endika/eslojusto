@@ -1,6 +1,9 @@
 import { BE1904 } from '../../src/engine/credit/data/be1904';
 import { CREDIT_NORMS } from '../../src/engine/credit/data/norms';
 import { CREDIT_SOURCES } from '../../src/engine/credit/data/sources';
+import type { CreditInput } from '../../src/engine/credit/types';
+import { parseDate } from '../../src/engine/date';
+import { loan } from '../engine/credit/input';
 
 export const DEPS = {
   norms: CREDIT_NORMS,
@@ -43,3 +46,20 @@ export function result(): HTMLElement {
     </template>`;
   return root;
 }
+
+// A synthetic revolving card with a balance, on the assumptions of annex I, part II.
+export const card = (change: Partial<CreditInput> = {}): CreditInput =>
+  loan({
+    product: 'revolving',
+    agreedOn: parseDate('2024-03-10'),
+    drawnOn: parseDate('2024-03-10'),
+    principal: 1_500,
+    netDisbursed: null,
+    nominalRate: 21.94,
+    declaredApr: 24.29,
+    declaredTotalPayable: null,
+    instalments: null,
+    charges: [],
+    card: { limit: 1_500, nominalRate: 21.94, annualFee: 0, minimumPayment: 60, balance: 1_200 },
+    ...change,
+  });

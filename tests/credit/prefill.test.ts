@@ -82,9 +82,10 @@ function readAnswers(p: P, added: Record<string, string>) {
 }
 
 describe('a credit contract', () => {
-  const p = prefill({ fields: LOAN, charges: OPENING });
+  const contract = () => prefill({ fields: LOAN, charges: OPENING });
 
   it('fills the loan, its rate, its stated APR and its instalments', () => {
+    const p = contract();
     expect(entry(p, 'product')).toBe('personal_loan');
     expect(entry(p, 'agreedOn')).toBe('2019-02-15');
     expect(entry(p, 'principal')).toBe('10.500,00');
@@ -102,15 +103,18 @@ describe('a credit contract', () => {
   });
 
   it('puts the opening charge on its sheet with how it was paid', () => {
+    const p = contract();
     expect(entry(p, 'openingFee')).toBe('761,25');
     expect(entry(p, 'openingHow')).toBe('deducted');
   });
 
   it('quotes the early repayment clause beside the compensation', () => {
+    const p = contract();
     expect(p.quotes.compensation).toMatch(/^El prestatario podrá reembolsar/);
   });
 
   it('never fills what the documents do not say, such as the purpose or the drawdown', () => {
+    const p = contract();
     expect(entry(p, 'purpose')).toBeUndefined();
     expect(entry(p, 'drawnOn')).toBeUndefined();
     expect(entry(p, 'confirmedApr')).toBeUndefined();
@@ -118,6 +122,7 @@ describe('a credit contract', () => {
   });
 
   it('gives answers the form reads into the engine’s input once the person adds the rest', () => {
+    const p = contract();
     const read = readAnswers(p, {
       purpose: 'personal',
       drawnOn: '2019-02-15',
