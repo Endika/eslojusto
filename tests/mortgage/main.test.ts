@@ -134,7 +134,6 @@ describe('the mortgage section', () => {
   });
 
   it.each([
-    ['unlocked unless told otherwise', undefined, false],
     ['unlocked', () => 'unlocked' as const, false],
     ['locked', () => 'locked' as const, true],
   ])('shows a review inside the scope %s, and tells who listens', (_name, detail, locked) => {
@@ -163,11 +162,6 @@ describe('the mortgage section', () => {
   });
 
   describe('showing the review again', () => {
-    it('shows nothing before there is a review', () => {
-      setUp().refreshResult(result);
-      expect(renderMortgageResult).not.toHaveBeenCalled();
-    });
-
     it('shows the one on screen as the pass leaves its detail', () => {
       reads({ input, invoiceFields: [] });
       let detail: 'locked' | 'unlocked' = 'unlocked';

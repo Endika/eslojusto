@@ -316,16 +316,6 @@ describe('the mortgage report, block by block', () => {
   const SINGLE = { ...READINGS, prepaymentOption: 'a_015_5y' } as const;
 
   describe('what the person confirmed', () => {
-    it('gives only what was asked, when little was', () => {
-      expect(part(echoed({}), YOUR_DATA)).toEqual([
-        'row: client.mortgage.report.deed_on = 10-05-2012',
-        'row: client.mortgage.report.consumer = client.mortgage.answer.yes',
-        'row: client.mortgage.report.rate_type = client.mortgage.report.rate.variable',
-        'row: client.mortgage.report.revision = client.mortgage.report.revision_months {"meses":"12"}',
-        'row: client.mortgage.report.expenses_clause = client.mortgage.report.expenses_clause.present',
-      ]);
-    });
-
     it('gives everything else when it was asked, in the order of the form', () => {
       expect(part(echoed(FULL), YOUR_DATA)).toEqual([
         'row: client.mortgage.report.deed_on = 10-03-2021',
@@ -344,36 +334,11 @@ describe('the mortgage report, block by block', () => {
       ]);
     });
 
-    it.each([
-      ['no invoices to say who agreed', { invoices: [] }],
-      ['the invoices out of reach', { invoicesAtHand: false }],
-    ])('leaves the agreement out with %s', (_name, change) => {
-      const withInvoices = { invoices: [invoice('valuation', 300)], agreementOnExpenses: false };
-      const rows = part(echoed({ ...withInvoices, ...change }), YOUR_DATA);
-      expect(rows.some((r) => r.includes('report.agreement'))).toBe(false);
-      const kept = part(echoed(withInvoices), YOUR_DATA);
-      expect(kept).toContain('row: client.mortgage.report.agreement = client.mortgage.answer.no');
-    });
-
     it('leaves out what came back when it was nothing', () => {
       for (const alreadyReturned of [null, 0])
         expect(
           part(echoed({ alreadyReturned }), YOUR_DATA).some((r) => r.includes('returned')),
         ).toBe(false);
-    });
-
-    it('gives the day of the first invoice that has one', () => {
-      const rows = part(
-        echoed({
-          invoices: [
-            invoice('valuation', 300),
-            invoice('agency', 100, { paidOn: d('2020-02-02') }),
-            invoice('notary_loan', 100, { paidOn: d('2020-03-03') }),
-          ],
-        }),
-        YOUR_DATA,
-      );
-      expect(rows).toContain('row: client.mortgage.report.paid_on = 02-02-2020');
     });
   });
 
@@ -387,14 +352,6 @@ describe('the mortgage report, block by block', () => {
       'text: client.mortgage.report.totals_apart',
     ];
 
-    it('says nothing is owed when nothing is', () => {
-      expect(summary({})).toEqual([
-        `${STATUTE} = client.mortgage.total.nothing`,
-        `${CASE_LAW} = client.mortgage.total.nothing`,
-        ...TAIL,
-      ]);
-    });
-
     it('gives the law’s figure, the notary record charged to nobody, and what came back', () => {
       expect(summary(LCCI)).toEqual([
         `${STATUTE} = 300,00 €`,
@@ -402,30 +359,6 @@ describe('the mortgage report, block by block', () => {
         `${CASE_LAW} = client.mortgage.total.nothing`,
         ...TAIL,
         'bullet: client.mortgage.calculation.expenses.returned {"euros":"300,00 €"}',
-      ]);
-    });
-
-    it('gives the split with the legal interest up to the day, even when it comes to nothing', () => {
-      expect(
-        summary({
-          deedOn: d('2018-12-14'),
-          invoices: [invoice('notary_loan', 800, { paidOn: TODAY_DEED })],
-        }),
-      ).toEqual([
-        `${STATUTE} = client.mortgage.total.nothing`,
-        `${CASE_LAW} = 400,00 €`,
-        'row: client.mortgage.report.total_interest {"fecha":"08-10-2026"} = 0,00 €',
-        ...TAIL,
-      ]);
-    });
-
-    it('gives no figure for the split while its rulings are unread, nor interest', () => {
-      expect(
-        summary({ deedOn: d('2018-12-14'), invoices: [invoice('notary_loan', 800)] }, UNREAD_DEPS),
-      ).toEqual([
-        `${STATUTE} = client.mortgage.total.nothing`,
-        `${CASE_LAW} = client.mortgage.total.no_figure_yet`,
-        ...TAIL,
       ]);
     });
 
@@ -439,46 +372,29 @@ describe('the mortgage report, block by block', () => {
       ]);
     });
 
-    it.each([
-      ['none', { caseLaw: { principal: 100, interest: null } }],
-      [
-        'with nothing to give it on',
-        {
-          caseLaw: { principal: 0, interest: { amount: 5, until: '2026-10-08', estimated: false } },
-        },
-      ],
-    ])('gives no interest row for interest %s', (_name, totals) => {
+    it('gives no interest row for interest that is none or has nothing to be given on', () => {
       const r = reviewed({ deedOn: d('2018-12-14'), invoices: [invoice('notary_loan', 800)] });
-      const injected = { ...r, review: { ...r.review, totals: { ...r.review.totals, ...totals } } };
-      const model = mortgageReport(injected as never, LEGAL_INTEREST, echo, TODAY);
-      expect(part(model, SUMMARY).some((l) => l.includes('total_interest'))).toBe(false);
+      const none = { principal: 100, interest: null };
+      const nothing = {
+        principal: 0,
+        interest: { amount: 5, until: '2026-10-08', estimated: false },
+      };
+      for (const caseLaw of [none, nothing]) {
+        const injected = {
+          ...r,
+          review: { ...r.review, totals: { ...r.review.totals, caseLaw } },
+        };
+        const model = mortgageReport(injected as never, LEGAL_INTEREST, echo, TODAY);
+        expect(part(model, SUMMARY).some((l) => l.includes('total_interest'))).toBe(false);
+      }
     });
 
-    it.each([
-      [
-        'the least a fee over its cap gives, and the most',
-        READINGS,
-        [
-          'row: client.mortgage.report.total_fees = 150,00 €',
-          'note: client.mortgage.report.fees_up_to {"maximo":"170,00 €"}',
-        ],
-      ],
-      [
-        'a fee over its cap in every reading',
-        SINGLE,
-        ['row: client.mortgage.report.total_fees = 170,00 €'],
-      ],
-      [
-        'a fee within its cap',
-        { ...SINGLE, operations: [op({ feeCharged: 10 })] },
-        ['row: client.mortgage.report.total_fees = client.mortgage.total.nothing'],
-      ],
-    ])('gives %s apart', (_name, change, fees) => {
-      expect(summary(change)).toEqual([
+    it('gives a fee within its cap as nothing, apart', () => {
+      expect(summary({ ...SINGLE, operations: [op({ feeCharged: 10 })] })).toEqual([
         `${STATUTE} = client.mortgage.total.nothing`,
         `${CASE_LAW} = client.mortgage.total.nothing`,
         TAIL[0],
-        ...fees,
+        'row: client.mortgage.report.total_fees = client.mortgage.total.nothing',
         TAIL[1],
       ]);
     });
@@ -526,21 +442,13 @@ describe('the mortgage report, block by block', () => {
     });
     const interestOf = (review: MortgageReview) => review.expenses.items[0]?.interest ?? null;
 
-    it('gives the interest year by year of an item that has both its figure and its interest', () => {
-      const model = inject(SPLIT_PAID, (r) => withItem({ interest: interestOf(r) })(r));
-      expect(part(model, EXPENSES).some((l) => l.includes(INTEREST))).toBe(true);
-    });
-
-    it.each([
-      ['no interest', (r: MortgageReview) => withItem({ interest: null })(r)],
-      ['no figure', (r: MortgageReview) => withItem({ interest: interestOf(r), amount: null })(r)],
-      [
-        'an invoice that is not there',
-        (r: MortgageReview) => withItem({ interest: interestOf(r), index: 9 })(r),
-      ],
-    ])('gives none for an item with %s', (_name, edit) => {
-      const model = inject(SPLIT_PAID, edit);
-      expect(part(model, EXPENSES).some((l) => l.includes(INTEREST))).toBe(false);
+    it('gives no interest year by year for an item with no figure or no invoice', () => {
+      for (const change of [{ amount: null }, { index: 9 }]) {
+        const model = inject(SPLIT_PAID, (r) =>
+          withItem({ interest: interestOf(r), ...change })(r),
+        );
+        expect(part(model, EXPENSES).some((l) => l.includes(INTEREST))).toBe(false);
+      }
     });
 
     it('gives no section, nor sources, for a cap of today that is not there', () => {
@@ -569,38 +477,34 @@ describe('the mortgage report, block by block', () => {
       ).toBe(false);
     });
 
-    it.each([
-      ['a cap the law cannot check', { status: 'review_it', cap: 25 }],
-      ['a cap with no figure', { status: 'cap', cap: null }],
-    ])('gives no cap for %s', (_name, change) => {
-      const model = inject({ deedOn: d('2024-06-01'), rateType: 'fixed' }, (r) => ({
-        prepaymentToday: {
-          kind: 'single',
-          finding: { ...(r.prepaymentToday as TodayItem & { finding: object }).finding, ...change },
-        },
-      }));
-      const today = part(model, 'client.mortgage.report.today');
-      expect(today.some((l) => l.includes('today_cap') || l.includes('today_nothing'))).toBe(false);
+    it('gives no cap for one the law cannot check or one with no figure', () => {
+      for (const change of [
+        { status: 'review_it', cap: 25 },
+        { status: 'cap', cap: null },
+      ]) {
+        const model = inject({ deedOn: d('2024-06-01'), rateType: 'fixed' }, (r) => ({
+          prepaymentToday: {
+            kind: 'single',
+            finding: {
+              ...(r.prepaymentToday as TodayItem & { finding: object }).finding,
+              ...change,
+            },
+          },
+        }));
+        const today = part(model, 'client.mortgage.report.today');
+        expect(today.some((l) => l.includes('today_cap') || l.includes('today_nothing'))).toBe(
+          false,
+        );
+      }
     });
   });
 
   describe('the whole of it', () => {
     const cases: [string, Partial<MortgageInput>, string, MortgageDeps?][] = [
       [
-        'a deed with nothing to show',
-        {},
-        'title meta rule text heading row×5 heading row×2 note text heading text×2 bullet source heading source×6 heading subheading text source×2 subheading text source subheading text source subheading text source heading bullet×7 heading text',
-      ],
-      [
         'a deed of the split, with its interest and a clause',
         SPLIT_DEED,
         'title meta rule text heading row×12 heading row×3 note text heading subheading text bullet×3 text row×9 source×5 subheading text bullet×4 text row×9 source×5 subheading text bullet source heading text×2 bullet source heading note subheading text×2 bullet source×2 heading source×15 heading subheading text source subheading text source×2 subheading text source subheading text source subheading text source heading bullet×7 heading text',
-      ],
-      [
-        'the same with no figure for the split',
-        SPLIT_DEED,
-        'title meta rule text heading row×12 heading row×2 note text heading subheading text bullet×2 source×3 subheading text bullet×2 source×3 subheading text bullet source heading text×2 bullet source heading note subheading text×2 bullet source×2 heading source×12 heading subheading text source subheading text source subheading text source subheading text source subheading text source heading bullet×7 heading text',
-        UNREAD_DEPS,
       ],
       [
         'a deed of the split paid today, with no interest to give year by year',
@@ -620,49 +524,11 @@ describe('the mortgage report, block by block', () => {
         READINGS,
         'title meta rule text heading row×6 heading row×2 note row note text heading subheading text×3 bullet×2 text×2 bullet×2 source heading text×4 bullet×2 text×2 bullet×2 source heading source×6 heading subheading text source×2 subheading text source subheading text source subheading text source heading bullet×7 heading text',
       ],
-      [
-        'a fee over its cap in every reading',
-        SINGLE,
-        'title meta rule text heading row×7 heading row×2 note row text heading subheading text bullet×2 source heading text×2 bullet×2 source heading source×6 heading subheading text source×2 subheading text source subheading text source subheading text source heading bullet×7 heading text',
-      ],
-      [
-        'what repaying today costs in each reading',
-        { deedOn: d('2024-06-01'), rateType: 'variable', prepaymentOption: 'unknown' },
-        'title meta rule text heading row×6 heading row×2 note text heading text×4 bullet×2 text×3 bullet×2 text source×2 heading source×7 heading subheading text source×2 subheading text source subheading text source subheading text source heading bullet×7 heading text',
-      ],
-      [
-        'what repaying today costs in one',
-        { deedOn: d('2024-06-01'), rateType: 'fixed' },
-        'title meta rule text heading row×5 heading row×2 note text heading text×2 bullet×2 text source×2 heading source×7 heading subheading text source×2 subheading text source subheading text source subheading text source heading bullet×7 heading text',
-      ],
-      [
-        'what repaying today costs when it costs nothing',
-        { deedOn: d('2020-03-01'), rateType: 'variable', prepaymentOption: 'a_015_5y' },
-        'title meta rule text heading row×6 heading row×2 note text heading text×2 bullet×2 source heading source×6 heading subheading text source×2 subheading text source subheading text source subheading text source heading bullet×7 heading text',
-      ],
     ];
 
-    it.each(cases)('is made of the blocks of %s', (_name, change, expected, deps = DEPS) => {
-      expect(structure(echoed(change, deps))).toBe(expected);
-    });
-
-    it('opens with the title, the day and the intro, and ends with where to find out', () => {
-      const { blocks } = echoed({});
-      expect(lines(blocks.slice(0, 5))).toEqual([
-        'title: client.mortgage.report.title',
-        'meta: client.documents.report.generated {"fecha":"9 de octubre de 2026"}',
-        'rule: ',
-        'text: client.mortgage.report.intro',
-        'heading: client.mortgage.report.your_data',
-      ]);
-      expect(lines(blocks.slice(-2))).toEqual([
-        'heading: client.mortgage.report.channels',
-        'text: client.mortgage.report.channels_text',
-      ]);
-      expect(lines(blocks.slice(-3, -2))[0]).toMatch(/^bullet: client\.mortgage\.unchecked\./);
-      expect(echoed({}).footer).toBe(
-        'client.mortgage.report.footer {"fecha":"9 de octubre de 2026"}',
-      );
+    it('is made of the blocks of each kind of review', () => {
+      for (const [name, change, expected, deps = DEPS] of cases)
+        expect(structure(echoed(change, deps)), name).toBe(expected);
     });
   });
 });

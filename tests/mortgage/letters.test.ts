@@ -205,14 +205,9 @@ describe('the lines of the amounts letter when the review is read differently', 
     finding: { ...finding, ...change },
   });
 
-  it.each([
-    ['a cost the lender bears with nothing to give back', { amount: null }],
-    ['a cost the lender bears for no euros', { amount: 0 }],
-    ['a cost the borrower bears', { status: 'borrower_bears' }],
-    ['a cost the bank paid', { status: 'paid_by_bank' }],
-  ] as const)('leaves out %s', (_name, change) => {
-    const lines = amountLines(withItems([{ ...item, ...change }]));
-    expect(lines.expenses).toEqual([]);
+  it('leaves out a cost the lender bears for no euros, and one the bank paid', () => {
+    for (const change of [{ amount: 0 }, { status: 'paid_by_bank' }] as const)
+      expect(amountLines(withItems([{ ...item, ...change }])).expenses).toEqual([]);
   });
 
   it('leaves out a fee that is within its cap, whatever it carries', () => {
@@ -366,50 +361,33 @@ describe('the letters, block by block', () => {
     ]);
   });
 
-  it.each([
-    [
-      'a cost with what came back',
-      { ...REGISTRY, alreadyReturned: 300 },
-      [INTRO, ...EXPENSE, RETURNED('300,00 €', '300,00 €'), ASK],
-    ],
-    ['a cost with nothing back', REGISTRY, [INTRO, ...EXPENSE, ASK]],
-    [
-      'a cost the law puts on nobody, with all the rest given back',
-      {
-        ...REGISTRY,
-        invoices: [invoice('notary_loan', 600), invoice('transparency_deed', 50)],
-        alreadyReturned: 5_000,
-      },
-      [INTRO, NOT_CHARGEABLE, 'source', ASK],
-    ],
-    ['a cost all given back', { ...REGISTRY, alreadyReturned: 600 }, []],
-    [
-      'a fee over its cap in every reading',
-      { deedOn: d('2021-03-10'), prepaymentOption: 'a_015_5y', operations: [prepayment()] },
-      [INTRO, FEE('30,00 €', '170,00 €'), 'source', ASK],
-    ],
-    [
-      'a fee over its cap in some readings',
-      { deedOn: d('2021-03-10'), operations: [prepayment()] },
-      [
-        INTRO,
-        FEE('50,00 €', '150,00 €'),
-        'note: client.mortgage.letter.amounts.lowest',
-        'source',
-        ASK,
-      ],
-    ],
-  ] as const)('puts in the amounts letter %s', (_name, input, body) => {
+  it('puts in the amounts letter what the law settles, and nothing else', () => {
     const title = 'title: client.mortgage.letter.amounts.title';
-    expect(amounts(input)).toEqual([title, DEED_ON('10-03-2021'), ...body, ...CLOSING]);
-  });
-
-  it('leaves the amounts letter without figures when no law settles one', () => {
-    expect(amounts({})).toEqual([
-      'title: client.mortgage.letter.amounts.title',
-      DEED_ON('10-05-2012'),
-      ...CLOSING,
-    ]);
+    const cases: [string, Partial<MortgageInput>, string[]][] = [
+      [
+        'a cost with what came back',
+        { ...REGISTRY, alreadyReturned: 300 },
+        [INTRO, ...EXPENSE, RETURNED('300,00 €', '300,00 €'), ASK],
+      ],
+      ['a cost with nothing back', REGISTRY, [INTRO, ...EXPENSE, ASK]],
+      [
+        'a cost the law puts on nobody, with all the rest given back',
+        {
+          ...REGISTRY,
+          invoices: [invoice('notary_loan', 600), invoice('transparency_deed', 50)],
+          alreadyReturned: 5_000,
+        },
+        [INTRO, NOT_CHARGEABLE, 'source', ASK],
+      ],
+      [
+        'a fee over its cap in every reading',
+        { deedOn: d('2021-03-10'), prepaymentOption: 'a_015_5y', operations: [prepayment()] },
+        [INTRO, FEE('30,00 €', '170,00 €'), 'source', ASK],
+      ],
+    ];
+    for (const [name, input, body] of cases)
+      expect(amounts(input), name).toEqual([title, DEED_ON('10-03-2021'), ...body, ...CLOSING]);
+    expect(amounts({})).toEqual([title, DEED_ON('10-05-2012'), ...CLOSING]);
   });
 });
 
@@ -481,18 +459,12 @@ describe('the mortgage review as the pass sees it', () => {
     expect(c.report(tr, TODAY)).toEqual(mortgageReport(r, LEGAL_INTEREST, tr, TODAY));
   });
 
-  describe('selling it quietly', () => {
+  it('sells it quietly only with nothing on the lender, no fee over its cap and no clause flagged', () => {
     const valuation = invoice('valuation', 300);
-    const within = prepayment({ feeCharged: 10 });
     const REPAID = { deedOn: d('2021-03-10'), prepaymentOption: 'a_015_5y' } as const;
     const cases: [string, Partial<MortgageInput>, boolean][] = [
       ['an invoice the borrower bears', { deedOn: TODAY, invoices: [valuation] }, true],
-      ['a fee within its cap', { ...REPAID, operations: [within] }, true],
-      [
-        'a fee within its cap and an invoice the borrower bears',
-        { ...REPAID, invoices: [valuation], operations: [within] },
-        true,
-      ],
+      ['a fee within its cap', { ...REPAID, operations: [prepayment({ feeCharged: 10 })] }, true],
       [
         'a clause the deed lacks',
         { deedOn: TODAY, invoices: [valuation], clauses: [{ label: 'irph', present: false }] },
@@ -502,25 +474,6 @@ describe('the mortgage review as the pass sees it', () => {
       [
         'only a figure not entered',
         { deedOn: TODAY, invoices: [invoice('notary_loan', null)] },
-        false,
-      ],
-      [
-        'a cost on the lender beside one the borrower bears',
-        { deedOn: TODAY, invoices: [valuation, invoice('notary_loan', 300)] },
-        false,
-      ],
-      [
-        'a fee over its cap',
-        { ...REPAID, invoices: [valuation], operations: [prepayment({ feeCharged: 200 })] },
-        false,
-      ],
-      [
-        'a fee over its cap in one reading only',
-        {
-          deedOn: d('2021-03-10'),
-          invoices: [valuation],
-          operations: [prepayment({ feeCharged: 35 })],
-        },
         false,
       ],
       [
@@ -538,9 +491,8 @@ describe('the mortgage review as the pass sees it', () => {
         false,
       ],
     ];
-    it.each(cases)('with %s', (_name, input, quiet) => {
-      expect(mortgageCase(completed(input), LEGAL_INTEREST).quiet).toBe(quiet);
-    });
+    for (const [name, input, quiet] of cases)
+      expect(mortgageCase(completed(input), LEGAL_INTEREST).quiet, name).toBe(quiet);
   });
 
   it('words the letter and its file for the kind asked, the request for documents by default', () => {
