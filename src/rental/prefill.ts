@@ -36,6 +36,7 @@ interface RentalPrefill extends ReadPrefill {
 
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
 const lowest = (...cs: Confidence[]): Confidence =>
+  // Stryker disable next-line EqualityOperator: two equal ranks are the same confidence, so either side gives the same result
   cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
 
 const isNumber = (v: ExtractedValue | undefined): v is number =>
@@ -45,7 +46,7 @@ const amountOf = (v: ExtractedValue | undefined): number | null =>
 const wholeOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && Number.isInteger(v) ? v : null;
 const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' && v.trim() !== '' ? v.trim() : null;
+  typeof v === 'string' ? v.trim() || null : null;
 const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
   typeof v === 'string' && (options as readonly string[]).includes(v) ? (v as T) : null;
 
@@ -125,9 +126,11 @@ function receiptsByMonth(receipts: readonly ExtractedRow[]): {
   readonly months: ReadonlyMap<string, ExtractedRow>;
   readonly disagree: boolean;
 } {
-  const ordered = [...receipts].sort(
-    (a, b) => Number(b.source === 'rent_receipt') - Number(a.source === 'rent_receipt'),
-  );
+  const isReceiptDocument = (r: ExtractedRow) => r.source === 'rent_receipt';
+  const ordered = [
+    ...receipts.filter(isReceiptDocument),
+    ...receipts.filter((r) => !isReceiptDocument(r)),
+  ];
   const months = new Map<string, ExtractedRow>();
   let disagree = false;
   for (const row of ordered) {
@@ -157,10 +160,8 @@ interface RentChange {
 
 // How many anniversaries fall in the months after `after` up to `month`.
 function anniversariesBetween(start: CivilDate, after: string, month: string): number {
-  let n = 0;
-  for (let y = start.y + 1; y * 12 + start.m <= monthIndex(month); y += 1)
-    if (y * 12 + start.m > monthIndex(after)) n += 1;
-  return n;
+  const upTo = (m: string) => Math.floor((monthIndex(m) - start.m) / 12);
+  return upTo(month) - upTo(after);
 }
 
 const sameRent = (a: number, b: number) => Math.abs(a - b) < 0.005;
@@ -183,7 +184,7 @@ function rentChanges(
         ? []
         : [{ month, rent, confidence: row.confidence }];
     })
-    .sort((a, b) => (a.month < b.month ? -1 : 1));
+    .sort((a, b) => a.month.localeCompare(b.month));
   const changes: RentChange[] = [];
   let current = sorted[0];
   sorted.forEach((r, i) => {
@@ -195,6 +196,7 @@ function rentChanges(
       monthIndex(after.month) === monthIndex(r.month) + 1 &&
       sameRent(after.rent, current.rent);
     if (oneOff) return;
+    // Stryker disable next-line OptionalChaining: the first receipt holds the rent `current` starts at, so a change is never at index 0
     const before = sorted[i - 1]?.month ?? r.month;
     const gap = monthIndex(r.month) - monthIndex(before) > 1;
     changes.push({
@@ -203,7 +205,7 @@ function rentChanges(
       next: r.rent,
       confidence: gap ? 'low' : lowest(r.confidence, current.confidence),
       gapAfter: gap ? before : null,
-      unclear: gap && start !== null && anniversariesBetween(start, before, r.month) >= 2,
+      unclear: start !== null && anniversariesBetween(start, before, r.month) >= 2,
     });
     current = r;
   });
@@ -602,6 +604,7 @@ export function rentalPrefill(
   e: RentalExtraction,
   answers: Readonly<Record<string, string>>,
   tr: Translate,
+  // Stryker disable next-line ArrayDeclaration: a string that names no check matches none, as an empty list does
   checks: readonly FailedCheck[] = [],
 ): RentalPrefill {
   const a = new Answers();
