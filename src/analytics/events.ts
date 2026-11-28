@@ -1406,7 +1406,7 @@ function matchesRule(rule: Rule, v: unknown): boolean {
   return (
     Array.isArray(v) &&
     new Set(v).size === v.length &&
-    v.every((x) => typeof x === 'string' && rule.list.includes(x))
+    v.every((x) => (rule.list as readonly unknown[]).includes(x))
   );
 }
 
