@@ -49,6 +49,13 @@ describe('part-time contents (art. 12.4.a ET)', () => {
     );
   });
 
+  it('without the hours, full time is presumed too', () => {
+    expect(findingFor(partTime({ hoursStated: false }), 'part_time_contents').calculation).toEqual([
+      phrase('part_time.hours_missing'),
+      phrase('part_time.full_time_presumed'),
+    ]);
+  });
+
   it('hours and distribution stated are within the rule', () => {
     expect(findingFor(partTime({}), 'part_time_contents').status).toBe('within_limit');
   });
@@ -104,6 +111,38 @@ describe('complementary hours (art. 12.5 ET)', () => {
     );
   });
 
+  it.each([
+    [29, 'within_limit'],
+    [30, 'within_limit'],
+    [31, 'depends_on_agreement'],
+    [60, 'depends_on_agreement'],
+    [61, 'over_legal_limit'],
+  ])('%s %% of complementary hours is %s', (percent, status) => {
+    expect(findingFor(pact(percent), 'complementary_hours').status).toBe(status);
+  });
+
+  it.each([
+    [2, 'depends_on_agreement'],
+    [3, 'within_limit'],
+  ])('%s days of notice is %s, and the percent still counts', (days, status) => {
+    expect(findingFor(pact(20, days), 'complementary_hours').status).toBe(status);
+  });
+
+  it('without a notice agreed, only the percent is read', () => {
+    expect(findingFor(pact(20, null), 'complementary_hours').calculation).toEqual([
+      phrase('part_time.complementary_percent', { percent: 20, cap: 30, agreementMax: 60 }),
+    ]);
+  });
+
+  it.each([
+    ['exactly ten hours', { weekly: 10, annual: null }, 'within_limit'],
+    ['no hours known', { weekly: null, annual: null }, 'within_limit'],
+    ['just under ten hours', { weekly: 9.9, annual: null }, 'clause_void'],
+  ] as const)('a pact with %s is %s', (_name, contractHours, status) => {
+    const input = partTime({ complementary: { percent: 20, noticeDays: 3 } }, { contractHours });
+    expect(findingFor(input, 'complementary_hours').status).toBe(status);
+  });
+
   it('counts the ten hours over the year when only yearly hours are known', () => {
     // 500 hours a year are 9.59 a week.
     const input = partTime(
@@ -126,17 +165,59 @@ describe('voluntary complementary hours (art. 12.5.g ET)', () => {
     expect(offered(35).status).toBe('over_legal_limit');
   });
 
+  const says = phrase('part_time.voluntary_percent', { percent: 10, cap: 15, agreementMax: 30 });
+
   it('in a fixed-term contract they are void', () => {
     expect(
       offered(10, {
         modality: 'production',
         startDate: parseDate('2026-01-01'),
         endDate: parseDate('2026-05-31'),
-      }).status,
-    ).toBe('clause_void');
+      }),
+    ).toMatchObject({
+      status: 'clause_void',
+      calculation: [
+        says,
+        phrase('part_time.voluntary_needs_open_ended'),
+        phrase('clause.partial_nullity'),
+      ],
+    });
   });
 
   it('with an unknown modality they are to review', () => {
-    expect(offered(10, { modality: 'unknown' }).status).toBe('review_it');
+    expect(offered(10, { modality: 'unknown' })).toMatchObject({
+      status: 'review_it',
+      calculation: [says, phrase('part_time.voluntary_needs_open_ended')],
+    });
+  });
+
+  it.each([
+    [15, 'within_limit'],
+    [16, 'depends_on_agreement'],
+    [30, 'depends_on_agreement'],
+    [31, 'over_legal_limit'],
+  ])('%s %% in an open-ended contract is %s', (percent, status) => {
+    expect(offered(percent).status).toBe(status);
+  });
+
+  it('under ten hours a week they are void', () => {
+    expect(offered(10, { contractHours: { weekly: 8, annual: null } })).toMatchObject({
+      status: 'clause_void',
+      calculation: [
+        says,
+        phrase('part_time.complementary_under_10_hours', { hours: 8 }),
+        phrase('clause.partial_nullity'),
+      ],
+    });
+  });
+
+  it.each([
+    ['exactly ten hours', { weekly: 10, annual: null }],
+    ['no hours known', { weekly: null, annual: null }],
+  ])('with %s they are read against the percent alone', (_name, contractHours) => {
+    expect(offered(10, { contractHours })).toMatchObject({
+      status: 'within_limit',
+      calculation: [says],
+    });
   });
 });

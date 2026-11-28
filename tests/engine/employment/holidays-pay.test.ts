@@ -63,10 +63,45 @@ describe('holidays (art. 38.1 ET)', () => {
     expect(finding.calculation[0]).toEqual(phrase('holidays.working_days', { days: { days: 22 } }));
   });
 
-  it('thirty working days cover thirty calendar ones', () => {
-    expect(findingFor(holidays({ days: 30, unit: 'working' }), 'holidays_30').status).toBe(
-      'within_limit',
-    );
+  it.each([30, 31])('%s working days cover thirty calendar ones, whatever the week', (days) => {
+    expect(
+      findingFor(holidays({ days, unit: 'working', workDaysPerWeek: null }), 'holidays_30'),
+    ).toMatchObject({
+      status: 'within_limit',
+      calculation: [phrase('holidays.working_days', { days: { days } })],
+    });
+  });
+
+  it('29 working days in a six-day week reach the usual equivalence of 26', () => {
+    expect(
+      findingFor(holidays({ days: 26, unit: 'working', workDaysPerWeek: 6 }), 'holidays_30'),
+    ).toMatchObject({
+      status: 'within_limit',
+      calculation: [
+        phrase('holidays.working_days_equivalent', {
+          days: { days: 26 },
+          week: { integer: 6 },
+          calendar: { days: 30 },
+        }),
+        phrase('holidays.usual_equivalence', { minimum: { days: 26 } }),
+      ],
+    });
+  });
+
+  it('25 calendar days with the agreement above say both figures', () => {
+    const agreement = { ...contract().agreement, holidayDays: 32 };
+    expect(findingFor({ ...holidays({}), agreement }, 'holidays_30').calculation).toEqual([
+      phrase('holidays.calendar_days', { days: { days: 30 } }),
+      phrase('holidays.under_your_agreement', { agreed: { days: 32 } }),
+    ]);
+  });
+
+  it.each([null, 30, 25])('an agreement of %s days does not raise the thirty', (holidayDays) => {
+    const agreement = { ...contract().agreement, holidayDays };
+    expect(findingFor({ ...holidays({}), agreement }, 'holidays_30')).toMatchObject({
+      status: 'within_limit',
+      calculation: [phrase('holidays.calendar_days', { days: { days: 30 } })],
+    });
   });
 
   it('25 calendar days are below the minimum', () => {
@@ -106,6 +141,21 @@ describe('holidays (art. 38.1 ET)', () => {
     expect(finding.sources.map((s) => s.id)).toEqual([
       'holidays_not_paid_out',
       'smi_temporary_120',
+    ]);
+  });
+
+  it('a fixed-term contract of 120 days is still to review', () => {
+    const finding = findingFor(
+      {
+        ...holidays({ includedInSalary: true }),
+        modality: 'production',
+        startDate: parseDate('2026-03-01'),
+        endDate: parseDate('2026-06-28'),
+      },
+      'holidays_not_paid_out',
+    );
+    expect(finding.calculation).toEqual([
+      phrase('holidays.short_temporary_exception', { days: { days: 120 } }),
     ]);
   });
 
@@ -249,6 +299,49 @@ describe('holidays (art. 38.1 ET)', () => {
           }),
         ],
       });
+    });
+
+    it.each([
+      ['a known modality', 'production' as const, 'review_it', 'holidays.may_be_annual'],
+      ['an unknown modality', 'unknown' as const, 'review_it', 'holidays.may_be_annual'],
+    ])('a figure of exactly the agreement prorated, with %s', (_name, modality, status, key) => {
+      const agreement = { ...contract().agreement, holidayDays: 35 };
+      const finding = findingFor(
+        { ...hundredDays, modality, agreement, ...holidays({ days: 9.59 }) },
+        'holidays_30',
+      );
+      expect(finding.status).toBe(status);
+      expect(finding.calculation.map((p) => p.key)).toContain(key);
+    });
+
+    it('an unknown modality never rests on an agreement above thirty', () => {
+      const agreement = { ...contract().agreement, holidayDays: 35 };
+      expect(
+        findingFor(
+          { ...hundredDays, modality: 'unknown', agreement, ...holidays({ days: 8.22 }) },
+          'holidays_30',
+        ),
+      ).toMatchObject({
+        status: 'review_it',
+        basedOnYourAnswer: false,
+        calculation: [
+          phrase('holidays.calendar_days', { days: { days: 8.22 } }),
+          phrase('holidays.prorated_entitlement', {
+            span: { days: 100 },
+            entitled: { days: 8.22 },
+          }),
+          phrase('holidays.prorated_if_temporary'),
+        ],
+      });
+    });
+
+    it('the prorated figure exactly is within the limit', () => {
+      expect(
+        findingFor(
+          { ...hundredDays, modality: 'production', ...holidays({ days: 8.22 }) },
+          'holidays_30',
+        ).status,
+      ).toBe('within_limit');
     });
 
     it('an agreement whose prorated part the figure covers leaves it within the limit', () => {
@@ -495,6 +588,26 @@ describe('extra payments (art. 31 ET)', () => {
     extraPays: { count: 0, prorated: false },
   });
 
+  it('the extra pays of every case cite the yearly minimum wage when they compare with it', () => {
+    const cites = (change: Partial<EmploymentInput>) =>
+      findingFor(change, 'extra_pays').sources.map((s) => s.id);
+    expect(cites({ extraPays: { count: 0, prorated: false } })).toEqual([
+      'extra_pays',
+      'smi_annual',
+    ]);
+    expect(cites(twelve(1500))).toEqual(['extra_pays', 'smi_annual']);
+    expect(cites(twelve(1400))).toEqual(['extra_pays', 'smi_annual']);
+  });
+
+  it('a yearly pay exactly at the minimum is not under it', () => {
+    // 1.424,50 € × 12 = 17.094 €, the minimum of 2026.
+    const f = findingFor({ ...twelve(1424.5) }, 'extra_pays');
+    expect(f.calculation.map((p) => p.key)).toEqual([
+      'extra_pays.count',
+      'extra_pays.none_over_minimum',
+    ]);
+  });
+
   it('no payment with 1.500 € × 12 over the minimum depends on the agreement', () => {
     const f = findingFor(twelve(1500), 'extra_pays');
     expect(f).toMatchObject({
@@ -541,9 +654,10 @@ describe('extra payments (art. 31 ET)', () => {
   });
 
   it('proration is for the agreement to allow', () => {
-    expect(findingFor({ extraPays: { count: 2, prorated: true } }, 'extra_pays').status).toBe(
-      'depends_on_agreement',
-    );
+    expect(findingFor({ extraPays: { count: 2, prorated: true } }, 'extra_pays')).toMatchObject({
+      status: 'depends_on_agreement',
+      calculation: [phrase('extra_pays.prorated_by_agreement')],
+    });
   });
 
   it('not entered', () => {
@@ -603,6 +717,34 @@ describe('extra payments (art. 31 ET)', () => {
       ],
     });
     expect(offerPass([{ kind: 'single', finding: f }])).toBe(false);
+  });
+
+  it('a permanent contract with an end date has no daily minimum to hold its extra pays', () => {
+    const f = findingFor(
+      {
+        modality: 'permanent',
+        startDate: START,
+        endDate: lasting(60),
+        salary: dayRate,
+        extraPays: { count: 0, prorated: false },
+      },
+      'extra_pays',
+    );
+    expect(f.calculation.map((p) => p.key)).not.toContain('extra_pays.in_daily_minimum');
+  });
+
+  it('a fixed-term contract without an end date has no daily minimum to hold them either', () => {
+    const f = findingFor(
+      {
+        modality: 'eventual',
+        startDate: START,
+        endDate: null,
+        salary: dayRate,
+        extraPays: { count: 0, prorated: false },
+      },
+      'extra_pays',
+    );
+    expect(f.calculation.map((p) => p.key)).not.toContain('extra_pays.in_daily_minimum');
   });
 
   it('from 121 days, in either pay form, the agreement decides once the year reaches the minimum', () => {

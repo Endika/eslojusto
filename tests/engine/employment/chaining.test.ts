@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseDate } from '../../../src/engine/date';
+import { addDays, parseDate, toIso } from '../../../src/engine/date';
 import { reviewChaining } from '../../../src/engine/employment/chaining';
 import { EMPLOYMENT_NORMS } from '../../../src/engine/employment/data/norms';
 import type { NormTable } from '../../../src/engine/employment/norms';
@@ -342,5 +342,333 @@ describe('reviewChaining', () => {
   it('a contract concluded before the reform is not reviewed in this version', () => {
     const f = only(review(chained(['2022-02-01', '2022-07-31'], [])));
     expect(f.status).toBe('not_reviewed_in_this_version');
+    expect(f.calculation).toEqual([{ key: 'modality.before_reform' }]);
+  });
+});
+
+describe('reviewChaining in detail', () => {
+  const figures = (assessed: Assessed) => {
+    const f = only(assessed);
+    return f.calculation[0]?.vars;
+  };
+  const replacement = (start: string, end: string, history: EmploymentPeriod[]) =>
+    chained([start, end], history, { modality: 'replacement' });
+
+  it.each([
+    ['starts three days later', '2024-01-04', '2025-07-31'],
+    ['ends three days earlier', '2024-01-01', '2025-07-28'],
+  ])('a history period that %s than the current contract is the same contract', (_, start, end) => {
+    const f = only(review(chained(['2024-01-01', '2025-07-31'], [period(start, end)])));
+    expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 1 });
+  });
+
+  it.each([
+    ['starts four days later', '2024-01-05', '2025-07-31'],
+    ['ends four days earlier', '2024-01-01', '2025-07-27'],
+  ])('a history period that %s than the current contract is not', (_, start, end) => {
+    const assessed = review(chained(['2024-01-01', '2025-07-31'], [period(start, end)]));
+    expect(assessed.kind === 'readings' && assessed.question).toBe('chaining_overlap');
+  });
+
+  it('a history period that starts with the current contract but ends sooner is another contract', () => {
+    const assessed = review(
+      chained(['2024-01-01', '2025-08-31'], [period('2024-01-01', '2024-03-31')]),
+    );
+    expect(assessed.kind === 'readings' && assessed.question).toBe('chaining_overlap');
+  });
+
+  it('a history period that ends with the current contract but starts later is another contract', () => {
+    const assessed = review(
+      chained(['2024-01-01', '2025-08-31'], [period('2025-06-01', '2025-08-31')]),
+    );
+    expect(assessed.kind === 'readings' && assessed.question).toBe('chaining_overlap');
+  });
+
+  it('a row of another company is not a row left out for its unknown kind', () => {
+    const f = only(
+      review(
+        chained(
+          ['2025-01-01', '2025-06-30'],
+          [period('2023-01-01', '2023-06-30', { employer: 'other', kind: 'unknown' })],
+        ),
+      ),
+    );
+    expect(f.calculation.map((p) => p.key)).toEqual(['chaining.within']);
+  });
+
+  it('reads the history in whatever order it comes', () => {
+    const a = period('2024-01-01', '2024-06-30');
+    const b = period('2024-03-01', '2025-08-31');
+    const input = (history: EmploymentPeriod[]) => chained(['2026-01-01', '2026-02-28'], history);
+    expect(review(input([b, a]))).toEqual(review(input([a, b])));
+  });
+
+  it('only the contracts up to today count, and the one running is cut at today', () => {
+    // Today is 2026-10-07: the row from 2026-10-08 is yet to come.
+    const future = period('2026-10-08', '2027-12-31');
+    const running = period('2026-10-07', '2027-12-31');
+    const input = chained(['2025-04-01', '2025-09-30'], [future, running]);
+    expect(figures(review(input))).toMatchObject({
+      dias: { integer: 1 + 183 },
+      contratos: { integer: 2 },
+    });
+  });
+
+  it('a contract that is not production is read against the history around it', () => {
+    // A replacement contract in the middle: the production rows before and after are two contracts.
+    const input = replacement('2025-07-01', '2025-07-31', [
+      period('2025-01-01', '2025-06-30'),
+      period('2025-09-01', '2025-12-31'),
+    ]);
+    expect(figures(review(input))).toMatchObject({
+      dias: { integer: 181 + 122 },
+      contratos: { integer: 2 },
+    });
+  });
+
+  it('a production row touching a contract that is not production is part of it', () => {
+    const input = replacement('2025-07-01', '2025-07-31', [period('2025-01-01', '2025-07-01')]);
+    expect(figures(review(input))).toMatchObject({
+      dias: { integer: 0 },
+      contratos: { integer: 0 },
+    });
+  });
+
+  it('a contract that ended on the first cutoff was in force on it, and not on the second', () => {
+    const assessed = review(
+      chained(['2022-04-01', '2023-08-31'], [period('2021-04-01', '2021-12-31')]),
+    );
+    const readings = assessed.kind === 'readings' ? assessed.readings : [];
+    expect(readings.map((r) => [r.when, r.finding.calculation[0]?.vars?.contratos])).toEqual([
+      ['cutoff_2021_12_31', { integer: 2 }],
+      ['cutoff_2022_03_30', { integer: 1 }],
+    ]);
+  });
+
+  it('a contract that ended on the second cutoff was in force on both', () => {
+    const f = only(
+      review(chained(['2022-04-01', '2023-08-31'], [period('2021-04-01', '2022-03-30')])),
+    );
+    expect(f.status).toBe('becomes_permanent');
+    expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 2 });
+  });
+});
+
+describe('reviewChaining on histories where the details decide', () => {
+  type Row = [string, string, EmploymentPeriod['employer'], EmploymentPeriod['kind']];
+  const integerOf = (figure: unknown): number | undefined =>
+    typeof figure === 'object' &&
+    figure !== null &&
+    'integer' in figure &&
+    typeof figure.integer === 'number'
+      ? figure.integer
+      : undefined;
+  // [key, days, limit, contracts] of one phrase, null where it carries no figure.
+  const phraseOf = (key: string, days?: number, limit?: number, contracts?: number) => [
+    key,
+    days ?? null,
+    limit ?? null,
+    contracts ?? null,
+  ];
+  const figure = (finding: Finding) => [
+    finding.status,
+    ...finding.calculation.map((p) =>
+      phraseOf(
+        p.key,
+        integerOf(p.vars?.dias),
+        integerOf(p.vars?.limite),
+        integerOf(p.vars?.contratos),
+      ),
+    ),
+  ];
+  const summary = (assessed: Assessed) =>
+    assessed.kind === 'single'
+      ? ['single', figure(assessed.finding)]
+      : [
+          'readings',
+          assessed.question,
+          ...assessed.readings.map((r) => [r.when, figure(r.finding)]),
+        ];
+  const rows = (history: Row[]) =>
+    history.map(([start, end, employer, kind]) => period(start, end, { employer, kind }));
+  const unknownLeftOut = phraseOf('chaining.kind_unknown_not_counted', undefined, undefined, 1);
+  const groupDoubt = phraseOf('chaining.depends_on_group');
+  const overlapDoubt = phraseOf('chaining.depends_on_overlap');
+
+  it.each<[string, [string, string | null], Row[], Partial<EmploymentInput>, unknown]>([
+    [
+      'group and agency placements that decide, an unknown row left out',
+      ['2022-08-05', null],
+      [
+        ['2022-08-09', '2023-03-05', 'same_group', 'production'],
+        ['2022-08-06', '2023-03-05', 'same_via_agency', 'production'],
+        ['2022-08-05', '2023-03-06', 'same', 'production'],
+        ['2024-05-17', '2024-09-21', 'same', 'unknown'],
+      ],
+      { modality: 'eventual', historyIncomplete: true },
+      [
+        'readings',
+        'chaining_group',
+        [
+          'group_counted',
+          ['review_it', phraseOf('chaining.exceeds', 731, 549, 3), groupDoubt, unknownLeftOut],
+        ],
+        [
+          'group_not_counted',
+          [
+            'review_it',
+            phraseOf('chaining.exceeds', 731, 549, 2),
+            groupDoubt,
+            overlapDoubt,
+            unknownLeftOut,
+          ],
+        ],
+      ],
+    ],
+    [
+      'only the contracts of the company up to today, in force on each cutoff',
+      ['2023-05-06', '2023-06-14'],
+      [
+        ['2025-12-26', '2025-12-26', 'same', 'unknown'],
+        ['2021-08-14', '2022-03-25', 'same', 'production'],
+        ['2026-01-11', '2026-02-14', 'same_via_agency', 'production'],
+        ['2023-05-04', '2023-06-10', 'other', 'replacement'],
+      ],
+      {},
+      [
+        'readings',
+        'chaining_cutoff',
+        [
+          'cutoff_2021_12_31',
+          [
+            'within_limit',
+            phraseOf('chaining.within', 264, 548, 2),
+            phraseOf('chaining.same_group_not_counted', undefined, undefined, 1),
+            unknownLeftOut,
+          ],
+        ],
+        [
+          'cutoff_2022_03_30',
+          [
+            'within_limit',
+            phraseOf('chaining.within', 40, 550, 1),
+            phraseOf('chaining.same_group_not_counted', undefined, undefined, 1),
+            unknownLeftOut,
+          ],
+        ],
+      ],
+    ],
+    [
+      'a group contract that is the doubt, from a replacement contract',
+      ['2022-04-24', '2022-12-14'],
+      [
+        ['2021-04-10', '2022-08-31', 'same', 'production'],
+        ['2023-01-12', '2024-06-05', 'same_group', 'production'],
+      ],
+      { modality: 'replacement' },
+      [
+        'readings',
+        'chaining_group',
+        [
+          'group_counted',
+          ['review_it', phraseOf('chaining.exceeds', 598, 548, 2), groupDoubt, overlapDoubt],
+        ],
+        ['group_not_counted', ['within_limit', phraseOf('chaining.within', 509, 548, 1)]],
+      ],
+    ],
+    [
+      'group placements and a contract still to start, which count for nothing',
+      ['2025-09-25', null],
+      [
+        ['2025-06-20', '2025-08-01', 'same_group', 'production'],
+        ['2025-09-29', '2026-05-07', 'same', 'production'],
+        ['2026-04-14', '2027-09-09', 'same_group', 'production'],
+      ],
+      {},
+      [
+        'single',
+        [
+          'within_limit',
+          phraseOf('chaining.within', 378, 546, 1),
+          phraseOf('chaining.same_group_not_counted', undefined, undefined, 2),
+        ],
+      ],
+    ],
+    [
+      'a row that overlaps the current contract by a day',
+      ['2023-10-23', null],
+      [['2023-10-22', '2024-10-23', 'same', 'production']],
+      { modality: 'eventual' },
+      [
+        'readings',
+        'chaining_overlap',
+        ['overlap_same_contract', ['within_limit', phraseOf('chaining.within', 731, 548, 1)]],
+        [
+          'overlap_separate_contracts',
+          ['review_it', phraseOf('chaining.exceeds', 731, 548, 2), overlapDoubt],
+        ],
+      ],
+    ],
+    [
+      'a contract still to start, beside the one that ended',
+      ['2025-08-15', '2025-09-05'],
+      [
+        ['2025-10-05', '2026-03-21', 'same', 'production'],
+        ['2026-12-04', '2027-08-09', 'same', 'production'],
+      ],
+      {},
+      ['single', ['within_limit', phraseOf('chaining.within', 190, 549, 2)]],
+    ],
+    [
+      'rows that overlap and a group placement that overlaps them',
+      ['2025-03-28', null],
+      [
+        ['2024-11-11', '2025-10-20', 'same', 'production'],
+        ['2025-01-18', '2025-11-14', 'same_group', 'production'],
+      ],
+      {},
+      [
+        'readings',
+        'chaining_group',
+        ['group_counted', ['review_it', phraseOf('chaining.exceeds', 696, 546, 2), groupDoubt]],
+        [
+          'group_not_counted',
+          ['review_it', phraseOf('chaining.exceeds', 696, 546, 2), groupDoubt, overlapDoubt],
+        ],
+      ],
+    ],
+  ])('%s', (_name, current, history, change, expected) => {
+    expect(summary(review(chained(current, rows(history), change)))).toEqual(expected);
+  });
+
+  it('two periods of the company that start the same day are one contract, even a one-day one', () => {
+    const assessed = review(
+      chained(
+        ['2025-03-01', '2025-09-30'],
+        rows([
+          ['2024-01-01', '2024-06-30', 'same', 'production'],
+          ['2024-01-01', '2024-01-01', 'same', 'production'],
+        ]),
+      ),
+    );
+    expect(summary(assessed)).toEqual([
+      'single',
+      ['within_limit', phraseOf('chaining.within', 396, 547, 2)],
+    ]);
+  });
+
+  it.each([
+    [177, 'within_limit', 'chaining.within'],
+    [178, 'review_it', 'chaining.near_limit'],
+    [184, 'review_it', 'chaining.near_limit'],
+    [185, 'becomes_permanent', 'chaining.exceeds'],
+  ])('a second contract of %s days, three days either side of 546, is %s', (days, status, key) => {
+    const start = parseDate('2026-01-01');
+    const input = chained(
+      ['2026-01-01', toIso(addDays(start, days - 1))],
+      [period('2025-01-01', '2025-12-31')],
+    );
+    const f = only(review(input));
+    expect([f.status, f.calculation[0]?.key]).toEqual([status, key]);
   });
 });

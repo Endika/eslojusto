@@ -52,9 +52,48 @@ describe('weekly schedule geometry', () => {
     ]);
   });
 
-  it('a gap under fifteen minutes does not break the stretch', () => {
-    const week = workWeek(every([1], ['08:00', '12:00'], ['12:10', '15:00']));
-    expect(week.days[0]?.longestStretch).toBe(7 * 60);
+  it.each([
+    ['12:10', 7 * 60],
+    ['12:14', 7 * 60],
+    ['12:15', 4 * 60],
+  ])('a second slot from %s: the longest stretch is %s minutes', (from, stretch) => {
+    const week = workWeek(every([1], ['08:00', '12:00'], [from, '15:00']));
+    expect(week.days[0]?.longestStretch).toBe(stretch);
+  });
+
+  it('the slots of a day are read in time order, whatever order they are given in', () => {
+    const week = workWeek(every([1], ['14:00', '18:00'], ['08:00', '10:30'], ['11:00', '13:00']));
+    expect(week.days[0]).toMatchObject({ start: 480, end: 1080, minutes: 4 * 60 + 150 + 120 });
+  });
+
+  it('the days are read in week order, whatever order they are given in', () => {
+    const week = workWeek([...every([3], ['09:00', '17:00']), ...every([1], ['09:00', '17:00'])]);
+    expect(week.days.map((d) => d.day)).toEqual([1, 3]);
+    expect(week.rests).toEqual([40 * 60, (4 * 24 + 16) * 60]);
+  });
+
+  it('a day with no slots is not a working day', () => {
+    const week = workWeek([{ day: 2, slots: [] }, ...every([1], ['09:00', '17:00'])]);
+    expect(week.days.map((d) => d.day)).toEqual([1]);
+  });
+
+  it('a slot ending where it starts runs the whole day', () => {
+    expect(workWeek(every([1], ['09:00', '09:00'])).days[0]?.minutes).toBe(24 * 60);
+  });
+
+  it('minutes count as minutes', () => {
+    expect(workWeek(every([1], ['08:30', '12:15'])).days[0]).toMatchObject({
+      start: 8 * 60 + 30,
+      minutes: 3 * 60 + 45,
+    });
+  });
+
+  it('the small hours belong to the night that began the day before', () => {
+    expect(workWeek(every([2], ['02:00', '05:00'])).days[0]?.nightMinutes).toBe(180);
+  });
+
+  it('a single working day rests until the same day next week', () => {
+    expect(workWeek(every([1], ['09:00', '17:00'])).rests).toEqual([7 * 24 * 60 - 8 * 60]);
   });
 });
 
@@ -108,7 +147,93 @@ describe('weekly hours (art. 34.1 ET)', () => {
   });
 });
 
+describe('weekly hours, exactly', () => {
+  const schedule = every(WEEKDAYS, ['08:00', '12:00'], ['13:00', '17:00']);
+
+  it('40 scheduled hours say so, and cite no special regime', () => {
+    const finding = findingFor({ schedule }, 'weekly_40');
+    expect(finding.calculation).toEqual([
+      phrase('working_time.weekly_hours_scheduled', { hours: 40 }),
+    ]);
+    expect(finding.sources.map((s) => s.id)).toEqual(['weekly_40']);
+  });
+
+  it('the schedule is read before the agreed hours when both are within the limit', () => {
+    expect(
+      findingFor({ schedule, contractHours: { weekly: 38, annual: null } }, 'weekly_40')
+        .calculation,
+    ).toEqual([phrase('working_time.weekly_hours_scheduled', { hours: 40 })]);
+  });
+
+  it('40 agreed hours without a schedule are within the limit', () => {
+    expect(
+      findingFor({ schedule: null, contractHours: { weekly: 40, annual: null } }, 'weekly_40'),
+    ).toMatchObject({
+      status: 'within_limit',
+      calculation: [phrase('working_time.weekly_hours_agreed', { hours: 40 })],
+    });
+  });
+
+  it('a schedule of days without slots is no schedule', () => {
+    expect(
+      findings({
+        schedule: [{ day: 1, slots: [] }],
+        contractHours: { weekly: 38, annual: null },
+      }).map((f) => f.id),
+    ).toEqual(['weekly_40']);
+  });
+});
+
 describe('daily hours, rests and breaks', () => {
+  it('reports the longest day, the first one on a tie', () => {
+    const schedule = [
+      ...every([1], ['08:00', '16:00']),
+      ...every([2, 3], ['08:00', '18:00']),
+      ...every([4], ['08:00', '17:00']),
+    ];
+    expect(findingFor({ schedule }, 'daily_9').calculation).toEqual([
+      phrase('working_time.longest_day', { day: { integer: 2 }, hours: 10 }),
+    ]);
+  });
+
+  it('nine hours exactly is within the limit', () => {
+    expect(findingFor({ schedule: every([1], ['08:00', '17:00']) }, 'daily_9').status).toBe(
+      'within_limit',
+    );
+  });
+
+  it('twelve hours between shifts exactly is within the rest', () => {
+    const schedule = [...every([1], ['08:00', '16:00']), ...every([2], ['04:00', '12:00'])];
+    const finding = findingFor({ schedule, shifts: true }, 'rest_12');
+    expect(finding.status).toBe('within_limit');
+    expect(finding.calculation).toEqual([phrase('working_time.shortest_rest', { hours: 12 })]);
+    expect(finding.sources.map((s) => s.id)).toEqual(['rest_12']);
+  });
+
+  it('a weekly rest of 36 hours exactly is within the rest', () => {
+    const schedule = every([1, 2, 3, 4, 5, 6], ['08:00', '20:00']);
+    const finding = findingFor({ schedule }, 'weekly_rest_36');
+    expect(finding.status).toBe('within_limit');
+    expect(finding.calculation).toEqual([phrase('working_time.longest_rest', { hours: 36 })]);
+    expect(finding.sources.map((s) => s.id)).toEqual(['weekly_rest_36']);
+  });
+
+  it('a short weekly rest cites the special regimes', () => {
+    const schedule = every([1, 2, 3, 4, 5, 6, 7], ['08:00', '16:00']);
+    expect(findingFor({ schedule }, 'weekly_rest_36').sources.map((s) => s.id)).toEqual([
+      'weekly_rest_36',
+      'special_working_time',
+    ]);
+  });
+
+  it('the break is read against the longest stretch of any day', () => {
+    const schedule = [...every([1], ['08:00', '15:00']), ...every([2], ['08:00', '12:00'])];
+    expect(findingFor({ schedule }, 'break_15')).toMatchObject({
+      status: 'missing_requirement',
+      calculation: [phrase('working_time.longest_stretch', { hours: 7 })],
+    });
+  });
+
   it('a ten-hour day depends on the agreement', () => {
     const schedule = every([1], ['08:00', '13:00'], ['14:00', '19:00']);
     const finding = findingFor({ schedule }, 'daily_9');
@@ -197,6 +322,60 @@ describe('night work (art. 36.1 ET)', () => {
     });
   });
 
+  it('a night worker by answer reads only the limits, with no note about the schedule', () => {
+    const finding = findingFor({ schedule: nights, nightWorker: true }, 'night_limits');
+    expect(finding.calculation).toEqual([
+      phrase('working_time.night_average', { hours: 9 }),
+      phrase('working_time.special_regimes'),
+    ]);
+    expect(finding.sources.map((s) => s.id)).toEqual(['night_limits', 'special_working_time']);
+  });
+
+  it('within the limits it cites no special regime', () => {
+    const schedule = every(WEEKDAYS, ['22:00', '06:00']);
+    expect(findingFor({ schedule, nightWorker: true }, 'night_limits')).toMatchObject({
+      status: 'within_limit',
+      calculation: [],
+    });
+    expect(
+      findingFor({ schedule, nightWorker: true }, 'night_limits').sources.map((s) => s.id),
+    ).toEqual(['night_limits']);
+  });
+
+  it('counts only the days with three night hours, three exactly included', () => {
+    const schedule = [
+      ...every([1], ['22:00', '01:00']),
+      ...every([2], ['22:00', '00:59']),
+      ...every([3], ['09:00', '17:00']),
+    ];
+    expect(findingFor({ schedule, nightWorker: null }, 'night_limits').calculation).toEqual([
+      phrase('working_time.night_hours_in_schedule', { days: { integer: 1 } }),
+    ]);
+  });
+
+  it('«No lo sé» with no night hours in the schedule has no night finding', () => {
+    const schedule = every(WEEKDAYS, ['08:00', '16:00']);
+    expect(findings({ schedule, nightWorker: null }).map((f) => f.id)).not.toContain(
+      'night_limits',
+    );
+  });
+
+  it('«No lo sé» without a schedule has no night finding, even with an overtime pact', () => {
+    expect(
+      findings({
+        schedule: null,
+        nightWorker: null,
+        overtimeAgreed: { hoursPerYear: 20, paidInMoney: null },
+      }).map((f) => f.id),
+    ).not.toContain('night_limits');
+  });
+
+  it('a night worker with no schedule and nothing else to check has no finding', () => {
+    expect(findings({ schedule: null, nightWorker: true }).map((f) => f.id)).not.toContain(
+      'night_limits',
+    );
+  });
+
   it('not a night worker, no night finding', () => {
     expect(findings({ schedule: nights, nightWorker: false }).map((f) => f.id)).not.toContain(
       'night_limits',
@@ -215,6 +394,27 @@ describe('overtime pacts (art. 35 ET)', () => {
     const finding = pact({ overtimeAgreed: { hoursPerYear: 'as_needed', paidInMoney: true } });
     expect(finding).toMatchObject({ id: 'overtime_cap_80', status: 'review_it' });
     expect(offerPass([{ kind: 'single', finding }])).toBe(false);
+  });
+
+  it('«as needed» says its cap and cites the voluntary overtime', () => {
+    const finding = pact({ overtimeAgreed: { hoursPerYear: 'as_needed', paidInMoney: true } });
+    expect(finding.calculation).toEqual([phrase('working_time.overtime_as_needed', { cap: 80 })]);
+    expect(finding.sources.map((s) => s.id)).toEqual(['overtime_cap_80', 'overtime_voluntary']);
+  });
+
+  it('exactly 80 hours a year is within the cap, and so is any number without a weekly figure', () => {
+    const within = pact({ overtimeAgreed: { hoursPerYear: 80, paidInMoney: true } });
+    expect(within).toMatchObject({
+      status: 'within_limit',
+      calculation: [phrase('working_time.overtime_hours', { hours: 80, cap: 80 })],
+    });
+    expect(within.sources.map((s) => s.id)).toEqual(['overtime_cap_80', 'overtime_voluntary']);
+    expect(
+      pact({
+        contractHours: { weekly: null, annual: 1800 },
+        overtimeAgreed: { hoursPerYear: 70, paidInMoney: true },
+      }).status,
+    ).toBe('within_limit');
   });
 
   it('100 hours a year paid in money is over the cap, 60 within it', () => {
@@ -269,6 +469,10 @@ describe('overtime pacts (art. 35 ET)', () => {
   ] as const)('a pact in %s is void', (_, change, id) => {
     const finding = pact({ ...change, overtimeAgreed: { hoursPerYear: 10, paidInMoney: null } });
     expect(finding).toMatchObject({ id, status: 'clause_void' });
+    expect(finding.calculation).toEqual([
+      phrase('working_time.overtime_not_allowed'),
+      phrase('clause.partial_nullity'),
+    ]);
     expect(finding.sources.map((s) => s.id)).toContain('partial_nullity');
   });
 

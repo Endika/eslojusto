@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import { EMPLOYMENT_NORMS } from '../../../src/engine/employment/data/norms';
+import { phrase } from '../../../src/engine/employment/calculation';
 import { reviewModality } from '../../../src/engine/employment/modality';
 import type { NormTable } from '../../../src/engine/employment/norms';
 import { LAW_QUOTES } from '../../../src/engine/employment/quotes';
@@ -488,5 +489,494 @@ describe('temporality copy', () => {
     for (const asserted of [/eres fij[oa]/, /te convierte/, /pasas a ser/, /ya eres/]) {
       expect(text).not.toMatch(asserted);
     }
+  });
+});
+
+describe('reviewModality: what each finding says', () => {
+  const anyTraining = (change: Partial<NonNullable<EmploymentInput['training']>> = {}) => ({
+    studiesEndedOn: null,
+    disability: null,
+    planAttached: null,
+    effectiveWorkPercent: { year1: null, year2: null },
+    ...change,
+  });
+  const says = (f: Finding) => [f.status, keys(f), f.basedOnYourAnswer];
+
+  it.each([
+    ['a cause not written', { causeStated: false }, 'review_it', ['modality.cause_missing'], true],
+    [
+      'circumstances not written',
+      { circumstancesStated: false },
+      'review_it',
+      ['modality.cause_missing'],
+      true,
+    ],
+    ['a cause not known', { causeStated: null }, 'not_entered', ['modality.cause_unknown'], false],
+    [
+      'circumstances not known',
+      { circumstancesStated: null },
+      'not_entered',
+      ['modality.cause_unknown'],
+      false,
+    ],
+    ['both written', {}, 'within_limit', ['modality.cause_stated'], true],
+  ])('production with %s', (_name, change, status, calculation, basedOn) => {
+    expect(
+      says(byId(production('2025-01-01', '2025-05-31', change), 'fixed_term_presumption')),
+    ).toEqual([status, calculation, basedOn]);
+  });
+
+  it('production within six months says its duration and that it fits', () => {
+    expect(keys(byId(production('2025-01-01', '2025-05-31'), 'production_6_months'))).toEqual([
+      'modality.duration',
+      'modality.production_within',
+    ]);
+  });
+
+  it.each([
+    ['named and stated', {}, 'within_limit', ['modality.replacement_stated'], true],
+    [
+      'person not named',
+      { replacedPersonNamed: false },
+      'missing_requirement',
+      ['modality.replacement_missing'],
+      true,
+    ],
+    [
+      'cause not stated',
+      { replacementCauseStated: false },
+      'missing_requirement',
+      ['modality.replacement_missing'],
+      true,
+    ],
+    [
+      'person not known',
+      { replacedPersonNamed: null },
+      'not_entered',
+      ['modality.replacement_unknown'],
+      false,
+    ],
+    [
+      'cause not known',
+      { replacementCauseStated: null },
+      'not_entered',
+      ['modality.replacement_unknown'],
+      false,
+    ],
+  ])('a replacement with the person %s', (_name, change, status, calculation, basedOn) => {
+    const input = temporary('replacement', '2025-01-01', '2025-05-31', {
+      replacedPersonNamed: true,
+      replacementCauseStated: true,
+      ...change,
+    });
+    expect(says(byId(input, 'replacement_name_cause'))).toEqual([status, calculation, basedOn]);
+  });
+
+  it('a selection cover says what it fits, and that the agreement may shorten it', () => {
+    const f = byId(
+      temporary('replacement_selection', '2025-01-01', '2025-02-28'),
+      'replacement_selection_3_months',
+    );
+    expect(says(f)).toEqual([
+      'within_limit',
+      ['modality.duration', 'modality.selection_within'],
+      false,
+    ]);
+    expect(f.agreementMaySetOther).toBe(true);
+  });
+
+  it('a selection cover without an end says so', () => {
+    const f = byId(
+      temporary('replacement_selection', '2026-08-01', null),
+      'replacement_selection_3_months',
+    );
+    expect(says(f)).toEqual([
+      'not_entered',
+      ['modality.duration_so_far', 'modality.no_end_date'],
+      false,
+    ]);
+  });
+
+  it('a selection cover over three months says it makes the contract permanent', () => {
+    const f = byId(
+      temporary('replacement_selection', '2025-01-01', '2025-06-30'),
+      'replacement_selection_3_months',
+    );
+    expect(keys(f)).toEqual([
+      'modality.duration',
+      'modality.selection_over',
+      'modality.permanent_on_breach',
+    ]);
+  });
+
+  describe('occasional production', () => {
+    const occasional = (start: string, end: string | null) =>
+      byId(temporary('production_occasional', start, end), 'production_occasional_90');
+    const days = (anio: number, dias: number) =>
+      phrase('modality.occasional_days', {
+        anio: { integer: anio },
+        dias: { integer: dias },
+        limite: { integer: 90 },
+      });
+
+    it('without an end date it says so', () => {
+      const f = occasional('2026-09-01', null);
+      expect(f.status).toBe('not_entered');
+      expect(keys(f)).toEqual([
+        'modality.occasional_days',
+        'modality.no_end_date',
+        'modality.occasional_not_continuous',
+      ]);
+    });
+
+    it('reads the calendar year with the most days, the first one on a tie', () => {
+      expect(occasional('2024-11-01', '2025-01-20').calculation[0]).toEqual(days(2024, 61));
+      expect(occasional('2024-12-20', '2025-03-10').calculation[0]).toEqual(days(2025, 69));
+      expect(occasional('2024-12-27', '2025-01-05').calculation[0]).toEqual(days(2024, 5));
+    });
+
+    it('reads a year in the middle of a long contract', () => {
+      const f = byId(
+        temporary('production_occasional', '2023-12-01', '2025-02-10'),
+        'production_occasional_90',
+      );
+      expect(f.calculation[0]).toEqual(
+        phrase('modality.occasional_days', {
+          anio: { integer: 2024 },
+          dias: { integer: 366 },
+          limite: { integer: 90 },
+        }),
+      );
+    });
+  });
+
+  describe('training', () => {
+    const limits = { minimo: { integer: 3 }, maximo: { integer: 24 } };
+    const alternance = (end: string | null, change: Partial<EmploymentInput> = {}) =>
+      temporary('training_alternance', '2025-09-01', end, change);
+
+    it('says its limits when within them, and when over the maximum', () => {
+      expect(says(byId(alternance('2026-08-31'), 'training_alternance_duration'))).toEqual([
+        'within_limit',
+        ['modality.duration', 'modality.training_within'],
+        false,
+      ]);
+      expect(byId(alternance('2026-08-31'), 'training_alternance_duration').calculation[1]).toEqual(
+        phrase('modality.training_within', limits),
+      );
+      expect(byId(alternance('2027-09-01'), 'training_alternance_duration').calculation).toEqual([
+        phrase('modality.duration', { meses: { integer: 24 }, dias: { integer: 1 } }),
+        phrase('modality.training_too_long', limits),
+        phrase('modality.training_max_disability'),
+      ]);
+    });
+
+    it('without an end date it says so, and never that it is too short', () => {
+      expect(
+        says(
+          byId(
+            alternance(null, { startDate: parseDate('2026-08-01') }),
+            'training_alternance_duration',
+          ),
+        ),
+      ).toEqual(['not_entered', ['modality.duration_so_far', 'modality.no_end_date'], false]);
+    });
+
+    it.each([
+      ['no training data', null, 'not_entered', ['modality.effective_work_unknown']],
+      ['no percentages', anyTraining(), 'not_entered', ['modality.effective_work_unknown']],
+      [
+        '65 % in the first year',
+        anyTraining({ effectiveWorkPercent: { year1: 65, year2: null } }),
+        'within_limit',
+        ['modality.effective_work'],
+      ],
+      [
+        '66 % in the first year',
+        anyTraining({ effectiveWorkPercent: { year1: 66, year2: null } }),
+        'over_legal_limit',
+        ['modality.effective_work'],
+      ],
+      [
+        '85 % in the second year',
+        anyTraining({ effectiveWorkPercent: { year1: null, year2: 85 } }),
+        'within_limit',
+        ['modality.effective_work'],
+      ],
+      [
+        '86 % in the second year',
+        anyTraining({ effectiveWorkPercent: { year1: null, year2: 86 } }),
+        'over_legal_limit',
+        ['modality.effective_work'],
+      ],
+      [
+        'an excess only in the first year',
+        anyTraining({ effectiveWorkPercent: { year1: 70, year2: 80 } }),
+        'over_legal_limit',
+        ['modality.effective_work', 'modality.effective_work'],
+      ],
+      [
+        'an excess only in the second year',
+        anyTraining({ effectiveWorkPercent: { year1: 60, year2: 90 } }),
+        'over_legal_limit',
+        ['modality.effective_work', 'modality.effective_work'],
+      ],
+    ])('the effective work with %s', (_name, training, status, calculation) => {
+      const f = byId(alternance('2026-08-31', { training }), 'training_alternance_effective_work');
+      expect(f.status).toBe(status);
+      expect(keys(f)).toEqual(calculation);
+      expect(f.basedOnYourAnswer).toBe(calculation[0] === 'modality.effective_work');
+    });
+
+    it('the effective work carries the year, the percentage and the limit', () => {
+      const training = anyTraining({ effectiveWorkPercent: { year1: 60, year2: 90 } });
+      expect(
+        byId(alternance('2026-08-31', { training }), 'training_alternance_effective_work')
+          .calculation,
+      ).toEqual([
+        phrase('modality.effective_work', { anio: { integer: 1 }, porcentaje: 60, limite: 65 }),
+        phrase('modality.effective_work', { anio: { integer: 2 }, porcentaje: 90, limite: 85 }),
+      ]);
+    });
+
+    it.each([
+      ['neither shifts nor nights', { shifts: false, nightWorker: false }, false],
+      ['an unknown night work', { shifts: false, nightWorker: null }, false],
+      ['shifts', { shifts: true, nightWorker: false }, true],
+      ['night work', { shifts: false, nightWorker: true }, true],
+    ])('an alternance contract with %s', (_name, change, flagged) => {
+      const f = findings(alternance('2026-08-31', change)).find(
+        (x) => x.id === 'training_alternance_no_overtime',
+      );
+      expect(f === undefined ? null : [f.status, keys(f)]).toEqual(
+        flagged ? ['review_it', ['modality.alternance_shifts_or_night']] : null,
+      );
+    });
+
+    it.each([
+      ['not known', null, 'not_entered', 'modality.plan_unknown', false],
+      ['missing', false, 'missing_requirement', 'modality.plan_missing', true],
+      ['attached', true, 'within_limit', 'modality.plan_attached', true],
+    ])('the training plan %s', (_name, planAttached, status, key, basedOn) => {
+      const f = byId(
+        alternance('2026-08-31', { training: anyTraining({ planAttached }) }),
+        'training_plan_attached',
+      );
+      expect(says(f)).toEqual([status, [key], basedOn]);
+    });
+
+    const practice = (
+      concluded: string,
+      studiesEndedOn: string | null,
+      disability: boolean | null,
+    ) =>
+      byId(
+        temporary('training_practice', concluded, '2026-12-31', {
+          training: anyTraining({
+            studiesEndedOn: studiesEndedOn === null ? null : parseDate(studiesEndedOn),
+            disability,
+          }),
+        }),
+        'training_practice_window',
+      );
+
+    it('the studies end not known', () => {
+      expect(says(practice('2025-02-03', null, null))).toEqual([
+        'not_entered',
+        ['modality.studies_end_unknown'],
+        false,
+      ]);
+      const withoutTraining = byId(
+        temporary('training_practice', '2025-02-03', '2025-12-31'),
+        'training_practice_window',
+      );
+      expect(says(withoutTraining)).toEqual([
+        'not_entered',
+        ['modality.studies_end_unknown'],
+        false,
+      ]);
+    });
+
+    it('says the months elapsed and the limit it was read against', () => {
+      expect(practice('2025-02-03', '2023-02-03', false).calculation).toEqual([
+        phrase('modality.practice_window', { meses: { integer: 24 }, limite: { integer: 36 } }),
+      ]);
+      expect(practice('2025-02-03', '2023-02-03', false).basedOnYourAnswer).toBe(true);
+    });
+
+    it.each([
+      ['on the last day of three years', '2022-02-03', false, 'within_limit'],
+      ['a day after three years', '2022-02-02', false, 'over_legal_limit'],
+      ['on the last day of five years, with a disability', '2020-02-03', true, 'within_limit'],
+      ['a day after five years, with a disability', '2020-02-02', true, 'over_legal_limit'],
+    ])('a practice contract concluded %s', (_name, studiesEnd, disability, status) => {
+      expect(practice('2025-02-03', studiesEnd, disability).status).toBe(status);
+    });
+  });
+
+  describe('fixed-discontinuous', () => {
+    const discontinuous = (d: EmploymentInput['discontinuous']) =>
+      byId(contract({ modality: 'discontinuous', discontinuous: d }), 'discontinuous_essentials');
+
+    it.each([
+      ['nothing entered', null, 'not_entered', 'modality.discontinuous_unknown', false],
+      [
+        'the period unknown',
+        { activityPeriod: null, hours: true, distribution: true },
+        'not_entered',
+        'modality.discontinuous_unknown',
+        false,
+      ],
+      [
+        'the hours missing',
+        { activityPeriod: true, hours: false, distribution: true },
+        'missing_requirement',
+        'modality.discontinuous_missing',
+        true,
+      ],
+      [
+        'the period missing',
+        { activityPeriod: false, hours: true, distribution: true },
+        'missing_requirement',
+        'modality.discontinuous_missing',
+        true,
+      ],
+      [
+        'the distribution missing',
+        { activityPeriod: true, hours: true, distribution: false },
+        'missing_requirement',
+        'modality.discontinuous_missing',
+        true,
+      ],
+      [
+        'the distribution missing and the period unknown',
+        { activityPeriod: null, hours: true, distribution: false },
+        'missing_requirement',
+        'modality.discontinuous_missing',
+        true,
+      ],
+      [
+        'everything stated',
+        { activityPeriod: true, hours: true, distribution: true },
+        'within_limit',
+        'modality.discontinuous_stated',
+        true,
+      ],
+    ])('with %s', (_name, d, status, key, basedOn) => {
+      expect(says(discontinuous(d))).toEqual([status, [key], basedOn]);
+    });
+  });
+
+  describe('written form', () => {
+    const unwritten = (change: Partial<EmploymentInput>) =>
+      findings(contract({ writtenContract: false, ...change })).find(
+        (f) => f.id === 'written_form',
+      );
+
+    it.each([
+      ['a training contract', { modality: 'training_alternance' as const }],
+      ['a fixed-discontinuous contract', { modality: 'discontinuous' as const }],
+      ['a work-or-service contract', { modality: 'work_or_service' as const }],
+      [
+        'a part-time arrangement',
+        {
+          partTime: {
+            hoursStated: true,
+            distributionStated: true,
+            complementary: null,
+            voluntaryPercent: null,
+          },
+        },
+      ],
+      ['hours under the full-time week', { contractHours: { weekly: 39, annual: null } }],
+      [
+        'hours under the agreement’s full-time week',
+        { fullTimeHours: 38, contractHours: { weekly: 37, annual: null } },
+      ],
+      ['regular remote work', { remoteShare: 30 }],
+      [
+        'a fixed-term contract of 29 days',
+        {
+          modality: 'production' as const,
+          startDate: parseDate('2025-01-01'),
+          endDate: parseDate('2025-01-29'),
+        },
+      ],
+    ])('is required for %s', (_name, change) => {
+      expect(unwritten(change)?.status).toBe('missing_requirement');
+    });
+
+    it.each([
+      ['hours of the full-time week', { contractHours: { weekly: 40, annual: null } }],
+      ['hours not known', { contractHours: { weekly: null, annual: 1800 } }],
+      [
+        'hours of the agreement’s week',
+        { fullTimeHours: 38, contractHours: { weekly: 38, annual: null } },
+      ],
+      ['no remote work', { remoteShare: null }],
+      ['remote work under 30 %', { remoteShare: 29 }],
+      [
+        'a fixed-term contract of 28 days',
+        {
+          modality: 'production' as const,
+          startDate: parseDate('2025-01-01'),
+          endDate: parseDate('2025-01-28'),
+        },
+      ],
+    ])('is not required for %s', (_name, change) => {
+      expect(unwritten(change)).toBeUndefined();
+    });
+
+    it('says what is missing, and that it rests on the answer', () => {
+      const f = unwritten({ modality: 'work_or_service' });
+      expect(says(f as Finding)).toEqual([
+        'missing_requirement',
+        ['modality.written_missing'],
+        true,
+      ]);
+    });
+
+    it('with the answer unknown, says so', () => {
+      const f = findings(contract({ writtenContract: null, modality: 'discontinuous' })).find(
+        (x) => x.id === 'written_form',
+      );
+      expect(f && says(f)).toEqual(['not_entered', ['modality.written_unknown'], false]);
+    });
+  });
+
+  describe('the modalities themselves', () => {
+    it('a permanent contract and an unknown modality', () => {
+      expect(says(byId(contract({ modality: 'permanent' }), 'fixed_term_presumption'))).toEqual([
+        'within_limit',
+        ['modality.permanent'],
+        false,
+      ]);
+      expect(says(byId(contract({ modality: 'unknown' }), 'fixed_term_presumption'))).toEqual([
+        'not_entered',
+        ['modality.unknown'],
+        false,
+      ]);
+    });
+
+    it.each(['eventual', 'interim'] as const)('an outdated %s name asks to review', (modality) => {
+      const input = temporary(modality, '2025-01-01', '2025-04-30', {
+        replacedPersonNamed: true,
+        replacementCauseStated: true,
+      });
+      expect(says(byId(input, 'abolished_modalities'))).toEqual([
+        'review_it',
+        ['modality.outdated_label'],
+        false,
+      ]);
+    });
+
+    it('a contract before the reform is filed under the modality item', () => {
+      const [only] = reviewModality(
+        temporary('production', '2022-01-10', '2022-05-31'),
+        TODAY,
+        deps,
+      );
+      expect(only?.kind === 'single' && only.finding.item).toBe('modality');
+    });
   });
 });

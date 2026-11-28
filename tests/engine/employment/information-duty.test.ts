@@ -136,6 +136,7 @@ describe('information duty (RD 723/2026)', () => {
       ),
     );
     expect(d).toEqual(expect.objectContaining({ applies: false, reason: 'ended_before_decree' }));
+    expect(!d.applies && d.sources.map((s) => s.id)).toEqual(['info_on_request']);
   });
 
   it('lists the agreement and the category first, and every element once', () => {
@@ -165,6 +166,7 @@ describe('information duty (RD 723/2026)', () => {
       applies: false,
       reason: 'no_trial',
     });
+    expect(none.elements.filter((e) => e.applies).length).toBe(INFO_ELEMENTS.length - 2);
     expect(agreed.elements.find((e) => e.element === 'h')).toMatchObject({
       applies: true,
       finding: { status: 'missing_requirement' },
@@ -228,6 +230,43 @@ describe('information duty (RD 723/2026)', () => {
     expect(keys(elementOf(duty(withInfo({ d: 'absent' })), 'd'))).not.toContain(
       'information.temporary_cause',
     );
+  });
+
+  it.each<[InfoElement, InfoPresence, string[]]>([
+    ['a', 'present', ['information.present']],
+    ['h', 'by_reference', ['information.by_reference']],
+    ['a', 'absent', ['information.missing_before_start']],
+    ['a', 'unknown', ['information.unknown', 'information.missing_before_start']],
+    ['k', 'unknown', ['information.only_if_used', 'information.missing_before_start']],
+    ['k', 'absent', ['information.only_if_used', 'information.missing_before_start']],
+    ['l', 'absent', ['information.protocol_always', 'information.missing_before_start']],
+    [
+      'f',
+      'by_reference',
+      ['information.reference_covers_part', 'information.missing_before_start'],
+    ],
+    [
+      'a',
+      'by_reference',
+      ['information.reference_not_allowed', 'information.missing_before_start'],
+    ],
+  ])('element %s %s says exactly %j', (element, presence, expected) => {
+    const f = elementOf(duty(withInfo({ [element]: presence }, started('2026-10-06'))), element);
+    expect(keys(f)).toEqual(expected);
+  });
+
+  it('only the cause element is told about the temporary cause', () => {
+    const temporary = started('2026-10-06', {
+      modality: 'production',
+      endDate: parseDate('2027-03-31'),
+    });
+    expect(keys(elementOf(duty(withInfo({ a: 'absent' }, temporary)), 'a'))).toEqual([
+      'information.missing_before_start',
+    ]);
+    expect(keys(elementOf(duty(withInfo({ d: 'absent' }, temporary)), 'd'))).toEqual([
+      'information.temporary_cause',
+      'information.missing_before_start',
+    ]);
   });
 
   it('never opens the pass on its own', () => {

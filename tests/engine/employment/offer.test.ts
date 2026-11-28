@@ -55,11 +55,36 @@ describe('offer against contract', () => {
     expect(compared(offer({ grossAnnual: 24000 }), { salary })?.differences).toEqual([]);
   });
 
-  it('what either side leaves unknown is listed as not compared', () => {
-    const result = compared(offer({ weeklyHours: null, modality: 'unknown', remote: null }), {
-      remoteShare: null,
-    });
-    expect(result?.notCompared.map((n) => n.field)).toEqual(['weekly_hours', 'modality', 'remote']);
+  it.each<[string, Offer['remote'], number | null, string | null]>([
+    ['on site', 'hybrid', 0, 'none'],
+    ['one percent remote', 'full', 1, 'hybrid'],
+    ['99 percent remote', 'full', 99, 'hybrid'],
+    ['fully remote', 'hybrid', 100, 'full'],
+  ])('a contract %s reads as %s against an offer', (_name, offered, remoteShare, read) => {
+    expect(compared(offer({ remote: offered }), { remoteShare })?.differences).toEqual([
+      { field: 'remote', offer: offered, contract: read },
+    ]);
+  });
+
+  it.each([
+    ['gross pay', { grossAnnual: null }, {}, 'gross_annual'],
+    ['gross pay of a net offer', { grossAnnual: null, net: true }, {}, 'gross_annual'],
+    ['weekly hours of the offer', { weeklyHours: null }, {}, 'weekly_hours'],
+    [
+      'weekly hours of the contract',
+      {},
+      { contractHours: { weekly: null, annual: 1800 } },
+      'weekly_hours',
+    ],
+    ['modality of the offer', { modality: null }, {}, 'modality'],
+    ['unknown modality of the offer', { modality: 'unknown' }, {}, 'modality'],
+    ['unknown modality of the contract', {}, { modality: 'unknown' }, 'modality'],
+    ['remote work of the offer', { remote: null }, {}, 'remote'],
+    ['remote work of the contract', {}, { remoteShare: null }, 'remote'],
+  ] as const)('an unknown %s is the only thing not compared', (_name, theOffer, change, field) => {
+    const result = compared(offer(theOffer), change);
+    expect(result?.notCompared).toEqual([{ field, reason: 'not_known' }]);
+    expect(result?.differences).toEqual([]);
   });
 
   it('a day rate with extra payments of unknown size gives no yearly pay to compare', () => {

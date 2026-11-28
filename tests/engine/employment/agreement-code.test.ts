@@ -26,6 +26,23 @@ describe('the scope an agreement code gives (RD 713/2010, anexo 3)', () => {
     expect(agreementScope('28001230012010').level).toBe('unknown');
   });
 
+  it.each([
+    ['00', 'unknown'],
+    ['01', 'province'],
+    ['52', 'province'],
+    ['53', 'unknown'],
+    ['70', 'unknown'],
+    ['71', 'regional'],
+    ['86', 'regional'],
+    ['87', 'unknown'],
+  ])('reads the authority of a code starting with %s as %s', (digits, authority) => {
+    expect(agreementScope(`${digits}004225011981`).authority).toBe(authority);
+  });
+
+  it.each(['x99004225011981', '99004225011981x'])('says nothing of %s', (code) => {
+    expect(agreementScope(code)).toEqual({ authority: 'unknown', level: 'unknown' });
+  });
+
   it('says nothing of a code that is not one of the 14-digit ones, or of an unused authority', () => {
     expect(agreementScope(null)).toEqual({ authority: 'unknown', level: 'unknown' });
     expect(agreementScope('9900422501198')).toEqual({ authority: 'unknown', level: 'unknown' });
