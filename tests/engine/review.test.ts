@@ -62,6 +62,20 @@ describe('reviewFinalPay', () => {
     ]);
   });
 
+  it('(b) end before start → error on endDate', () => {
+    const r = reviewFinalPay(withInput({ endDate: f('2009-01-01') }), {}, TODAY);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errors).toEqual([{ field: 'endDate', code: 'end_before_start' }]);
+    }
+  });
+
+  it('(c) fixed-term end with no type → error', () => {
+    const r = reviewFinalPay(withInput({ cause: 'fixed_term_end' }), {}, TODAY);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.errors.map((x) => x.field)).toContain('fixedTermType');
+  });
+
   it('(d) disciplinary dismissal: unfair reference and severance at 0', () => {
     const rev = review(withInput({ cause: 'disciplinary_dismissal' }));
     expect(rev.unfairReference).toBeGreaterThan(0);
@@ -96,6 +110,7 @@ describe('reviewFinalPay', () => {
   });
 
   it.each([
+    [{ cause: 'resignation' }, 'resignation', 'et49_1d'],
     [{ cause: 'fixed_term_end', fixedTermType: 'replacement' }, 'replacement', 'et49_1c'],
     [{ cause: 'fixed_term_end', fixedTermType: 'training' }, 'training', 'et49_1c'],
     [{ cause: 'fixed_term_end', fixedTermType: 'production_circumstances' }, undefined, 'et49_1c'],
@@ -104,6 +119,45 @@ describe('reviewFinalPay', () => {
     const severance = review(withInput(o)).items.find((x) => x.item.id === 'severance');
     expect(severance?.item.zeroReason).toBe(reason);
     expect(severance?.item.sources[0]?.id).toBe(source);
+  });
+
+  it('(e) a correct final pay never comes out below the minimum', () => {
+    const inputs: FinalPayInput[] = [
+      base,
+      withInput({ cause: 'disciplinary_dismissal' }),
+      withInput({ cause: 'objective_dismissal', noticeDaysReceived: 5 }),
+      withInput({ cause: 'fixed_term_end', fixedTermType: 'production_circumstances' }),
+      withInput({ cause: 'fixed_term_end', fixedTermType: 'training', startDate: f('2024-01-10') }),
+      withInput({
+        cause: 'resignation',
+        extraPayProrated: false,
+        extraPayCount: 2,
+        extraPayAmount: 2500,
+        agreementNoticeDays: 15,
+        noticeDaysGiven: 3,
+      }),
+      withInput({
+        cause: 'objective_dismissal',
+        extraPayProrated: false,
+        extraPayCount: 1,
+        extraPayAmount: 2500,
+      }),
+    ];
+    for (const e of inputs) {
+      const noFigures = review(e);
+      const figures: EmployerFigures = {};
+      for (const p of noFigures.items) {
+        if (p.item.range) figures[p.item.id] = p.item.range.max;
+      }
+      const rev = review(e, figures);
+      expect(rev.items.filter((x) => x.status === 'below_minimum')).toEqual([]);
+    }
+  });
+
+  it('(f) unchecked always includes net pay', () => {
+    for (const e of [base, withInput({ cause: 'resignation' })]) {
+      expect(review(e).uncheckedCodes).toContain('net_pay');
+    }
   });
 
   it('lists what it does not check, with additional extra payments only above two', () => {
@@ -121,6 +175,29 @@ describe('reviewFinalPay', () => {
       ...rest,
     ]);
   });
+
+  it('rejects an end date more than a year ahead', () => {
+    const r = reviewFinalPay(withInput({ endDate: f('2028-01-01') }), {}, TODAY);
+    expect(r.ok).toBe(false);
+  });
+
+  it.each([
+    ['2014-02-15', '2015-07-16', 3000, 4610.96],
+    ['2012-10-10', '2026-10-09', 1825, 27885],
+  ])(
+    'severance in the CGPJ zone: %s → %s with %f matches %f',
+    (startDate, endDate, monthly, figure) => {
+      const rev = review(
+        withInput({ startDate: f(startDate), endDate: f(endDate), monthlySalary: monthly }),
+        {
+          severance: figure,
+        },
+      );
+      const severance = rev.items.find((x) => x.item.id === 'severance');
+      expect(severance?.status).toBe('matches');
+      expect(severance?.item.range?.min).not.toBe(severance?.item.range?.max);
+    },
+  );
 });
 
 const itemOf = (e: FinalPayInput, id: string, c: EmployerFigures = {}) =>
@@ -185,6 +262,11 @@ describe('a cause the person does not know', () => {
     expect(severance?.item.calculation).toEqual([phrase('severance.cause_unknown')]);
     expect(severance?.item.sources).toEqual([SOURCES.et49]);
     expect(r.unfairReference).toBeNull();
+  });
+
+  it('keeps the items that do not depend on it as they are', () => {
+    const known = review(base).items.find((p) => p.item.id === 'pending_salary');
+    expect(review(unknown).items[0]?.item.range).toEqual(known?.item.range);
   });
 });
 
