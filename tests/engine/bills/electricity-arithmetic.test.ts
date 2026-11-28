@@ -200,11 +200,13 @@ describe('the bill against its own figures', () => {
         billed(1.38),
         tolerance,
       ],
-      ...[
-        [60, 0.2, 12],
-        [70, 0.15, 10.5],
-        [120, 0.1, 12],
-      ].map(([kwh, price, amount]) => [
+      ...(
+        [
+          [60, 0.2, 12],
+          [70, 0.15, 10.5],
+          [120, 0.1, 12],
+        ] as const
+      ).map(([kwh, price, amount]) => [
         say('arithmetic.energy', {
           kwh: { kwh },
           price: { price, unit: 'per_kwh' },

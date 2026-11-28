@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { TOLL_HOLIDAYS } from '../../../src/engine/bills/data/holidays-20td';
-import { officialFigures, type PvpcHourly } from '../../../src/engine/bills/electricity-official';
+import {
+  officialFigures,
+  pvpcMeanAllBetween,
+  type PvpcHourly,
+} from '../../../src/engine/bills/electricity-official';
 import { pvpcTable } from '../../../src/engine/bills/data/pvpc-hourly';
 import raw from '../../../src/engine/bills/data/pvpc-hourly.json';
 import { parseDate } from '../../../src/engine/date';
@@ -139,6 +143,126 @@ describe('the official figures of the paid report', () => {
     expect(
       officialFigures(freeBill({ ...twoDays, maxPowerUsed: { p1: null, p2: null } }), deps).power,
     ).toBeNull();
+  });
+});
+
+describe('more cases of the official figures', () => {
+  const weekend = {
+    days: Object.fromEntries(['2026-10-17', '2026-10-18'].map((d) => [d, day])),
+    coveredUntil: '2026-10-18',
+  };
+  const power = (change: Parameters<typeof freeBill>[0]) =>
+    officialFigures(freeBill(change), deps).power;
+
+  it('gives no energy figure for a bill without energy lines', () => {
+    expect(officialFigures(freeBill({ ...twoDays, energy: [] }), deps).energy).toBeNull();
+  });
+
+  it('takes the energy as one price when any line is for all of it', () => {
+    const energy = officialFigures(
+      freeBill({
+        ...twoDays,
+        energy: [
+          { period: 'all', kwh: 100, price: 0.1, amount: 10 },
+          { period: 'p1', kwh: 100, price: 0.2, amount: 20 },
+        ],
+      }),
+      deps,
+    ).energy;
+    expect(energy).toMatchObject({
+      singlePrice: true,
+      periods: [{ period: 'all', kwh: 200, yourCost: 30 }],
+    });
+  });
+
+  it('leaves out a period with no kWh, even where no hour falls in it', () => {
+    const bill = freeBill({
+      ...twoDays,
+      readingFrom: parseDate('2026-10-16'),
+      readingTo: parseDate('2026-10-18'),
+      energy: [
+        { period: 'p1', kwh: 0, price: 0.2, amount: 0 },
+        { period: 'p3', kwh: 100, price: 0.1, amount: 10 },
+      ],
+    });
+    const energy = officialFigures(bill, { pvpc: weekend, tollHolidays: TOLL_HOLIDAYS }).energy;
+    expect(energy).toMatchObject({ kind: 'compared', periods: [{ period: 'p3', kwh: 100 }] });
+  });
+
+  it('works out what a kW costs a year from a price per year', () => {
+    expect(officialFigures(juneBill(), deps).power?.map((p) => p.perKwYear)).toEqual([30.82, 0.73]);
+  });
+
+  it('gives no price for a kW when the period has no line or its lines differ', () => {
+    const line = { period: 'p1', kw: 4.6, unit: 'per_kw_day', days: null, amount: 1 } as const;
+    const prices = (lines: Parameters<typeof freeBill>[0]) =>
+      power({ ...twoDays, ...lines })?.map((p) => [p.perKwYear, p.unusedPerYear]);
+    expect(prices({ power: [{ ...line, price: 0.1 }] })).toEqual([
+      [36.5, 54.75],
+      [null, null],
+    ]);
+    expect(
+      prices({
+        power: [
+          { ...line, price: 0.1 },
+          { ...line, price: 0.2 },
+          { ...line, period: 'p2', price: 0.01 },
+        ],
+      }),
+    ).toEqual([
+      [null, null],
+      [3.65, 12.41],
+    ]);
+  });
+
+  it('gives the figures for the power used of one period alone', () => {
+    const only1 = power({ ...twoDays, maxPowerUsed: { p1: 3.1, p2: null } });
+    expect(only1?.[1]).toEqual({
+      period: 'p2',
+      contracted: 4.6,
+      maxUsed: null,
+      perKwYear: 3.65,
+      unusedKw: 0,
+      unusedPerYear: null,
+      aboveContracted: false,
+    });
+    expect(power({ ...twoDays, maxPowerUsed: { p1: null, p2: 1.2 } })?.[0]).toMatchObject({
+      maxUsed: null,
+      unusedKw: 0,
+    });
+  });
+
+  it('does not take the power used equal to the contracted as above it', () => {
+    expect(
+      power({ ...twoDays, maxPowerUsed: { p1: 4.6, p2: 4.6 } })?.map((p) => [
+        p.aboveContracted,
+        p.unusedKw,
+      ]),
+    ).toEqual([
+      [false, 0],
+      [false, 0],
+    ]);
+  });
+});
+
+describe('the mean of every PVPC hour', () => {
+  const dearLast: PvpcHourly = {
+    coveredUntil: '2026-10-14',
+    days: { ...pvpc.days, '2026-10-14': day.map(([h, price]) => [h, price + 24] as const) },
+  };
+  const at = (from: string, to: string, table = dearLast) =>
+    pvpcMeanAllBetween(parseDate(from), parseDate(to), table);
+
+  it('takes in the last day and not the first', () => {
+    // (111,50 + 111,50 + 135,50) / 3 = 119,50.
+    expect(at('2026-10-11', '2026-10-14')).toBe(0.1195);
+    expect(at('2026-10-12', '2026-10-14')).toBe(0.1235);
+  });
+
+  it('gives none for a day missing, for no day, or for a day with no hours', () => {
+    expect(at('2026-10-12', '2026-10-15')).toBeNull();
+    expect(at('2026-10-13', '2026-10-13')).toBeNull();
+    expect(at('2026-10-12', '2026-10-13', { ...pvpc, days: { '2026-10-13': [] } })).toBeNull();
   });
 });
 

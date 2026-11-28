@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { billsPhrase as say } from '../../../src/engine/bills/calculation';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
@@ -12,6 +13,7 @@ import { countedAmount, findingsOf, type BillItem } from '../../../src/engine/bi
 import type { NormTable } from '../../../src/engine/bills/norms';
 import type { Table } from '../../../src/engine/bills/tables';
 import type { ElectricityBillInput, PowerLine } from '../../../src/engine/bills/types';
+import { parseDate } from '../../../src/engine/date';
 import { freeBill, juneBill, only } from './input';
 
 const deps: PvpcDeps = { norms: BILLS_NORMS, tables: BILLS_TABLES };
@@ -37,18 +39,28 @@ const funding = (input: ElectricityBillInput, with_: PvpcDeps = deps): BillItem 
 
 describe('who may be on the PVPC', () => {
   it.each([
-    [{}, 'matches'],
-    [{ contractedPower: { p1: 10, p2: 10 } }, 'matches'],
-    [{ contractedPower: { p1: 10.01, p2: 4.6 } }, 'tariff_not_allowed'],
-    [{ holder: 'microenterprise' }, 'matches'],
-    [{ holder: 'other' }, 'tariff_not_allowed'],
-    [{ holder: null }, 'not_checkable'],
-    [{ retailer: 'other' }, 'review_it'],
-    [{ retailer: 'unknown' }, 'not_checkable'],
-  ] as const)('%j: %s', (change, status) => {
+    [{}, 'matches', say('pvpc.eligible')],
+    [{ contractedPower: { p1: 10, p2: 10 } }, 'matches', say('pvpc.eligible')],
+    [
+      { contractedPower: { p1: 10.01, p2: 4.6 } },
+      'tariff_not_allowed',
+      say('pvpc.power_over_10kw', { p1: { kw: 10.01 }, p2: { kw: 4.6 } }),
+    ],
+    [
+      { contractedPower: { p1: 4.6, p2: 10.01 } },
+      'tariff_not_allowed',
+      say('pvpc.power_over_10kw', { p1: { kw: 4.6 }, p2: { kw: 10.01 } }),
+    ],
+    [{ holder: 'microenterprise' }, 'matches', say('pvpc.eligible')],
+    [{ holder: 'other' }, 'tariff_not_allowed', say('pvpc.holder_not_allowed')],
+    [{ holder: null }, 'not_checkable', say('pvpc.holder_unknown')],
+    [{ retailer: 'other' }, 'review_it', say('pvpc.not_reference_retailer')],
+    [{ retailer: 'unknown' }, 'not_checkable', say('pvpc.retailer_unknown')],
+  ] as const)('%j: %s', (change, status, phrase) => {
     const f = only(checkPvpcEligibility(juneBill(change), BILLS_NORMS));
     expect(f.status).toBe(status);
     expect(f.amount).toBeNull();
+    expect(f.calculation).toEqual([phrase]);
     expect(f.sources.map((s) => s.id)).toEqual(['pvpc_eligibility']);
   });
 });
@@ -108,6 +120,65 @@ describe('the PVPC terms of the June bill', () => {
   });
 });
 
+describe('the words and rules of the PVPC terms', () => {
+  const billed = (euros: number) => say('arithmetic.billed', { euros: { euros } });
+  const rulesOf = (f: { sources: readonly { id: string }[] }) => f.sources.map((r) => r.id);
+
+  it('word each term with its figures and cite its own rules', () => {
+    const f = byId(juneBill());
+    expect(f['pvpc_power_p1']?.calculation).toEqual([
+      say('pvpc.power_p1', { kw: { kw: 4.6 }, euros: { euros: 11.65 } }),
+      billed(11.65),
+      say('pvpc.margin_not_updated'),
+    ]);
+    expect(rulesOf(f['pvpc_power_p1'] as never)).toEqual(['tolls', 'charges', 'pvpc_margin']);
+    expect(f['pvpc_power_p2']?.calculation).toEqual([
+      say('pvpc.power_p2', { kw: { kw: 4.6 }, euros: { euros: 0.27 } }),
+      billed(0.27),
+    ]);
+    expect(rulesOf(f['pvpc_power_p2'] as never)).toEqual(['tolls', 'charges']);
+    expect(f['social_bonus_funding']?.calculation).toEqual([
+      say('funding.days', { euros: { euros: 0.6 } }),
+      billed(0.6),
+    ]);
+  });
+
+  it('give no term for a power with no line, and keep the rest', () => {
+    const ids = (power: PowerLine[]) => checkPvpc(juneBill({ power }), deps).map((i) => only(i).id);
+    expect(ids([p2(0.27)])).toEqual(['pvpc_eligibility', 'pvpc_power_p2', 'social_bonus_funding']);
+    expect(ids([p1(11.65)])).toEqual(['pvpc_eligibility', 'pvpc_power_p1', 'social_bonus_funding']);
+  });
+
+  it('say which day no row covers, instead of a figure', () => {
+    const row = <V>(table: Table<V>): Table<V> => table.map((r) => ({ ...r, from: '2026-06-10' }));
+    const late = (name: 'tolls' | 'pvpcMargin' | 'socialBonusFunding'): PvpcDeps => ({
+      norms: BILLS_NORMS,
+      tables: { ...BILLS_TABLES, [name]: row(BILLS_TABLES[name] as Table<unknown>) },
+    });
+    const pending = (name: 'tolls' | 'pvpcMargin' | 'socialBonusFunding') =>
+      Object.values(byId(juneBill(), late(name)))
+        .filter((f) => f.status === 'pending_official_data')
+        .map((f) => [f.id, f.calculation, rulesOf(f)]);
+    const missing = [say('official.missing', { day: { date: '2026-06-01' } })];
+    expect(pending('tolls')).toEqual([
+      ['pvpc_power_p1', missing, ['tolls', 'charges', 'pvpc_margin']],
+      ['pvpc_power_p2', missing, ['tolls', 'charges']],
+    ]);
+    expect(pending('pvpcMargin')).toEqual([
+      ['pvpc_power_p1', missing, ['tolls', 'charges', 'pvpc_margin']],
+    ]);
+    expect(pending('socialBonusFunding')).toEqual([
+      [
+        'social_bonus_funding',
+        missing,
+        ['social_bonus_funding_until_june', 'social_bonus_funding'],
+      ],
+    ]);
+    const freeLate = checkPvpc(freeBill({ socialBonusFunding: 0.6 }), late('socialBonusFunding'));
+    expect(freeLate.map((i) => only(i).status)).toEqual(['pending_official_data']);
+  });
+});
+
 describe('the social bonus funding, by day', () => {
   // 25 days at 6,979247 €/year and 5 at 9,011295 €/year: 0,6015 → 0,60.
   it('across the change of 26-06-2026 cites both orders', () => {
@@ -136,17 +207,50 @@ describe('the social bonus funding, by day', () => {
   });
 
   it('must come apart on the PVPC', () => {
-    expect(only(funding(juneBill({ socialBonusFunding: null }))).status).toBe('not_on_bill');
+    const f = only(funding(juneBill({ socialBonusFunding: null })));
+    expect(f).toMatchObject({ id: 'social_bonus_funding', status: 'not_on_bill' });
+    expect(f.calculation).toEqual([say('funding.not_on_bill')]);
+    expect(f.rows).toHaveLength(2);
   });
 
   it('in the free market, one above the order is sent to review with no figure', () => {
     expect(checkSocialBonusFunding(freeBill({ socialBonusFunding: null }), deps)).toBeNull();
     expect(only(funding(freeBill({ socialBonusFunding: 0.6 }))).status).toBe('matches');
     expect(only(funding(freeBill({ socialBonusFunding: 0.4 }))).status).toBe('matches');
-    expect(only(funding(freeBill({ socialBonusFunding: 0.9 })))).toMatchObject({
-      status: 'review_it',
-      amount: null,
-    });
+    const above = only(funding(freeBill({ socialBonusFunding: 0.9 })));
+    expect(above).toMatchObject({ status: 'review_it', amount: null });
+    expect(above.calculation).toEqual([
+      say('funding.days', { euros: { euros: 0.6 } }),
+      say('arithmetic.billed', { euros: { euros: 0.9 } }),
+      say('funding.free_market_above'),
+    ]);
+  });
+
+  // A whole leap year at 3,65 €/year: 3,65 over 366 days, or 3,66 over 365.
+  it('in the free market, one within a cent of the highest of the two bases is not above it', () => {
+    const table: Table<number> = [
+      {
+        from: '2027-01-01',
+        until: null,
+        value: 3.65,
+        norm: 'order_ted634_2026',
+        url: BILLS_NORMS.order_ted634_2026.url,
+      },
+    ];
+    const leap = (socialBonusFunding: number) =>
+      only(
+        funding(
+          freeBill({
+            readingFrom: parseDate('2027-12-31'),
+            readingTo: parseDate('2028-12-31'),
+            billedDays: null,
+            socialBonusFunding,
+          }),
+          { norms: BILLS_NORMS, tables: { ...BILLS_TABLES, socialBonusFunding: table } },
+        ),
+      ).status;
+    expect(leap(3.67)).toBe('matches');
+    expect(leap(3.68)).toBe('review_it');
   });
 
   it('while a norm is not settled, gives both readings and counts only the lower', () => {

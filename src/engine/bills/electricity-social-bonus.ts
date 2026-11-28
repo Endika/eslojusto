@@ -76,6 +76,7 @@ export function checkSocialBonus(
   const yearCap = Math.min(...caps.stretches.flatMap((s) => s.rows.map((r) => smallest(r.value))));
   const periodCap = Math.min(
     prorated(caps.stretches, smallest, 365).low,
+    // Stryker disable next-line StringLiteral: prorated reads any base but 365 as the real length of the year
     prorated(caps.stretches, smallest, 'actual').low,
   );
   const kwh = kwhBilled(input);
@@ -93,6 +94,7 @@ export function checkSocialBonus(
     billsPhrase('tolerance.line'),
   ];
   const short = round2(lowest - bonus.amount);
+  // Stryker disable next-line EqualityOperator: the shortfall is rounded to the cent, so it never lands between the tolerance and its 1e-9
   if (short <= LINE_TOLERANCE + 1e-9) return finding('matches', calculation, { rows });
   return finding('discount_lower', calculation, {
     rows,

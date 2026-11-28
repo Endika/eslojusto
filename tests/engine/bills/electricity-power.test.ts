@@ -34,4 +34,20 @@ describe('the power used', () => {
       'power.change_once_a_year',
     ]);
   });
+
+  it.each([
+    ['both', { p1: 3.1, p2: 1.2 }, { p1: { kw: 3.1 }, p2: { kw: 1.2 } }],
+    ['the first only', { p1: 3.1, p2: null }, { p1: { kw: 3.1 } }],
+    ['the second only', { p1: null, p2: 1.2 }, { p2: { kw: 1.2 } }],
+  ])('gives the power used of %s', (_, maxPowerUsed, vars) => {
+    const f = only(powerUsed(juneBill({ maxPowerUsed }), BILLS_NORMS));
+    expect(f.calculation[1]).toEqual({ key: 'power.max_used', vars });
+  });
+
+  it('leaves out the cost of a kW of P1 when the bill has no P1 line', () => {
+    const noP1 = juneBill({ power: juneBill().power.filter((l) => l.period !== 'p1') });
+    expect(only(powerUsed(noP1, BILLS_NORMS)).calculation.map((p) => p.key)).not.toContain(
+      'power.p1_cost_year',
+    );
+  });
 });
