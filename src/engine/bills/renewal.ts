@@ -60,14 +60,11 @@ type Access =
 export function regulatedOn(day: string, { tables, norms }: RenewalDeps): Access {
   const tolls = valueOn(tables.tolls, day, norms);
   const charges = valueOn(tables.charges, day, norms);
-  for (const found of [tolls, charges]) {
-    if (found.kind === 'missing') return { kind: 'missing_table', day };
-  }
+  if (tolls.kind === 'missing' || charges.kind === 'missing') return { kind: 'missing_table', day };
   if (tolls.kind === 'conditional' || charges.kind === 'conditional') {
     const deciding = [tolls, charges].flatMap((f) => (f.kind === 'conditional' ? f.norms : []));
     return { kind: 'conditional', norms: [...new Set(deciding)] };
   }
-  if (tolls.kind !== 'ok' || charges.kind !== 'ok') return { kind: 'missing_table', day };
   const [t, c] = [tolls.row.value, charges.row.value];
   return {
     kind: 'ok',
