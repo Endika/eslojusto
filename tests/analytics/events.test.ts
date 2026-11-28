@@ -9,6 +9,7 @@ import {
   changedFields,
   differenceBucket,
   attemptBucket,
+  basketSizeBucket,
   reviewSecondsBucket,
   sectionSecondsBucket,
   isValidEvent,
@@ -100,6 +101,74 @@ describe('buckets', () => {
   });
   it('attempt', () => {
     expect([1, 2, 3, 9].map(attemptBucket)).toEqual(['1', '2', '3+', '3+']);
+  });
+  it('bills in a year', () => {
+    expect([1, 2, 3, 4, 6, 7, 12, 13].map(basketSizeBucket)).toEqual([
+      '1',
+      '2-3',
+      '2-3',
+      '4-6',
+      '4-6',
+      '7-12',
+      '7-12',
+      '13+',
+    ]);
+  });
+});
+
+describe('each kind of rule in the catalogue guard', () => {
+  const upload = { files_bucket: '1', pdfs: 3 };
+  const extraction = {
+    doc_types: ['payslip'],
+    fields_bucket: '1-3',
+    low_confidence: false,
+    failed_checks: false,
+    conflicts: false,
+    escalated: 'no',
+    skipped_reasons: ['blurry'],
+  };
+
+  it('lets a value of the kind through', () => {
+    expect(isValidEvent('upload_started', upload)).toBe(true);
+    expect(isValidEvent('extraction_completed', extraction)).toBe(true);
+  });
+
+  it.each([
+    ['a choice', 'section_viewed', { section: 'salario' }, 'section', ['nowhere', 7, null]],
+    ['a pattern', 'browser_language', { lang: 'ja' }, 'lang', ['JA', 'jaja', 7, null]],
+    ['a pattern', 'js_error', JS_ERROR, 'step', [7, 'Contract', null]],
+    ['a whole number', 'upload_started', upload, 'pdfs', [-1, 26, 1.5, '3', null]],
+    ['a flag', 'extraction_completed', extraction, 'conflicts', ['true', 1, null]],
+    [
+      'a list',
+      'extraction_completed',
+      extraction,
+      'doc_types',
+      [['nope'], ['payslip', 'payslip'], 'payslip', [7]],
+    ],
+    [
+      'the frames',
+      'js_error',
+      JS_ERROR,
+      'frames',
+      [['no frame'], 'main.js:1:4', [7], Array(6).fill('a.js:1:2')],
+    ],
+  ])('refuses %s of the wrong kind or out of range: %s', (_, event, valid, key, wrong) => {
+    for (const value of wrong)
+      expect(isValidEvent(event, { ...valid, [key]: value }), String(value)).toBe(false);
+  });
+
+  it('takes the edges of a range and of a list of frames', () => {
+    expect(isValidEvent('upload_started', { ...upload, pdfs: 0 })).toBe(true);
+    expect(isValidEvent('upload_started', { ...upload, pdfs: 25 })).toBe(true);
+    expect(isValidEvent('js_error', { ...JS_ERROR, frames: Array(5).fill('a.js:1:2') })).toBe(true);
+  });
+
+  it('takes only an object with exactly the keys of the event', () => {
+    for (const props of [null, 5, 'x', [], undefined])
+      expect(isValidEvent('started_over', props)).toBe(false);
+    expect(isValidEvent('started_over', {})).toBe(true);
+    expect(isValidEvent('nowhere', {})).toBe(false);
   });
 });
 
@@ -490,6 +559,16 @@ describe('review_completed', () => {
       ),
     ).toBe('all_match');
   });
+  it.each(['matches', 'above_minimum', 'deduction_within_max'] as const)(
+    'outcome: all_match with a %s among the rest',
+    (status) => {
+      expect(
+        outcomeOf(
+          review(['pending_salary', status, 1, null], ['extra_pay', 'not_checkable', 5, null]),
+        ),
+      ).toBe('all_match');
+    },
+  );
   it('outcome: only_not_checkable', () => {
     expect(
       outcomeOf(
@@ -598,8 +677,35 @@ describe('review_completed', () => {
     expect(withInput({ cause: 'resignation' }).fixed_term_type).toBe('not_applicable');
     expect(withInput({}).work_week).toBe('not_applicable');
     expect(withInput({ holidayUnit: 'working' }).work_week).toBe('5');
+    expect(withInput({ holidayUnit: 'working', workDaysPerWeek: 5 }).work_week).toBe('5');
     expect(withInput({ holidayUnit: 'working', workDaysPerWeek: 6 }).work_week).toBe('6');
     expect(withInput({ holidayUnit: 'working', workDaysPerWeek: 3 }).work_week).toBe('other');
+  });
+
+  it('leaves out the answers and figures that were not given', () => {
+    const { monthlySalary, ...without } = input;
+    expect(monthlySalary).toBe(1500);
+    expect(Object.keys(snapshot(without as FinalPayInput, {}))).not.toContain('monthlySalary');
+    expect(Object.keys(snapshot(input, {})).some((k) => k.startsWith('figure_'))).toBe(false);
+    expect(snapshot(input, { severance: 40000 })).toMatchObject({ figure_severance: '40000' });
+  });
+
+  it('says a fixed-term end of no stated type has none to name, and no deduction too high', () => {
+    const { fixedTermType, ...untyped } = input;
+    expect(fixedTermType).toBe('production_circumstances');
+    const p = reviewProps({
+      review: review(['pending_salary', 'matches', 1, null]),
+      input: untyped,
+      attempt: 1,
+      changedFields: [],
+      seconds: 1,
+      benefit,
+      otherContracts: 0,
+      detail: 'unlocked',
+      pass: 'none',
+      reveal: 'instant',
+    });
+    expect(p).toMatchObject({ fixed_term_type: 'not_applicable', deduction_too_high: false });
   });
 
   it('unknown holiday days taken (null) show as a change, without their value', () => {
