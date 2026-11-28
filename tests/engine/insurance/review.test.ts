@@ -4,7 +4,7 @@ import { INSURANCE_NORMS } from '../../../src/engine/insurance/data/norms';
 import { informationBlocks } from '../../../src/engine/insurance/information';
 import { reviewInsurance } from '../../../src/engine/insurance/review';
 import { scope } from '../../../src/engine/insurance/scope';
-import type { InsuranceInput } from '../../../src/engine/insurance/types';
+import type { InsuranceInput, InsuranceLine } from '../../../src/engine/insurance/types';
 import { validate } from '../../../src/engine/insurance/validate';
 import { notice, policy, TODAY } from './input';
 
@@ -17,8 +17,25 @@ const review = (input: InsuranceInput, today: CivilDate = TODAY) => {
 };
 
 describe('scope', () => {
+  it.each<InsuranceLine>(['home', 'car'])('reviews a %s policy', (line) => {
+    expect(scope(policy({ line }))).toEqual({ inScope: true });
+  });
+
+  it.each([
+    ['life', 'life'],
+    ['health', 'health'],
+    ['funeral', 'funeral'],
+    ['other', 'other_line'],
+  ] as const)('leaves out a %s policy', (line, reason) => {
+    expect(scope(policy({ line }))).toEqual({ inScope: false, reason });
+  });
+
   // The insurer's notice is due two months before the end: its deadline has to fall in 2016.
-  it.each([['2016-03-01', { inScope: true }]])('a period ending on %s', (day, expected) => {
+  it.each([
+    ['2016-01-01', { inScope: false, reason: 'before_2016' }],
+    ['2016-02-29', { inScope: false, reason: 'before_2016' }],
+    ['2016-03-01', { inScope: true }],
+  ])('a period ending on %s', (day, expected) => {
     expect(scope(policy({ expiresOn: parseDate(day) }))).toEqual(expected);
   });
 });
@@ -26,7 +43,13 @@ describe('scope', () => {
 describe('validation', () => {
   const errors = (change: Partial<InsuranceInput>) => validate(policy(change), TODAY);
 
+  it('accepts the synthetic policy', () => {
+    expect(errors({})).toEqual([]);
+  });
+
   it.each<[Partial<InsuranceInput>, string, string]>([
+    [{ expiresOn: { y: 2027, m: 2, d: 30 } }, 'expiresOn', 'invalid_date'],
+    [{ expiresOn: parseDate('2028-10-10') }, 'expiresOn', 'too_far_ahead'],
     [{ concludedOn: parseDate('2026-10-10') }, 'concludedOn', 'in_future'],
     [
       { concludedOn: parseDate('2026-10-01'), expiresOn: parseDate('2026-09-30') },
@@ -54,6 +77,14 @@ describe('validation', () => {
       'invalid_date',
     ],
     [{ policyReceivedOn: { y: 1990, m: 2, d: 30 } }, 'policyReceivedOn', 'invalid_date'],
+    [
+      {
+        notice: notice({ receivedOn: parseDate('2026-10-10') }),
+        expiresOn: parseDate('2026-10-01'),
+      },
+      'notice.receivedOn',
+      'in_future',
+    ],
     [{ notice: notice({ newPremium: 1_000_001 }) }, 'notice.newPremium', 'amount_range'],
     [{ notice: notice({ newPremium: Infinity }) }, 'notice.newPremium', 'amount_range'],
     [{ notice: notice({ previousPremium: -5 }) }, 'notice.previousPremium', 'amount_range'],
@@ -73,6 +104,7 @@ describe('validation', () => {
     ],
     ['two years ahead for the end', { expiresOn: parseDate('2028-10-09') }],
     ['the largest premium', { notice: notice({ newPremium: 1_000_000 }) }],
+    ['a receipt on the day of the conclusion', { policyReceivedOn: parseDate('2024-03-01') }],
   ])('accepts %s', (_, change) => {
     expect(errors(change)).toEqual([]);
   });
@@ -86,6 +118,31 @@ describe('validation', () => {
 });
 
 describe('insurance review', () => {
+  it('a home policy with a renewal notice', () => {
+    const r = review(
+      policy({ notice: notice({ receivedOn: parseDate('2027-01-20') }) }),
+      parseDate('2027-01-25'),
+    );
+    expect(r.findings.map((f) => [f.id, f.status])).toEqual([
+      ['non_renewal', 'open'],
+      ['change_notice', 'late'],
+      ['premium', 'up'],
+      ['distance_withdrawal', 'not_applicable'],
+    ]);
+    expect(r.information.map((b) => b.id)).toEqual([
+      'policy_correction',
+      'questionnaire',
+      'proportional_rule',
+      'overinsurance',
+    ]);
+    expect(r.unchecked).toEqual([
+      'clause_transparency',
+      'premium_price',
+      'insured_value',
+      'claims',
+    ]);
+  });
+
   it('a motor policy contracted online', () => {
     const r = review(
       policy({
@@ -123,12 +180,48 @@ describe('insurance review', () => {
       expect(r.findings.filter((f) => 'amount' in f)).toEqual([]);
     }
   });
+
+  it('every finding and block cites only rules of its own table', () => {
+    const r = review(
+      policy({ distance: true, concludedOn: parseDate('2026-10-01'), notice: notice() }),
+    );
+    const cited = [...r.findings, ...r.information].flatMap((x) => x.sources.map((s) => s.url));
+    for (const url of cited) expect(url.startsWith('https://www.boe.es/')).toBe(true);
+  });
 });
 
 describe('information blocks', () => {
+  it('gives the month to ask for a correction of the policy, from its delivery', () => {
+    const block = review(
+      policy({
+        distance: true,
+        policyReceivedOn: parseDate('2024-01-31'),
+        concludedOn: parseDate('2024-01-15'),
+      }),
+    ).information[0];
+    expect(block?.calculation[1]).toEqual({
+      key: 'information.policy_correction.until',
+      vars: { day: { date: '2024-02-29' } },
+    });
+  });
+
   it('has no date while the policy has not arrived', () => {
     const block = review(policy({ distance: true, policyReceived: false })).information[0];
     expect(block?.calculation[1]?.key).toBe('information.policy_correction.no_policy');
+  });
+
+  it('gives no date when the policy came on a day not given', () => {
+    const block = review(
+      policy({
+        distance: true,
+        concludedOn: parseDate('2024-01-15'),
+        policyReceived: true,
+        policyReceivedOn: null,
+      }),
+    ).information[0];
+    expect(block?.calculation[1]).toEqual({
+      key: 'information.policy_correction.delivery_unknown',
+    });
   });
 
   it('says nothing of the delivery when it was not asked', () => {
@@ -158,6 +251,25 @@ describe('information blocks', () => {
       policy({ distance: true, policyReceived: null, policyReceivedOn: parseDate('2024-03-05') }),
     ).information[0];
     expect(block?.calculation[1]?.key).toBe('information.policy_correction.delivery_unknown');
+  });
+
+  it('names what each block says and the rule it rests on', () => {
+    expect(
+      review(policy()).information.map((b) => [
+        b.id,
+        b.calculation.map((p) => p.key),
+        b.sources.map((s) => s.id),
+      ]),
+    ).toEqual([
+      ['policy_correction', ['information.policy_correction'], ['policy_correction']],
+      ['questionnaire', ['information.questionnaire'], ['questionnaire']],
+      [
+        'proportional_rule',
+        ['information.proportional_rule', 'information.proportional_rule.example'],
+        ['proportional_rule'],
+      ],
+      ['overinsurance', ['information.overinsurance'], ['overinsurance']],
+    ]);
   });
 
   it('works the proportional rule through an example', () => {
