@@ -1,8 +1,8 @@
 import { formatAmountInput } from '../../calculator/number';
-import type { ExtractedValue, RenewalExtraction, SourcedField } from '../../documents/contract';
-import type { ReadMark, ReadPrefill } from '../../documents/ports';
-import { parseDate, toIso } from '../../engine/date';
+import type { RenewalExtraction, SourcedField } from '../../documents/contract';
+import type { ReadPrefill } from '../../documents/ports';
 import type { Translate } from '../../i18n/client';
+import { Answers, isoOf, numberOf } from '../read';
 import { ENERGY_PRICINGS, POWER_UNITS, type RenewalFormField } from './form';
 
 // Prices come with up to six decimals; the form takes them back with a decimal comma.
@@ -12,18 +12,6 @@ const PRICE = new Intl.NumberFormat('es-ES', {
   useGrouping: false,
 });
 const QUANTITY = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 3, useGrouping: false });
-
-const numberOf = (v: ExtractedValue | undefined): number | null =>
-  typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null;
-
-function isoOf(v: ExtractedValue | undefined): string | null {
-  if (typeof v !== 'string') return null;
-  try {
-    return toIso(parseDate(v));
-  } catch {
-    return null;
-  }
-}
 
 const PRICES = [
   ['currentPowerP1', PRICE],
@@ -42,6 +30,8 @@ const PRICES = [
   ['powerKwP2', QUANTITY],
   ['annualKwh', QUANTITY],
 ] as const;
+// Stryker disable next-line Regex: no field of a side has anything after the digit of its period
+const ENERGY_PER_PERIOD = /EnergyP\d$/;
 const AMOUNTS = ['declaredWithoutTax', 'declaredWithTax'] as const;
 const FLAGS = ['separateFromBill'] as const;
 
@@ -49,13 +39,10 @@ const FLAGS = ['separateFromBill'] as const;
 // costs it declares and whether it came apart from the bill. Whether the price is fixed is not
 // asked, so the API's answer to it is left out.
 export function renewalPrefill(e: RenewalExtraction, tr: Translate): ReadPrefill {
-  const entries: [string, string][] = [];
-  const marks: ReadMark[] = [];
+  const a = new Answers<RenewalFormField>();
   const { fields } = e;
-  const read = (name: RenewalFormField, f: SourcedField, value: string) => {
-    entries.push([name, value]);
-    marks.push({ id: name, container: `[data-field="${name}"]`, confidence: f.confidence });
-  };
+  const read = (name: RenewalFormField, f: SourcedField, value: string) =>
+    a.read(name, value, f.confidence);
 
   for (const name of ['letterDate', 'renewalDate'] as const) {
     const f = fields[name];
@@ -82,16 +69,16 @@ export function renewalPrefill(e: RenewalExtraction, tr: Translate): ReadPrefill
   // Each side's energy as the letter gives it: once for all the day or once per period.
   for (const side of ['current', 'next'] as const) {
     const pricing = ENERGY_PRICINGS.find((p) =>
-      entries.some(([name]) =>
+      a.entries.some(([name]) =>
         p === 'single'
           ? name === `${side}Energy`
-          : name.startsWith(side) && /EnergyP\d$/.test(name),
+          : name.startsWith(side) && ENERGY_PER_PERIOD.test(name),
       ),
     );
-    if (pricing !== undefined) entries.push([`${side}EnergyPricing`, pricing]);
+    if (pricing !== undefined) a.open(`${side}EnergyPricing`, pricing);
   }
 
-  const low = marks.some((m) => m.confidence === 'low');
+  const low = a.lowConfidence();
   const notes = [
     ...(low ? [tr('client.documents.done_low')] : []),
     ...(fields.isRenewal?.value === false
@@ -99,5 +86,5 @@ export function renewalPrefill(e: RenewalExtraction, tr: Translate): ReadPrefill
       : []),
     ...(e.truncated ? [tr('client.bills.documents.truncated')] : []),
   ];
-  return { entries, marks, count: marks.length, lowConfidence: low, notes };
+  return { entries: a.entries, marks: a.marks, count: a.marks.length, lowConfidence: low, notes };
 }

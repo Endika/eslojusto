@@ -1,15 +1,13 @@
 import { formatAmountInput } from '../../calculator/number';
 import {
   TELECOM_CHECKS,
-  type Confidence,
-  type ExtractedValue,
   type FailedCheck,
   type SourcedField,
   type TelecomExtraction,
 } from '../../documents/contract';
-import type { ReadMark, ReadPrefill } from '../../documents/ports';
-import { parseDate, toIso } from '../../engine/date';
+import type { ReadPrefill } from '../../documents/ports';
 import type { Translate } from '../../i18n/client';
+import { Answers, amountOf, isoOf, lowest, textOf } from '../read';
 import { PRICE_INDEXES, type TelecomFormField } from './form';
 
 // The questions beside which the contract's own words are shown, to check the answer against them.
@@ -20,42 +18,7 @@ interface TelecomPrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
 }
 
-const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-const lowest = (...cs: Confidence[]): Confidence =>
-  cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
-
-const amountOf = (v: ExtractedValue | undefined): number | null =>
-  typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
-const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' && v.trim() !== '' ? v.trim() : null;
-
-function isoOf(v: ExtractedValue | undefined): string | null {
-  if (typeof v !== 'string') return null;
-  try {
-    return toIso(parseDate(v));
-  } catch {
-    return null;
-  }
-}
-
-class Answers {
-  readonly entries: [string, string][] = [];
-  readonly marks: ReadMark[] = [];
-
-  read(name: TelecomFormField, value: string, confidence: Confidence, derived = false) {
-    this.entries.push([name, value]);
-    this.marks.push({
-      id: name,
-      container: `[data-field="${name}"]`,
-      confidence,
-      ...(derived && { derived: true as const }),
-    });
-  }
-
-  open(name: TelecomFormField, value: string) {
-    this.entries.push([name, value]);
-  }
-
+class TelecomAnswers extends Answers<TelecomFormField> {
   field(name: TelecomFormField, f: SourcedField | undefined, value: string | null) {
     if (f && value !== null) this.read(name, value, f.confidence);
   }
@@ -67,9 +30,10 @@ class Answers {
 export function telecomPrefill(
   e: TelecomExtraction,
   tr: Translate,
+  // Stryker disable next-line ArrayDeclaration: a stray entry names no check, so none is worded
   checks: readonly FailedCheck[] = [],
 ): TelecomPrefill {
-  const a = new Answers();
+  const a = new TelecomAnswers();
   const { fields } = e;
   const notes: string[] = [];
 
@@ -125,7 +89,7 @@ export function telecomPrefill(
   const reviewText = textOf(fields.priceReviewText?.value);
   if (reviewText) quotes.priceIndex = reviewText;
 
-  const low = a.marks.some((m) => m.confidence === 'low');
+  const low = a.lowConfidence();
   return {
     entries: a.entries,
     marks: a.marks,

@@ -8,6 +8,7 @@ import {
   sheetOfField,
 } from '../../src/bills/renewal/form';
 import { RENEWAL_FIELDS } from '../../src/bills/renewal/ports';
+import { RENEWAL_FLOW } from '../../src/bills/renewal/steps';
 import { renewalPrefill } from '../../src/bills/renewal/prefill';
 import type { RenewalExtraction } from '../../src/documents/contract';
 import { pageTranslator } from '../support/page-strings';
@@ -279,5 +280,14 @@ describe('a comma followed by three digits', () => {
       current: { power: { p1: 30.817, p2: 0.725 } },
       next: { power: { p1: 40.25, p2: 18.372 } },
     });
+  });
+});
+
+describe('the renewal flow', () => {
+  it('completes a sheet when it has no error, and the result always', () => {
+    const empty = document.createElement('form');
+    expect(RENEWAL_FLOW.complete(form(), 'fechas', TODAY)).toBe(true);
+    expect(RENEWAL_FLOW.complete(empty, 'fechas', TODAY)).toBe(false);
+    expect(RENEWAL_FLOW.complete(empty, 'resultado', TODAY)).toBe(true);
   });
 });

@@ -8,7 +8,9 @@ import {
   sheetErrors,
   sheetOfField,
 } from '../../src/bills/electricity/form';
+import { ELECTRICITY_FLOW } from '../../src/bills/electricity/steps';
 import { applies as telecomApplies } from '../../src/bills/telecom/conditions';
+import { TELECOM_FLOW } from '../../src/bills/telecom/steps';
 import { readTelecomForm } from '../../src/bills/telecom/form';
 import { juneBill, meter } from '../engine/bills/input';
 
@@ -184,6 +186,11 @@ describe('the electricity form', () => {
     expect(formScope(el)).toEqual({ inScope: false, reason: 'canary_ceuta_melilla' });
     expect(electricityApplies(el, 'autoconsumo')).toBe(false);
     expect(electricityApplies(el, 'resultado')).toBe(true);
+    expect(electricityApplies(el, 'suministro')).toBe(true);
+  });
+
+  it('asks a sheet with no condition of a bill within the review', () => {
+    expect(electricityApplies(form(BILL), 'autoconsumo')).toBe(true);
   });
 
   it('asks a bill issued on 12-06-2026 the rest of its sheets', () => {
@@ -211,6 +218,15 @@ describe('the electricity sheets', () => {
     expect(electricityApplies(radios({ meterCharged: 'no' }), 'contador-tipo')).toBe(false);
     expect(electricityApplies(radios({ hasPenalty: 'yes' }), 'penalizacion-contrato')).toBe(true);
     expect(electricityApplies(radios({ hasBonus: 'no' }), 'bono-social-consumo')).toBe(false);
+  });
+});
+
+describe('the electricity flow', () => {
+  it('completes a sheet when it has no error, and the result always', () => {
+    const empty = document.createElement('form');
+    expect(ELECTRICITY_FLOW.complete(form(BILL), 'suministro', TODAY)).toBe(true);
+    expect(ELECTRICITY_FLOW.complete(empty, 'suministro', TODAY)).toBe(false);
+    expect(ELECTRICITY_FLOW.complete(empty, 'resultado', TODAY)).toBe(true);
   });
 });
 
@@ -285,10 +301,49 @@ describe('the telecom form', () => {
     expect(telecomApplies(el, 'cobros')).toBe(true);
   });
 
+  it('asks the sheets of a commitment and of the exit even when the exit is outside the review', () => {
+    const el = form(EXIT, { exitRequestedOn: '2021-12-31', startedOn: '2021-01-01' });
+    el.innerHTML += '<input type="radio" name="hasCommitment" value="no" checked />';
+    expect(telecomApplies(el, 'permanencia')).toBe(true);
+    expect(telecomApplies(el, 'resultado')).toBe(true);
+    expect(telecomApplies(el, 'baja')).toBe(true);
+    expect(telecomApplies(el, 'penalizacion')).toBe(false);
+    expect(telecomApplies(el, 'cobros')).toBe(false);
+  });
+
+  it('asks the agreed penalty only of a commitment', () => {
+    const answered = (value: string) => {
+      const el = document.createElement('form');
+      el.innerHTML = `<input type="radio" name="hasCommitment" value="${value}" checked />`;
+      return el;
+    };
+    expect(telecomApplies(answered('yes'), 'penalizacion')).toBe(true);
+    expect(telecomApplies(answered('no'), 'penalizacion')).toBe(false);
+    expect(telecomApplies(document.createElement('form'), 'penalizacion')).toBe(false);
+  });
+
+  it('asks what changed and the handset whenever the conditions changed, noticed or not', () => {
+    for (const change of ['notice', 'no_notice']) {
+      const el = form(EXIT);
+      el.innerHTML += `<input type="radio" name="change" value="${change}" checked />`;
+      expect(telecomApplies(el, 'cambio')).toBe(true);
+      expect(telecomApplies(el, 'terminal')).toBe(true);
+    }
+  });
+
   it('stops an exit before 2022 at the gate', () => {
     const el = form(EXIT, { exitRequestedOn: '2021-12-31', startedOn: '2021-01-01' });
     el.innerHTML += '<input type="radio" name="hasCommitment" value="yes" checked />';
     expect(telecomApplies(el, 'aviso')).toBe(false);
     expect(telecomApplies(el, 'baja')).toBe(true);
+  });
+});
+
+describe('the telecom flow', () => {
+  it('completes a sheet when it has no error, and the result always', () => {
+    const empty = document.createElement('form');
+    expect(TELECOM_FLOW.complete(form(EXIT), 'baja', TODAY)).toBe(true);
+    expect(TELECOM_FLOW.complete(empty, 'baja', TODAY)).toBe(false);
+    expect(TELECOM_FLOW.complete(empty, 'resultado', TODAY)).toBe(true);
   });
 });
