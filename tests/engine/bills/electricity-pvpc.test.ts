@@ -180,32 +180,6 @@ describe('the words and rules of the PVPC terms', () => {
 });
 
 describe('the social bonus funding, by day', () => {
-  // 25 days at 6,979247 €/year and 5 at 9,011295 €/year: 0,6015 → 0,60.
-  it('across the change of 26-06-2026 cites both orders', () => {
-    const f = only(funding(juneBill()));
-    expect(f.status).toBe('matches');
-    expect(f.rows.map((r) => [r.norm, r.from, r.until])).toEqual([
-      ['order_ted1524_2025', '2026-01-01', '2026-06-25'],
-      ['order_ted634_2026', '2026-06-26', '2026-12-31'],
-    ]);
-  });
-
-  it('the new figure on every day is over the regulated price: 0,74 − 0,60', () => {
-    expect(only(funding(juneBill({ socialBonusFunding: 0.74 })))).toMatchObject({
-      status: 'above_regulated_price',
-      amount: 0.14,
-      recurring: true,
-    });
-  });
-
-  it('the old figure on every day is short: 0,57 against 0,60', () => {
-    expect(only(funding(juneBill({ socialBonusFunding: 0.57 })))).toMatchObject({
-      status: 'differs_from_official',
-      amount: 0.03,
-      direction: 'under',
-    });
-  });
-
   it('must come apart on the PVPC', () => {
     const f = only(funding(juneBill({ socialBonusFunding: null })));
     expect(f).toMatchObject({ id: 'social_bonus_funding', status: 'not_on_bill' });

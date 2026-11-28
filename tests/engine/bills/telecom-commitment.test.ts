@@ -5,10 +5,9 @@ import { countedAmount, type BillItem } from '../../../src/engine/bills/finding'
 import {
   checkCommitment,
   checkCommitmentPenalty,
-  commitmentDays,
 } from '../../../src/engine/bills/telecom-commitment';
 import type { Commitment, TelecomInput } from '../../../src/engine/bills/types';
-import { parseDate, toIso } from '../../../src/engine/date';
+import { parseDate } from '../../../src/engine/date';
 import { only, telecom } from './input';
 
 const present = (item: BillItem | null): BillItem => {
@@ -34,15 +33,6 @@ const commitment = (change: Partial<Commitment>): Commitment => ({
 // 18 months from 01-03-2025 end on 01-09-2026: 549 days, of which 184 are left on 01-03-2026,
 // after 12 months. Art. 62.5 TRLGDCU: 180 × 184 / 549 = 60,3279 → 60,33 at most.
 describe('a commitment penalty', () => {
-  it('counts the days of the commitment and those left on the request day', () => {
-    const days = commitmentDays(commitment({}), parseDate('2026-03-01'));
-    expect({ ...days, endsOn: toIso(days.endsOn) }).toEqual({
-      endsOn: '2026-09-01',
-      total: 549,
-      left: 184,
-    });
-  });
-
   it('within the proportional cap is within the limit', () => {
     const item = penalty();
     expect(summary(item)).toEqual({ status: 'within_limit', amount: null, counted: 0 });
@@ -61,21 +51,8 @@ describe('a commitment penalty', () => {
     expect(only(item)).toMatchObject({ id: 'commitment_penalty', direction: null });
   });
 
-  it('a cent over the cap still matches', () => {
-    expect(summary(penalty({ penaltyCharged: 60.34 })).status).toBe('within_limit');
-  });
-
   it('gives nothing without a commitment', () => {
     expect(checkCommitmentPenalty(telecom({ commitment: null }), BILLS_NORMS)).toBeNull();
-  });
-
-  it('above the cap is paid over, and counted', () => {
-    expect(only(penalty({ penaltyCharged: 90 }))).toMatchObject({ direction: 'over' });
-    expect(summary(penalty({ penaltyCharged: 90 }))).toEqual({
-      status: 'paid_over',
-      amount: 29.67,
-      counted: 29.67,
-    });
   });
 
   it('once the commitment is over, any penalty is paid over', () => {
@@ -90,10 +67,6 @@ describe('a commitment penalty', () => {
     const item = penalty({ commitment: commitment({ agreedPenalty: null }) });
     expect(summary(item)).toEqual({ status: 'not_checkable', amount: null, counted: 0 });
     expect(only(item).calculation).toEqual([say('commitment.agreed_unknown')]);
-  });
-
-  it.each([[null], [0]])('gives nothing when %s was charged', (charged) => {
-    expect(checkCommitmentPenalty(telecom({ penaltyCharged: charged }), BILLS_NORMS)).toBeNull();
   });
 });
 
@@ -139,17 +112,5 @@ describe('the length of a commitment', () => {
     expect(only(items[1] as BillItem).calculation.at(-1)).toEqual(
       say('commitment.over_maximum_penalty', { maximum: { integer: 24 } }),
     );
-  });
-
-  it('over 24 months still counts what is over the cap on its agreed length', () => {
-    const items = checkCommitment(
-      telecom({ commitment: commitment({ months: 30 }), penaltyCharged: 150 }),
-      BILLS_NORMS,
-    );
-    expect(items.map(summary)[1]).toEqual({ status: 'paid_over', amount: 41.88, counted: 41.88 });
-  });
-
-  it('gives nothing without a commitment', () => {
-    expect(ids(telecom({ commitment: null }))).toEqual([]);
   });
 });

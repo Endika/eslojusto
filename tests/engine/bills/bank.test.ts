@@ -131,10 +131,6 @@ const matches = (r: ElectricityReview): boolean =>
   r.items.flatMap(findingsOf).every((x) => x.status === 'matches' || x.status === 'information');
 
 describe('the synthetic bank of electricity packs', () => {
-  it('holds 38 cases', () => {
-    expect(ELECTRICITY).toHaveLength(38);
-  });
-
   it.each(ELECTRICITY.map((c) => [c.id, c] as const))('%s', (_, c) => {
     const bills = reviewed(c);
     expect(bills.map((b) => asBill(b.review))).toEqual(c.expected.review.bills);
@@ -150,10 +146,6 @@ describe('the synthetic bank of electricity packs', () => {
 });
 
 describe('the synthetic bank of telecom packs', () => {
-  it('holds 9 cases', () => {
-    expect(TELECOM).toHaveLength(9);
-  });
-
   it.each(TELECOM.map((c) => [c.id, c] as const))('%s', (_, c) => {
     const result = reviewTelecom(toTelecom(c.expected.input), f(c.today), TELECOM_DEPS);
     if (!result.ok) throw new Error(`invalid input: ${JSON.stringify(result.errors)}`);

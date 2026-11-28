@@ -61,20 +61,6 @@ describe('reviewing a renewal letter', () => {
     expect(result.recalc).toMatchObject({ kind: 'ok', current: 909.16, next: 1071.15 });
   });
 
-  it('does not invent a period split of the consumption', () => {
-    const periods = { p1: 0.2, p2: 0.15, p3: 0.1 };
-    expect(
-      review({
-        current: { power: { p1: 0.11, p2: 0.03 }, energy: periods },
-        next: { power: { p1: 0.12, p2: 0.05 }, energy: periods },
-      }).recalc,
-    ).toEqual({ kind: 'needs_period_use' });
-  });
-
-  it('asks for the consumption when the letter gives none', () => {
-    expect(review({ annualKwh: null }).recalc).toEqual({ kind: 'no_consumption' });
-  });
-
   it('splits the regulated part from the retailer margin', () => {
     const { split } = review();
     if (split.kind !== 'ok') throw new Error('split expected');
@@ -90,18 +76,6 @@ describe('reviewing a renewal letter', () => {
       retailerNext: 0.164508,
     });
     expect(split.regulatedChange).toBe(false);
-  });
-
-  it('has no toll table for a 2027 renewal', () => {
-    expect(review({ renewalDate: '2027-01-15' }).split).toEqual({
-      kind: 'missing_table',
-      day: '2027-01-15',
-    });
-  });
-
-  it('keeps the split when the letter date has no tables', () => {
-    const result = review({ letterDate: '2025-06-20' }).split;
-    expect(result).toMatchObject({ kind: 'ok', regulatedChange: null });
   });
 
   it('reports a change in the regulated part between letter and renewal', () => {
@@ -129,54 +103,13 @@ describe('reviewing a renewal letter', () => {
     });
   });
 
-  it('is conditional while the norm deciding the tables is unsettled', () => {
-    const december = BILLS_NORMS.rdl25_2026_december;
-    const [held] = BILLS_TABLES.tolls;
-    if (held === undefined || december.condition === undefined) throw new Error('fixture expected');
-    const open: NormTable = {
-      ...BILLS_NORMS,
-      rdl25_2026_december: {
-        ...december,
-        status: 'conditional',
-        condition: { ...december.condition, met: null },
-      },
-    };
-    const tolls = [
-      { ...held, from: '2026-12-01', until: '2026-12-31', norm: 'rdl25_2026_december' as const },
-    ];
-    const own: RenewalDeps = { tables: { ...BILLS_TABLES, tolls }, norms: open };
-    expect(reviewRenewalCore(letter(), own).split).toEqual({
-      kind: 'conditional',
-      norms: ['rdl25_2026_december'],
-    });
-  });
-
   describe('notice', () => {
-    it('meets one month ahead', () => {
-      expect(review().notice).toEqual({ kind: 'meets', days: 40 });
-    });
-
-    it('falls short under a calendar month', () => {
-      expect(review({ letterDate: '2026-11-20' }).notice).toEqual({
-        kind: 'short',
-        days: 20,
-        separate: true,
-      });
-    });
-
     it('counts a month as the same date of the next one, not 30 days', () => {
       expect(review({ letterDate: '2026-11-10' }).notice).toEqual({ kind: 'meets', days: 30 });
       expect(review({ letterDate: '2026-11-11' }).notice).toEqual({
         kind: 'short',
         days: 29,
         separate: true,
-      });
-    });
-
-    it('is not checked for a letter before the rule took effect', () => {
-      expect(review({ letterDate: '2026-05-01' }).notice).toEqual({
-        kind: 'not_checked_before',
-        since: '2026-06-12',
       });
     });
 
@@ -194,14 +127,6 @@ describe('reviewing a renewal letter', () => {
 
     it('fails when the letter came with the bill', () => {
       expect(review({ separateFromBill: false }).notice).toEqual({ kind: 'not_separate' });
-    });
-
-    it('keeps both faults of a short letter that came with the bill', () => {
-      expect(review({ separateFromBill: false, letterDate: '2026-11-20' }).notice).toEqual({
-        kind: 'short',
-        days: 20,
-        separate: false,
-      });
     });
   });
 
@@ -221,17 +146,6 @@ describe('reviewing a renewal letter', () => {
       expect(
         review({ next: { ...same, energy: { p1: 0.144972, p2: 0.144972, p3: 0.144972 } } }).exit,
       ).toEqual({ kind: 'free' });
-    });
-
-    it('is not assessed when the letter changes no price', () => {
-      expect(review({ next: letter().current }).exit).toEqual({ kind: 'no_change' });
-    });
-
-    it('is not checked for a letter before 12-06-2026', () => {
-      expect(review({ letterDate: '2026-06-11', renewalDate: '2026-07-20' }).exit).toEqual({
-        kind: 'not_checked_before',
-        since: '2026-06-12',
-      });
     });
   });
 

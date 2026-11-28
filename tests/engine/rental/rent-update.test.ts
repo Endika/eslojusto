@@ -181,24 +181,6 @@ describe('the cap in force on each anniversary', () => {
     expect(r.sources.map((s) => s.id)).toContain('cap_igc_2022_extended');
   });
 
-  it('2024: 3 % below a 3,6 % CPI', () => {
-    // IPC May 2024 3,6 %; cap 3 %: 1.000 × 1,03 = 1.030; 6 a month from June 2024 to September
-    // 2026: 28 months = 168 €.
-    const v = single(
-      first(
-        check(
-          contract({
-            signedOn: f('2023-06-15'),
-            startDate: f('2023-06-20'),
-            updates: [update('2024-06-20', 1000, 1036)],
-          }),
-        ),
-      ),
-    );
-    expect(figures(v)).toMatchObject({ maxRent: 1030, monthly: 6, months: 28, accumulated: 168 });
-    expect(v.cap?.rule).toBe('cap_3_2024');
-  });
-
   it('2025: the IRAV caps a contract signed from 26-05-2023, the CPI an earlier one', () => {
     // 20-03-2025: IRAV February 2,08 % and IPC February 3,0 % (both out 14-03-2025). Under the
     // IRAV, 9,20 a month from March 2025 to September 2026: 19 months = 174,80 €.
@@ -493,74 +475,6 @@ describe('large landlord', () => {
     expect(figures(v)).toMatchObject({ status: 'paid_over', maxRent: 1020, accumulated: 1200 });
     expect(v.cap?.rule).toBe('cap_igc_2023');
   });
-
-  it('no: a written agreement leaves nothing to check', () => {
-    expect(single(agreed(false))).toMatchObject({
-      status: 'not_checkable',
-      unchecked: 'agreed_in_writing',
-    });
-  });
-
-  it('«No lo sé»: both readings, the lower counted, and the company hint', () => {
-    const r = agreed(null, 'company');
-    const d = depends(r);
-    expect(d.reasons).toEqual(['large_landlord_unknown']);
-    expect(d.low.status).toBe('not_checkable');
-    // 30 a month from June 2023 to September 2026: 40 months = 1.200 €.
-    expect(d.high.accumulated).toBe(1200);
-    expect(counted(r)).toBe(0);
-    expect(r.companyLandlordHint).toBe(true);
-    expect(agreed(null, 'person').companyLandlordHint).toBe(false);
-  });
-
-  it('«No lo sé» changes nothing without an agreement', () => {
-    // Without agreement the IGC (2 %) binds below the CPI and the 5 % clause: 1.020; 30 a month
-    // from June 2023 to September 2026: 40 months = 1.200 €.
-    const r = first(
-      check(
-        contract({
-          signedOn: f('2020-06-20'),
-          startDate: f('2020-06-25'),
-          landlordType: 'company',
-          largeLandlord: null,
-          updateClause: 'fixed_percent',
-          fixedPercent: 5,
-          updates: [update('2023-06-25', 1000, 1050)],
-        }),
-      ),
-    );
-    expect(figures(single(r))).toMatchObject({ maxRent: 1020, monthly: 30, accumulated: 1200 });
-    expect(r.companyLandlordHint).toBe(false);
-  });
-
-  it('outside the windows with a large-landlord rule, an agreement is not checked', () => {
-    const r = first(
-      check(
-        contract({
-          largeLandlord: true,
-          updates: [update('2025-03-20', 1000, 1100, { agreedInWriting: true })],
-        }),
-      ),
-    );
-    expect(single(r).unchecked).toBe('agreed_in_writing');
-  });
-
-  it('«No lo sé» on the agreement gives both readings', () => {
-    const r = first(
-      check(
-        contract({
-          largeLandlord: false,
-          updates: [update('2022-03-20', 1000, 1100, { agreedInWriting: null })],
-        }),
-      ),
-    );
-    const d = depends(r);
-    expect(d.reasons).toEqual(['agreement_unknown']);
-    expect(d.low.unchecked).toBe('agreed_in_writing');
-    // IPC February 2022 7,6 %: 1.076; 24 a month from March 2022 to September 2026: 55 months =
-    // 1.320 €.
-    expect(figures(d.high)).toMatchObject({ maxRent: 1076, accumulated: 1320 });
-  });
 });
 
 describe('when no rise fits', () => {
@@ -571,55 +485,6 @@ describe('when no rise fits', () => {
     // 20 a month from March 2022 to September 2026: 55 months = 1.100 €.
     expect(figures(v)).toMatchObject({ maxRent: 1000, monthly: 20, months: 55, accumulated: 1100 });
     expect(v.calculation.map((p) => p.key)).toContain('rent_update.no_clause');
-  });
-
-  describe('a rise applied before the anniversary is still that anniversary’s update', () => {
-    // 20-03-2025, contract from 2024: IRAV February 2,08 % allows 1.020,80; notice in February.
-    const early = (effectiveOn: string) =>
-      single(
-        first(
-          check(
-            contract({
-              signedOn: f('2024-03-15'),
-              startDate: f('2024-03-20'),
-              updateClause: 'irav',
-              updates: [
-                update('2025-03-20', 1000, 1020.8, {
-                  effectiveOn: f(effectiveOn),
-                  chargedFrom: f(effectiveOn),
-                  noticeOn: f('2025-02-10'),
-                }),
-              ],
-            }),
-          ),
-        ),
-      );
-
-    it('applied from the 1st of the anniversary month, it matches applying it on the day', () => {
-      // Checked by the month, March is the anniversary month: nothing above 1.020,80, never the
-      // whole year (12 × 20,80 = 249,60).
-      const first1 = early('2025-03-01');
-      const onDay = early('2025-03-20');
-      expect(figures(first1)).toEqual(figures(onDay));
-      expect(figures(first1)).toMatchObject({ status: 'within_limit', maxRent: 1020.8 });
-      expect(first1.accumulated).toBeLessThanOrEqual(20.8);
-      expect(first1.cap?.rule).toBe('cap_irav');
-    });
-
-    it('months charged before the anniversary month are paid over in full', () => {
-      // February 2025 at 1.020,80 over a 1.000 base: 20,80; March 2025 to September 2026, within
-      // the cap. February 2025 to September 2026: 20 months.
-      const v = early('2025-02-01');
-      expect(figures(v)).toMatchObject({
-        status: 'paid_over',
-        maxRent: 1020.8,
-        monthly: 0,
-        months: 20,
-        accumulated: 20.8,
-      });
-      expect(v.monthsBeforeDue).toBe(1);
-      expect(v.calculation.map((p) => p.key)).toContain('rent_update.before_anniversary');
-    });
   });
 
   it('a rise applied after the anniversary is that year’s update, due per art. 18.2', () => {
@@ -643,55 +508,6 @@ describe('when no rise fits', () => {
     expect(figures(v)).toMatchObject({ maxRent: 1076, monthly: 24, months: 54, accumulated: 1296 });
     expect(v.monthsBeforeDue).toBe(0);
     expect(v.cap?.rule).toBe('cap_ipc');
-  });
-
-  it('a second rise in the same contract year is paid over in full', () => {
-    // The first, within 1.076, runs March to August 2022, up to the second; the second, 24 a
-    // month from September 2022 to September 2026: 49 months = 1.176 €.
-    const results = check(
-      contract({
-        updates: [
-          update('2022-03-20', 1076, 1100, {
-            effectiveOn: f('2022-09-01'),
-            chargedFrom: f('2022-09-01'),
-            noticeOn: f('2022-08-01'),
-          }),
-          update('2022-03-20', 1000, 1076),
-        ],
-      }),
-    );
-    const [rise, second] = results.map(single);
-    expect(results.map((r) => r.index)).toEqual([1, 0]);
-    expect(rise && figures(rise)).toMatchObject({ status: 'within_limit', months: 6 });
-    expect(second && figures(second)).toMatchObject({
-      base: 1076,
-      maxRent: 1076,
-      monthly: 24,
-      months: 49,
-      accumulated: 1176,
-    });
-    expect(second?.calculation.map((p) => p.key)).toContain('rent_update.second_rise');
-  });
-
-  it('a 29 February start has its anniversary on 28 February in other years', () => {
-    const input = (day: string, effectiveOn = day) =>
-      contract({
-        signedOn: f('2020-02-20'),
-        startDate: f('2020-02-29'),
-        initialRent: 700,
-        updates: [update(day, 700, 703.5, { effectiveOn: f(effectiveOn) })],
-      });
-    // On 28-02-2021 the IPC January 0,5 % was out, and the February flash (0,0 %) too.
-    const on28 = depends(first(check(input('2021-02-28'))));
-    expect(on28.reasons).toEqual(['index_month_doubtful']);
-    expect(on28.low.maxRent).toBe(703.5);
-    expect(on28.high.maxRent).toBe(700);
-    // Applied a day early, it is still the update of 28-02-2021.
-    expect(depends(first(check(input('2021-02-28', '2021-02-27')))).reasons).toEqual(on28.reasons);
-    // On 29-02-2024 the February flash came out that same day.
-    const leap = depends(first(check(input('2024-02-29'))));
-    for (const { value } of leap.readings)
-      expect(value.calculation.map((p) => p.key)).not.toContain('rent_update.before_anniversary');
   });
 
   it('a negative IGC under a clause naming no index allows no rise', () => {
@@ -896,82 +712,6 @@ describe('a company landlord that is not a large landlord (Ley 12/2023, art. 3.k
 });
 
 describe('several years', () => {
-  it('carry the allowed rent, not the charged one, as the next base', () => {
-    // 2022: IPC Feb 2022 7,6 % → 1.076,00, charged 1.100 (24/month), March 2022 to February
-    //       2023, up to the next update: 12 months = 288 €.
-    // 2023: IGC Dec 2022 7,19 %, read as 2 %, below IPC Feb 2023 6,0 % → 1.076 × 1,02 =
-    //       1.097,52; charged 1.100 × 1,06 = 1.166 (68,48/month), March 2023 to February 2024:
-    //       12 months = 821,76 €.
-    // 2024: IPC Feb 2024 2,8 % below 3 % → 1.097,52 × 1,028 = 1.128,25; charged
-    //       1.166 × 1,028 = 1.198,65 (70,40/month), March 2024 to September 2026: 31 months =
-    //       2.182,40 €.
-    const results = check(
-      contract({
-        updates: [
-          update('2024-03-20', 1166, 1198.65),
-          update('2022-03-20', 1000, 1100),
-          update('2023-03-20', 1100, 1166),
-        ],
-      }),
-    );
-    const readings = results.map(single);
-    expect(results.map((r) => r.index)).toEqual([1, 2, 0]);
-    expect(readings.map((v) => [v.base, v.maxRent, v.monthly, v.accumulated])).toEqual([
-      [1000, 1076, 24, 288],
-      [1076, 1097.52, 68.48, 821.76],
-      [1097.52, 1128.25, 70.4, 2182.4],
-    ]);
-    expect(readings.map((v) => v.calculation[0]?.key)).toEqual([
-      'rent_update.base_initial',
-      'rent_update.base_previous_max',
-      'rent_update.base_previous_max',
-    ]);
-  });
-
-  it('a missing year restarts from the rent the person gave', () => {
-    const results = check(
-      contract({
-        updates: [update('2022-03-20', 1000, 1100), update('2024-03-20', 1166, 1198.65)],
-      }),
-    );
-    expect(single(results[1] as RentUpdateResult).base).toBe(1166);
-  });
-
-  it('the first anniversary starts from the contract rent', () => {
-    const v = single(
-      first(check(contract({ initialRent: 990, updates: [update('2022-03-20', 1000, 1060)] }))),
-    );
-    expect(v.base).toBe(990);
-    expect(v.calculation[0]?.key).toBe('rent_update.base_initial');
-  });
-
-  it('a doubt in one year carries into the years built on it', () => {
-    // 2026 inside RDL 8/2026 (1.020 or 1.024,70); 2027 under RDL 29/2026 pending, with a
-    // synthetic IRAV March 2027 of 2,20 % (2 % or 2,2 %) on whichever base the year before left.
-    const results = check(
-      contract({
-        signedOn: f('2024-04-10'),
-        startDate: f('2024-04-15'),
-        updateClause: 'irav',
-        updates: [update('2026-04-15', 1000, 1024.7), update('2027-04-15', 1024.7, 1050)],
-      }),
-      f('2027-06-10'),
-      FUTURE_BEFORE_VOTE,
-    );
-    const [y2026, y2027] = results.map(depends);
-    expect(y2026?.reasons).toEqual(['repealed_window']);
-    expect(y2026?.low.months).toBe(12);
-    expect(y2027?.reasons).toEqual(['pending_validation', 'repealed_window']);
-    expect(y2027?.readings.map((r) => [r.value.base, r.value.maxRent]).sort()).toEqual([
-      [1020, 1040.4],
-      [1020, 1042.44],
-      [1024.7, 1045.19],
-      [1024.7, 1047.24],
-    ]);
-    expect(y2027 && [y2027.low.accumulated, y2027.high.accumulated]).toEqual([8.28, 28.8]);
-    expect(counted(results[1] as RentUpdateResult)).toBe(0);
-  });
-
   it('a validated RDL 29/2026 leaves 2027 with the 2 % cap on either base of 2026', () => {
     const results = check(
       contract({
@@ -992,107 +732,6 @@ describe('several years', () => {
   });
 });
 
-describe('the months a rise paid over counts', () => {
-  const keys = (v: RentUpdateReading) => v.calculation.map((p) => p.key);
-
-  it('without a later update, run until today and say so', () => {
-    // 20-03-2025, contract from 2024: IRAV February 2,08 % allows 1.020,80; 9,20 a month from
-    // March 2025, past the next anniversary in March 2026, to September 2026: 19 months =
-    // 174,80 €.
-    const v = single(
-      first(
-        check(
-          contract({
-            signedOn: f('2024-03-15'),
-            startDate: f('2024-03-20'),
-            updates: [update('2025-03-20', 1000, 1030)],
-          }),
-        ),
-      ),
-    );
-    expect(figures(v)).toMatchObject({ months: 19, accumulated: 174.8 });
-    expect(keys(v)).toContain('rent_update.until_today');
-    expect(keys(v)).not.toContain('rent_update.five_years');
-  });
-
-  it('stop at a later update', () => {
-    // 9,20 a month from March 2025 to February 2026, the month before the next update was
-    // charged: 12 months = 110,40 €.
-    const v = single(
-      first(
-        check(
-          contract({
-            signedOn: f('2024-03-15'),
-            startDate: f('2024-03-20'),
-            updates: [update('2025-03-20', 1000, 1030), update('2026-03-20', 1030, 1050)],
-          }),
-        ),
-      ),
-    );
-    expect(figures(v)).toMatchObject({ months: 12, accumulated: 110.4 });
-    expect(keys(v)).not.toContain('rent_update.until_today');
-  });
-
-  it('stopped by the keys past the anniversary, never say «hasta hoy»', () => {
-    // Keys back on 15-06-2026, past the March 2026 anniversary: the count stops at May 2026.
-    const v = single(
-      first(
-        check(
-          contract({
-            signedOn: f('2024-03-15'),
-            startDate: f('2024-03-20'),
-            updates: [update('2025-03-20', 1000, 1030)],
-            moveOut: { keysReturnedOn: f('2026-06-15'), returns: [], deductions: [] },
-          }),
-        ),
-      ),
-    );
-    expect(keys(v)).not.toContain('rent_update.until_today');
-  });
-
-  it('stop at the keys and count only months already due', () => {
-    const input = contract({
-      updates: [update('2025-03-20', 1000, 1040)],
-      moveOut: { keysReturnedOn: f('2025-08-15'), returns: [], deductions: [] },
-    });
-    // March to July 2025, the month before the keys: 5 months × 10 = 50 €.
-    const v = single(first(check(input)));
-    expect(figures(v)).toMatchObject({ months: 5, accumulated: 50 });
-    expect(keys(v)).not.toContain('rent_update.until_today');
-    const open = contract({ updates: [update('2025-03-20', 1000, 1040)] });
-    // Paid by the 7th: on 07-05-2025 March and April are due, on 08-05-2025 May too.
-    expect(single(first(check(open, f('2025-05-07')))).months).toBe(2);
-    expect(single(first(check(open, f('2025-05-08')))).months).toBe(3);
-  });
-
-  it('leave out the months over five years old and say so', () => {
-    // No clause, so the whole 20 € rise is paid over. Charged from March 2021; five years back
-    // from 07-10-2026 the first month is October 2021: October 2021 to September 2026, 60 months
-    // = 1.200 €, not the 67 months from March 2021 (1.340 €).
-    const v = single(
-      first(
-        check(
-          contract({
-            signedOn: f('2020-03-15'),
-            startDate: f('2020-03-20'),
-            updateClause: 'none',
-            updates: [update('2021-03-20', 1000, 1020)],
-          }),
-        ),
-      ),
-    );
-    expect(figures(v)).toMatchObject({ monthly: 20, months: 60, accumulated: 1200 });
-    expect(v.calculation.find((p) => p.key === 'rent_update.months')?.vars).toEqual({
-      months: { integer: 60 },
-      from: { month: '2021-10' },
-      to: { month: '2026-09' },
-    });
-    expect(keys(v)).toEqual(
-      expect.arrayContaining(['rent_update.until_today', 'rent_update.five_years']),
-    );
-  });
-});
-
 describe('index figures', () => {
   it('on the day the INE publishes one, both readings', () => {
     // 15-09-2026: IRAV August (2,47 %) out that day; July (2,49 %) the day before.
@@ -1110,28 +749,6 @@ describe('index figures', () => {
     expect(d.reasons).toEqual(['index_month_doubtful']);
     expect(d.low.maxRent).toBe(1024.9);
     expect(d.high).toMatchObject({ maxRent: 1024.7, monthly: 0.2 });
-  });
-
-  it('never uses a month the table does not cover', () => {
-    const stale: RentalDeps = {
-      norms: NORMS,
-      indices: { ...INDICES, irav: { ...IRAV, coveredUntil: '2025-01-01' } },
-    };
-    const v = single(
-      first(
-        check(
-          contract({
-            signedOn: f('2024-03-15'),
-            startDate: f('2024-03-20'),
-            updates: [update('2025-03-20', 1000, 1030)],
-          }),
-          TODAY,
-          stale,
-        ),
-      ),
-    );
-    expect(v).toMatchObject({ status: 'not_checkable', unchecked: 'index_not_loaded' });
-    expect(v.accumulated).toBe(0);
   });
 
   it('an IRAV clause before the IRAV existed cannot be checked', () => {

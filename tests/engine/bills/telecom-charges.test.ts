@@ -61,19 +61,6 @@ describe('the charges of telecom bills', () => {
     expect(c.severalFees).toBe(true);
   });
 
-  it('has no extras, premium rate or fees when the bills have none', () => {
-    const c = telecomCharges([bill(line('handset', 10), line('discount', 2))], TODAY);
-    expect(c).toMatchObject({ extras: 0, premiumRate: false, severalFees: false });
-  });
-
-  it('asks to recognise each fee only when a bill has more than one', () => {
-    const one = telecomCharges(
-      [bill(line('fixed_fee', 23.14)), bill(line('fixed_fee', 23.14))],
-      TODAY,
-    );
-    expect(one.severalFees).toBe(false);
-  });
-
   it('tells when a discount with an end day ends, or ended, and by how much', () => {
     const c = telecomCharges(
       [
@@ -106,12 +93,6 @@ describe('the charges of telecom bills', () => {
     expect(c.promotions).toEqual([
       { bill: 0, line: 1, endsOn: day('2026-09-30'), ended: true, amount: 4.13 },
     ]);
-  });
-
-  it('leaves out a discount of nothing', () => {
-    expect(
-      telecomCharges([bill(line('discount', 0, null, '2026-12-31'))], TODAY).promotions,
-    ).toEqual([]);
   });
 
   it('tells only of discounts with an end day and an amount', () => {

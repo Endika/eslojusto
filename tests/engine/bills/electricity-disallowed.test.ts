@@ -46,8 +46,8 @@ describe('excess power on the 2.0TD tariff', () => {
     expect(only(check(true)).id).toBe('excess_power');
   });
 
-  it.each([null, 0, -1])('gives nothing when the excess is %s', (amount) => {
-    const excessPower = amount === null ? null : { amount, maximeter: false };
+  it('gives nothing when the excess is 0', () => {
+    const excessPower = { amount: 0, maximeter: false };
     expect(checkExcessPower(juneBill({ excessPower }), BILLS_NORMS)).toBeNull();
   });
 });

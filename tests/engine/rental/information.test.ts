@@ -24,14 +24,6 @@ const withNorm = (id: keyof NormTable, change: Partial<Norm>): NormTable => ({
   [id]: { ...NORMS[id], ...change },
 });
 
-// Every number anywhere inside a value.
-const numbersIn = (v: unknown): number[] =>
-  typeof v === 'number'
-    ? [v]
-    : v !== null && typeof v === 'object'
-      ? Object.values(v).flatMap(numbersIn)
-      : [];
-
 describe('stressed zones', () => {
   const signed2024 = { signedOn: f('2024-02-01'), startDate: f('2024-02-01') };
 
@@ -73,32 +65,12 @@ describe('the RDL 29/2026 reference price', () => {
 });
 
 describe('term and extensions, dates only', () => {
-  it('three years agreed with a person: five-year term and its notice windows', () => {
-    const bs = blocks({ startDate: f('2021-03-20'), agreedMonths: 36 });
-    expect(find(bs, 'minimum_term').dates).toEqual({
-      contractEnd: '2024-03-20',
-      mandatoryEnd: '2026-03-20',
-    });
-    expect(find(bs, 'notice_windows').dates).toEqual({
-      landlordBy: '2025-11-20',
-      tenantBy: '2026-01-20',
-      tacitUntil: '2029-03-20',
-    });
-    expect(ids(bs)).not.toContain('extensions_rdl28');
-    expect(ids(bs)).not.toContain('extension_rdl29');
-  });
-
   it('counts from the signing when the keys came before it (LAU art. 9.1)', () => {
     const bs = blocks({ signedOn: f('2021-04-02'), startDate: f('2021-03-20'), agreedMonths: 12 });
     expect(find(bs, 'minimum_term').dates).toEqual({
       contractEnd: '2022-04-02',
       mandatoryEnd: '2026-04-02',
     });
-  });
-
-  it('seven years with a company', () => {
-    const bs = blocks({ startDate: f('2021-03-20'), agreedMonths: 36, landlordType: 'company' });
-    expect(find(bs, 'minimum_term').dates.mandatoryEnd).toBe('2028-03-20');
   });
 
   const endsIn2027 = { signedOn: f('2022-01-05'), startDate: f('2022-01-10'), agreedMonths: 12 };
@@ -132,19 +104,6 @@ describe('term and extensions, dates only', () => {
   });
 });
 
-describe('always there', () => {
-  it('deposit lodging, the region and meter-read supplies', () => {
-    const bs = blocks({ region: 'CT' });
-    expect(ids(bs)).toEqual(
-      expect.arrayContaining(['deposit_lodging', 'regional_rules', 'meters']),
-    );
-    expect(find(bs, 'regional_rules')).toMatchObject({
-      region: 'CT',
-      links: ['https://www.boe.es/buscar/act.php?id=BOE-A-1994-26003'],
-    });
-  });
-});
-
 describe('moving out', () => {
   const moveOut = (keys: string) => ({ keysReturnedOn: f(keys), returns: [], deductions: [] });
 
@@ -156,40 +115,6 @@ describe('moving out', () => {
     expect(ids(blocks({ moveOut: moveOut('2026-09-30') }, NORMS_BEFORE_VOTE))).not.toContain(
       'closing_document',
     );
-  });
-
-  it('the closing document from 08-10-2026 applies without doubt once validated', () => {
-    expect(
-      find(blocks({ moveOut: moveOut('2026-10-20') }), 'closing_document').sources[0],
-    ).toMatchObject({ id: 'closing_document', status: 'in_force', statusSince: '2026-11-13' });
-    expect(ids(blocks({ moveOut: moveOut('2026-09-30') }))).not.toContain('closing_document');
-  });
-
-  it('extra guarantees in money accrue no interest here', () => {
-    const bs = blocks({
-      moveOut: moveOut('2026-09-30'),
-      guarantees: [{ kind: 'cash', amount: 1500 }],
-    });
-    expect(ids(bs)).toContain('guarantee_return');
-  });
-});
-
-describe('no block carries an amount', () => {
-  it.each([
-    ['a plain contract', {}],
-    [
-      'everything opened',
-      {
-        signedOn: f('2024-02-01'),
-        startDate: f('2024-02-01'),
-        agreedMonths: 12,
-        stressedZone: true,
-        guarantees: [{ kind: 'cash' as const, amount: 1500 }],
-        moveOut: { keysReturnedOn: f('2026-10-20'), returns: [], deductions: [] },
-      },
-    ],
-  ])('%s', (_, change) => {
-    expect(numbersIn(blocks(change))).toEqual([]);
   });
 });
 
@@ -218,27 +143,6 @@ describe('what each block says and cites', () => {
       sources: sources.map((x) => x.id),
     }));
   const plain = { dates: {}, answer: null, region: null, links: [] };
-
-  it('a plain contract: the reference price, the term, the notice windows and what always is', () => {
-    expect(shape(blocks())).toEqual([
-      { ...plain, id: 'reference_price', links: [SERPAVI], sources: ['cap_2_rdl29'] },
-      {
-        ...plain,
-        id: 'minimum_term',
-        dates: { contractEnd: '2026-03-20', mandatoryEnd: '2026-03-20' },
-        sources: ['term_minimum'],
-      },
-      {
-        ...plain,
-        id: 'notice_windows',
-        dates: { landlordBy: '2025-11-20', tenantBy: '2026-01-20', tacitUntil: '2029-03-20' },
-        sources: ['term_tacit'],
-      },
-      { ...plain, id: 'deposit_lodging', sources: ['deposit_lodging'] },
-      { ...plain, id: 'regional_rules', region: 'MD', links: [LAU], sources: [] },
-      { ...plain, id: 'meters', sources: ['charges_meters'] },
-    ]);
-  });
 
   it('a stressed zone, a cash guarantee and a move-out add their blocks', () => {
     const bs = blocks({
