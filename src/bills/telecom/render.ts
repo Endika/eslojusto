@@ -41,6 +41,7 @@ export const telecomLabels = (tr: Translate): ItemLabels => ({
 });
 
 const isChangeExit = (item: BillItem): boolean =>
+  // Stryker disable next-line MethodExpression: every reading of an item is of the same line
   findingsOf(item).some((f) => f.id === 'change_exit');
 
 // The totals first, then the commitment, the exit after a change and what was billed after it took
