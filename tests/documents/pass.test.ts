@@ -183,7 +183,7 @@ describe('createPassStore', () => {
     ['a redeemed payment with no expiry', { ...ok, redeemed: true }],
     ['a redeemed payment with a text expiry', { ...ok, redeemed: true, expiresAt: '9' }],
     ['a start that is no integer', { ...ok, startedAt: 'now' }],
-    ['a start that is a fraction', { ...ok, startedAt: 1.5 }],
+    ['a start that is a fraction', { ...ok, startedAt: NOW - 0.5 }],
   ])('drops a stored payment with %s', (_name, entry) => {
     const store = memoryStore();
     store.set(STORAGE_KEYS.checkout, JSON.stringify([entry]));
@@ -224,6 +224,18 @@ describe('createPassStore', () => {
     for (const token of [`v2.${old}.s`, 'v1..s', 'text']) {
       passes.saveQuota(token);
       expect(passes.quota(), token).toBe(token);
+    }
+  });
+  it('keeps a counter that is not a free-reads one of a day', () => {
+    const passes = createPassStore(memoryStore(), () => NOW * 1000);
+    const token = (claims: object) => passToken(claims);
+    for (const claims of [
+      { typ: 'pass', day: '2020-01-01' },
+      { typ: 'quota' },
+      { typ: 'quota', day: 5 },
+    ]) {
+      passes.saveQuota(token(claims));
+      expect(passes.quota(), JSON.stringify(claims)).toBe(token(claims));
     }
   });
   it('a retired pass downloads but reads no more', () => {

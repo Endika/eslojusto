@@ -35,9 +35,12 @@ const ITEM_IDS = [
 const HOLIDAY_FIELDS = ['annualHolidayDays', 'holidayDaysTaken'] as const;
 
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-const lowest = (...cs: Confidence[]): Confidence =>
-  // Stryker disable next-line EqualityOperator: equal ranks are the same confidence, so which one stays does not matter
-  cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
+const lowest = (...fields: (Typed<unknown> | false | null)[]): Confidence =>
+  fields.reduce<Confidence>(
+    // Stryker disable next-line EqualityOperator: equal ranks are the same confidence, so which one stays does not matter
+    (a, f) => (f && RANK[f.confidence] < RANK[a] ? f.confidence : a),
+    'high',
+  );
 
 // A field read as one kind of value, or nothing when the reading gave another.
 interface Typed<T> {
@@ -144,10 +147,10 @@ function payslip(fields: Fields, salaryStated: boolean): PrefilledField[] {
       name: 'monthlySalary',
       value: formatAmountInput(salary),
       confidence: lowest(
-        total.confidence,
-        prorated.confidence,
-        ...(!prorated.value && paid ? [paid.confidence] : []),
-        ...(taken && taken.value > 0 ? [taken.confidence] : []),
+        total,
+        prorated,
+        !prorated.value && paid,
+        taken && taken.value > 0 && taken,
       ),
       derived: true,
     });
@@ -160,12 +163,12 @@ function workHistory(
   current: { startDate?: string; endDate?: string },
 ) {
   const end = safeDate(current.endDate ?? null);
-  const since = end ? toIso({ ...end, y: end.y - 6 }) : null;
+  const since = end ? toIso({ ...end, y: end.y - 6 }) : '';
   return rows.flatMap((row): PrefilledContract[] => {
     const { startDate, endDate } = row.values;
     if (typeof startDate !== 'string' || typeof endDate !== 'string') return [];
     if (startDate === current.startDate) return [];
-    if (since !== null && endDate < since) return [];
+    if (endDate < since) return [];
     if (current.endDate && endDate > current.endDate) return [];
     return [{ startDate, endDate, confidence: row.confidence }];
   });
@@ -205,5 +208,7 @@ export const prefilledCount = (p: Prefill): number =>
 export const hasHolidayDays = (p: Prefill): boolean =>
   p.fields.some((f) => (HOLIDAY_FIELDS as readonly string[]).includes(f.name));
 
-export const hasLowConfidence = (p: Prefill): boolean =>
-  [...p.fields, ...(p.otherContracts ?? [])].some((f) => f.confidence === 'low');
+export const hasLowConfidence = (p: Prefill): boolean => {
+  const low = (f: { readonly confidence: Confidence }) => f.confidence === 'low';
+  return p.fields.some(low) || (p.otherContracts?.some(low) ?? false);
+};

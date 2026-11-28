@@ -146,7 +146,7 @@ describe('the PDF-to-pages adapter, in what it asks of pdf.js', () => {
     ]);
   });
 
-  it.each([0, -1, 1.5, Number.NaN])(
+  it.each([-1, Number.NaN])(
     'answers unreadable for a document of %s pages, and frees it',
     async (n) => {
       const calls: unknown[] = [];

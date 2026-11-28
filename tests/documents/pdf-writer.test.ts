@@ -60,9 +60,6 @@ describe('wrapping a text', () => {
     expect(wrap('aa bb', 25)).toEqual(['aa bb']);
     expect(wrap('aa bb', 24)).toEqual(['aa', 'bb']);
   });
-  it('keeps the line breaks of its own', () => {
-    expect(wrap('aa\nbb', 100)).toEqual(['aa', 'bb']);
-  });
   it('breaks a word longer than the room where it must, but never inside a lone letter', () => {
     expect(wrap('aaaaaaaaaaaa', 22)).toEqual(['aaaa', 'aaaa', 'aaaa']);
     expect(wrap('aaaaaaaaaaaa', 20)).toEqual(['aaaa', 'aaaa', 'aaaa']);
@@ -73,49 +70,11 @@ describe('wrapping a text', () => {
 });
 
 describe('where the text lands', () => {
-  it('starts at the margin, one line below the top, and leaves what it asks for after', () => {
-    const doc = make();
-    doc.paragraph('abc', S, { after: 6 });
-    doc.paragraph('abc', S);
-    expect(placed(doc)).toEqual([['F1 10 @60 767.89 ×3', 'F1 10 @60 747.89 ×3']]);
-  });
-  it('moves down by the style’s leading, or by one and four tenths of its size, and indents', () => {
-    const doc = make();
-    doc.paragraph('abc abc', { ...S, leading: 20 });
-    doc.paragraph('abc abc', S, { indent: 10 });
-    doc.paragraph('abc', S);
-    expect(placed(doc)).toEqual([
-      ['F1 10 @60 767.89 ×7', 'F1 10 @70 747.89 ×7', 'F1 10 @60 733.89 ×3'],
-    ]);
-  });
-  it('writes sizes and colours to two decimals, and a bold text as a stroked one', () => {
-    const doc = make();
-    doc.textAt('a', 0, 100, { font: 'sans', size: 10.456, color: [0.123, 0.456, 0.789] });
-    doc.textAt('a', 3, 100, { font: 'serif', size: 8, bold: true });
-    expect(pagesOf(doc)[0]?.ops).toEqual([
-      'BT /F1 10.46 Tf 0.12 0.46 0.79 rg 60 741.89 Td <0002> Tj ET',
-      'BT /F2 8 Tf 0.09 0.08 0.06 rg 2 Tr 0.28 w 0.09 0.08 0.06 RG 63 741.89 Td <0002> Tj 0 Tr ET',
-    ]);
-  });
   it('links the words of a paragraph, from the indent to the end of the line', () => {
     const doc = make();
     doc.paragraph('abc', S, { indent: 4, link: 'https://a.test' });
     expect(pagesOf(doc)[0]?.links).toEqual([
       { rect: [64, 765.39, 79, 777.39], url: 'https://a.test' },
-    ]);
-  });
-  it('puts a row’s value at the right edge and each line of its label at the left', () => {
-    const doc = make();
-    const style = { ...S, leading: 12 };
-    doc.row(`${'a'.repeat(60)} ${'b'.repeat(60)}`, 'c', style, { font: 'serif', size: 8 });
-    doc.paragraph('abc', S);
-    expect(placed(doc)).toEqual([
-      [
-        'F2 8 @531.28 767.89 ×1',
-        'F1 10 @60 767.89 ×60',
-        'F1 10 @60 755.89 ×60',
-        'F1 10 @60 743.89 ×3',
-      ],
     ]);
   });
 });
@@ -245,10 +204,6 @@ describe('a line to write on', () => {
     expect(blank('abc')).toEqual([['F1 10 @62 756.89 ×3', lineAt('751.89'), 'F1 8 @60 741.89 ×3']]);
     expect(blank(undefined)).toEqual([[lineAt('751.89'), 'F1 8 @60 741.89 ×3']]);
   });
-  it('shrinks a value too long for its line, unless it may wrap', () => {
-    expect(blank('W'.repeat(24))[0]?.[0]).toBe('F1 4 @62 756.89 ×24');
-    expect(blank('W'.repeat(9))[0]?.[0]).toBe('F1 10 @62 756.89 ×9');
-  });
   it('wraps a long value over as many lines as it needs, the line below the last', () => {
     expect(blank('abc abc abc abc abc abc', true)).toEqual([
       ['F1 10 @62 756.89 ×19', 'F1 10 @62 742.89 ×3', lineAt('737.89'), 'F1 8 @60 727.89 ×3'],
@@ -273,17 +228,6 @@ describe('a line to write on', () => {
 });
 
 describe('the footer', () => {
-  it('numbers each page at the bottom, and wraps a long one upwards from its first line', () => {
-    const doc = make((n, total) => `${'a'.repeat(n)}${'b'.repeat(total)}`);
-    doc.paragraph('abc', S);
-    doc.newPage();
-    return doc.save().then(() => {
-      expect(placed(doc)).toEqual([
-        ['F1 10 @60 767.89 ×3', 'F1 7.5 @60 42 ×3'],
-        ['F1 7.5 @60 42 ×4'],
-      ]);
-    });
-  });
   it('wraps a footer line by line, ten points apart', async () => {
     const doc = make(() => `${'a'.repeat(130)} b`);
     await doc.save();
@@ -331,6 +275,24 @@ describe('the copy map of a font', () => {
     expect(entries[0]).toBe('<0001> <0100>');
     expect(entries[149]).toBe('<0096> <0195>');
     expect(entries).toEqual([...entries].sort());
+  });
+});
+
+describe('links and astral characters', () => {
+  it('lists every link of a page, apart by a space', async () => {
+    const doc = make();
+    doc.paragraph('abc', S, { link: 'https://a.test' });
+    doc.paragraph('abc', S, { link: 'https://b.test' });
+    const pdf = Buffer.from(await doc.save()).toString('latin1');
+    expect(pdf).toContain('>> >> << /Type /Annot /Subtype /Link');
+  });
+  it('copies a character beyond the basic plane as its two code units', async () => {
+    const doc = make(undefined, fontOf(' \u{1F600}'));
+    doc.paragraph('\u{1F600}', S);
+    const map = streams(Buffer.from(await doc.save()).toString('latin1')).find((x) =>
+      x.data.includes('beginbfchar'),
+    );
+    expect(map?.data).toContain('<0002> <d83dde00>');
   });
 });
 

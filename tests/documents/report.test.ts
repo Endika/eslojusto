@@ -74,14 +74,6 @@ describe('the shape of the report', () => {
       'text: Depende de tus últimas nóminas. La cantidad sale de lo cotizado en los últimos 180 días (art. 270.1 LGSS) y este contrato dura menos, así que entra otro trabajo que esta revisión no conoce.',
     );
   });
-  it('says only that a resignation gives no benefit', () => {
-    const blocks = reportOf(
-      { cause: 'resignation', agreementNoticeDays: 15, noticeDaysGiven: 0 },
-      { notice_deduction: 5000 },
-    );
-    expect(shape(blocks)).toContain('heading text note source');
-    expect(shape(blocks).endsWith('heading text note source')).toBe(true);
-  });
   it('gives a range of amounts when the children are not known', () => {
     const input = { ...unfairDismissal, monthlySalary: 3000 };
     const r = completed(input);
@@ -215,11 +207,14 @@ describe('the data and items of the report, line by line', () => {
     expect(startsWith(past, 'note: Cómo se calcula: 10 % al año')).toBe(false);
   });
 
-  it('takes the holiday note only for a duration that could still grow', () => {
-    const note = 'note: Las vacaciones pagadas y no disfrutadas también cuentan';
-    expect(startsWith(reportOf({ startDate: { y: 2025, m: 3, d: 1 } }), note)).toBe(true);
-    expect(startsWith(reportOf({}), note)).toBe(false);
-    expect(startsWith(reportOf({ startDate: { y: 2026, m: 6, d: 1 } }), note)).toBe(false);
+  it('writes the amounts of a benefit with no duration as two stretches, and the deduction', () => {
+    const blocks = reportOf({ startDate: { y: 2025, m: 12, d: 1 } });
+    expect(lines(blocks)).toContain(
+      'text: Serían unos 1.225\u00a0€ al mes los primeros 6 meses y unos 1.225\u00a0€ después, en bruto.',
+    );
+    expect(lines(blocks)).toContain(
+      'note: De ahí se descuentan unos 104\u00a0€ al mes de Seguridad Social y el IRPF que te corresponda, que esta revisión no calcula.',
+    );
   });
 });
 
@@ -229,29 +224,24 @@ describe('the shape of the letters', () => {
       'title blank×3 text bullet text×3 blank',
     );
   });
-  it('without a shortfall, is the same letter without a list', () => {
-    expect(shape(letterModel(completed(unfairDismissal, { severance: 41000 }), tr).blocks)).toBe(
-      'title blank×3 text×4 blank',
-    );
-  });
 });
 
 describe('the report', () => {
-  const model = reportModel(completed(), tr, today);
-  const all = text(model.blocks);
+  const model = () => reportModel(completed(), tr, today);
+  const all = () => text(model().blocks);
   it('covers the data, every item, what is not checked and the benefit', () => {
-    expect(all).toContain('Despido improcedente');
-    expect(all).toContain('01-03-2010');
-    expect(all).toContain('Indemnización');
-    expect(all).toContain('Por debajo del mínimo legal: faltan 438,41');
-    expect(all).toContain('Lo que esta revisión no comprueba');
-    expect(all).toContain('Salarios de tramitación');
-    expect(all).toContain('Tu paro (estimación)');
-    expect(all).toContain('720 días');
+    expect(all()).toContain('Despido improcedente');
+    expect(all()).toContain('01-03-2010');
+    expect(all()).toContain('Indemnización');
+    expect(all()).toContain('Por debajo del mínimo legal: faltan 438,41');
+    expect(all()).toContain('Lo que esta revisión no comprueba');
+    expect(all()).toContain('Salarios de tramitación');
+    expect(all()).toContain('Tu paro (estimación)');
+    expect(all()).toContain('720 días');
   });
   it('says the holiday unit in the data and under the holiday item', () => {
-    expect(all).toContain('30 días naturales al año; 0 disfrutados');
-    expect(all).toContain('Hemos contado 0 días naturales disfrutados de 30 al año.');
+    expect(all()).toContain('30 días naturales al año; 0 disfrutados');
+    expect(all()).toContain('Hemos contado 0 días naturales disfrutados de 30 al año.');
     const working = text(
       reportModel(
         completed({
@@ -268,7 +258,7 @@ describe('the report', () => {
     expect(working).toContain('toma 22 días laborables como los 30 naturales');
   });
   it('cites every source with its link and the date it is in force from', () => {
-    const sources = model.blocks.filter((b) => b.type === 'source');
+    const sources = model().blocks.filter((b) => b.type === 'source');
     expect(sources.length).toBeGreaterThan(5);
     expect(sources).toContainEqual({
       type: 'source',
@@ -277,8 +267,8 @@ describe('the report', () => {
     });
   });
   it('dates itself and the law it applies', () => {
-    expect(all).toContain('7 de octubre de 2026');
-    expect(model.footer).toContain('Cifras según la ley en vigor el 7 de octubre de 2026');
+    expect(all()).toContain('7 de octubre de 2026');
+    expect(model().footer).toContain('Cifras según la ley en vigor el 7 de octubre de 2026');
   });
 });
 

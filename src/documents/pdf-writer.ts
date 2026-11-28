@@ -51,10 +51,7 @@ const fmt = (n: number) => (Math.round(n * 100) / 100).toString();
 const color = ([r, g, b]: Rgb) => `${fmt(r)} ${fmt(g)} ${fmt(b)}`;
 
 function base64ToBytes(b64: string): Uint8Array {
-  const binary = atob(b64);
-  const out = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
-  return out;
+  return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 }
 
 const latin1 = (s: string) => Uint8Array.from(s, (c) => c.charCodeAt(0) & 0xff);
@@ -271,8 +268,8 @@ export class PdfDocument {
       // A long value shrinks to fit on its line rather than cross the margin.
       const room = width - 4;
       const measured = this.measure(value, valueStyle);
-      // Stryker disable next-line EqualityOperator: at exactly the room, the fitted size is the size itself
       const fitted =
+        // Stryker disable next-line EqualityOperator: at exactly the room, the fitted size is the size itself
         measured > room ? { ...valueStyle, size: (valueStyle.size * room) / measured } : valueStyle;
       this.textAt(value, 2, this.y - 5, fitted);
     }
@@ -286,10 +283,11 @@ export class PdfDocument {
 
   async save(): Promise<Uint8Array> {
     const total = this.pages.length;
-    if (this.footer) {
+    const { footer } = this;
+    if (footer) {
       const style: TextStyle = { font: 'sans', size: 7.5, color: SOFT };
       this.pages.forEach((page, i) =>
-        this.wrap(this.footer?.(i + 1, total) ?? '', style, this.width).forEach((line, j) =>
+        this.wrap(footer(i + 1, total), style, this.width).forEach((line, j) =>
           this.textAt(line, 0, A4.height - MARGIN.bottom + 30 + j * 10, style, page),
         ),
       );
@@ -310,7 +308,9 @@ export class PdfDocument {
       return body;
     };
 
+    // Stryker disable next-line StringLiteral: a placeholder, replaced below once the pages are known
     const catalog = add('');
+    // Stryker disable next-line StringLiteral: a placeholder, replaced below once the pages are known
     const pagesId = add('');
     const fontIds: Record<string, number> = {};
     for (const state of Object.values(this.fonts)) {
@@ -374,8 +374,9 @@ export class PdfDocument {
     objects[catalog - 1] = `<< /Type /Catalog /Pages ${pagesId} 0 R /Lang (es-ES) >>`;
     const info = add(`<< /Title ${pdfString(this.title)} /Producer (eslojusto.es) >>`);
 
-    const chunks: Uint8Array[] = [latin1('%PDF-1.7\n%\xe2\xe3\xcf\xd3\n')];
-    let offset = chunks[0]?.length ?? 0;
+    const header = latin1('%PDF-1.7\n%\xe2\xe3\xcf\xd3\n');
+    const chunks: Uint8Array[] = [header];
+    let offset = header.length;
     const offsets: number[] = [];
     objects.forEach((body, i) => {
       offsets.push(offset);

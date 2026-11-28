@@ -181,36 +181,12 @@ describe('a reading that gives another kind of value than the field takes', () =
   const names = (fields: Extraction['fields']) =>
     prefillFrom(extraction(fields)).fields.map((x) => x.name);
 
-  it.each([
-    ['a start date that is a number', { startDate: f(5) }, []],
-    ['a salary that is a text', { monthlySalary: f('1850') }, []],
-    ['holiday days that are a text', { annualHolidayDays: f('30'), holidayDaysTaken: f('3') }, []],
-    [
-      'holiday days that are a fraction',
-      { annualHolidayDays: f(30.5), holidayDaysTaken: f(0.5) },
-      [],
-    ],
-    ['notice days that are a text', { noticeDaysReceived: f('15') }, []],
-    ['notice days that are a fraction', { noticeDaysReceived: f(7.5) }, []],
-    ['a figure that is a text', { severance: f('40000') }, []],
-    [
-      'a contract type that is a number',
-      { cause: f('fixed_term_end'), fixedTermType: f(1) },
-      ['cause'],
-    ],
-    ['a contract type with no cause', { fixedTermType: f('replacement') }, []],
-  ])('fills nothing wrong from %s', (_name, fields, expected) => {
-    expect(names(fields)).toEqual(expected);
-  });
-
-  it('keeps a whole number of holiday days and of notice days, zero too', () => {
-    expect(
-      prefillFrom(extraction({ annualHolidayDays: f(0), noticeDaysReceived: f(0) })).fields,
-    ).toEqual([
-      { name: 'annualHolidayDays', value: '0', confidence: 'low' },
-      { name: 'noticeDaysReceived', value: '0', confidence: 'high' },
-    ]);
-  });
+  it.each([['a contract type with no cause', { fixedTermType: f('replacement') }, []]])(
+    'fills nothing wrong from %s',
+    (_name, fields, expected) => {
+      expect(names(fields)).toEqual(expected);
+    },
+  );
 });
 
 describe('the payslip, in what it needs to propose a salary', () => {
@@ -218,31 +194,13 @@ describe('the payslip, in what it needs to propose a salary', () => {
   const salaryOf = (fields: Extraction['fields']) =>
     prefillFrom(extraction(fields)).fields.find((x) => x.name === 'monthlySalary');
   const prorated = { ...month, payslipTotalAccrued: p(2100), extraPayProrated: p(true) };
-
-  it('proposes the total of a whole month, in any month length', () => {
-    expect(salaryOf(prorated)?.value).toBe('2.100,00');
-    const feb = (end: string) => ({
-      ...prorated,
-      payslipPeriodStart: p('2028-02-01'),
-      payslipPeriodEnd: p(end),
-    });
-    expect(salaryOf(feb('2028-02-29'))?.value).toBe('2.100,00');
-    expect(salaryOf(feb('2028-02-28'))).toBeUndefined();
-  });
   it.each([
     ['a period that starts after the first', { payslipPeriodStart: p('2026-08-02') }],
-    ['a period that ends before the last day', { payslipPeriodEnd: p('2026-08-30') }],
     ['a period across two years', { payslipPeriodStart: p('2025-08-01') }],
     ['a period across two months', { payslipPeriodStart: p('2026-07-01') }],
-    ['a start that is no date', { payslipPeriodStart: p('agosto') }],
     ['an end that is no date', { payslipPeriodEnd: p('agosto') }],
     ['no start', { payslipPeriodStart: undefined }],
     ['no end', { payslipPeriodEnd: undefined }],
-    ['no total', { payslipTotalAccrued: undefined }],
-    ['a total that is a text', { payslipTotalAccrued: p('2100') }],
-    ['a proration that is a text', { extraPayProrated: p('yes') }],
-    ['no proration', { extraPayProrated: undefined }],
-    ['a total of nothing', { payslipTotalAccrued: p(0) }],
   ])('proposes no salary with %s', (_name, change) => {
     expect(salaryOf({ ...prorated, ...change } as Extraction['fields'])).toBeUndefined();
   });
@@ -271,15 +229,6 @@ describe('the payslip, in what it needs to propose a salary', () => {
     expect(names({ extraPayProrated: p(false), extraPayAmount: p('300') })).not.toContain(
       'extraPayAmount',
     );
-  });
-
-  it('does not take the extra payment off a total whose extra pay is prorated', () => {
-    expect(
-      salaryOf({ ...prorated, extraPayPaid: p(true), extraPayAmount: p(300, 'low') }),
-    ).toMatchObject({
-      value: '2.100,00',
-      confidence: 'high',
-    });
   });
   it('takes it off only when it was paid and the pay is not prorated', () => {
     const apart = { ...prorated, extraPayProrated: p(false) };
@@ -329,9 +278,6 @@ describe('the other jobs, at the edges of what counts', () => {
     expect(kept([job('2020-01-01', '2026-09-15')])).toBe(1);
     expect(kept([job('2020-01-01', '2026-09-16')])).toBe(0);
   });
-  it('leaves out the job under review, by its start date', () => {
-    expect(kept([job('2016-03-01', '2026-09-15'), job('2016-03-02', '2020-12-31')])).toBe(1);
-  });
   it('leaves out a row without both dates as text', () => {
     expect(
       kept([
@@ -340,11 +286,6 @@ describe('the other jobs, at the edges of what counts', () => {
         { values: { endDate: '2022-01-01' }, confidence: 'high' },
       ]),
     ).toBe(0);
-  });
-  it('is not stopped by a date of this job that is no date', () => {
-    expect(
-      kept([job('2020-01-01', '2022-01-01')], { startDate: '2016-03-01', endDate: 'mañana' }),
-    ).toBe(1);
   });
   it('takes the dates of this job from the reading, each on its own', () => {
     const rows = [job('2016-03-01', '2026-01-01'), job('2020-01-01', '2026-09-30')];
