@@ -9,7 +9,7 @@ import {
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
 import { conflictLines } from '../documents/summary';
-import { parseDate, toIso, type CivilDate } from '../engine/date';
+import { parseDate, toIso } from '../engine/date';
 import type { Translate } from '../i18n/client';
 import { CAR_COVERS, LINES, type InsuranceFormField } from './form';
 
@@ -25,27 +25,18 @@ interface InsurancePrefill extends ReadPrefill {
 // Of the insurance documents, only the policy and the renewal notice both state the end date.
 const INSURANCE_CONFLICT_FIELDS = ['expiresOn'] as const;
 
-const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-const lowest = (...cs: Confidence[]): Confidence =>
-  cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
+// What the person remembers is still theirs to confirm: a reading is never more than fairly sure.
+const atMostMedium = (c: Confidence): Confidence => (c === 'high' ? 'medium' : c);
 
+const isFiniteNumber = (v: unknown): v is number => Number.isFinite(v);
 const amountOf = (v: ExtractedValue | undefined): number | null =>
-  typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.round(v * 100) / 100 : null;
+  isFiniteNumber(v) && v > 0 ? Math.round(v * 100) / 100 : null;
 const textOf = (v: ExtractedValue | undefined): string | null =>
-  typeof v === 'string' && v.trim() !== '' ? v.trim() : null;
+  typeof v === 'string' ? v.trim() || null : null;
 const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
-  typeof v === 'string' && (options as readonly string[]).includes(v) ? (v as T) : null;
+  options.find((o) => o === v) ?? null;
 const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
   v === true ? 'yes' : v === false ? 'no' : null;
-
-function dateOf(v: ExtractedValue | undefined): CivilDate | null {
-  if (typeof v !== 'string') return null;
-  try {
-    return parseDate(v);
-  } catch {
-    return null;
-  }
-}
 
 class Answers {
   readonly entries: [string, string][] = [];
@@ -72,10 +63,13 @@ class Answers {
   }
 }
 
-const dateText = (f: SourcedField | undefined): string | null => {
-  const d = dateOf(f?.value);
-  return d ? toIso(d) : null;
-};
+function dateText(v: ExtractedValue | undefined): string | null {
+  try {
+    return toIso(parseDate(String(v)));
+  } catch {
+    return null;
+  }
+}
 
 // How the policy was taken out says whether it was at a distance: by internet or by phone, or
 // face to face. What the person remembers is still theirs to confirm.
@@ -87,7 +81,7 @@ const DISTANCE = { online: 'yes', phone: 'yes', in_person: 'no' } as const;
 export function insurancePrefill(
   e: InsuranceExtraction,
   tr: Translate,
-  checks: readonly FailedCheck[] = [],
+  checks: readonly FailedCheck[],
 ): InsurancePrefill {
   const a = new Answers();
   const { fields } = e;
@@ -97,15 +91,15 @@ export function insurancePrefill(
   if (line === 'car')
     a.field('carCover', fields.carCover, oneOf(fields.carCover?.value, CAR_COVERS));
   a.field('renews', fields.renews, yesNo(fields.renews?.value));
-  a.field('expiresOn', fields.expiresOn, dateText(fields.expiresOn));
+  a.field('expiresOn', fields.expiresOn, dateText(fields.expiresOn?.value));
 
   const channel = fields.channel;
   const distance = oneOf(channel?.value, ['online', 'phone', 'in_person'] as const);
   if (channel && distance)
-    a.read('distance', DISTANCE[distance], lowest(channel.confidence, 'medium'), true);
-  a.field('concludedOn', fields.concludedOn, dateText(fields.concludedOn));
+    a.read('distance', DISTANCE[distance], atMostMedium(channel.confidence), true);
+  a.field('concludedOn', fields.concludedOn, dateText(fields.concludedOn?.value));
 
-  const noticeOn = dateText(fields.noticeOn);
+  const noticeOn = dateText(fields.noticeOn?.value);
   const previous = amountOf(fields.previousPremium?.value);
   const next = amountOf(fields.newPremium?.value);
   const changes = yesNo(fields.coverChanges?.value);

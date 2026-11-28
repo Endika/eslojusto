@@ -1,17 +1,15 @@
 import type { Assessed, Finding, HouseholdInput } from '../engine/household/types';
 import { countedAmount, type HouseholdReview } from '../engine/household/review';
-import type { HouseholdEvents } from '../household/ports';
+import type { HouseholdEvents, Step } from '../household/ports';
 import {
   HOUSEHOLD_STATUSES,
   attemptBucket,
   differenceBucket,
   reviewSecondsBucket,
-  sectionSecondsBucket,
   type Props,
-  type Section,
   type Track,
-  validationCode,
 } from './events';
+import { sectionAnalytics } from './section';
 
 type Completed = Props<'household_review_completed'>;
 type Family = 'pay' | 'working_time' | 'holidays' | 'termination' | 'severance' | 'notice';
@@ -99,60 +97,20 @@ export function householdReviewProps(data: {
 // The household review's events as catalogue events: steps, field names, codes and buckets only.
 // Kept for this page view: when each step and the whole run started, and how many reviews.
 export function householdAnalytics(track: Track, now: () => number): HouseholdEvents {
-  let viewedSection: Section | null = null;
-  let sectionEnteredAt = 0;
-  let start: number | null = null;
-  let attempts = 0;
-  const secondsSince = (t: number) => (now() - t) / 1000;
-
+  const { events, reviewed } = sectionAnalytics<Step>(track, now);
   return {
-    stepShown(step) {
-      if (step === viewedSection) return;
-      viewedSection = step;
-      sectionEnteredAt = now();
-      start ??= sectionEnteredAt;
-      track('section_viewed', { section: step });
-    },
-    stepCompleted(step) {
-      track('section_completed', {
-        section: step,
-        seconds: sectionSecondsBucket(secondsSince(sectionEnteredAt)),
-      });
-    },
-    wentBack(from, to) {
-      track('went_back', { from, to });
-    },
-    fieldRejected(step, field, code) {
-      track('validation_error', {
-        section: step,
-        field: field as Props<'validation_error'>['field'],
-        code: validationCode(code) as Props<'validation_error'>['code'],
-      });
-    },
+    ...events,
     outOfScope(reason) {
       track('household_out_of_scope', { reason });
     },
     reviewCompleted({ review, input, ending }) {
-      attempts += 1;
       track(
         'household_review_completed',
-        householdReviewProps({
-          review,
-          input,
-          ending,
-          attempt: attempts,
-          seconds: secondsSince(start ?? sectionEnteredAt),
-        }),
+        householdReviewProps({ review, input, ending, ...reviewed() }),
       );
-    },
-    helpOpened(topic) {
-      track('help_opened', { topic: topic as Props<'help_opened'>['topic'] });
     },
     detailOpened(item) {
       track('detail_opened', { item });
-    },
-    startedOver() {
-      track('started_over', {});
     },
   };
 }

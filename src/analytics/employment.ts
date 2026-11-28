@@ -4,19 +4,22 @@ import type { EmploymentPhrase } from '../engine/employment/calculation';
 import { everyAssessed, type EmploymentReview } from '../engine/employment/review';
 import type { Assessed, EmploymentInput, Finding } from '../engine/employment/types';
 import type { PassMode } from '../documents/ports';
-import type { CompletedEmploymentReview, Detail, EmploymentEvents } from '../employment/ports';
+import type {
+  CompletedEmploymentReview,
+  Detail,
+  EmploymentEvents,
+  Step,
+} from '../employment/ports';
 import {
   EMPLOYMENT_TRACKABLE_FIELDS,
   POINT_STATUSES,
   attemptBucket,
   differenceBucket,
   reviewSecondsBucket,
-  sectionSecondsBucket,
   type Props,
-  type Section,
   type Track,
-  validationCode,
 } from './events';
+import { sectionAnalytics } from './section';
 
 type Completed = Props<'employment_review_completed'>;
 type Family =
@@ -179,63 +182,25 @@ export function employmentAnalytics(
   now: () => number,
   pass: (r: CompletedEmploymentReview) => PassMode,
 ): EmploymentEvents {
-  let viewedSection: Section | null = null;
-  let sectionEnteredAt = 0;
-  let start: number | null = null;
-  let attempts = 0;
-  const secondsSince = (t: number) => (now() - t) / 1000;
-
+  const { events, reviewed } = sectionAnalytics<Step>(track, now);
   return {
-    stepShown(step) {
-      if (step === viewedSection) return;
-      viewedSection = step;
-      sectionEnteredAt = now();
-      start ??= sectionEnteredAt;
-      track('section_viewed', { section: step });
-    },
-    stepCompleted(step) {
-      track('section_completed', {
-        section: step,
-        seconds: sectionSecondsBucket(secondsSince(sectionEnteredAt)),
-      });
-    },
-    wentBack(from, to) {
-      track('went_back', { from, to });
-    },
+    ...events,
     fieldRejected(step, field, code) {
       if (!(EMPLOYMENT_TRACKABLE_FIELDS as readonly string[]).includes(field)) return;
-      track('validation_error', {
-        section: step,
-        field: field as Props<'validation_error'>['field'],
-        code: validationCode(code) as Props<'validation_error'>['code'],
-      });
+      events.fieldRejected(step, field, code);
     },
     outOfScope(reason) {
       track('employment_out_of_scope', { reason });
     },
     reviewCompleted(completed) {
       const { review, input, detail } = completed;
-      attempts += 1;
       track(
         'employment_review_completed',
-        employmentReviewProps({
-          review,
-          input,
-          attempt: attempts,
-          seconds: secondsSince(start ?? sectionEnteredAt),
-          detail,
-          pass: pass(completed),
-        }),
+        employmentReviewProps({ review, input, ...reviewed(), detail, pass: pass(completed) }),
       );
-    },
-    helpOpened(topic) {
-      track('help_opened', { topic: topic as Props<'help_opened'>['topic'] });
     },
     detailOpened(item) {
       track('detail_opened', { item });
-    },
-    startedOver() {
-      track('started_over', {});
     },
   };
 }

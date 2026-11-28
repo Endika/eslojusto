@@ -2,7 +2,7 @@ import { toIso } from '../engine/date';
 import type { RentalItemResult, RentalReview } from '../engine/rental/review';
 import type { ItemStatus, RentalInput } from '../engine/rental/types';
 import type { PassMode } from '../documents/ports';
-import type { CompletedRentalReview, Detail, RentalEvents } from '../rental/ports';
+import type { CompletedRentalReview, Detail, RentalEvents, Step } from '../rental/ports';
 import {
   DOUBT_REASONS,
   ITEM_STATUSES,
@@ -10,12 +10,10 @@ import {
   attemptBucket,
   differenceBucket,
   reviewSecondsBucket,
-  sectionSecondsBucket,
   type Props,
-  type Section,
   type Track,
-  validationCode,
 } from './events';
+import { sectionAnalytics } from './section';
 
 type Family = 'fees' | 'guarantees' | 'rent_update' | 'charges' | 'deposit_return';
 
@@ -100,62 +98,21 @@ export function rentalAnalytics(
   now: () => number,
   pass: (r: CompletedRentalReview) => PassMode,
 ): RentalEvents {
-  let viewedSection: Section | null = null;
-  let sectionEnteredAt = 0;
-  let start: number | null = null;
-  let attempts = 0;
-  const secondsSince = (t: number) => (now() - t) / 1000;
-
+  const { events, reviewed } = sectionAnalytics<Step>(track, now);
   return {
-    stepShown(step) {
-      if (step === viewedSection) return;
-      viewedSection = step;
-      sectionEnteredAt = now();
-      start ??= sectionEnteredAt;
-      track('section_viewed', { section: step });
-    },
-    stepCompleted(step) {
-      track('section_completed', {
-        section: step,
-        seconds: sectionSecondsBucket(secondsSince(sectionEnteredAt)),
-      });
-    },
-    wentBack(from, to) {
-      track('went_back', { from, to });
-    },
-    fieldRejected(step, field, code) {
-      track('validation_error', {
-        section: step,
-        field: field as Props<'validation_error'>['field'],
-        code: validationCode(code) as Props<'validation_error'>['code'],
-      });
-    },
+    ...events,
     outOfScope(reason) {
       track('rental_out_of_scope', { reason });
     },
     reviewCompleted(completed) {
       const { review, input, detail } = completed;
-      attempts += 1;
       track(
         'rental_review_completed',
-        rentalReviewProps({
-          review,
-          input,
-          attempt: attempts,
-          seconds: secondsSince(start ?? sectionEnteredAt),
-          detail,
-          pass: pass(completed),
-        }),
+        rentalReviewProps({ review, input, ...reviewed(), detail, pass: pass(completed) }),
       );
-    },
-    helpOpened(topic) {
-      track('help_opened', { topic: topic as Props<'help_opened'>['topic'] });
     },
     detailOpened(item) {
       track('detail_opened', { item });
-    },
-    startedOver() {
-      track('started_over', {});
     },
   };
 }
