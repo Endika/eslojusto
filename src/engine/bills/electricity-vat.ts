@@ -57,10 +57,9 @@ function applicable(rate: VatRate, input: ElectricityBillInput, doubts: Set<Bill
     rates = [reduced, general];
   } else rates = [general];
   const maybeSevere =
-    bonus !== undefined &&
     bonus !== null &&
     (bonus.category === null || (bonus.category === 'severe' && rate.severeVulnerable === null));
-  if (rates.length === 1 && rates[0] === general && maybeSevere) {
+  if (rates[0] === general && maybeSevere) {
     doubts.add('vat.severe_unknown');
     rates = [reduced, general];
   }
@@ -106,7 +105,7 @@ export function checkVat(input: ElectricityBillInput, { norms, tables }: VatDeps
       [at(percent, services), at(general, services), 0],
       [at(percent, penalty), at(general, penalty), 0],
       [at(percent, settled), 0],
-    ].filter((options) => options[0] !== 0);
+    ];
     return possibleSums(at(percent, electricity) + at(meterPercent, meter), parts);
   };
   const open = discounts + excess + services + penalty + Math.abs(settled) > 0;
@@ -121,14 +120,14 @@ export function checkVat(input: ElectricityBillInput, { norms, tables }: VatDeps
 
   const reading = (rate: Applicable): TaxReading => {
     const expected = vatAt(rate, rate.percent);
+    // Stryker disable next-line ConditionalExpression,MethodExpression: its own rate gives sums among the expected ones, which did not match when they are read
+    const otherRates = tableRates.filter((p) => p !== rate.percent);
     return {
       percent: rate.percent,
       expected,
-      unsettled: rate.general !== rate.percent && meter > 0 ? vatAt(rate, rate.general) : [],
+      unsettled: vatAt(rate, rate.general),
       unsettledPhrase: 'vat.meter_reduced',
-      atOtherRates: tableRates
-        .filter((p) => p !== rate.percent)
-        .flatMap((p) => vatAt({ percent: p, general: p }, p)),
+      atOtherRates: otherRates.flatMap((p) => vatAt({ percent: p, general: p }, p)),
       calculation: [
         billsPhrase('vat.base', { euros: { euros: round2(shownBase) } }),
         ...(open ? [billsPhrase('tax.parts_either')] : []),
@@ -151,6 +150,7 @@ export function checkVat(input: ElectricityBillInput, { norms, tables }: VatDeps
   const sorted = [...options].sort((a, b) => a.percent - b.percent);
   const low = sorted[0];
   const high = sorted.at(-1);
+  // Stryker disable next-line ConditionalExpression,LogicalOperator,CallExpression: a day with a lookup has a row
   if (low === undefined || high === undefined) throw new RangeError(`No VAT rate covers ${day}`);
   return acrossRates(
     {
