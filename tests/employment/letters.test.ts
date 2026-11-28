@@ -9,6 +9,7 @@ import { formatEuros } from '../../src/calculator/number';
 import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
 import type { Block, DocumentModel } from '../../src/documents/ports';
 import { employmentCase } from '../../src/employment/case';
+import { employmentReport } from '../../src/employment/report';
 import { headline } from '../../src/employment/summary';
 import {
   certificateRequest,
@@ -19,11 +20,14 @@ import {
   payShortfall,
 } from '../../src/employment/letters';
 import type { CompletedEmploymentReview } from '../../src/employment/ports';
+import type { Assessed } from '../../src/engine/employment/types';
+import { finding } from '../engine/employment/input';
 import { EMPLOYMENT_FORBIDDEN, FORBIDDEN } from '../support/forbidden';
 import {
   belowMinimum,
   contract,
   corners,
+  malformed,
   shortDayRate,
   shortDayRateDoubt,
   TABLES,
@@ -510,6 +514,14 @@ describe('the letters', () => {
       });
   });
 
+  it('are made only of blocks the PDF can draw', () => {
+    for (const input of [...corners, { ...belowMinimum, ...absentInfo('o', 'e', 'q') }]) {
+      const c = employmentCase(completed(input), TODAY, TABLES);
+      for (const kind of [...c.letterKinds, ...(c.freeLetterKinds ?? [])])
+        expect(malformed(c.letter(kind, details, tr).blocks)).toEqual([]);
+    }
+  });
+
   it('inform without advising, asserting or pressing', () => {
     const models: DocumentModel[] = [];
     for (const input of [...corners, { ...belowMinimum, ...absentInfo('o', 'e', 'q') }]) {
@@ -544,8 +556,16 @@ describe('the contract review as the pass sees it', () => {
     expect(c.filename?.('letter', 'temporary_contracts_certificate')).toBe(
       'client.employment.letter.certificate.filename',
     );
+    expect(c.filename?.('letter')).toBe('client.employment.letter.information.filename');
     expect(text(c.letter('temporary_contracts_certificate', NO_DETAILS, tr))).toContain(
       'Al servicio público de empleo',
+    );
+    expect(c.report(tr, TODAY)).toEqual(employmentReport(r, tr, TODAY));
+    expect(c.letter('employment', NO_DETAILS, tr)).toEqual(
+      companyLetter(r, 'full', TODAY, TABLES, NO_DETAILS, tr),
+    );
+    expect(c.letter('information_request', NO_DETAILS, tr)).toEqual(
+      companyLetter(r, 'information', TODAY, TABLES, NO_DETAILS, tr),
     );
   });
 
@@ -564,5 +584,180 @@ describe('the contract review as the pass sees it', () => {
     expect(headline(completed(clear).review)).toBe('nothing_found');
     expect(employmentCase(completed(clear), TODAY, TABLES).quiet).toBe(true);
     expect(employmentCase(completed(belowMinimum), TODAY, TABLES).quiet).toBe(false);
+  });
+});
+
+describe('what the letters read of a review', () => {
+  const withItems = (r: CompletedEmploymentReview, items: Assessed[]) => ({
+    ...r,
+    review: { ...r.review, items },
+  });
+  const pay = (status: 'below_minimum' | 'within_limit', id = 'smi_annual' as const) =>
+    finding({ id, status });
+  const readings = (...findings: ReturnType<typeof pay>[]) =>
+    ({
+      kind: 'readings',
+      question: 'complement_kind',
+      readings: findings.map((f) => ({ when: 'complement_fixed', finding: f })),
+    }) as unknown as Assessed;
+  const base = completed(belowMinimum);
+
+  it('asks for no missing information of a review that has no duty', () => {
+    const out = completed(contract({ relationship: 'sport' }));
+    expect(out.review.informationDuty).toBeNull();
+    expect(missingInformation(out.review)).toBeNull();
+  });
+
+  it.each([
+    ['no point on the pay', [], null],
+    [
+      'a point on the pay, below in its one reading',
+      [{ kind: 'single', finding: pay('below_minimum') }],
+      'single',
+    ],
+    [
+      'a pay point beside another in a reading, below in both',
+      [readings(pay('below_minimum'), finding({ id: 'trial_limits', status: 'below_minimum' }))],
+      'readings',
+    ],
+    [
+      'a pay point within the limit in one reading',
+      [readings(pay('below_minimum'), pay('within_limit'))],
+      null,
+    ],
+  ])('the pay shortfall of %s', (_, items, kind) => {
+    const shortfall = payShortfall(withItems(base, items as Assessed[]), TODAY, TABLES);
+    expect(shortfall === null ? null : shortfall.lowest ? 'readings' : 'single').toBe(kind);
+  });
+
+  it('names no year that is within the minimum of the tables it is given', () => {
+    const lower = MINIMUM_WAGE.map((r) => (r.year === 2026 ? { ...r, annual: 10000 } : r));
+    expect(payShortfall(base, TODAY, { ...TABLES, minimumWage: lower })).toBeNull();
+  });
+
+  it('has no shortfall to name when no year of the contract has its minimum in the table', () => {
+    expect(payShortfall(base, TODAY, { ...TABLES, minimumWage: [] })).toBeNull();
+  });
+
+  it('asks the company about a clause void, though nothing else is wrong', () => {
+    const waiver = contract({
+      startDate: f('2026-01-01'),
+      signedOn: null,
+      clauses: [
+        {
+          label: 'waiver',
+          months: null,
+          compensationStated: null,
+          trainingDescribed: null,
+          waivedRight: 'holidays',
+          costsOnWorker: null,
+          literal: { text: '' },
+        },
+      ],
+    });
+    expect(kindsOf(completed(waiver)).paid).toEqual(['employment']);
+    expect(
+      kindsOf(completed(contract({ startDate: f('2026-01-01'), signedOn: null }))).paid,
+    ).toEqual([]);
+  });
+
+  it.each([
+    [
+      'a point that holds in every reading',
+      [
+        readings(
+          finding({ id: 'trial_limits', status: 'becomes_permanent' }),
+          finding({ id: 'trial_limits', status: 'becomes_permanent' }),
+        ),
+      ],
+      true,
+    ],
+    [
+      'a point that holds in one reading only',
+      [
+        readings(
+          finding({ id: 'trial_limits', status: 'becomes_permanent' }),
+          finding({ id: 'trial_limits', status: 'within_limit' }),
+        ),
+      ],
+      false,
+    ],
+    ['a point with no reading', [readings()], false],
+    [
+      'a fixed-term rule over its limit',
+      [
+        {
+          kind: 'single',
+          finding: finding({ id: 'production_6_months', status: 'over_legal_limit' }),
+        },
+      ],
+      true,
+    ],
+    [
+      'a rule that is not about fixed terms, over its limit',
+      [{ kind: 'single', finding: finding({ id: 'trial_limits', status: 'over_legal_limit' }) }],
+      false,
+    ],
+    [
+      'a fixed-term rule the agreement may move',
+      [
+        {
+          kind: 'single',
+          finding: finding({
+            id: 'production_6_months',
+            status: 'over_legal_limit',
+            agreementMaySetOther: true,
+          }),
+        },
+      ],
+      false,
+    ],
+    [
+      'a status that is no breach',
+      [{ kind: 'single', finding: finding({ id: 'production_6_months', status: 'within_limit' }) }],
+      false,
+    ],
+  ])('the certificate is offered for %s: %s', (_, items, offered) => {
+    expect(hasTemporalityFinding(withItems(base, items as Assessed[]))).toBe(offered);
+  });
+
+  it('writes the identity typed without its spaces, and leaves it out when only spaces', () => {
+    const letter = (id: string) =>
+      text(companyLetter(base, 'full', TODAY, TABLES, { ...details, id }, tr));
+    expect(letter('  00000000A  ')).toContain('00000000A');
+    expect(letter('  00000000A  ')).not.toContain(' 00000000A ');
+    expect(letter('   ')).not.toContain('DNI');
+  });
+
+  it('names a point with no norm without one', () => {
+    const noSource = {
+      kind: 'single',
+      finding: finding({ id: 'trial_limits', status: 'over_legal_limit', sources: [] }),
+    } as Assessed;
+    const letter = companyLetter(withItems(base, [noSource]), 'full', TODAY, TABLES, details, tr);
+    expect(letter.blocks).toContainEqual({
+      type: 'bullet',
+      text: tr('client.employment.letter.points.line', {
+        punto: tr('client.employment.finding.trial_limits'),
+        norma: '',
+      }),
+    });
+  });
+
+  it('asks only for the information owed in the letter that only asks for it', () => {
+    const r = completed({ ...workOrService, ...absentInfo('o') });
+    const only = text(companyLetter(r, 'information', TODAY, TABLES, details, tr));
+    const all = text(full(r, details));
+    expect(only).toContain(tr('client.employment.letter.information.title'));
+    expect(only).not.toContain(tr('client.employment.letter.points.intro'));
+    expect(all).toContain(tr('client.employment.letter.company.title'));
+    expect(all).toContain(tr('client.employment.letter.points.intro'));
+  });
+
+  it('dates the contract in the letter to the company and names the law in the certificate', () => {
+    const letter = text(companyLetter(base, 'full', TODAY, TABLES, details, tr));
+    expect(letter).toContain('2026');
+    expect(letter).not.toMatch(/[{}]/);
+    expect(text(certificateRequest(TABLES, details, tr))).not.toMatch(/[{}]/);
   });
 });
