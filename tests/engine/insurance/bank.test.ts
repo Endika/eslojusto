@@ -41,6 +41,10 @@ const asExpected = (r: InsuranceReview): ExpectedInsuranceReview => ({
 });
 
 describe('the synthetic bank of insurance packs', () => {
+  it('holds 10 cases', () => {
+    expect(CASES).toHaveLength(10);
+  });
+
   it.each(CASES.map((c) => [c.id, c] as const))('%s', (_, c) => {
     const result = reviewInsurance(toInput(c.expected.input), f(c.today), {
       norms: INSURANCE_NORMS,
