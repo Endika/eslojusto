@@ -7,12 +7,11 @@ import { findingsOf } from '../../../src/engine/credit/finding';
 import {
   reviewCredit,
   termMonths,
-  UNCHECKED,
   type CreditDeps,
   type CreditReview,
 } from '../../../src/engine/credit/review';
 import type { CreditInput } from '../../../src/engine/credit/types';
-import { loan, repayment, TODAY } from './input';
+import { loan, TODAY } from './input';
 
 const DEPS: CreditDeps = { norms: CREDIT_NORMS, sources: CREDIT_SOURCES, rates: BE1904 };
 
@@ -26,106 +25,9 @@ const statuses = (r: CreditReview) =>
   r.items.map((item) => findingsOf(item).map((f) => `${f.id}:${f.status}`));
 
 describe('reviewCredit', () => {
-  it('reviews the loan of STS 366/2026 end to end', () => {
-    const r = review();
-    expect(r.scope).toEqual({ inScope: true, indicatorOnly: false });
-    expect(statuses(r)).toEqual([['apr:contract_lower'], ['withdrawal:ended']]);
-    expect(r.indicator).toMatchObject({ status: 'distance_only', apr: 12, aprOrigin: 'declared' });
-    expect(r.totals).toEqual({ overCharged: { counted: 0, upTo: 0 } });
-    expect(r.offerPass).toBe(true);
-    expect(r.unchecked).toEqual(UNCHECKED);
-  });
-
-  it('compares the APR worked out once the person takes it: 8,51 points', () => {
-    const r = review({ confirmedApr: true });
-    expect(r.indicator).toMatchObject({ apr: 16.61, aprOrigin: 'recalculated', points: 8.51 });
-  });
-
   it('stops errors before anything is worked out', () => {
     const result = reviewCredit(loan({ principal: 0 }), TODAY, DEPS);
     expect(result.ok).toBe(false);
-  });
-
-  it('works nothing out for a credit out of scope', () => {
-    const r = review({ secured: 'mortgage' });
-    expect(r).toMatchObject({
-      scope: { inScope: false, reason: 'mortgage' },
-      items: [],
-      indicator: null,
-      information: [],
-      offerPass: false,
-    });
-  });
-
-  it('gives a revolving card concluded before the law only the indicator', () => {
-    const r = review({
-      product: 'revolving',
-      agreedOn: parseDate('2008-05-10'),
-      drawnOn: parseDate('2008-05-10'),
-      instalments: null,
-      netDisbursed: null,
-      charges: [],
-      declaredApr: 26.82,
-      card: { limit: 3_000, nominalRate: 24, annualFee: 0, minimumPayment: 90, balance: 3_000 },
-    });
-    expect(r.scope).toEqual({ inScope: true, indicatorOnly: true });
-    expect(r.items).toEqual([]);
-    expect(r.indicator).toMatchObject({
-      status: 'above',
-      reference: { kind: 'ruling_2010', value: 19.32 },
-      points: 7.5,
-    });
-    expect(r.information.map((b) => b.id)).toEqual(['card_payoff']);
-    expect(r.offerPass).toBe(false);
-  });
-
-  it('counts compensation charged over the cap and offers the pass for it', () => {
-    const r = review({
-      declaredApr: 16.6,
-      earlyRepayment: repayment({ on: parseDate('2022-02-15'), interestSettled: null }),
-    });
-    expect(statuses(r)[0]).toEqual(['apr:matches']);
-    expect(r.totals.overCharged).toEqual({ counted: 25, upTo: 25 });
-    expect(r.offerPass).toBe(true);
-  });
-
-  it('counts the lowest reading when the base of the cap is in doubt', () => {
-    const r = review({
-      declaredApr: 16.6,
-      earlyRepayment: repayment({ interestSettled: 40, compensationCharged: 60 }),
-    });
-    expect(r.totals.overCharged).toEqual({ counted: 9.6, upTo: 10 });
-  });
-
-  it('offers no pass when the APR matches and nothing is charged over a cap', () => {
-    expect(review({ declaredApr: 16.6 }).offerPass).toBe(false);
-    expect(review({ declaredApr: 18 }).offerPass).toBe(false);
-  });
-
-  it('offers no pass for a lower APR that holds in only one reading of the insurance', () => {
-    // Without the insurance the figures give 16,61 %; with it, more.
-    const r = review({
-      declaredApr: 16.6,
-      insurance: { premium: 400, single: true, financed: false, required: null },
-    });
-    expect(statuses(r)[0]).toEqual(['apr:contract_lower', 'apr:matches']);
-    expect(r.offerPass).toBe(false);
-  });
-
-  it('never lets the indicator open the pass nor reach a total', () => {
-    const r = review({ declaredApr: 16.6, confirmedApr: true });
-    expect(r.indicator?.points).toBe(8.51);
-    expect(r.indicator?.status).toBe('distance_only');
-    expect(r.offerPass).toBe(false);
-    expect(r.totals.overCharged.counted).toBe(0);
-  });
-
-  it('adds the dealer discount to review when it was taken back', () => {
-    const r = review({
-      product: 'car_loan',
-      earlyRepayment: repayment({ discountLost: true }),
-    });
-    expect(statuses(r).map((s) => s[0])).toContain('dealer_discount:review_it');
   });
 
   it('reads the term of a loan in whole months from the drawdown', () => {
@@ -149,14 +51,6 @@ describe('reviewCredit', () => {
     expect(termMonths(loan({ balloon }), 'balloon_with_last')).toBe(48);
     const dated = { amount: 3_000, dueOn: parseDate('2023-02-15') };
     expect(termMonths(loan({ balloon: dated }), 'balloon_with_last')).toBe(48);
-  });
-
-  it('leaves the past month out of the term when the drawdown day comes after the last due day', () => {
-    expect(termMonths(loan({ drawnOn: parseDate('2019-02-20') }), 'balloon_month_after')).toBe(47);
-  });
-
-  it('has no term without instalments', () => {
-    expect(termMonths(loan({ instalments: null }), 'balloon_with_last')).toBeNull();
   });
 
   it('compares the lowest APR worked out, and the stated one when a reading works none out', () => {

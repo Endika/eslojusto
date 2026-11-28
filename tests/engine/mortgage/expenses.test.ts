@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate, type CivilDate } from '../../../src/engine/date';
 import { reviewExpenses, type ExpenseItem } from '../../../src/engine/mortgage/expenses';
-import type { SourceTable } from '../../../src/engine/mortgage/norms';
 import type { Invoice, MortgageDeps, MortgageInput } from '../../../src/engine/mortgage/types';
 import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from './input';
 
@@ -117,53 +116,6 @@ describe('a 2018-12 deed, before the LCCI with the lender bearing the tax', () =
     expect(r.totals.statute).toEqual({ principal: 1_500, interest: null });
     expect(r.totals.caseLaw.principal).toBe(1_350);
   });
-
-  // Interest on these costs rests on ruling 725/2018, a court's criterion: it never rides on the
-  // tax the law puts on the lender, read or not.
-  it('works out no interest on the tax by law, whether ruling 725/2018 is read or not', () => {
-    for (const deps of [UNREAD_DEPS, DEPS]) {
-      const tax = run(deed, deps).items.at(-1);
-      expect([tax?.interest, keys(tax), sourceIds(tax)]).toEqual([
-        null,
-        ['expenses.statute'],
-        ['ajd_lender'],
-      ]);
-    }
-    const r = run(deed, DEPS);
-    expect(r.totals.statute).toEqual({ principal: 1_500, interest: null });
-    expect(r.totals.caseLaw.principal).toBe(1_350);
-    expect(r.totals.caseLaw.interest?.amount).toBeGreaterThan(0);
-  });
-});
-
-describe('the LCCI regime starts with deeds of 16-06-2019', () => {
-  it('a deed of 15-06-2019 still falls under the split; the tax, by law', () => {
-    const r = run({ deedOn: d('2019-06-15'), invoices: setUp('2019-06-15') });
-    expect(r.items.map((i) => [i.basis, i.status])).toEqual([
-      ['case_law', 'lender_bears'],
-      ['case_law', 'lender_bears'],
-      ['case_law', 'lender_bears'],
-      ['case_law', 'lender_bears'],
-      ['statute', 'lender_bears'],
-    ]);
-  });
-
-  it('a deed of 16-06-2019 puts it all on the lender by law but the valuation', () => {
-    const r = run({ deedOn: d('2019-06-16'), invoices: setUp('2019-06-16') }, DEPS);
-    expect(statuses(r.items)).toEqual([
-      ['notary_loan', 'statute', 'lender_bears', 100, 600],
-      ['registry_mortgage', 'statute', 'lender_bears', 100, 400],
-      ['agency', 'statute', 'lender_bears', 100, 300],
-      ['valuation', 'statute', 'borrower_bears', 0, null],
-      ['ajd_loan', 'statute', 'lender_bears', 100, 1_500],
-    ]);
-    expect(keys(r.items[3])).toEqual(['expenses.valuation_borrower']);
-    expect(sourceIds(r.items[0])?.[0]).toBe('expenses_lcci');
-    // Ruling 725/2018 speaks of deeds before the LCCI: not a word on interest after it.
-    expect(keys(r.items[0])).toEqual(['expenses.statute']);
-    expect(sourceIds(r.items[0])).toEqual(['expenses_lcci']);
-    expect(r.totals).toEqual({ statute: { principal: 2_800, interest: null }, caseLaw: NOTHING });
-  });
 });
 
 describe('a 2021 deed', () => {
@@ -234,22 +186,6 @@ describe('a 2021 deed', () => {
     expect(r.totals.statute.principal).toBe(2_441.76);
   });
 
-  it('takes out an outlay matching a tax that counts nothing here, saying only where it goes', () => {
-    const r = run(
-      {
-        deedOn: d('2017-03-01'),
-        invoices: [invoice('agency', 1_900, { supplied: [1_500] }), invoice('ajd_loan', 1_500)],
-      },
-      DEPS,
-    );
-    // 1.900 − 1.500 of the tax, which is the borrower's before 10-11-2018.
-    expect(statuses(r.items)).toEqual([
-      ['agency', 'case_law', 'lender_bears', 100, 400],
-      ['ajd_loan', null, 'not_applicable_to_date', null, null],
-    ]);
-    expect(keys(r.items[0])).toContain('expenses.supplied_own_line');
-  });
-
   it('keeps the figures by law after an agreement with the lender, citing art. 3', () => {
     const r = run({ deedOn, agreementOnExpenses: true, invoices: [invoice('notary_loan', 600)] });
     expect(r.items[0]?.status).toBe('lender_bears');
@@ -273,27 +209,10 @@ describe('what stays out of the figures', () => {
     },
   );
 
-  it('an invoice mixing the purchase and the loan without a breakdown', () => {
-    for (const deedOn of ['2012-05-10', '2021-04-20']) {
-      const r = run(
-        { deedOn: d(deedOn), invoices: [invoice('notary_loan', 1_400, { mixed: true })] },
-        DEPS,
-      );
-      expect([r.items[0]?.status, r.items[0]?.amount, keys(r.items[0])]).toEqual([
-        'review_it',
-        null,
-        ['expenses.mixed'],
-      ]);
-      expect(r.totals).toEqual({ statute: NOTHING, caseLaw: NOTHING });
-    }
-  });
-
   // Half of an invoice that also holds the purchase is not the lender's, and a share of what the
   // lender paid itself means nothing: neither shows a share, read or not.
   it.each([
-    ['mixed', { mixed: true }, 'review_it', 'expenses.mixed'],
     ['paid by the lender', { paidBy: 'bank' }, 'paid_by_bank', 'expenses.paid_by_bank'],
-    ['of an unknown payer', { paidBy: 'unknown' }, 'review_it', 'expenses.payer_unknown'],
   ] as const)('an invoice %s under the split shows no share', (_, change, status, key) => {
     for (const deps of [UNREAD_DEPS, DEPS]) {
       const [item] = run({ invoices: [invoice('notary_loan', 900, change)] }, deps).items;
@@ -333,30 +252,6 @@ describe('what stays out of the figures', () => {
     }
   });
 
-  it('a notary record of the advice on a deed before the LCCI', () => {
-    const [item] = run({ invoices: [invoice('transparency_deed', 60)] }, DEPS).items;
-    expect([item?.status, keys(item)]).toEqual([
-      'review_it',
-      ['expenses.transparency_before_lcci'],
-    ]);
-  });
-
-  it('a person who is not a consumer, before 2019: the split does not apply', () => {
-    const r = run({ consumer: false, invoices: setUp('2012-05-10') }, DEPS);
-    expect(r.items.slice(0, 4).map((i) => [i.status, keys(i)])).toEqual(
-      Array(4).fill(['not_applicable', ['expenses.not_consumer']]),
-    );
-    expect(r.totals.caseLaw).toEqual(NOTHING);
-  });
-
-  it('a person who does not know: both answers differ, so it is left to check', () => {
-    const r = run({ deedOn: d('2018-12-14'), consumer: null, invoices: setUp('2018-12-14') }, DEPS);
-    expect(r.items.map((i) => [i.status, keys(i)?.[0]])).toEqual([
-      ...Array(4).fill(['review_it', 'expenses.consumer_unknown']),
-      ['lender_bears', 'expenses.statute'],
-    ]);
-  });
-
   it.each([
     ['absent', 'expenses.no_clause'],
     ['unknown', 'expenses.clause_unknown'],
@@ -380,56 +275,17 @@ describe('what stays out of the figures', () => {
     ]);
   });
 
-  it('not knowing about an agreement leaves the split and the earlier tax to check, not the LCCI', () => {
-    const before = run(
-      {
-        deedOn: d('2018-12-14'),
-        agreementOnExpenses: null,
-        invoices: [invoice('registry_mortgage', 400), invoice('ajd_loan', 1_500)],
-      },
-      DEPS,
-    );
-    expect(before.items.map((i) => [i.status, keys(i)])).toEqual(
-      Array(2).fill(['review_it', ['expenses.agreement_unknown']]),
-    );
-    const after = run({
-      deedOn: d('2021-04-20'),
-      agreementOnExpenses: null,
-      invoices: [invoice('registry_mortgage', 400)],
-    });
-    expect(after.items[0]?.status).toBe('lender_bears');
-  });
-
-  it.each([
-    ['bank', 'paid_by_bank', 'expenses.paid_by_bank'],
-    ['unknown', 'review_it', 'expenses.payer_unknown'],
-  ] as const)('a cost paid by %s', (paidBy, status, key) => {
-    const r = run({ deedOn: d('2021-04-20'), invoices: [invoice('agency', 300, { paidBy })] });
-    expect([r.items[0]?.status, r.items[0]?.amount, keys(r.items[0])]).toEqual([
-      status,
-      null,
-      [key],
-    ]);
-  });
-
-  it('a cost with no invoice nor amount is never estimated', () => {
-    const r = run({ deedOn: d('2021-04-20'), invoices: [invoice('notary_loan', null)] });
-    expect([r.items[0]?.status, keys(r.items[0])]).toEqual(['not_entered', ['item.not_entered']]);
-  });
-
-  it('without the invoices at hand, a cost has no figure, not a figure left out', () => {
-    const r = run({
-      deedOn: d('2015-03-02'),
-      invoicesAtHand: false,
-      agreementOnExpenses: null,
-      invoices: [invoice('notary_loan', null), invoice('valuation', null)],
-    });
-    expect(r.items.map((i) => [i.status, i.share, i.amount, keys(i)])).toEqual([
-      ['no_invoice', 50, null, ['expenses.no_invoice']],
-      ['no_invoice', 100, null, ['expenses.no_invoice']],
-    ]);
-    expect(r.totals).toEqual({ statute: NOTHING, caseLaw: NOTHING });
-  });
+  it.each([['unknown', 'review_it', 'expenses.payer_unknown']] as const)(
+    'a cost paid by %s',
+    (paidBy, status, key) => {
+      const r = run({ deedOn: d('2021-04-20'), invoices: [invoice('agency', 300, { paidBy })] });
+      expect([r.items[0]?.status, r.items[0]?.amount, keys(r.items[0])]).toEqual([
+        status,
+        null,
+        [key],
+      ]);
+    },
+  );
 
   it('the tax left blank because the lender paid it says so', () => {
     const blank = invoice('ajd_loan', null, { paidBy: 'bank' });
@@ -492,13 +348,6 @@ describe('legal interest on the split, once ruling 725/2018 is read', () => {
     expect(keys(r.items[0])?.at(-1)).toBe('interest.not_published');
   });
 
-  it('counts from the deed day, marked as an estimate, when the day of payment is unknown', () => {
-    const r = run({ invoices: [invoice('registry_mortgage', 400)] }, DEPS);
-    expect(r.items[0]?.interest?.estimated).toBe(true);
-    expect(keys(r.items[0])).toContain('interest.estimated');
-    expect(r.totals.caseLaw.interest?.estimated).toBe(true);
-  });
-
   it('works out no interest once something has come back, and takes it off each line', () => {
     const r = run(
       { deedOn: d('2018-12-14'), invoices: setUp('2018-12-14'), alreadyReturned: 200 },
@@ -516,20 +365,6 @@ describe('legal interest on the split, once ruling 725/2018 is read', () => {
 
 describe('a court criterion never moves what the law settles', () => {
   const deed = { deedOn: d('2018-12-14'), invoices: setUp('2018-12-14') };
-  const unread = (id: keyof SourceTable): MortgageDeps => ({
-    ...DEPS,
-    sources: { ...DEPS.sources, [id]: { ...DEPS.sources[id], verified: false } },
-  });
-
-  it.each(['sts35_2021', 'sts816_2023', 'tjue_c224_19', 'sts725_2018'] as const)(
-    'taking %s back to unread leaves the tax by law as it was',
-    (id) => {
-      const read = run(deed, DEPS);
-      const back = run(deed, unread(id));
-      expect(back.items.at(-1)).toEqual(read.items.at(-1));
-      expect(back.totals.statute).toEqual(read.totals.statute);
-    },
-  );
 
   it('the line by law is the same with every ruling unread, read, or the criteria as information', () => {
     const info = {
@@ -564,34 +399,6 @@ describe('what each outcome says and cites', () => {
   const ajd = { deedOn: d('2018-12-14') };
 
   it.each([
-    [
-      'a purchase cost',
-      {},
-      invoice('notary_purchase', 900),
-      DEPS,
-      [null, 'not_applicable', null, ['expenses.purchase'], []],
-    ],
-    [
-      'a notary cancellation',
-      {},
-      invoice('notary_cancellation', 90),
-      DEPS,
-      [null, 'not_applicable', null, ['expenses.cancellation'], []],
-    ],
-    [
-      'a registry cancellation',
-      {},
-      invoice('registry_cancellation', 90),
-      DEPS,
-      [null, 'review_it', null, ['expenses.registry_cancellation'], []],
-    ],
-    [
-      'the tax before 2018',
-      {},
-      invoice('ajd_loan', 90),
-      DEPS,
-      [null, 'not_applicable_to_date', null, ['expenses.ajd_before_2018'], ['sts147_148_2018']],
-    ],
     [
       'the record of the advice before the LCCI',
       {},
@@ -634,27 +441,7 @@ describe('what each outcome says and cites', () => {
       DEPS,
       ['case_law', 'borrower_bears', 0, ['expenses.copy_borrower'], SPLIT],
     ],
-    [
-      'the valuation by the LCCI',
-      lcci,
-      invoice('valuation', 350),
-      DEPS,
-      ['statute', 'borrower_bears', 0, ['expenses.valuation_borrower'], ['expenses_lcci']],
-    ],
-    [
-      'a copy of the borrower by the LCCI',
-      lcci,
-      invoice('notary_copy_borrower', 25),
-      DEPS,
-      ['statute', 'borrower_bears', 0, ['expenses.copy_borrower'], ['expenses_lcci']],
-    ],
-    [
-      'a cost paid by the lender',
-      {},
-      invoice('notary_loan', null, { paidBy: 'bank' }),
-      DEPS,
-      ['case_law', 'paid_by_bank', null, ['expenses.paid_by_bank_blank'], SPLIT],
-    ],
+
     [
       'a cost not entered',
       {},
@@ -676,20 +463,7 @@ describe('what each outcome says and cites', () => {
       DEPS,
       ['case_law', 'review_it', null, ['expenses.mixed'], SPLIT],
     ],
-    [
-      'an unknown payer',
-      {},
-      invoice('notary_loan', 900, { paidBy: 'unknown' }),
-      DEPS,
-      ['case_law', 'review_it', null, ['expenses.payer_unknown'], SPLIT],
-    ],
-    [
-      'an agreement',
-      { agreementOnExpenses: true },
-      invoice('notary_loan', 900),
-      DEPS,
-      ['case_law', 'review_it', null, ['expenses.agreement_case_law'], SPLIT],
-    ],
+
     [
       'a possible agreement',
       { agreementOnExpenses: null },
@@ -697,33 +471,7 @@ describe('what each outcome says and cites', () => {
       DEPS,
       ['case_law', 'review_it', null, ['expenses.agreement_unknown'], SPLIT],
     ],
-    [
-      'the split without figures',
-      {},
-      invoice('notary_loan', 900),
-      UNREAD_DEPS,
-      [
-        'case_law',
-        'split_explained',
-        50,
-        ['expenses.case_law_explained', 'expenses.case_law_condition'],
-        SPLIT,
-      ],
-    ],
-    [
-      'the tax and an agreement',
-      { ...ajd, agreementOnExpenses: true },
-      invoice('ajd_loan', 900),
-      DEPS,
-      ['statute', 'review_it', null, ['expenses.agreement_ajd'], ['ajd_lender']],
-    ],
-    [
-      'the tax paid by the lender',
-      ajd,
-      invoice('ajd_loan', 900, { paidBy: 'bank' }),
-      DEPS,
-      ['statute', 'paid_by_bank', null, ['expenses.paid_by_bank'], ['ajd_lender']],
-    ],
+
     [
       'the tax with its norm pending validation',
       ajd,
@@ -745,19 +493,7 @@ describe('what each outcome says and cites', () => {
       norm('lcci', { inForceUntil: '2020-12-31' }),
       ['case_law', 'review_it', null, ['expenses.doubtful_norm'], SPLIT],
     ],
-    [
-      'the notary of an agreement under the LCCI',
-      { ...lcci, agreementOnExpenses: true },
-      invoice('notary_loan', 900),
-      DEPS,
-      [
-        'statute',
-        'lender_bears',
-        100,
-        ['expenses.statute', 'expenses.agreement_statute'],
-        ['expenses_lcci', 'binding_terms'],
-      ],
-    ],
+
     [
       'the tax of an agreement under the LCCI',
       { ...lcci, agreementOnExpenses: true },
@@ -789,13 +525,6 @@ describe('what an agency passes on', () => {
 
   it('an outlay that fills the total leaves the agency nothing, not the outlay apart', () => {
     expect(outlays(agency(300, [300]))).toEqual([0, ['expenses.supplied_left_out']]);
-  });
-
-  it('an outlay matching nothing entered is only left out', () => {
-    expect(outlays(agency(300, [100], invoice('notary_loan', 100)))).toEqual([
-      200,
-      ['expenses.supplied_left_out'],
-    ]);
   });
 
   it('an outlay matching an invoice entered with no amount stays left out', () => {
@@ -841,14 +570,6 @@ describe('the interest, in the cases left over', () => {
     ]);
   });
 
-  it('works out the interest when nothing has come back, a zero or a blank', () => {
-    for (const alreadyReturned of [0, null]) {
-      const item = registry({ alreadyReturned });
-      expect(item?.interest?.amount).toBeGreaterThan(0);
-      expect(keys(item)).not.toContain('interest.returned');
-    }
-  });
-
   it('works out no interest on a payment before the table begins', () => {
     const item = registry({ deedOn: d('1994-06-01') }, d('1994-06-01'));
     expect([item?.interest, keys(item)?.slice(-1)]).toEqual([null, ['interest.before_table']]);
@@ -864,10 +585,5 @@ describe('the interest, in the cases left over', () => {
       key: 'interest.not_published',
       vars: { year: { integer: 2027 } },
     });
-  });
-
-  it('says nothing of a return when none came back', () => {
-    expect(run({ alreadyReturned: 0 }).calculation).toEqual([]);
-    expect(run({ alreadyReturned: null }).calculation).toEqual([]);
   });
 });

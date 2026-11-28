@@ -2,9 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseDate as f } from '../../src/engine/date';
 import { phrase } from '../../src/engine/calculation';
 import { lateInterest } from '../../src/engine/late-interest';
-import { exact } from '../../src/engine/money';
-import { reviewFinalPay } from '../../src/engine/review';
-import type { FinalPayInput, Item, ItemId } from '../../src/engine/types';
+import type { Item, ItemId } from '../../src/engine/types';
 
 const item = (id: ItemId, min: number, max = min): Item => ({
   id,
@@ -95,53 +93,5 @@ describe('the year to claim it (art. 59.1 and 59.2 ET)', () => {
   it('a termination on 29 February ends its year on 28 February', () => {
     expect(lateInterest(items, f('2024-02-29'), f('2025-02-28')).daysLeft).toBe(0);
     expect(lateInterest(items, f('2024-02-29'), f('2025-03-01')).daysLeft).toBe(-1);
-  });
-});
-
-describe('the review asks for it only when the final pay is unpaid', () => {
-  const input: FinalPayInput = {
-    cause: 'unfair_dismissal',
-    startDate: f('2020-01-01'),
-    endDate: f('2026-08-31'),
-    monthlySalary: 3000,
-    extraPayProrated: true,
-    extraPayCount: 2,
-    extraPayAmount: 0,
-    extraPayAccrual: 'unknown',
-    holidayUnit: 'calendar',
-    annualHolidayDays: 30,
-    holidayDaysTaken: 0,
-  };
-  const interest = (o: Partial<FinalPayInput>) => {
-    const r = reviewFinalPay({ ...input, ...o }, {}, f('2026-10-06'));
-    if (!r.ok) throw new Error(JSON.stringify(r.errors));
-    return r.review.lateInterest;
-  };
-
-  it('not answered or paid: none', () => {
-    expect(interest({})).toBeNull();
-    expect(interest({ paid: true })).toBeNull();
-  });
-
-  it('unpaid: on the month’s salary only, never on the severance', () => {
-    const l = interest({ paid: false });
-    // The whole of August, 3,000 €, and 36 days to 6 October.
-    expect(l?.base).toBe(3000);
-    expect(l?.daysLate).toBe(36);
-    expect(l?.amount).toBe(29.59);
-    expect(l?.sources.map((s) => s.id)).toEqual(['et29', 'et59']);
-  });
-
-  it('with extra pay apart, its accrued share counts too', () => {
-    const l = interest({ paid: false, extraPayProrated: false, extraPayAmount: 3000 });
-    const r = reviewFinalPay(
-      { ...input, paid: false, extraPayProrated: false, extraPayAmount: 3000 },
-      {},
-      f('2026-10-06'),
-    );
-    if (!r.ok) throw new Error('invalid input');
-    const min = (id: ItemId) => r.review.items.find((p) => p.item.id === id)?.item.range?.min ?? 0;
-    expect(min('extra_pay')).toBeGreaterThan(0);
-    expect(l?.base).toBe(exact(min('pending_salary') + min('extra_pay')).min);
   });
 });

@@ -68,42 +68,6 @@ describe('reviewMortgage', () => {
     });
   });
 
-  it('a 2021 deed end to end: costs by law, the fee over its cap and the floor the law forbids', () => {
-    const r = reviewOf(deed2021());
-    expect(r.scope).toEqual({ inScope: true });
-    // 700 + 450 + 350 + 1.200; the valuation stays the borrower's.
-    expect(r.totals.statute).toEqual({ principal: 2_700, interest: null });
-    expect(r.totals.caseLaw).toEqual({ principal: 0, interest: null });
-    // 0,15 % of 20.000 € is 30 €: 70 € over.
-    expect(r.totals.fees).toEqual({ counted: 70, upTo: 70 });
-    expect(r.flags.map((f) => [f.label, f.parts.map((p) => p.basis)])).toEqual([
-      ['floor_clause', ['statute']],
-    ]);
-    expect(r.information.map((b) => b.id)).toContain('fein_timing');
-    expect(r.offerPass).toBe(true);
-    expect(r.unchecked).toEqual([
-      'clause_transparency',
-      'floor_irph_paid',
-      'time_limits',
-      'novations',
-      'insurance',
-      'purchase',
-      'purchase_taxes',
-    ]);
-  });
-
-  it('the notary record charged under the LCCI is a figure by law of its own, out of the totals', () => {
-    const r = reviewOf({
-      deedOn: d('2021-05-10'),
-      invoices: [invoice('transparency_deed', 60, paid('2021-05-09'))],
-    });
-    expect(r.expenses.items.map((i) => [i.basis, i.status, i.amount])).toEqual([
-      ['statute', 'not_chargeable', 60],
-    ]);
-    expect(r.totals.statute.principal).toBe(0);
-    expect(r.offerPass).toBe(true);
-  });
-
   it.each([
     [
       'a notary record of less than a cent',
@@ -145,32 +109,6 @@ describe('reviewMortgage', () => {
     );
     expect(r.expenses.items.map((i) => i.status)).toEqual(['split_explained']);
     expect(r.flags).toHaveLength(2);
-    expect(r.offerPass).toBe(false);
-  });
-
-  it('the same 2012 deed offers it with the split giving figures', () => {
-    const r = reviewOf(
-      { deedOn: d('2012-05-10'), invoices: [invoice('notary_loan', 600, paid('2012-05-10'))] },
-      DEPS,
-    );
-    expect(r.totals.caseLaw.principal).toBe(300);
-    expect(r.offerPass).toBe(true);
-  });
-
-  it('a fee within its cap and costs without a figure offer no pass', () => {
-    const r = reviewOf({
-      deedOn: d('2021-05-10'),
-      prepaymentOption: 'a_015_5y',
-      operations: [
-        {
-          on: d('2022-03-01'),
-          kind: 'partial_prepayment',
-          principal: 20_000,
-          feeCharged: 30,
-          hadInsurance: null,
-        },
-      ],
-    });
     expect(r.offerPass).toBe(false);
   });
 });

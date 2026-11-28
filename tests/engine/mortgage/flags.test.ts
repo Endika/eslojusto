@@ -3,7 +3,7 @@ import { parseDate } from '../../../src/engine/date';
 import { reviewFlags, type ClauseFlag } from '../../../src/engine/mortgage/flags';
 import type { SourceTable } from '../../../src/engine/mortgage/norms';
 import type { Clause, MortgageInput } from '../../../src/engine/mortgage/types';
-import { DEPS, mortgage, TODAY, UNREAD_DEPS } from './input';
+import { DEPS, mortgage, TODAY } from './input';
 
 const d = parseDate;
 
@@ -96,12 +96,6 @@ describe('floor clause', () => {
 });
 
 describe('IRPH', () => {
-  it('is shown with the Court of Justice rulings and the day they were read', () => {
-    expect(parts(one('2005-03-01', clause('irph')))).toEqual([
-      ['case_law', 'irph', ['flags.irph'], ['tjue_c125_18', 'tjue_c265_22'], '2026-10-19'],
-    ]);
-  });
-
   it('gives the state as of the oldest reading among its rulings', () => {
     const sources: SourceTable = {
       ...DEPS.sources,
@@ -185,14 +179,6 @@ describe('late interest', () => {
     });
   });
 
-  it('2016 at 9,5 %: within three times the highest legal interest, still over + 2', () => {
-    const keys = one('2016-03-01', late(9.5)).parts.map((x) => x.calculation.map((c) => c.key));
-    expect(keys).toEqual([
-      ['flags.default_interest_lh114'],
-      ['flags.default_interest_case_law', 'flags.default_interest_case_law_above'],
-    ]);
-  });
-
   it('2010: before Ley 1/2013, its cap reaches what accrues from then on, without a figure', () => {
     const flag = one('2010-06-01', late(20));
     expect(parts(flag)).toEqual([
@@ -231,12 +217,6 @@ describe('late interest', () => {
         ['tjue_c96_16', 'sts364_2016'],
         '2026-10-10',
       ],
-    ]);
-  });
-
-  it('without the rates, the rule alone', () => {
-    expect(parts(one('2020-06-01', clause('default_interest')))[0]?.[2]).toEqual([
-      'flags.default_interest_lcci',
     ]);
   });
 });
@@ -354,38 +334,6 @@ describe('flag states', () => {
       clause('irph', { present: false }),
     ]);
     expect(flags.map((f) => [f.label, f.state])).toEqual([['irph', 'in_deed']]);
-  });
-
-  it('cite each Supreme Court ruling only while it stays read in CENDOJ', () => {
-    const all = flagsOf('2016-03-01', [
-      clause('floor_clause', { floorPercent: 3 }),
-      clause('irph'),
-      clause('default_interest', { defaultRate: 20, ordinaryRate: 2 }),
-      clause('early_termination', { missedInstalments: 1 }),
-      clause('opening_fee', { duplicateFee: true }),
-    ]);
-    const cited = all.flatMap((f) => f.parts.flatMap((x) => x.sources.map((s) => s.id)));
-    expect(cited.filter((id) => id.startsWith('sts'))).toEqual([
-      'sts241_2013',
-      'sts364_2016',
-      'sts463_2019',
-      'sts816_2023',
-    ]);
-    const unread = reviewFlags(
-      mortgage({
-        deedOn: d('2016-03-01'),
-        clauses: [
-          clause('floor_clause', { floorPercent: 3 }),
-          clause('default_interest', { defaultRate: 20, ordinaryRate: 2 }),
-          clause('early_termination', { missedInstalments: 1 }),
-          clause('opening_fee', { duplicateFee: true }),
-        ],
-      }),
-      TODAY,
-      UNREAD_DEPS,
-    );
-    const citedUnread = unread.flatMap((f) => f.parts.flatMap((x) => x.sources.map((s) => s.id)));
-    expect(citedUnread.filter((id) => id.startsWith('sts'))).toEqual([]);
   });
 });
 

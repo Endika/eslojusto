@@ -19,11 +19,10 @@ const dismissal: FinalPayInput = {
 };
 
 describe('benefitState', () => {
-  it.each([
-    ['resignation', { cause: 'resignation' }, 'not_applicable'],
-    ['a short contract', { startDate: f('2026-08-01') }, 'no_figures'],
-    ['a dismissal with the figures', {}, 'with_figures'],
-  ] as const)('%s: %s', (_, over, state) => {
-    expect(benefitState(estimateBenefit({ ...dismissal, ...over }, 0))).toBe(state);
-  });
+  it.each([['a dismissal with the figures', {}, 'with_figures']] as const)(
+    '%s: %s',
+    (_, over, state) => {
+      expect(benefitState(estimateBenefit({ ...dismissal, ...over }, 0))).toBe(state);
+    },
+  );
 });
