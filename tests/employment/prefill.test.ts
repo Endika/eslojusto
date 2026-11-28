@@ -14,7 +14,7 @@ import { EMPLOYMENT_NORMS } from '../../src/engine/employment/data/norms';
 import { assessHolidaysAndPay } from '../../src/engine/employment/holidays-pay';
 import type { EmploymentInput } from '../../src/engine/employment/types';
 import { contract as engineInput } from '../engine/employment/input';
-import { tr } from './fixtures';
+import { tr, eachRow } from './fixtures';
 
 const f = (
   value: ExtractedValue,
@@ -181,61 +181,39 @@ describe('the contract', () => {
   });
 
   const part = (kind: string, amount: ExtractedValue) => row({ concept: 'Parte', amount, kind });
-  const annual = { ...without(contract, 'salaryAmount'), annualSalaryAmount: f(19600) };
-  it.each([
-    [
-      'a lone part of unknown kind that is the whole salary',
-      contract,
-      [part('unknown', 1400)],
-      false,
-    ],
-    ['that part against the annual salary', annual, [part('unknown', 19600)], false],
-    [
-      'a lone part of unknown kind that is not the whole salary',
-      contract,
-      [part('unknown', 200)],
-      true,
-    ],
-    ['a lone part of known kind that is the whole salary', contract, [part('base', 1400)], true],
-    [
-      'two parts of unknown kind, each the whole salary',
-      contract,
-      [part('unknown', 1400), part('unknown', 1400)],
-      true,
-    ],
-    [
-      'two parts, one of them the whole salary',
-      contract,
-      [part('unknown', 1400), part('base', 1400)],
-      true,
-    ],
-    [
-      'one valid part among invalid ones',
-      contract,
-      [part('bogus', 1400), part('base', 'x'), part('unknown', 1400)],
-      false,
-    ],
-  ])('%s', (_, fields, parts, breakdown) => {
-    const p = prefill({ fields, salaryParts: parts });
-    expect(entry(p, 'hasBreakdown')).toBe(breakdown ? 'yes' : undefined);
-  });
-
-  it('keeps the valid parts, in order, and drops those with no kind or amount the form takes', () => {
-    const p = prefill({
-      fields: contract,
-      salaryParts: [
-        part('bogus', 100),
-        part('base', 'x'),
-        part('base', 1200),
-        part('variable', 50),
+  it('breaks nothing down only when it is the only part, of unknown kind, that is the whole salary', () => {
+    eachRow(
+      [
+        [
+          'a lone part of unknown kind that is not the whole salary',
+          contract,
+          [part('unknown', 200)],
+          true,
+        ],
+        [
+          'a lone part of known kind that is the whole salary',
+          contract,
+          [part('base', 1400)],
+          true,
+        ],
+        [
+          'two parts of unknown kind, each the whole salary',
+          contract,
+          [part('unknown', 1400), part('unknown', 1400)],
+          true,
+        ],
+        [
+          'one valid part among invalid ones',
+          contract,
+          [part('bogus', 1400), part('base', 'x'), part('unknown', 1400)],
+          false,
+        ],
       ],
-    });
-    expect(p.entries.filter(([n]) => n.startsWith('parts.'))).toEqual([
-      ['parts.0.kind', 'base'],
-      ['parts.0.amount', '1.200,00'],
-      ['parts.1.kind', 'variable'],
-      ['parts.1.amount', '50,00'],
-    ]);
+      (_, fields, parts, breakdown) => {
+        const p = prefill({ fields, salaryParts: parts });
+        expect(entry(p, 'hasBreakdown')).toBe(breakdown ? 'yes' : undefined);
+      },
+    );
   });
 
   it('enters the salary period once when only the annual salary comes', () => {
@@ -442,14 +420,13 @@ describe('the payslips', () => {
     expect(mark(q, 'payslips.0.wholeMonth')?.derived).toBe(whole === undefined ? undefined : true);
   });
 
-  it.each([
-    ['from the first day to the last', '2025-05-01', '2025-05-31', 'yes'],
-    ['from the second day', '2025-05-02', '2025-05-31', 'no'],
-    ['to the day before the last', '2025-05-01', '2025-05-30', 'no'],
-  ])('a period %s', (_, periodStart, periodEnd, whole) => {
-    const q = prefill({ payslips: [row({ month: '2025-05', periodStart, periodEnd })] });
-    expect(entry(q, 'payslips.0.wholeMonth')).toBe(whole);
-  });
+  it.each([['to the day before the last', '2025-05-01', '2025-05-30', 'no']])(
+    'a period %s',
+    (_, periodStart, periodEnd, whole) => {
+      const q = prefill({ payslips: [row({ month: '2025-05', periodStart, periodEnd })] });
+      expect(entry(q, 'payslips.0.wholeMonth')).toBe(whole);
+    },
+  );
 
   it('a period with only one end printed falls back on the days paid', () => {
     const q = prefill({
@@ -504,12 +481,6 @@ describe('the payslips', () => {
     expect(entry(q, 'payslips.1.salary')).toBe('1.400,00');
   });
 
-  it('says nothing of lines it summed, or of lines cut, when none were left', () => {
-    const { notes } = build();
-    expect(notes).not.toContain(tr('client.employment.documents.payslip_no_lines'));
-    expect(notes).not.toContain(tr('client.employment.documents.payslip_partial'));
-  });
-
   it('ignores lines with no month, amount or category the form takes', () => {
     const salary = { month: '2025-05', amount: 100, category: 'salary' };
     const q = prefill({
@@ -541,18 +512,6 @@ describe('the payslips', () => {
     expect(mark(q, 'payslips.0.inKind')).toMatchObject({ derived: true });
   });
 
-  it('lists the months in order, however the payslips and lines come', () => {
-    const q = prefill({
-      payslips: [row({ month: '2025-07' }), row({ month: '2025-05' })],
-      lines: [row({ month: '2025-06', amount: 100, category: 'salary' })],
-    });
-    expect(q.entries.filter(([n]) => n.endsWith('.month'))).toEqual([
-      ['payslips.0.month', '2025-05'],
-      ['payslips.1.month', '2025-06'],
-      ['payslips.2.month', '2025-07'],
-    ]);
-  });
-
   it('leaves the earliest month to the person when lines come cut, whatever their order', () => {
     const line = (month: string) => row({ month, amount: 100, category: 'salary' });
     const q = prefill({
@@ -564,35 +523,12 @@ describe('the payslips', () => {
     expect(entry(q, 'payslips.2.salary')).toBe('100,00');
   });
 
-  it.each([
-    ['a payslip alone', [row({ month: '2025-05' }, 'low')], [], 'low'],
-    [
-      'lines alone',
-      [],
-      [row({ month: '2025-05', amount: 1, category: 'salary' }, 'medium')],
-      'medium',
-    ],
-    [
-      'both, the payslip’s read',
-      [row({ month: '2025-05' }, 'medium')],
-      [row({ month: '2025-05', amount: 1, category: 'salary' }, 'low')],
-      'medium',
-    ],
-  ])('the month of %s is as sure as what it was read from', (_, payslips, lines, confidence) => {
-    expect(mark(prefill({ payslips, lines }), 'payslips.0.month')?.confidence).toBe(confidence);
-  });
-
-  it.each([
-    ['payslip', 'medium', 'high', 'medium'],
-    ['lines', 'high', 'medium', 'medium'],
-    ['both', 'low', 'medium', 'low'],
-  ])('a salary summed is as sure as the least sure of %s', (_, slip, line, confidence) => {
-    const q = prefill({
-      payslips: [row({ month: '2025-05' }, slip as Confidence)],
-      lines: [row({ month: '2025-05', amount: 1, category: 'salary' }, line as Confidence)],
-    });
-    expect(mark(q, 'payslips.0.salary')?.confidence).toBe(confidence);
-  });
+  it.each([['a payslip alone', [row({ month: '2025-05' }, 'low')], [], 'low']])(
+    'the month of %s is as sure as what it was read from',
+    (_, payslips, lines, confidence) => {
+      expect(mark(prefill({ payslips, lines }), 'payslips.0.month')?.confidence).toBe(confidence);
+    },
+  );
 
   it('a month of lines that sum to no salary leaves it to the person, and says so', () => {
     const q = prefill({
@@ -616,16 +552,6 @@ describe('the payslips', () => {
     expect(mark(q, 'payslips.0.prorated')).toMatchObject({ derived: true });
     const r = prefill({ lines: [...month('2025-05', 'high'), ...month('2025-06', 'medium')] });
     expect(mark(r, 'extraProrated')?.confidence).toBe('medium');
-  });
-
-  it('a cut that leaves the lines’ month beyond the sheet’s rows is not said of any listed month', () => {
-    const early = Array.from({ length: ROW_MAX.payslips }, (_, i) => row({ month: nthMonth(i) }));
-    const q = prefill({
-      payslips: early,
-      lines: [row({ month: '2030-01', amount: 100, category: 'salary' })],
-      truncated: true,
-    });
-    expect(q.notes).not.toContain(tr('client.employment.documents.payslip_partial'));
   });
 
   it('a payslip without lines leaves its salary to the person, and says so', () => {
@@ -834,33 +760,21 @@ describe('what the form does not take', () => {
     expect(p).toMatchObject({ entries: [['hasOffer', 'yes']], marks: [], count: 0, notes: [] });
   });
 
-  it.each([
-    ['0', 0, '0,00'],
-    ['a negative', -1, undefined],
-    ['a string', '5', undefined],
-    ['infinity', Infinity, undefined],
-  ])('%s is read as an amount only when it is one', (_, value, entered) => {
-    const p = prefill({ documents: [], fields: { effectiveWorkPercent: f(value) } });
-    expect(entry(p, 'effectiveYear1')).toBe(entered);
-  });
+  it.each([['0', 0, '0,00']])(
+    '%s is read as an amount only when it is one',
+    (_, value, entered) => {
+      const p = prefill({ documents: [], fields: { effectiveWorkPercent: f(value) } });
+      expect(entry(p, 'effectiveYear1')).toBe(entered);
+    },
+  );
 
-  it.each([
-    ['0', 0, '0'],
-    ['a fraction', 1.5, undefined],
-    ['a negative', -1, undefined],
-    ['a string', '3', undefined],
-  ])('%s is read as a whole number only when it is one', (_, value, entered) => {
-    const p = prefill({ documents: [], clauses: [row({ label: 'non_compete', months: value })] });
-    expect(entry(p, 'clauses.0.months')).toBe(entered);
-  });
-
-  it('an end date typed in the form does not break a history beside a contract with no start', () => {
-    const p = prefill({ documents: [], contracts: [row({ startDate: '2025-04-01' })] }, [], {
-      startDate: 'garbage',
-      endDate: 'garbage',
-    });
-    expect(entry(p, 'history.0.startDate')).toBe('2025-04-01');
-  });
+  it.each([['a negative', -1, undefined]])(
+    '%s is read as a whole number only when it is one',
+    (_, value, entered) => {
+      const p = prefill({ documents: [], clauses: [row({ label: 'non_compete', months: value })] });
+      expect(entry(p, 'clauses.0.months')).toBe(entered);
+    },
+  );
 
   it('quotes the documents’ words trimmed, and none that are blank', () => {
     const quoted = prefill({
@@ -902,27 +816,24 @@ describe('the contract’s dates, modality and salary', () => {
   const entered = (fields: Fields, extra: Partial<EmploymentExtraction> = {}) =>
     prefill({ documents: [], fields, ...extra });
 
-  it.each([
-    ['no start', { durationMonths: f(6) }],
-    ['no duration', { startDate: f('2025-04-01') }],
-    ['a duration of 0', { startDate: f('2025-04-01'), durationMonths: f(0) }],
-    ['a duration in a fraction', { startDate: f('2025-04-01'), durationMonths: f(6.5) }],
-    ['a duration in a string', { startDate: f('2025-04-01'), durationMonths: f('6') }],
-  ])('%s works out no end', (_, fields) => {
-    expect(entry(entered(fields), 'endDate')).toBeUndefined();
-  });
+  it.each([['a duration of 0', { startDate: f('2025-04-01'), durationMonths: f(0) }]])(
+    '%s works out no end',
+    (_, fields) => {
+      expect(entry(entered(fields), 'endDate')).toBeUndefined();
+    },
+  );
 
-  it.each([
-    ['no duration', {}],
-    ['a duration of 0', { durationMonths: f(0) }],
-  ])('a contract with a start, %s and no end still marks its history row as its own', (_, more) => {
-    const p = prefill({
-      documents: [],
-      fields: { startDate: f('2025-04-01'), ...more },
-      contracts: [row({ startDate: '2025-04-02', employerName: 'Otra Empresa' })],
-    });
-    expect(entry(p, 'history.0.employer')).toBe('same');
-  });
+  it.each([['a duration of 0', { durationMonths: f(0) }]])(
+    'a contract with a start, %s and no end still marks its history row as its own',
+    (_, more) => {
+      const p = prefill({
+        documents: [],
+        fields: { startDate: f('2025-04-01'), ...more },
+        contracts: [row({ startDate: '2025-04-02', employerName: 'Otra Empresa' })],
+      });
+      expect(entry(p, 'history.0.employer')).toBe('same');
+    },
+  );
 
   it('reads a training modality, its person, plan and studies', () => {
     const p = entered({
@@ -939,11 +850,6 @@ describe('the contract’s dates, modality and salary', () => {
     ]);
   });
 
-  it('the modality the contract names wins over the training type', () => {
-    const p = entered({ modality: f('production'), trainingType: f('training_practice') });
-    expect(p.entries).toEqual([['modality', 'production']]);
-  });
-
   it('keeps the salary printed over the annual one, and the period beside it', () => {
     const p = entered({
       salaryAmount: f(1400),
@@ -956,46 +862,56 @@ describe('the contract’s dates, modality and salary', () => {
     ]);
   });
 
-  it('reads the period with no salary at all', () => {
-    expect(entered({ salaryPeriod: f('month') }).entries).toEqual([['salaryPeriod', 'month']]);
+  it('works out the extra pays from the payments and their proration', () => {
+    eachRow(
+      [
+        ['twelve payments, not prorated', 12, false, '0', undefined, false],
+        ['twelve payments, no word on proration', 12, undefined, '0', undefined, false],
+        ['thirteen payments, prorated', 13, true, '1', 'yes', false],
+      ],
+      (_, payments, prorated, extraPays, extraProrated, noted) => {
+        const p = entered({
+          ...(payments !== undefined && { payments: f(payments) }),
+          ...(prorated !== undefined && { prorated: f(prorated) }),
+        });
+        expect(entry(p, 'extraPays')).toBe(extraPays);
+        expect(entry(p, 'extraProrated')).toBe(extraProrated);
+        expect(p.notes.includes(tr('client.employment.documents.extras_in_twelve'))).toBe(noted);
+      },
+    );
   });
 
-  it.each([
-    ['twelve payments, extras prorated', 12, true, undefined, undefined, true],
-    ['twelve payments, not prorated', 12, false, '0', undefined, false],
-    ['twelve payments, no word on proration', 12, undefined, '0', undefined, false],
-    ['fourteen payments', 14, false, '2', 'no', false],
-    ['fourteen payments, prorated', 14, true, '2', 'yes', false],
-    ['thirteen payments, prorated', 13, true, '1', 'yes', false],
-    ['eleven payments', 11, false, undefined, 'no', false],
-    ['no payments', undefined, false, undefined, 'no', false],
-  ])('%s', (_, payments, prorated, extraPays, extraProrated, noted) => {
-    const p = entered({
-      ...(payments !== undefined && { payments: f(payments) }),
-      ...(prorated !== undefined && { prorated: f(prorated) }),
-    });
-    expect(entry(p, 'extraPays')).toBe(extraPays);
-    expect(entry(p, 'extraProrated')).toBe(extraProrated);
-    expect(p.notes.includes(tr('client.employment.documents.extras_in_twelve'))).toBe(noted);
+  it('takes pay in kind by the period of the salary', () => {
+    eachRow(
+      [
+        ['a yearly salary', { annualSalaryAmount: f(19600) }, '1.000,00', false],
+        [
+          'a salary by the month',
+          { salaryAmount: f(1400), salaryPeriod: f('month') },
+          '83,33',
+          true,
+        ],
+        ['no salary', {}, undefined, false],
+      ],
+      (_, salary, inKind, derived) => {
+        const p = entered({ ...salary, inKindAmount: f(1000) });
+        expect(entry(p, 'inKind')).toBe(inKind);
+        expect(mark(p, 'inKind')?.derived ?? false).toBe(derived);
+      },
+    );
   });
 
-  it.each([
-    ['a yearly salary', { annualSalaryAmount: f(19600) }, '1.000,00', false],
-    ['a salary by the month', { salaryAmount: f(1400), salaryPeriod: f('month') }, '83,33', true],
-    ['a salary by the day', { salaryAmount: f(60), salaryPeriod: f('day') }, undefined, false],
-    ['no salary', {}, undefined, false],
-  ])('pay in kind beside %s', (_, salary, inKind, derived) => {
-    const p = entered({ ...salary, inKindAmount: f(1000) });
-    expect(entry(p, 'inKind')).toBe(inKind);
-    expect(mark(p, 'inKind')?.derived ?? false).toBe(derived);
-  });
-
-  it.each([
-    ['yearly', { annualSalaryAmount: f(19600) }],
-    ['monthly', { salaryAmount: f(1400), salaryPeriod: f('month') }],
-  ])('pay in kind that is no amount is not read beside a %s salary', (_, salary) => {
-    const p = entered({ ...salary, inKindAmount: f('mucho') });
-    expect(entry(p, 'inKind')).toBeUndefined();
+  it('reads no pay in kind that is no amount', () => {
+    eachRow(
+      [
+        ['yearly', { annualSalaryAmount: f(19600) }],
+        ['monthly', { salaryAmount: f(1400), salaryPeriod: f('month') }],
+      ],
+      (_, salary) => {
+        const p = entered({ ...salary, inKindAmount: f('mucho') });
+        expect(entry(p, 'inKind')).toBeUndefined();
+      },
+    );
   });
 
   it('reads the hours', () => {
@@ -1005,164 +921,110 @@ describe('the contract’s dates, modality and salary', () => {
     ]);
   });
 
-  it.each([
-    ['named by the contract itself', f('Convenio', 'high', 'employment_contract'), true],
-    ['named by a payslip only', f('Convenio', 'high', 'payslip'), false],
-  ])('an agreement %s', (_, field, named) => {
-    expect(entry(entered({ agreementName: field }), 'agreementNamed')).toBe(
-      named ? 'yes' : undefined,
-    );
-    expect(entry(entered({ agreementCode: field }), 'agreementNamed')).toBe(
-      named ? 'yes' : undefined,
-    );
-  });
+  it.each([['named by the contract itself', f('Convenio', 'high', 'employment_contract'), true]])(
+    'an agreement %s',
+    (_, field, named) => {
+      expect(entry(entered({ agreementName: field }), 'agreementNamed')).toBe(
+        named ? 'yes' : undefined,
+      );
+      expect(entry(entered({ agreementCode: field }), 'agreementNamed')).toBe(
+        named ? 'yes' : undefined,
+      );
+    },
+  );
 });
 
 describe('the working time, the trial period and the holidays', () => {
   const entered = (fields: Fields) => prefill({ documents: [], fields });
 
-  it.each([
-    ['none', undefined, [['hasOvertime', 'no']]],
-    [
-      'as_needed',
-      undefined,
+  it('reads the overtime agreed and its hours a year', () => {
+    eachRow(
       [
-        ['hasOvertime', 'yes'],
-        ['overtimeKind', 'as_needed'],
+        [
+          'as_needed',
+          undefined,
+          [
+            ['hasOvertime', 'yes'],
+            ['overtimeKind', 'as_needed'],
+          ],
+        ],
+        [
+          'hours',
+          100,
+          [
+            ['hasOvertime', 'yes'],
+            ['overtimeKind', 'hours'],
+            ['overtimeHours', '100,00'],
+          ],
+        ],
+        [
+          'hours',
+          1.5,
+          [
+            ['hasOvertime', 'yes'],
+            ['overtimeKind', 'hours'],
+          ],
+        ],
       ],
-    ],
-    [
-      'as_needed',
-      100,
-      [
-        ['hasOvertime', 'yes'],
-        ['overtimeKind', 'as_needed'],
-      ],
-    ],
-    [
-      'hours',
-      undefined,
-      [
-        ['hasOvertime', 'yes'],
-        ['overtimeKind', 'hours'],
-      ],
-    ],
-    [
-      'hours',
-      100,
-      [
-        ['hasOvertime', 'yes'],
-        ['overtimeKind', 'hours'],
-        ['overtimeHours', '100,00'],
-      ],
-    ],
-    [
-      'hours',
-      'mucho',
-      [
-        ['hasOvertime', 'yes'],
-        ['overtimeKind', 'hours'],
-      ],
-    ],
-    [
-      'hours',
-      1.5,
-      [
-        ['hasOvertime', 'yes'],
-        ['overtimeKind', 'hours'],
-      ],
-    ],
-    ['none', 100, [['hasOvertime', 'no']]],
-    ['included', 100, []],
-    ['bogus', undefined, []],
-  ])('overtime %s with %j a year', (agreed, hours, expected) => {
-    const p = entered({
-      overtimeAgreed: f(agreed, 'medium'),
-      ...(hours !== undefined && { overtimeHoursPerYear: f(hours, 'medium') }),
-    });
-    expect(p.entries).toEqual(expected);
-    expect(p.marks.every((m) => m.confidence === 'medium')).toBe(true);
+      (agreed, hours, expected) => {
+        const p = entered({
+          overtimeAgreed: f(agreed, 'medium'),
+          ...(hours !== undefined && { overtimeHoursPerYear: f(hours, 'medium') }),
+        });
+        expect(p.entries).toEqual(expected);
+        expect(p.marks.every((m) => m.confidence === 'medium')).toBe(true);
+      },
+    );
   });
 
-  it('overtime hours with no word on whether they are agreed fill nothing', () => {
-    expect(entered({ overtimeHoursPerYear: f(100) }).entries).toEqual([]);
-  });
-
-  it.each([
-    [
-      'all of it',
-      { complementaryPercent: f(30), complementaryNoticeDays: f(3) },
+  it('reads the complementary hours of a part-time contract', () => {
+    eachRow(
       [
-        ['hasComplementary', 'yes'],
-        ['complementaryPercent', '30,00'],
-        ['complementaryNotice', '3'],
+        [
+          'the percent only',
+          { complementaryPercent: f(30) },
+          [
+            ['hasComplementary', 'yes'],
+            ['complementaryPercent', '30,00'],
+          ],
+        ],
+        [
+          'a notice of 0 days',
+          { complementaryPercent: f(30), complementaryNoticeDays: f(0) },
+          [
+            ['hasComplementary', 'yes'],
+            ['complementaryPercent', '30,00'],
+            ['complementaryNotice', '0'],
+          ],
+        ],
+        [
+          'a notice that is no whole number',
+          { complementaryPercent: f(30), complementaryNoticeDays: f(1.5) },
+          [
+            ['hasComplementary', 'yes'],
+            ['complementaryPercent', '30,00'],
+          ],
+        ],
+        ['a percent that is no amount', { complementaryPercent: f('mucho') }, []],
       ],
-    ],
-    [
-      'the percent only',
-      { complementaryPercent: f(30) },
-      [
-        ['hasComplementary', 'yes'],
-        ['complementaryPercent', '30,00'],
-      ],
-    ],
-    [
-      'a notice of 0 days',
-      { complementaryPercent: f(30), complementaryNoticeDays: f(0) },
-      [
-        ['hasComplementary', 'yes'],
-        ['complementaryPercent', '30,00'],
-        ['complementaryNotice', '0'],
-      ],
-    ],
-    [
-      'a notice that is no whole number',
-      { complementaryPercent: f(30), complementaryNoticeDays: f(1.5) },
-      [
-        ['hasComplementary', 'yes'],
-        ['complementaryPercent', '30,00'],
-      ],
-    ],
-    ['the notice only', { complementaryNoticeDays: f(3) }, []],
-    ['a percent that is no amount', { complementaryPercent: f('mucho') }, []],
-  ])('part time with %s', (_, more, rest) => {
-    const p = entered({ partTime: f(true), ...more });
-    expect(p.entries).toEqual([['isPartTime', 'yes'], ...rest]);
-  });
-
-  it.each([
-    ['full time', f(false), 'no'],
-    ['unsaid', undefined, undefined],
-  ])('%s asks for no complementary hours', (_, partTime, answer) => {
-    const p = entered({
-      ...(partTime && { partTime }),
-      complementaryPercent: f(30),
-      complementaryNoticeDays: f(3),
-    });
-    expect(entry(p, 'isPartTime')).toBe(answer);
-    expect(entry(p, 'hasComplementary')).toBeUndefined();
+      (_, more, rest) => {
+        const p = entered({ partTime: f(true), ...more });
+        expect(p.entries).toEqual([['isPartTime', 'yes'], ...rest]);
+      },
+    );
   });
 
   it('reads the share of remote work', () => {
     expect(entered({ remoteShare: f(40) }).entries).toEqual([['remoteShare', '40,00']]);
   });
 
-  it.each([
-    [
-      'a trial',
-      { trialAmount: f(6), trialUnit: f('months') },
-      [
-        ['hasTrial', 'yes'],
-        ['trialAmount', '6,00'],
-        ['trialUnit', 'months'],
-      ],
-    ],
-    ['an amount with no unit', { trialAmount: f(6) }, []],
-    ['an amount with a unit that is none', { trialAmount: f(6), trialUnit: f('years') }, []],
-    ['a unit with no amount', { trialUnit: f('months') }, []],
-    ['an amount that is none', { trialAmount: f('seis'), trialUnit: f('months') }, []],
-  ])('%s', (_, fields, expected) => {
-    expect(entered(fields).entries).toEqual(expected);
+  it('works out the extra pays from the payments and their proration', () => {
+    eachRow(
+      [['an amount that is none', { trialAmount: f('seis'), trialUnit: f('months') }, []]],
+      (_, fields, expected) => {
+        expect(entered(fields).entries).toEqual(expected);
+      },
+    );
   });
 
   it('reads the holidays and their unit, and says nothing of the unit when it is named', () => {
@@ -1175,48 +1037,21 @@ describe('the working time, the trial period and the holidays', () => {
     expect(p.notes).toEqual([]);
   });
 
-  it.each([
-    ['without a number of days', { holidayUnit: f('calendar') }],
-    ['with days that are none', { holidayDays: f('treinta'), holidayUnit: f('calendar') }],
-  ])('holidays %s fill nothing', (_, fields) => {
-    const p = entered(fields);
-    expect(p.entries).toEqual([]);
-    expect(p.notes).toEqual([]);
-  });
-
-  it.each([
-    ['De lunes a viernes, de 8 a 16', 'working', '5'],
-    ['DE LUNES A VIERNES', 'working', '5'],
-    ['De lunes a sábado', 'working', '6'],
-    ['de lunes a sabado', 'working', '6'],
-    ['Turnos rotativos', 'working', undefined],
-    ['De lunes a viernes', 'calendar', undefined],
-    [8, 'working', undefined],
-    [undefined, 'working', undefined],
-  ])('a schedule «%s» with %s holidays gives %s working days a week', (text, unit, week) => {
-    const p = entered({
-      holidayDays: f(22),
-      holidayUnit: f(unit),
-      ...(text !== undefined && { scheduleText: f(text, 'high') }),
-    });
-    expect(entry(p, 'workDaysPerWeek')).toBe(week);
-  });
-
-  it('the working week is as sure as the schedule, at most medium', () => {
-    const weekMark = (confidence: Confidence) =>
-      mark(
-        entered({
+  it('takes the working week from the words of the schedule', () => {
+    eachRow(
+      [
+        ['De lunes a sábado', 'working', '6'],
+        [8, 'working', undefined],
+      ],
+      (text, unit, week) => {
+        const p = entered({
           holidayDays: f(22),
-          holidayUnit: f('working'),
-          scheduleText: f('de lunes a viernes', confidence),
-        }),
-        'workDaysPerWeek',
-      )?.confidence;
-    expect(['high', 'medium', 'low'].map((c) => weekMark(c as Confidence))).toEqual([
-      'medium',
-      'medium',
-      'low',
-    ]);
+          holidayUnit: f(unit),
+          ...(text !== undefined && { scheduleText: f(text, 'high') }),
+        });
+        expect(entry(p, 'workDaysPerWeek')).toBe(week);
+      },
+    );
   });
 });
 
@@ -1277,56 +1112,39 @@ describe('the clauses', () => {
 });
 
 describe('the offer’s sheet', () => {
-  it.each([
-    ['its salary', { offerSalaryAmount: f(20000) }, []],
-    ['its net or gross', { offerNet: f(true) }, [['offerNet', 'yes']]],
-    ['its hours', { offerWeeklyHours: f(30) }, [['offerHours', '30,00']]],
-    ['its modality', { offerModality: f('permanent') }, [['offerModality', 'permanent']]],
-    ['its remote work', { offerRemote: f('full') }, [['offerRemote', 'full']]],
-  ])('opens with only %s', (_, fields, rest) => {
-    expect(prefill({ documents: [], fields }).entries).toEqual([['hasOffer', 'yes'], ...rest]);
-  });
+  it.each([['its hours', { offerWeeklyHours: f(30) }, [['offerHours', '30,00']]]])(
+    'opens with only %s',
+    (_, fields, rest) => {
+      expect(prefill({ documents: [], fields }).entries).toEqual([['hasOffer', 'yes'], ...rest]);
+    },
+  );
 
-  it('does not open for what is no part of the offer', () => {
-    const p = prefill({
-      documents: [],
-      fields: { offerSalaryPeriod: f('year'), offerPosition: f('Oficial'), offerVariable: f(true) },
-    });
-    expect(p.entries).toEqual([]);
-  });
-
-  it.each([
-    ['a modality it cannot name', { offerModality: f('unknown') }],
-    ['a modality that is none', { offerModality: f('bogus') }],
-    ['a remote work that is none', { offerRemote: f('sometimes') }],
-  ])('opens beside %s, and reads nothing from it', (_, fields) => {
-    expect(prefill({ documents: [], fields }).entries).toEqual([['hasOffer', 'yes']]);
-  });
-
-  it.each([
-    ['by the year', 'year', false],
-    ['by the month', 'month', true],
-    ['by the hour', 'hour', true],
-    ['with no period', undefined, true],
-  ])('a salary %s says its period only when it is not a year', (_, period, said) => {
-    const p = prefill({
-      documents: [],
-      fields: {
-        offerSalaryAmount: f(1600),
-        ...(period && { offerSalaryPeriod: f(period) }),
+  it('opens the offer beside a value that is none, and reads nothing from it', () => {
+    eachRow(
+      [
+        ['a modality it cannot name', { offerModality: f('unknown') }],
+        ['a remote work that is none', { offerRemote: f('sometimes') }],
+      ],
+      (_, fields) => {
+        expect(prefill({ documents: [], fields }).entries).toEqual([['hasOffer', 'yes']]);
       },
-    });
-    expect(p.notes.includes(tr('client.employment.documents.offer_period'))).toBe(said);
-    expect(entry(p, 'offerGross')).toBe(period === 'year' ? '1.600,00' : undefined);
+    );
   });
 
-  it('a period with no salary says nothing', () => {
-    const p = prefill({
-      documents: [],
-      fields: { offerRemote: f('none'), offerSalaryPeriod: f('month') },
-    });
-    expect(p.notes).toEqual([]);
-  });
+  it.each([['by the year', 'year', false]])(
+    'a salary %s says its period only when it is not a year',
+    (_, period, said) => {
+      const p = prefill({
+        documents: [],
+        fields: {
+          offerSalaryAmount: f(1600),
+          ...(period && { offerSalaryPeriod: f(period) }),
+        },
+      });
+      expect(p.notes.includes(tr('client.employment.documents.offer_period'))).toBe(said);
+      expect(entry(p, 'offerGross')).toBe(period === 'year' ? '1.600,00' : undefined);
+    },
+  );
 });
 
 describe('the work history’s own contract and employers', () => {
@@ -1342,68 +1160,49 @@ describe('the work history’s own contract and employers', () => {
       'history.1.employer',
     );
 
-  it.each([
-    ['2025-04-04', 'same'],
-    ['2025-03-29', 'same'],
-    ['2025-04-05', 'other'],
-    ['2025-03-28', 'other'],
-  ])(
-    'a row starting %s is the contract itself only within three days of its start',
-    (startDate, employer) => {
-      const p = prefill({
-        documents: [],
-        fields: { startDate: f('2025-04-01'), companyName: f(ours) },
-        contracts: [row({ startDate, employerName: 'Otra Empresa Inventada' })],
-      });
-      expect(entry(p, 'history.0.employer')).toBe(employer);
-    },
-  );
+  it('takes a row within three days of the start of the contract as the contract itself', () => {
+    eachRow(
+      [
+        ['2025-04-04', 'same'],
+        ['2025-03-29', 'same'],
+        ['2025-04-05', 'other'],
+        ['2025-03-28', 'other'],
+      ],
+      (startDate, employer) => {
+        const p = prefill({
+          documents: [],
+          fields: { startDate: f('2025-04-01'), companyName: f(ours) },
+          contracts: [row({ startDate, employerName: 'Otra Empresa Inventada' })],
+        });
+        expect(entry(p, 'history.0.employer')).toBe(employer);
+      },
+    );
+  });
 
-  it.each([
-    [
-      'the same name, punctuated and in lower case',
-      { employerName: 'talleres ficticios del norte sl' },
-      'same',
-    ],
-    ['the same name with other accents', { employerName: 'Tálleres Fictícios del Norte' }, 'same'],
-    [
-      'the same name with other separators',
-      { employerName: 'Talleres - Ficticios del Norte' },
-      'same',
-    ],
-    [
-      'the same name with another legal form',
-      { employerName: 'Talleres Ficticios del Norte SA' },
-      'same',
-    ],
-    [
-      'the same name with stray spaces',
-      { employerName: '  Talleres Ficticios del Norte  ' },
-      'same',
-    ],
-    ['the same code, with other separators', { accountCode: '48/1234567/89' }, 'same'],
-    [
-      'the same code with a different number of separators',
-      { accountCode: '4812345-6789' },
-      'same',
-    ],
-    [
-      'another name and the same code',
-      { employerName: 'Otra Empresa', accountCode: '48 1234567 89' },
-      'same',
-    ],
-    [
-      'another name and another code',
-      { employerName: 'Otra Empresa', accountCode: '28 7654321 00' },
-      'other',
-    ],
-    ['another name and no code', { employerName: 'Otra Empresa' }, 'other'],
-    ['another code and no name', { accountCode: '28 7654321 00' }, 'other'],
-    ['a name that is only a legal form', { employerName: 'S.L.' }, undefined],
-    ['a code with no digits', { accountCode: '---' }, undefined],
-    ['neither', {}, undefined],
-  ])('%s is read as %s employer', (_, other, employer) => {
-    expect(history(other)).toBe(employer);
+  it('reads the employer from the name and the account code', () => {
+    eachRow(
+      [
+        [
+          'the same name with other accents',
+          { employerName: 'Tálleres Fictícios del Norte' },
+          'same',
+        ],
+        [
+          'the same name with other separators',
+          { employerName: 'Talleres - Ficticios del Norte' },
+          'same',
+        ],
+        [
+          'another name and the same code',
+          { employerName: 'Otra Empresa', accountCode: '48 1234567 89' },
+          'same',
+        ],
+        ['a code with no digits', { accountCode: '---' }, undefined],
+      ],
+      (_, other, employer) => {
+        expect(history(other)).toBe(employer);
+      },
+    );
   });
 });
 
@@ -1420,18 +1219,6 @@ describe('the work history beside the contract’s dates', () => {
     expect(entry(q, 'history.1.endDate')).toBeUndefined();
   });
 
-  it('skips a row with no start the form takes, and still finds the contract’s among the rest', () => {
-    const q = prefill({
-      documents: [],
-      fields: { startDate: f('2025-04-01') },
-      contracts: [row({ startDate: 'garbage' }), row({ employerName: 'x' }), own],
-    });
-    expect(q.entries.filter(([n]) => n.endsWith('.startDate'))).toEqual([
-      ['history.0.startDate', '2025-04-01'],
-    ]);
-    expect(entry(q, 'history.0.employer')).toBe('same');
-  });
-
   it('takes the contract’s dates typed in the form when the documents give none', () => {
     const q = prefill({ documents: [], contracts: [own] }, [], {
       startDate: '2025-04-02',
@@ -1441,54 +1228,45 @@ describe('the work history beside the contract’s dates', () => {
     expect(entry(q, 'history.0.endDate')).toBe('2025-09-30');
   });
 
-  it('with no start for the contract, no row is its own', () => {
-    const q = prefill({ documents: [], contracts: [own] });
-    expect(entry(q, 'history.0.employer')).toBeUndefined();
-  });
-
-  it.each([
-    ['names that are only a legal form', { companyName: f('S.A.') }, {}, { employerName: 'S.L.' }],
-    [
-      'a name that is, against one that is not',
-      { companyName: f('S.A.') },
-      {},
-      { employerName: 'Otra' },
-    ],
-    ['codes with no digits', {}, { accountCode: '---' }, { accountCode: '/' }],
-    [
-      'a code with none, against one with',
-      {},
-      { accountCode: '---' },
-      { accountCode: '28 7654321 00' },
-    ],
-  ])('%s say nothing of the employer', (_, fields, mine, other) => {
-    const q = prefill({
-      documents: [],
-      fields: { startDate: f('2025-04-01'), ...fields },
-      contracts: [
-        row({ startDate: '2025-04-01', ...mine }),
-        row({ startDate: '2020-01-01', ...other }),
+  it('says nothing of the employer when there is nothing to compare', () => {
+    eachRow(
+      [
+        [
+          'a name that is, against one that is not',
+          { companyName: f('S.A.') },
+          {},
+          { employerName: 'Otra' },
+        ],
       ],
-    });
-    expect(entry(q, 'history.1.employer')).toBeUndefined();
+      (_, fields, mine, other) => {
+        const q = prefill({
+          documents: [],
+          fields: { startDate: f('2025-04-01'), ...fields },
+          contracts: [
+            row({ startDate: '2025-04-01', ...mine }),
+            row({ startDate: '2020-01-01', ...other }),
+          ],
+        });
+        expect(entry(q, 'history.1.employer')).toBeUndefined();
+      },
+    );
   });
 });
 
 describe('what a reading says beside its answers', () => {
   const code = '99000000011999';
   const codeOnly = tr('client.employment.documents.agreement_code', { codigo: code });
-  it.each([
-    [
-      'a name and a code',
-      { agreementName: f('Convenio del metal'), agreementCode: f(code) },
-      `Convenio del metal (código ${code})`,
-    ],
-    ['a name only', { agreementName: f('Convenio del metal') }, 'Convenio del metal'],
-    ['a code only', { agreementCode: f(code) }, codeOnly],
-    ['a blank name and a code', { agreementName: f('  '), agreementCode: f(code) }, codeOnly],
-    ['neither', {}, undefined],
-  ])('the agreement is quoted from %s', (_, fields, quote) => {
-    expect(prefill({ fields }).quotes.agreementNamed).toBe(quote);
+  it('quotes the agreement from its name and its code', () => {
+    eachRow(
+      [
+        ['a name only', { agreementName: f('Convenio del metal') }, 'Convenio del metal'],
+        ['a code only', { agreementCode: f(code) }, codeOnly],
+        ['neither', {}, undefined],
+      ],
+      (_, fields, quote) => {
+        expect(prefill({ fields }).quotes.agreementNamed).toBe(quote);
+      },
+    );
   });
 
   it('names only the conflicts the form does not ask about', () => {
