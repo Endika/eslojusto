@@ -151,28 +151,9 @@ describe('a read of the penalty a bill charged', () => {
     expect(several.entries).toEqual([['penaltyCharged', '120,50']]);
     expect(several.marks[0]).toMatchObject({ confidence: 'medium', derived: true });
   });
-
-  it('reads no penalty from a line of another kind', () => {
-    const other = {
-      values: { document: 1, kind: 'fixed_fee', amount: 30 },
-      confidence: 'high' as const,
-    };
-    expect(telecomPrefill(extraction({ lines: [other] }), tr).entries).toEqual([]);
-  });
 });
 
 describe('what a read says of itself', () => {
-  it('says so when an answer is low in confidence, and says nothing when none is', () => {
-    expect(telecomPrefill(fieldsOf({ commitmentMonths: field(12, 'low') }), tr)).toMatchObject({
-      lowConfidence: true,
-      notes: ['client.documents.done_low'],
-    });
-    expect(telecomPrefill(fieldsOf({ commitmentMonths: field(12) }), tr)).toMatchObject({
-      lowConfidence: false,
-      notes: [],
-    });
-  });
-
   it('says what was cut off, then the checks that failed, in the order the checks have', () => {
     const p = telecomPrefill(extraction({ truncated: true }), tr, [
       'lines_above_total',

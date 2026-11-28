@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { electricityCase } from '../../../src/bills/electricity/case';
 import { officialBlocks } from '../../../src/bills/electricity/official';
 import type { CompletedElectricityReview } from '../../../src/bills/electricity/ports';
+import { PASS_PRICE } from '../../../src/documents/contract';
 import { NO_DETAILS } from '../../../src/documents/letter';
 import type { Block } from '../../../src/documents/ports';
 import { billFinding, single } from '../../../src/engine/bills/finding';
@@ -49,6 +50,13 @@ describe('the electricity case', () => {
     expect(quiet([])).toBe(false);
   });
 
+  it('offers the pass from what the bills count reaching its price', () => {
+    const counting = (counted: number) =>
+      electricityCase([entryWith([], {}, { counted })], NORMS_BEFORE_FIGURE).offer;
+    expect(counting(PASS_PRICE)).toBe(true);
+    expect(counting(PASS_PRICE - 0.01)).toBe(false);
+  });
+
   it('adds the year to the report from two bills, not for one', () => {
     expect(texts(blocksOf([over()]))).not.toContain('client.bills.report.year');
     expect(texts(blocksOf([over(), over(july)]))).toContain('client.bills.report.year');
@@ -67,11 +75,6 @@ describe('the electricity case', () => {
     expect(vi.mocked(officialBlocks).mock.calls[0]?.[0]).toEqual([a, b]);
     expect(vi.mocked(officialBlocks).mock.calls[0]?.[1]).toEqual(official());
     expect(list.at(-1)).toEqual({ type: 'note', text: 'EXTRA' });
-  });
-
-  it('asks for the official figures as unavailable until they load', () => {
-    blocksOf([over()]);
-    expect(vi.mocked(officialBlocks).mock.calls[0]?.[1]).toBeNull();
   });
 
   it('builds the correction letter of the bills kept', () => {

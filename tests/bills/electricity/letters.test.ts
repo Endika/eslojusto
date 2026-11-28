@@ -161,7 +161,9 @@ describe('the correction letter, block by block', () => {
     const told = blocks(entryWith([single(finding('total', 1))]));
     expect(told).toContainEqual({
       type: 'bullet',
-      text: expect.stringContaining('client.bills.letter.correction.line_difference {'),
+      text: expect.stringMatching(
+        /^client\.bills\.letter\.correction\.line_difference \{"linea":".+","diferencia":".+"\}$/,
+      ),
     });
   });
 
@@ -215,6 +217,33 @@ describe('the correction letter, block by block', () => {
     expect(sources).toHaveLength(2);
     expect(new Set(cited).size).toBe(2);
     for (const s of sources) expect(s).toMatchObject({ url: expect.stringMatching(/^https:/) });
+  });
+
+  it('keeps the rules of every line, whichever they are', () => {
+    const entry = entryWith([
+      single(finding('vat', 1, null, 'vat')),
+      single(finding('meter', 1, null, 'meter_rent')),
+    ]);
+    const sources = correctionLetter([entry], NORMS_BEFORE_FIGURE, details, tr).blocks.filter(
+      (b) => b.type === 'source',
+    );
+    expect(sources).toHaveLength(3);
+  });
+
+  it('says the lowest reading counts when any line has several readings, not only all', () => {
+    const readings: BillItem = {
+      kind: 'readings',
+      question: 'official_value',
+      readings: [
+        { when: 'lower_value', finding: finding('meter', 1) },
+        { when: 'higher_value', finding: finding('meter', 2) },
+      ],
+    };
+    const entry = entryWith([single(finding('vat', 1)), readings]);
+    const kinds = correctionLetter([entry], NORMS_BEFORE_FIGURE, details, tr).blocks.map(
+      (b) => b.type,
+    );
+    expect(kinds).toContain('note');
   });
 
   it('closes with the refund, the request, the regards and the signature', () => {

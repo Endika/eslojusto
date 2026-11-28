@@ -53,6 +53,7 @@ const tone = (id: BillsItemId): Tone => {
 // answers it was worked out from.
 export function electricityLabels(input: ElectricityBillInput, tr: Translate): ItemLabels {
   const lineName = (f: BillFinding): string | null => {
+    // Stryker disable next-line ConditionalExpression: indexing a list with null gives undefined, which is no line either
     if (f.line === null) return null;
     if (f.id === 'power') {
       const p = input.power[f.line]?.period;

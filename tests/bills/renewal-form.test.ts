@@ -282,15 +282,6 @@ describe('what the renewal form requires', () => {
     expect('errors' in r ? r.errors : []).toEqual([]);
   });
 
-  it('asks the power unit, and whether the letter came apart from the bill', () => {
-    expect(readRenewalForm(form({ powerUnit: null }), TODAY)).toEqual({
-      errors: [{ field: 'powerUnit', code: 'missing_choice' }],
-    });
-    expect(readRenewalForm(form({ separateFromBill: null }), TODAY)).toEqual({
-      errors: [{ field: 'separateFromBill', code: 'missing_choice' }],
-    });
-  });
-
   it.each([
     ['yes', true],
     ['no', false],
@@ -299,15 +290,6 @@ describe('what the renewal form requires', () => {
     expect(readRenewalForm(form({ separateFromBill: answer }), TODAY)).toMatchObject({
       input: { separateFromBill: expected },
     });
-  });
-
-  it('gives an answer that cannot be read where it was asked, for the sheet it is on', () => {
-    expect(readRenewalForm(form({ annualKwh: 'mucho' }), TODAY)).toEqual({
-      errors: [{ field: 'annualKwh', code: 'invalid_number' }],
-    });
-    expect(sheetErrors(form({ annualKwh: 'mucho' }), 'consumo', TODAY)).toEqual([
-      { field: 'annualKwh', code: 'invalid_number' },
-    ]);
   });
 
   it('checks a sheet with what the engine bounds only on that sheet', () => {

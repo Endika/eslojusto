@@ -35,6 +35,7 @@ const kindOf = (v: ExtractedValue | undefined): TelecomLineKind =>
 
 const documentOf = (row: ExtractedRow): number | null => {
   const n = row.values['document'];
+  // Stryker disable next-line ConditionalExpression: Number.isInteger is false for a non-number; typeof only narrows
   return typeof n === 'number' && Number.isInteger(n) ? n : null;
 };
 
@@ -89,8 +90,12 @@ export function chargesMemory() {
       : [b.operator, isoOf(b.issuedOn), isoOf(b.periodFrom), isoOf(b.periodTo), b.total].join('|');
   return {
     add(read: readonly ReadBill[]) {
-      const keys = new Set(read.map(keyOf).filter((k) => k !== null));
-      bills = [...read, ...bills.filter((b) => !keys.has(keyOf(b) ?? ''))].sort(newestFirst);
+      const keys = new Set(read.map(keyOf));
+      const replaced = (b: ReadBill) => {
+        const key = keyOf(b);
+        return key !== null && keys.has(key);
+      };
+      bills = [...read, ...bills.filter((b) => !replaced(b))].sort(newestFirst);
     },
     clear() {
       bills = [];

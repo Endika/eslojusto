@@ -10,8 +10,13 @@ import { juneBill, TODAY } from '../../engine/bills/input';
 import { NORMS_BEFORE_FIGURE } from '../../engine/bills/norms-before-figure';
 
 // A line of a bill charged over the norm by `amount`.
-export function finding(id: BillsItemId, amount: number, line: number | null = null): BillFinding {
-  return billFinding(id, 'paid_over', [], ['vat'], NORMS_BEFORE_FIGURE, {
+export function finding(
+  id: BillsItemId,
+  amount: number,
+  line: number | null = null,
+  rule: 'vat' | 'billing' | 'meter_rent' = 'vat',
+): BillFinding {
+  return billFinding(id, 'paid_over', [], [rule], NORMS_BEFORE_FIGURE, {
     amount,
     direction: 'over',
     line,

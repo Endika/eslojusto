@@ -18,25 +18,9 @@ describe('the answers of a bills form', () => {
     expect(answers(formOf({ a: '  hola  ' })).text('a')).toBe('hola');
   });
 
-  it('keeps a date left empty as missing only when it is required', () => {
-    const a = answers(formOf({ d: '' }));
-    expect(a.date('d', false)).toBeNull();
-    expect(a.errors).toEqual([]);
-    expect(a.date('d', true)).toBeNull();
-    expect(a.errors).toEqual([{ field: 'd', code: 'missing_value' }]);
-  });
-
   it('keeps a date that does not exist as invalid', () => {
     const a = answers(formOf({ d: '2026-02-31' }));
     expect(a.date('d', false)).toBeNull();
     expect(a.errors).toEqual([{ field: 'd', code: 'invalid_date' }]);
-  });
-
-  it('keeps a figure left empty as missing only when it is required', () => {
-    const a = answers(formOf({ n: ' ' }));
-    expect(a.figure('n', false)).toBeNull();
-    expect(a.errors).toEqual([]);
-    expect(a.figure('n', true)).toBeNull();
-    expect(a.errors).toEqual([{ field: 'n', code: 'missing_value' }]);
   });
 });

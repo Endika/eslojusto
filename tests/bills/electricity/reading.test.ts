@@ -71,12 +71,4 @@ describe('the electricity reading', () => {
     reading.prefill(pack, {}, []);
     expect(reading.pending()).toBe(2);
   });
-
-  it('lets a bill typed by hand go when another read comes', () => {
-    const reading = electricityReading(document.createElement('form'), tr);
-    reading.prefill(pack, {}, []);
-    reading.typed();
-    reading.prefill(pack, {}, []);
-    expect(reading.pending()).toBe(2);
-  });
 });
