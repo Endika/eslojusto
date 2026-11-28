@@ -195,6 +195,21 @@ describe('bills events', () => {
     expect(p.findings).not.toEqual([]);
   });
 
+  it.each([
+    ['pending on a norm', { pendingOn: ['rdl7_2026'] }],
+    ['depending on a norm', { dependsOn: ['rdl7_2026'] }],
+  ] as const)('says a result is conditional when a line is %s', (_, change) => {
+    const { review, input } = electricity(juneBill());
+    const [first, ...rest] = review.items;
+    if (first?.kind !== 'single') throw new Error('expected a single reading');
+    const conditional = (items: typeof review.items) =>
+      electricityBillProps({ review: { ...review, items }, input }, 'claim').conditional;
+    expect(conditional(review.items)).toBe(false);
+    expect(conditional([{ ...first, finding: { ...first.finding, ...change } }, ...rest])).toBe(
+      true,
+    );
+  });
+
   it('says when something is charged short, without the figure', () => {
     // The meter at 1,00 with VAT left at 10,55: 0,04 short of (47,02 + 2,40 + 1,00) × 21 %.
     const p = electricityBillProps(electricity(juneBill({ meter: meter({ amount: 1 }) })), 'claim');
@@ -257,6 +272,14 @@ describe('bills events', () => {
       after_exit: 'none',
       pass: 'quiet',
     });
+  });
+
+  it('counts a commitment over the legal maximum, with no penalty charged for it', () => {
+    const long = telecom({
+      commitment: { startedOn: parseDate('2025-03-01'), months: 36, agreedPenalty: null },
+      penaltyCharged: null,
+    });
+    expect(telecomReviewProps(telecomReview(long), 'claim').commitment).toBe('above_legal_maximum');
   });
 
   it('a year leaves its size, its difference and the offer in buckets', () => {
