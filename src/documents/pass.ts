@@ -58,10 +58,9 @@ interface PassClaims {
 function base64UrlJson(part: string): unknown {
   try {
     const b64 = part.replace(/-/g, '+').replace(/_/g, '/');
-    const bytes = Uint8Array.from(atob(b64.padEnd(Math.ceil(b64.length / 4) * 4, '=')), (c) =>
-      c.charCodeAt(0),
-    );
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
     return JSON.parse(new TextDecoder().decode(bytes));
+    // Stryker disable next-line BlockStatement: the callers read undefined as they read null
   } catch {
     return null;
   }
@@ -71,7 +70,9 @@ function base64UrlJson(part: string): unknown {
 // the page reads the claims to know whether the pass is worth sending at all.
 export function passClaims(token: string): PassClaims | null {
   const [version, payload, signature, ...rest] = token.split('.');
-  if (version !== 'v1' || !payload || !signature || rest.length > 0) return null;
+  if (version !== 'v1' || !signature || rest.length > 0) return null;
+  // Stryker disable next-line ConditionalExpression: a missing or empty payload fails to decode, which reads as no claims
+  if (!payload) return null;
   const c = base64UrlJson(payload);
   if (typeof c !== 'object' || c === null) return null;
   const { typ, sid, exp } = c as Record<string, unknown>;
@@ -82,7 +83,9 @@ export function passClaims(token: string): PassClaims | null {
 // The UTC day a free-reads counter counts, as the API signs it.
 function quotaDay(token: string): string | null {
   const [version, payload] = token.split('.');
-  if (version !== 'v1' || !payload) return null;
+  if (version !== 'v1') return null;
+  // Stryker disable next-line ConditionalExpression: a missing or empty payload fails to decode, which reads as no claims
+  if (!payload) return null;
   const c = base64UrlJson(payload);
   if (typeof c !== 'object' || c === null) return null;
   const { typ, day } = c as Record<string, unknown>;
@@ -104,12 +107,15 @@ export const canDownload = (state: PassState) => state === 'valid' || state === 
 
 const readJson = (store: KeyValueStore, key: string): Record<string, unknown> | null => {
   const raw = store.get(key);
+  // Stryker disable next-line ConditionalExpression: JSON.parse(null) is null, which reads as nothing just the same
   if (raw === null) return null;
   try {
     const v: unknown = JSON.parse(raw);
+    // Stryker disable next-line ConditionalExpression,LogicalOperator: a number, a string or an array has none of the fields the pass is read from
     return typeof v === 'object' && v !== null && !Array.isArray(v)
       ? (v as Record<string, unknown>)
       : null;
+    // Stryker disable next-line BlockStatement: the caller reads undefined as it reads null
   } catch {
     return null;
   }
@@ -174,7 +180,9 @@ export function createPassStore(store: KeyValueStore, now: () => number = () => 
       const raw = store.get(STORAGE_KEYS.checkout);
       let list: unknown;
       try {
+        // Stryker disable next-line ConditionalExpression,ArrayDeclaration: JSON.parse(null) is null, which holds no checkout either
         list = raw === null ? [] : JSON.parse(raw);
+        // Stryker disable next-line BlockStatement: with no list read, none of its entries is a checkout either
       } catch {
         return [];
       }
