@@ -54,10 +54,10 @@ interface EmploymentPrefill extends ReadPrefill {
 
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
 const lowest = (...cs: Confidence[]): Confidence =>
+  // Stryker disable next-line EqualityOperator: on a tie both sides are the same confidence
   cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
 
-const isNumber = (v: ExtractedValue | undefined): v is number =>
-  typeof v === 'number' && Number.isFinite(v);
+const isNumber = (v: ExtractedValue | undefined): v is number => Number.isFinite(v);
 const amountOf = (v: ExtractedValue | undefined): number | null =>
   isNumber(v) && v >= 0 ? Math.round(v * 100) / 100 : null;
 const wholeOf = (v: ExtractedValue | undefined): number | null =>
@@ -65,11 +65,13 @@ const wholeOf = (v: ExtractedValue | undefined): number | null =>
 const textOf = (v: ExtractedValue | undefined): string | null =>
   typeof v === 'string' && v.trim() !== '' ? v.trim() : null;
 const oneOf = <T extends string>(v: ExtractedValue | undefined, options: readonly T[]): T | null =>
+  // Stryker disable next-line ConditionalExpression: the options hold no non-string, so includes alone gives the same answer
   typeof v === 'string' && (options as readonly string[]).includes(v) ? (v as T) : null;
 const yesNo = (v: ExtractedValue | undefined): 'yes' | 'no' | null =>
   v === true ? 'yes' : v === false ? 'no' : null;
 
 function dateOf(v: ExtractedValue | undefined): CivilDate | null {
+  // Stryker disable next-line ConditionalExpression: parseDate rejects whatever is not a date string, caught below
   if (typeof v !== 'string') return null;
   try {
     return parseDate(v);
@@ -80,6 +82,7 @@ function dateOf(v: ExtractedValue | undefined): CivilDate | null {
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 const monthOf = (v: ExtractedValue | undefined): string | null =>
+  // Stryker disable next-line ConditionalExpression: a non-string never reads as «yyyy-mm» once turned into text
   typeof v === 'string' && MONTH.test(v) ? v : null;
 
 const amountText = formatAmountInput;
@@ -150,6 +153,7 @@ function fieldReader(a: Answers, fields: Fields) {
 function relationship(a: Answers, e: EmploymentExtraction, contractRead: boolean) {
   const hints = e.relationshipHints.flatMap((row) => {
     const hint = row.values['hint'];
+    // Stryker disable next-line ConditionalExpression,ArrayDeclaration: a hint that is no string matches none of the hints below
     return typeof hint === 'string' ? [{ hint, confidence: row.confidence }] : [];
   });
   const special = hints.filter(
@@ -183,8 +187,9 @@ function dates(
   if (end) return { start, end };
   // A duration in months ends the day before the same day that many months on.
   const months = fields.durationMonths;
-  const n = wholeOf(months?.value);
-  if (!start || !months || n === null || n <= 0) return { start, end: null };
+  if (!start || !months) return { start, end: null };
+  const n = wholeOf(months.value) ?? 0;
+  if (n <= 0) return { start, end: null };
   const worked = addDays(addMonthsClamped(start, n), -1);
   a.read('endDate', toIso(worked), lowest(months.confidence, 'medium'), true);
   return { start, end: worked };
@@ -220,9 +225,9 @@ function salary(a: Answers, fields: Fields, parts: readonly ExtractedRow[]): boo
   // Twelve monthly payments and the extra ones: the form asks for the extra ones. Twelve payments
   // with the extras prorated hold them inside, in a number the contract does not give.
   const payments = fields.payments;
-  const count = wholeOf(payments?.value);
+  const count = wholeOf(payments?.value) ?? 0;
   const inTwelve = count === 12 && fields.prorated?.value === true;
-  const extras = payments && count !== null && count >= 12 && !inTwelve ? count - 12 : null;
+  const extras = count >= 12 && !inTwelve ? count - 12 : null;
   if (payments && extras !== null) a.read('extraPays', String(extras), payments.confidence, true);
   if (extras !== 0 && !inTwelve) read.flag('extraProrated', 'prorated');
   // The contract gives pay in kind a year; the form takes it for the salary's period.
@@ -253,13 +258,10 @@ function salaryParts(a: Answers, parts: readonly ExtractedRow[], total: number |
   if (rows.length === 0) return;
   // One part of unknown kind that is the whole salary («según convenio y mejora voluntaria»)
   // breaks nothing down: the salary stays the amount the contract fixes.
-  const [only] = rows;
-  if (
-    rows.length === 1 &&
-    only?.values['kind'] === 'unknown' &&
-    amountOf(only.values['amount']) === total
-  )
-    return;
+  const wholeSalary = (r: ExtractedRow) =>
+    r.values['kind'] === 'unknown' && amountOf(r.values['amount']) === total;
+  // Stryker disable next-line MethodExpression: with exactly one row, some and every are the same
+  if (rows.length === 1 && rows.every(wholeSalary)) return;
   a.open('hasBreakdown', 'yes');
   rows.forEach((row, i) => {
     a.read(rowField('parts', i, 'kind'), String(row.values['kind']), row.confidence);
@@ -302,19 +304,22 @@ function sumLines(lines: readonly ExtractedRow[]) {
     const raw = row.values['amount'];
     const amount = isNumber(raw) ? raw : null;
     const category = row.values['category'];
-    if (!month || amount === null || typeof category !== 'string') continue;
+    if (!month || amount === null) continue;
     const sums = months.get(month) ?? {
       salary: 0,
       prorated: 0,
       inKind: 0,
+      // Stryker disable next-line StringLiteral: an empty confidence ranks nowhere, so the first line's wins either way
       confidence: 'high',
     };
     const cents = Math.round(amount * 100);
-    if ((SALARY_LINES as readonly string[]).includes(category)) sums.salary += cents;
+    if ((SALARY_LINES as readonly (ExtractedValue | undefined)[]).includes(category))
+      sums.salary += cents;
     else if (category === 'prorated_extra_pay') sums.prorated += cents;
     else if (category === 'in_kind') sums.inKind += cents;
     else {
       const left = oneOf(category, LEFT_OUT_LINES);
+      // Stryker disable next-line ConditionalExpression: a line of no known kind adds nothing the note could name
       if (left) leftOut.add(left);
       continue;
     }
@@ -345,7 +350,7 @@ function wholeMonth(
   // A whole month is paid as 30 days or as its calendar days; 28 or 29 in February, or 30 in a
   // 31-day month, may be either a whole month or not, and is left to the person.
   if (days >= Math.max(30, last)) return { value: 'yes', derived: true };
-  if ((m === 2 && days >= 28) || (last === 31 && days === 30)) return null;
+  if ((m === 2 && days >= 28) || days === 30) return null;
   return { value: 'no', derived: true };
 }
 
@@ -368,12 +373,14 @@ function payslips(
   if (months.length === 0) return { leftOut, unsummed: false, partial: false, prorated: null };
   a.open('hasPayslips', 'yes');
   let unsummed = false;
-  let prorated: Confidence | null = null;
+  const prorated: Confidence[] = [];
   months.forEach((month, i) => {
     const field = (key: string) => rowField('payslips', i, key);
     const slip = byMonth.get(month);
     const sum = sums.get(month);
+    // Stryker disable next-line StringLiteral: lowest starts at high, so a default of high never moves it
     const base = lowest(slip?.confidence ?? 'high', sum?.confidence ?? 'high');
+    // Stryker disable next-line StringLiteral,OptionalChaining: every month listed comes from a payslip or from lines
     a.read(field('month'), month, slip?.confidence ?? sum?.confidence ?? 'high');
     if (month === partial) {
       // Its month is still listed; its sums are the person's.
@@ -383,7 +390,7 @@ function payslips(
       a.read(field('salary'), amountText(sum.salary / 100), confidence, true);
       if (sum.prorated > 0) {
         a.read(field('prorated'), amountText(sum.prorated / 100), confidence, true);
-        prorated = lowest(prorated ?? 'high', confidence);
+        prorated.push(confidence);
       }
       if (sum.inKind > 0) a.read(field('inKind'), amountText(sum.inKind / 100), confidence, true);
     } else unsummed = true;
@@ -396,8 +403,8 @@ function payslips(
   return {
     leftOut,
     unsummed,
-    partial: partial !== undefined && months.includes(partial),
-    prorated,
+    partial: months.some((month) => month === partial),
+    prorated: prorated.length > 0 ? lowest(...prorated) : null,
   };
 }
 
@@ -449,11 +456,19 @@ function trialAndHolidays(a: Answers, fields: Fields): boolean {
   read.figure('holidayDays', 'holidayDays');
   const holidayUnit = read.choice('holidayUnit', 'holidayUnit', ['calendar', 'working'] as const);
   // Working days need the working week; a schedule «de lunes a viernes» or «a sábado» gives it.
-  const schedule = textOf(fields.scheduleText?.value)?.toLowerCase() ?? '';
-  const week = /lunes a viernes/.test(schedule) ? 5 : /lunes a s[aá]bado/.test(schedule) ? 6 : null;
-  if (holidayUnit === 'working' && week !== null && fields.scheduleText)
-    a.read('workDaysPerWeek', String(week), lowest(fields.scheduleText.confidence, 'medium'), true);
+  const schedule = fields.scheduleText;
+  if (holidayUnit === 'working' && schedule) {
+    const week = workingWeek(textOf(schedule.value));
+    if (week !== null)
+      a.read('workDaysPerWeek', String(week), lowest(schedule.confidence, 'medium'), true);
+  }
   return holidayUnit === null;
+}
+
+function workingWeek(text: string | null): number | null {
+  if (text === null) return null;
+  const schedule = text.toLowerCase();
+  return /lunes a viernes/.test(schedule) ? 5 : /lunes a s[aá]bado/.test(schedule) ? 6 : null;
 }
 
 function clauses(a: Answers, rows: readonly ExtractedRow[]) {
@@ -532,8 +547,7 @@ function nameKey(name: string): string {
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
     .toLowerCase()
-    .replace(/[^a-z0-9ñ]+/g, ' ')
-    .trim();
+    .replace(/[^a-z0-9ñ]+/g, ' ');
   return plain.replace(LEGAL_FORMS, '').trim();
 }
 const codeKey = (code: string) => code.replace(/\D/g, '');
@@ -567,36 +581,34 @@ function history(
   companyName: string | null,
   cut: boolean,
 ) {
-  const isCurrent = (row: ExtractedRow) => {
+  const dated = rows.flatMap((row) => {
     const start = dateOf(row.values['startDate']);
-    return contract.start !== null && start !== null && near(start, contract.start);
-  };
-  const current = rows.find(isCurrent);
+    return start ? [{ row, start }] : [];
+  });
+  const contractStart = contract.start;
+  const current = contractStart ? dated.find((d) => near(d.start, contractStart)) : undefined;
   const ours = {
     name: companyName,
-    code: current ? textOf(current.values['accountCode']) : null,
+    code: current ? textOf(current.row.values['accountCode']) : null,
   };
-  const read = a.rows(
-    'history',
-    rows.filter((r) => dateOf(r.values['startDate']) !== null),
-  );
+  const read = a.rows('history', dated);
   if (read.length === 0) return;
   a.open('hasHistory', 'yes');
-  read.forEach((row, i) => {
+  read.forEach((item, i) => {
+    const { row, start } = item;
     const field = (key: string) => rowField('history', i, key);
-    const start = dateOf(row.values['startDate']);
     const end = dateOf(row.values['endDate']);
-    if (start) a.read(field('startDate'), toIso(start), row.confidence);
+    a.read(field('startDate'), toIso(start), row.confidence);
     if (end) a.read(field('endDate'), toIso(end), row.confidence);
-    else if (row === current && contract.end)
+    else if (item === current && contract.end)
       a.read(field('endDate'), toIso(contract.end), row.confidence, true);
-    const employer = row === current ? 'same' : employerOf(row, ours);
+    const employer = item === current ? 'same' : employerOf(row, ours);
     // A name is matched less surely than the row of the contract itself.
     if (employer)
       a.read(
         field('employer'),
         employer,
-        row === current ? row.confidence : lowest(row.confidence, 'medium'),
+        item === current ? row.confidence : lowest(row.confidence, 'medium'),
         true,
       );
   });
@@ -609,11 +621,11 @@ type CutList = (typeof CUT_LISTS)[number];
 
 // Which lists reached their maximum when the API says one was cut; rows that failed its checks
 // can leave a cut list short of it, so `unknown` says the cut may be anywhere. Any read work
-// history is then taken as possibly cut: that only leaves the chaining count in doubt.
+// history is taken as possibly cut then: that only leaves the chaining count in doubt.
 function cutLists(e: EmploymentExtraction) {
-  if (!e.truncated) return { lists: [] as CutList[], history: false, unknown: false };
+  if (!e.truncated) return { lists: [] as CutList[], unknown: false };
   const lists = CUT_LISTS.filter((l) => e[l].length >= EMPLOYMENT_LIST_MAXIMA[l]);
-  return { lists, history: e.contracts.length > 0, unknown: lists.length === 0 };
+  return { lists, unknown: lists.length === 0 };
 }
 
 // Category and agreement are not asked as such, so a disagreement is only said.
@@ -626,7 +638,7 @@ export function employmentPrefill(
   e: EmploymentExtraction,
   answers: Readonly<Record<string, string>>,
   tr: Translate,
-  checks: readonly FailedCheck[] = [],
+  checks: readonly FailedCheck[],
 ): EmploymentPrefill {
   const a = new Answers();
   const contractRead = e.documents.some((d) => d.kind === 'employment_contract');
@@ -642,7 +654,7 @@ export function employmentPrefill(
       end: contractDates.end ?? dateOf(answers['endDate']),
     },
     textOf(e.fields.companyName?.value),
-    cut.history,
+    e.truncated === true,
   );
   const extrasInTwelve = salary(a, e.fields, e.salaryParts);
   const slips = payslips(a, e.payslips, e.lines, {
@@ -671,11 +683,14 @@ export function employmentPrefill(
   quote('categorySalary', e.fields.category);
   const agreement = textOf(e.fields.agreementName?.value);
   const code = textOf(e.fields.agreementCode?.value);
-  if (agreement || code)
-    quotes.agreementNamed =
-      agreement && code
-        ? tr('client.employment.documents.agreement_with_code', { nombre: agreement, codigo: code })
-        : (agreement ?? tr('client.employment.documents.agreement_code', { codigo: code ?? '' }));
+  if (agreement && code)
+    quotes.agreementNamed = tr('client.employment.documents.agreement_with_code', {
+      nombre: agreement,
+      codigo: code,
+    });
+  else if (agreement) quotes.agreementNamed = agreement;
+  else if (code)
+    quotes.agreementNamed = tr('client.employment.documents.agreement_code', { codigo: code });
 
   const conflicts = e.conflicts.flatMap((c) =>
     (CONFLICT_FIELDS as readonly string[]).includes(c.field)
