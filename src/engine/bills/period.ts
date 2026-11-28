@@ -189,6 +189,7 @@ export function proratedOver<V>(
   if (span.kind === 'missing') return span;
   return {
     kind: 'ok',
+    // Stryker disable next-line StringLiteral: prorated reads any base but 365 as the real length of the year
     byBase: [prorated(span.stretches, perYear, 365), prorated(span.stretches, perYear, 'actual')],
     rows: rowsCited(span.stretches, norms),
     deciding: span.deciding,
