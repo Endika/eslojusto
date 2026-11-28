@@ -115,11 +115,9 @@ function periodPay(salary: Salary, world: ComplementWorld): { counted: number; e
 const complementInDoubt = (salary: Salary): boolean =>
   salary.breakdown.some((c) => !COUNTED.complement_variable.has(c.kind));
 
-// An hour rate with only yearly hours: those may be effective hours, without the paid rest.
+// An hour rate without its week: yearly hours alone may be effective hours, without the paid rest.
 const hoursInDoubt = (input: EmploymentInput): boolean =>
-  input.salary.period === 'hour' &&
-  input.contractHours.weekly === null &&
-  input.contractHours.annual !== null;
+  input.salary.period === 'hour' && input.contractHours.weekly === null;
 
 const extraPaysOf = (salary: Salary): number => Math.max(0, salary.payments - MONTHS_IN_YEAR);
 
@@ -222,7 +220,7 @@ export function contractAnnualPay(input: EmploymentInput): number | null {
   const onlyBase = breakdownGap(salary) === 0 && salary.breakdown.every((c) => c.kind === 'base');
   if (salary.period === 'month' && !salary.prorated && extraPaysOf(salary) > 0 && !onlyBase)
     return null;
-  const pay = annualPay(input, salary.amount, 'effective_hours');
+  const pay = annualPay(input, salary.amount, FAVOURABLE.hours);
   return pay === null || pay.extraPaysUnknown ? null : round2(pay.annual);
 }
 
@@ -357,7 +355,7 @@ export function compareByYear(
   const coefficient = partTimeCoefficient(input);
   const short = isShortTemporary(input);
   const until = short ? (input.endDate ?? today) : min(input.endDate ?? today, today);
-  const lastYear = compareDates(input.startDate, until) <= 0 ? until.y : input.startDate.y;
+  const lastYear = Math.max(until.y, input.startDate.y);
   const years: YearComparison[] = [];
   for (let year = input.startDate.y; year <= lastYear; year += 1) {
     const lookup = minimumWageFor(year, table);
@@ -376,7 +374,7 @@ export function compareByYear(
     const certain = verdictOf(input, shortfall, {
       hoursKnown: coefficient !== null && (short || pay !== null),
       // Art. 4.1: the floor per working day already holds the share of the extra payments.
-      extraPaysUnknown: pay?.extraPaysUnknown ?? false,
+      extraPaysUnknown: pay?.extraPaysUnknown === true,
       effectsVerified: row.retroactiveVerified || toIso(input.startDate) >= row.publishedOn,
     });
     const verdict =
@@ -489,11 +487,11 @@ export function comparePayslips(
       return { month: p.month, verdict, row, minimum, paid, shortfall, prorated };
     };
     if (!prorated) return compare(withExtras(0), 'annual_decides');
-    // The month shows less prorated than the contract's count implies: some may be paid apart.
-    const proratedShort =
+    // The month showing less prorated than the contract's count implies: some may be paid apart.
+    if (
       proratedCount !== null &&
-      p.proratedExtraPay < (p.salaryInMoney * proratedCount) / MONTHS_IN_YEAR - CENT;
-    if (proratedCount !== null && !proratedShort) {
+      p.proratedExtraPay >= (p.salaryInMoney * proratedCount) / MONTHS_IN_YEAR - CENT
+    ) {
       return compare(withExtras(proratedCount), null);
     }
     // Unknown or doubtful count: only the yearly count can tell.
@@ -508,7 +506,9 @@ function wholeMonthsCovered(input: EmploymentInput, year: number, today: CivilDa
   for (let m = 1; m <= MONTHS_IN_YEAR; m += 1) {
     const first = { y: year, m, d: 1 };
     const last = { y: year, m, d: daysInMonth(year, m) };
-    if (compareDates(first, input.startDate) >= 0 && compareDates(last, until) <= 0) {
+    // Stryker disable next-line ConditionalExpression,EqualityOperator: only years after the start year are asked for, so the first of a month is never before the start
+    const begun = compareDates(first, input.startDate) >= 0;
+    if (begun && compareDates(last, until) <= 0) {
       months.push(`${year}-${String(m).padStart(2, '0')}`);
     }
   }
@@ -530,6 +530,7 @@ function payslipsAgainstYear(
   const verdictsIn = (world: PayWorld) =>
     new Map(
       compareByYear(input, today, table, world).flatMap((y) =>
+        // Stryker disable next-line ConditionalExpression: a year not compared has no verdict, so the check only narrows the type
         y.kind === 'compared' ? [[y.year, y.verdict] as const] : [],
       ),
     );
@@ -617,7 +618,10 @@ const sumOf = (values: readonly number[]): number =>
 
 const firstLoadedYear = (table: MinimumWageTable): number => Math.min(...table.map((r) => r.year));
 
-function yearPhrase(y: YearComparison, short: boolean): EmploymentPhrase {
+function yearPhrase(
+  y: Exclude<YearComparison, { kind: 'not_loaded' }>,
+  short: boolean,
+): EmploymentPhrase {
   if (y.kind === 'not_published') {
     return phrase('minimum_wage.not_published', {
       year: integer(y.year),
@@ -625,7 +629,6 @@ function yearPhrase(y: YearComparison, short: boolean): EmploymentPhrase {
       reference: euros(short ? y.reference.temporaryPerDay : y.reference.annual),
     });
   }
-  if (y.kind === 'not_loaded') return phrase('minimum_wage.not_loaded', { year: integer(y.year) });
   const vars = { year: integer(y.year), minimum: euros(y.minimum), pay: euros(y.pay) };
   const family = short ? 'temporary' : 'year';
   if (y.verdict === 'below') {
@@ -659,8 +662,7 @@ function contractFinding(
   const pay = annualPay(input, counted, world.hours);
   const gap = breakdownGap(salary);
   const years = compareByYear(input, today, deps.minimumWage, world);
-  const compared = years.flatMap((y) => (y.kind === 'compared' ? [y] : []));
-  const below = compared.filter((y) => y.verdict === 'below');
+  const below = years.flatMap((y) => (y.kind === 'compared' && y.verdict === 'below' ? [y] : []));
   const accrued = below.flatMap((y) => (y.accrued === null ? [] : [y.accrued]));
   const total = sumOf(accrued);
   const notLoaded = years.some((y) => y.kind === 'not_loaded');
@@ -688,7 +690,7 @@ function contractFinding(
     );
   }
   calculation.push(
-    ...years.filter((y) => y.kind !== 'not_loaded').map((y) => yearPhrase(y, short)),
+    ...years.flatMap((y) => (y.kind === 'not_loaded' ? [] : [yearPhrase(y, short)])),
   );
   if (below.length > 0 && input.modality === 'discontinuous') {
     calculation.push(phrase('minimum_wage.discontinuous_periods'));
@@ -703,6 +705,7 @@ function contractFinding(
   const sources = uniqueSources([
     ruleSource(id, deps.norms),
     ...(id === 'smi_prorata' ? [ruleSource('smi_annual', deps.norms)] : []),
+    // Stryker disable next-line ArrayDeclaration: smi_absorption cites the same article as smi_annual, which uniqueSources keeps once; the rule stays so the finding names it should the two articles ever differ
     ...(short ? [] : [ruleSource('smi_absorption', deps.norms)]),
     ...rows.map((row) => decreeSource(row, decreeArticle, deps.norms)),
   ]);
@@ -727,11 +730,12 @@ function yearOutcomes(
   deps: MinimumWageDeps,
   world: PayWorld,
 ): string {
-  return compareByYear(input, today, deps.minimumWage, world)
-    .map((y) =>
-      y.kind === 'compared' ? `${y.year}:${y.verdict}:${y.shortfall}` : `${y.year}:${y.kind}`,
-    )
-    .join('|');
+  return JSON.stringify(
+    compareByYear(input, today, deps.minimumWage, world).map((y) =>
+      // Stryker disable next-line ConditionalExpression: a year not compared reads the same in every world
+      y.kind === 'compared' ? [y.year, y.verdict, y.shortfall] : [y.year, y.kind],
+    ),
+  );
 }
 
 // Each doubt about the pay opens two readings that show only when they change the result, year by
@@ -752,15 +756,12 @@ function assessContract(input: EmploymentInput, today: CivilDate, deps: MinimumW
       (complement) => outcomeIn({ complement }),
     );
   }
-  if (hoursInDoubt(input)) {
-    return readingsOf(
-      'paid_hours',
-      'effective_hours',
-      (hours) => findingIn({ hours }),
-      (hours) => outcomeIn({ hours }),
-    );
-  }
-  return { kind: 'single', finding: findingIn({}) };
+  return readingsOf(
+    'paid_hours',
+    'effective_hours',
+    (hours) => findingIn({ hours }),
+    (hours) => outcomeIn({ hours }),
+  );
 }
 
 function readingsOf<Q extends 'complement_kind' | 'paid_hours'>(
@@ -785,11 +786,13 @@ function payslipPhrase(c: PayslipComparison): EmploymentPhrase {
   if (c.verdict === 'not_compared' || c.verdict === 'not_loaded') {
     return phrase(`minimum_wage.payslip.${c.verdict}`, when);
   }
-  if (c.verdict === 'not_published') {
+  // Stryker disable next-line ConditionalExpression: a month not published always carries its reference row, so the second check only narrows the type
+  if (c.verdict === 'not_published' && c.row !== null) {
+    const reference = c.row;
     return phrase('minimum_wage.payslip.not_published', {
       ...when,
-      referenceYear: integer(c.row?.year ?? year),
-      reference: euros((c.prorated ? (c.row?.annual ?? 0) / MONTHS_IN_YEAR : c.row?.monthly) ?? 0),
+      referenceYear: integer(reference.year),
+      reference: euros(c.prorated ? reference.annual / MONTHS_IN_YEAR : reference.monthly),
     });
   }
   const vars = { ...when, minimum: euros(c.minimum ?? 0), paid: euros(c.paid ?? 0) };
@@ -827,7 +830,7 @@ function inKindFinding(input: EmploymentInput, deps: MinimumWageDeps): Finding |
   const sources = [ruleSource('smi_in_kind_cap', deps.norms)];
   const pay =
     salary.period === 'year' || salary.period === 'month'
-      ? annualPay(input, salary.amount, 'with_paid_rest')
+      ? annualPay(input, salary.amount, FAVOURABLE.hours)
       : null;
   if (pay === null) {
     return finding('smi_in_kind_cap', 'review_it', {

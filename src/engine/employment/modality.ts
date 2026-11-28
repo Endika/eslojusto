@@ -181,10 +181,11 @@ function productionExtensions(c: Context): readonly Finding[] {
 function occasionalDays(c: Context): Finding {
   const { end, known } = span(c);
   const start = c.input.startDate;
-  const years = Array.from({ length: end.y - start.y + 1 }, (_, i) => start.y + i).map((y) => {
+  const years = [];
+  for (let y = start.y; y <= end.y; y++) {
     const last = min(end, { y, m: 12, d: 31 });
-    return { year: y, days: calendarDays(max(start, { y, m: 1, d: 1 }), last), last };
-  });
+    years.push({ year: y, days: calendarDays(max(start, { y, m: 1, d: 1 }), last), last });
+  }
   const worst = years.reduce((a, b) => (b.days > a.days ? b : a));
   const agrifood = ruleStanding('production_occasional_agrifood_120', worst.last, c.norms);
   const days = (limit: number) =>
@@ -360,7 +361,10 @@ function alternanceShifts(c: Context): readonly Finding[] {
 
 // 11.3.b: concluded within three years of finishing the studies, five with a disability.
 function practiceWindow(c: Context): Finding {
-  const ended = c.input.training?.studiesEndedOn ?? null;
+  const { studiesEndedOn: ended, disability } = c.input.training ?? {
+    studiesEndedOn: null,
+    disability: null,
+  };
   if (ended === null) {
     return modalityFinding(c, {
       id: 'training_practice_window',
@@ -368,7 +372,6 @@ function practiceWindow(c: Context): Finding {
       calculation: [phrase('modality.studies_end_unknown')],
     });
   }
-  const disability = c.input.training?.disability ?? null;
   const after = (months: number) => compareDates(c.concluded, addMonthsClamped(ended, months)) > 0;
   const elapsed = wholeMonthsAndRest(ended, c.concluded).whole;
   const draft = (status: Finding['status'], limit: number, extra: EmploymentPhrase[] = []) =>
@@ -441,15 +444,14 @@ function discontinuousEssentials(c: Context): Finding {
 function writtenForm(c: Context): readonly Finding[] {
   const { input } = c;
   const { end } = span(c);
+  const fullTimeHours = input.fullTimeHours ?? LEGAL_WEEK_HOURS;
   const partTime =
-    input.partTime !== null ||
-    (input.contractHours.weekly !== null &&
-      input.contractHours.weekly < (input.fullTimeHours ?? LEGAL_WEEK_HOURS));
+    input.partTime !== null || (input.contractHours.weekly ?? fullTimeHours) < fullTimeHours;
   const required =
     TRAINING.has(input.modality) ||
     input.modality === 'discontinuous' ||
     input.modality === 'work_or_service' ||
-    (input.remoteShare !== null && input.remoteShare >= REGULAR_REMOTE_PERCENT) ||
+    (input.remoteShare ?? 0) >= REGULAR_REMOTE_PERCENT ||
     partTime ||
     (TEMPORARY.has(input.modality) && calendarDays(input.startDate, end) > WRITTEN_OVER_DAYS);
   if (!required || input.writtenContract === true) return [];

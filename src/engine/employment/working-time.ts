@@ -39,6 +39,7 @@ function weeklyHours(
 ): Finding | null {
   const agreed = input.contractHours.weekly;
   const scheduled = week === null ? null : hours(week.minutes);
+  // Stryker disable next-line ConditionalExpression: null > 40 is false too, so the null check only narrows the type
   if (agreed !== null && agreed > WEEKLY_MAX_HOURS)
     return finding(
       'weekly_40',
@@ -52,6 +53,7 @@ function weeklyHours(
       },
       norms,
     );
+  // Stryker disable next-line ConditionalExpression: null > 40 is false too, so the null check only narrows the type
   if (scheduled !== null && scheduled > WEEKLY_MAX_HOURS)
     return finding(
       'weekly_40',
@@ -174,7 +176,7 @@ function nightWork(
       phrase('working_time.night_hours_in_schedule', { days: { integer: nightDays.length } }),
     );
   const issues: EmploymentPhrase[] = [];
-  if (week !== null && week.days.length > 0) {
+  if (week !== null) {
     const average = week.minutes / week.days.length;
     if (average > NIGHT_AVERAGE_MAX_MINUTES)
       issues.push(phrase('working_time.night_average', { hours: hours(average) }));

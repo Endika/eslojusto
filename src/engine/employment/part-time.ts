@@ -49,7 +49,11 @@ const SEVERITY: readonly FindingStatus[] = [
   'within_limit',
 ];
 const worst = (statuses: readonly FindingStatus[]): FindingStatus =>
-  SEVERITY.find((s) => statuses.includes(s)) ?? 'within_limit';
+  statuses.reduce<FindingStatus>(
+    // Stryker disable next-line EqualityOperator: on a tie both statuses are the same one
+    (a, b) => (SEVERITY.indexOf(b) < SEVERITY.indexOf(a) ? b : a),
+    'within_limit',
+  );
 
 // A cap the agreement may raise up to a hard maximum: over the hard one is over the legal limit,
 // between them depends on the agreement.

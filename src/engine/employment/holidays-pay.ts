@@ -27,7 +27,7 @@ const mayPayHolidaysInSalary = (input: EmploymentInput): boolean => {
   const days = agreedDays(input);
   return (
     (isFixedTerm(input.modality) || input.modality === 'unknown') &&
-    (days === null || days <= SHORT_TEMPORARY_DAYS)
+    (days ?? 0) <= SHORT_TEMPORARY_DAYS
   );
 };
 
@@ -87,14 +87,9 @@ function belowThirty(
       norms,
     );
   }
-  const agreed = input.agreement.holidayDays;
-  const agreedProrated = agreed === null ? null : round2((agreed * span) / YEAR_DAYS);
-  if (
-    agreed !== null &&
-    agreedProrated !== null &&
-    agreedProrated > days &&
-    input.modality !== 'unknown'
-  )
+  const agreed = input.agreement.holidayDays ?? 0;
+  const agreedProrated = round2((agreed * span) / YEAR_DAYS);
+  if (agreedProrated > days && input.modality !== 'unknown')
     return finding(
       'holidays_30',
       {
@@ -135,6 +130,13 @@ function belowThirty(
   return finding('holidays_30', { status: 'within_limit', calculation: [says, prorated] }, norms);
 }
 
+const workingEquivalent = (days: number, week: number): EmploymentPhrase =>
+  phrase('holidays.working_days_equivalent', {
+    days: { days },
+    week: { integer: week },
+    calendar: { days: round2(days * calendarDaysPer('working', week)) },
+  });
+
 // Art. 38.1 ET counts thirty calendar days. Working days have no equivalence in the statute: with
 // the working week known, the usual one decides, the one the final pay review uses too (22 days of
 // a Monday-to-Friday week, 26 of a Monday-to-Saturday one); without it the point is to review,
@@ -154,19 +156,15 @@ function holidayDays(input: EmploymentInput, holidays: Holidays, norms: NormTabl
         },
         norms,
       );
-    if (workDaysPerWeek !== null && days >= minimumHolidays('working', workDaysPerWeek))
+    if (workDaysPerWeek !== null && days >= minimumHolidays(unit, workDaysPerWeek))
       return finding(
         'holidays_30',
         {
           status: 'within_limit',
           calculation: [
-            phrase('holidays.working_days_equivalent', {
-              days: { days },
-              week: { integer: workDaysPerWeek },
-              calendar: { days: round2(days * calendarDaysPer('working', workDaysPerWeek)) },
-            }),
+            workingEquivalent(days, workDaysPerWeek),
             phrase('holidays.usual_equivalence', {
-              minimum: { days: minimumHolidays('working', workDaysPerWeek) },
+              minimum: { days: minimumHolidays(unit, workDaysPerWeek) },
             }),
           ],
         },
@@ -179,11 +177,7 @@ function holidayDays(input: EmploymentInput, holidays: Holidays, norms: NormTabl
         calculation: [
           workDaysPerWeek === null
             ? phrase('holidays.working_days', { days: { days } })
-            : phrase('holidays.working_days_equivalent', {
-                days: { days },
-                week: { integer: workDaysPerWeek },
-                calendar: { days: round2(days * calendarDaysPer('working', workDaysPerWeek)) },
-              }),
+            : workingEquivalent(days, workDaysPerWeek),
           phrase('holidays.counted_in_calendar_days', { minimum: { days: CALENDAR_MINIMUM } }),
         ],
       },
@@ -192,8 +186,8 @@ function holidayDays(input: EmploymentInput, holidays: Holidays, norms: NormTabl
   }
   const says = phrase('holidays.calendar_days', { days: { days } });
   if (days < CALENDAR_MINIMUM) return belowThirty(input, holidays, norms);
-  const agreed = input.agreement.holidayDays;
-  if (agreed !== null && agreed > days)
+  const agreed = input.agreement.holidayDays ?? 0;
+  if (agreed > days)
     return finding(
       'holidays_30',
       {
