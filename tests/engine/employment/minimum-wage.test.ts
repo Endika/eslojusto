@@ -565,6 +565,15 @@ describe('payslips', () => {
       'minimum_wage.payslip.not_compared',
       'minimum_wage.total',
     ]);
+    expect(f.calculation[0]).toEqual(
+      phrase('minimum_wage.payslip.below', {
+        year: { integer: 2026 },
+        month: { integer: 9 },
+        minimum: { euros: 1424.5 },
+        paid: { euros: 1400 },
+        difference: { euros: 24.5 },
+      }),
+    );
   });
 
   it('leaves one low prorated payslip to review when the contract year reaches the minimum', () => {
@@ -1031,7 +1040,7 @@ describe('the contract year from its pay', () => {
   it.each([
     [
       'an hour rate with only yearly hours',
-      salary({ period: 'hour', amount: 10 }),
+      salary({ period: 'hour', amount: 10, payments: 12 }),
       { weekly: null, annual: 1800 },
       null,
     ],
@@ -1148,6 +1157,7 @@ describe('the contract year from its pay', () => {
     );
     expect(f.status).toBe('review_it');
     expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.year.hours_unknown');
+    expect(f.calculation.map((p) => p.key)).not.toContain('minimum_wage.prorata_annual');
   });
 });
 
@@ -1576,8 +1586,10 @@ describe('the contract finding, in words', () => {
       }),
       '2026-12-31',
     );
-    expect(four.calculation.map((p) => p.key)).toContain('minimum_wage.total');
     expect(four.amount).not.toBeNull();
+    expect(four.calculation).toContainEqual(
+      phrase('minimum_wage.total', { total: { euros: four.amount?.min ?? 0 } }),
+    );
   });
 
   it('a fixed-discontinuous contract short says its idle periods and has no total', () => {

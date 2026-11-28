@@ -36,6 +36,19 @@ describe('ruleStanding', () => {
   ] as const)('%s on %s: %s', (id, day, standing) => {
     expect(ruleStanding(id, parseDate(day), EMPLOYMENT_NORMS)).toBe(standing);
   });
+
+  it('the rule own dates bind even when its norm is in force the whole time', () => {
+    const always = {
+      ...EMPLOYMENT_NORMS,
+      et: { ...EMPLOYMENT_NORMS.et, inForceSince: '2000-01-01' },
+    };
+    const standing = (id: 'trial_limits' | 'weekly_40', day: string) =>
+      ruleStanding(id, parseDate(day), always);
+    expect(standing('weekly_40', '2015-11-12')).toBe('not_in_force');
+    expect(standing('weekly_40', '2015-11-13')).toBe('in_force');
+    expect(standing('trial_limits', '2026-11-18')).toBe('in_force');
+    expect(standing('trial_limits', '2026-11-19')).toBe('not_in_force');
+  });
 });
 
 describe('cite and settle', () => {

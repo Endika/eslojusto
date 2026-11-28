@@ -730,7 +730,7 @@ describe('extra payments (art. 31 ET)', () => {
       },
       'extra_pays',
     );
-    expect(f.calculation.map((p) => p.key)).not.toContain('extra_pays.in_daily_minimum');
+    expect(f.calculation.map((p) => p.key).join()).not.toContain('daily_minimum');
   });
 
   it('a fixed-term contract without an end date has no daily minimum to hold them either', () => {
@@ -744,7 +744,7 @@ describe('extra payments (art. 31 ET)', () => {
       },
       'extra_pays',
     );
-    expect(f.calculation.map((p) => p.key)).not.toContain('extra_pays.in_daily_minimum');
+    expect(f.calculation.map((p) => p.key).join()).not.toContain('daily_minimum');
   });
 
   it('from 121 days, in either pay form, the agreement decides once the year reaches the minimum', () => {

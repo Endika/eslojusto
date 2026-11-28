@@ -134,6 +134,7 @@ const workingEquivalent = (days: number, week: number): EmploymentPhrase =>
   phrase('holidays.working_days_equivalent', {
     days: { days },
     week: { integer: week },
+    // Stryker disable next-line StringLiteral: any unit but 'calendar' counts working days, so an empty one reads the same
     calendar: { days: round2(days * calendarDaysPer('working', week)) },
   });
 
