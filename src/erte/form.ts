@@ -17,12 +17,12 @@ type ErteParse =
   | { readonly kind: 'errors'; readonly fields: readonly ErteField[] };
 
 const REGIMES: readonly string[] = ['etop', 'force_majeure', 'red'];
-const CHILDREN: Readonly<Record<string, Children>> = {
-  '0': 0,
-  '1': 1,
-  '2': 2,
-  not_said: null,
-};
+const CHILDREN: ReadonlyMap<string, Children> = new Map([
+  ['0', 0],
+  ['1', 1],
+  ['2', 2],
+  ['not_said', null],
+]);
 
 // An unknown type needs nothing else: there is no single figure to ask for.
 export function parseErte(a: ErteAnswers): ErteParse {
@@ -31,23 +31,23 @@ export function parseErte(a: ErteAnswers): ErteParse {
   if (!REGIMES.includes(a.regime)) errors.push('regime');
   let measure: ErteMeasure = { kind: 'suspension' };
   if (a.measure === 'reduction') {
-    const percent = parseAmount(a.percent);
-    if (percent === null || !isReductionPercent(percent)) errors.push('percent');
+    const percent = parseAmount(a.percent) ?? Number.NaN;
+    if (!isReductionPercent(percent)) errors.push('percent');
     else measure = { kind: 'reduction', percent };
   } else if (a.measure !== 'suspension') errors.push('measure');
-  const base = parseAmount(a.base);
-  if (base === null || !Number.isFinite(base) || base <= 0 || base > 1_000_000) errors.push('base');
+  const base = parseAmount(a.base) ?? Number.NaN;
+  if (!Number.isFinite(base) || base <= 0 || base > 1_000_000) errors.push('base');
   // RED has no limit by children, so it does not ask.
   const askChildren = a.regime !== 'red';
-  if (askChildren && !(a.children in CHILDREN)) errors.push('children');
+  if (askChildren && !CHILDREN.has(a.children)) errors.push('children');
   if (errors.length > 0) return { kind: 'errors', fields: errors };
   return {
     kind: 'input',
     input: {
       regime: a.regime as ErteRegime,
       measure,
-      base: base as number,
-      children: askChildren ? (CHILDREN[a.children] ?? null) : null,
+      base,
+      children: askChildren ? (CHILDREN.get(a.children) ?? null) : null,
     },
   };
 }

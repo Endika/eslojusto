@@ -56,7 +56,23 @@ describe('parseErte', () => {
   it('names the range when the percentage is out of it', () => {
     expect(ERTE_ERRORS.percent).toBe('Escribe un porcentaje entre 10 y 70');
   });
-  it.each(['0', '-1', 'abc'])('rejects the base «%s»', (base) => {
+  it.each(['0', '-1', 'abc', '', '1.000.000,01'])('rejects the base «%s»', (base) => {
     expect(parseErte(answers({ base }))).toEqual({ kind: 'errors', fields: ['base'] });
+  });
+  it('accepts a base of exactly one million', () => {
+    expect(parseErte(answers({ base: '1.000.000' }))).toMatchObject({ input: { base: 1_000_000 } });
+  });
+  it.each([
+    ['0', 0],
+    ['1', 1],
+    ['2', 2],
+  ])('reads %s children', (children, expected) => {
+    expect(parseErte(answers({ children }))).toMatchObject({ input: { children: expected } });
+  });
+  it('rejects a children answer that is not one of the options', () => {
+    expect(parseErte(answers({ children: 'constructor' }))).toEqual({
+      kind: 'errors',
+      fields: ['children'],
+    });
   });
 });
