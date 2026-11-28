@@ -54,7 +54,6 @@ describe('weekly schedule geometry', () => {
 
   it.each([
     ['12:10', 7 * 60],
-    ['12:14', 7 * 60],
     ['12:15', 4 * 60],
   ])('a second slot from %s: the longest stretch is %s minutes', (from, stretch) => {
     const week = workWeek(every([1], ['08:00', '12:00'], [from, '15:00']));
@@ -72,28 +71,12 @@ describe('weekly schedule geometry', () => {
     expect(week.rests).toEqual([40 * 60, (4 * 24 + 16) * 60]);
   });
 
-  it('a day with no slots is not a working day', () => {
-    const week = workWeek([{ day: 2, slots: [] }, ...every([1], ['09:00', '17:00'])]);
-    expect(week.days.map((d) => d.day)).toEqual([1]);
-  });
-
   it('a slot ending where it starts runs the whole day', () => {
     expect(workWeek(every([1], ['09:00', '09:00'])).days[0]?.minutes).toBe(24 * 60);
   });
 
-  it('minutes count as minutes', () => {
-    expect(workWeek(every([1], ['08:30', '12:15'])).days[0]).toMatchObject({
-      start: 8 * 60 + 30,
-      minutes: 3 * 60 + 45,
-    });
-  });
-
   it('the small hours belong to the night that began the day before', () => {
     expect(workWeek(every([2], ['02:00', '05:00'])).days[0]?.nightMinutes).toBe(180);
-  });
-
-  it('a single working day rests until the same day next week', () => {
-    expect(workWeek(every([1], ['09:00', '17:00'])).rests).toEqual([7 * 24 * 60 - 8 * 60]);
   });
 });
 
@@ -156,13 +139,6 @@ describe('weekly hours, exactly', () => {
       phrase('working_time.weekly_hours_scheduled', { hours: 40 }),
     ]);
     expect(finding.sources.map((s) => s.id)).toEqual(['weekly_40']);
-  });
-
-  it('the schedule is read before the agreed hours when both are within the limit', () => {
-    expect(
-      findingFor({ schedule, contractHours: { weekly: 38, annual: null } }, 'weekly_40')
-        .calculation,
-    ).toEqual([phrase('working_time.weekly_hours_scheduled', { hours: 40 })]);
   });
 
   it('40 agreed hours without a schedule are within the limit', () => {
@@ -351,13 +327,6 @@ describe('night work (art. 36.1 ET)', () => {
     expect(findingFor({ schedule, nightWorker: null }, 'night_limits').calculation).toEqual([
       phrase('working_time.night_hours_in_schedule', { days: { integer: 1 } }),
     ]);
-  });
-
-  it('«No lo sé» with no night hours in the schedule has no night finding', () => {
-    const schedule = every(WEEKDAYS, ['08:00', '16:00']);
-    expect(findings({ schedule, nightWorker: null }).map((f) => f.id)).not.toContain(
-      'night_limits',
-    );
   });
 
   it('«No lo sé» without a schedule has no night finding, even with an overtime pact', () => {

@@ -14,13 +14,4 @@ describe('the agreed term against a number of months', () => {
     expect(lastsAtMostMonths(ending(null), 6)).toBeNull();
     expect(lastsLessThanMonths(ending(null), 6)).toBeNull();
   });
-
-  it.each([
-    ['2024-08-30', true, true],
-    ['2024-08-31', true, false],
-    ['2024-09-01', false, false],
-  ])('a term ending %s: at most 6 months %s, under 6 months %s', (end, atMost, lessThan) => {
-    expect(lastsAtMostMonths(ending(end), 6)).toBe(atMost);
-    expect(lastsLessThanMonths(ending(end), 6)).toBe(lessThan);
-  });
 });

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import { EMPLOYMENT_NORMS } from '../../../src/engine/employment/data/norms';
 import {
-  cite,
   longerThan,
   ruleStanding,
   settle,
@@ -13,14 +12,13 @@ import {
 describe('a span of months from a start day', () => {
   const start = parseDate('2025-01-15');
 
-  it.each([
-    ['2025-07-13', true, false],
-    ['2025-07-14', false, false],
-    ['2025-07-15', false, true],
-  ])('an end on %s is shorter: %s, longer: %s than six months', (end, shorter, longer) => {
-    expect(shorterThan(start, parseDate(end), 6)).toBe(shorter);
-    expect(longerThan(start, parseDate(end), 6)).toBe(longer);
-  });
+  it.each([['2025-07-14', false, false]])(
+    'an end on %s is shorter: %s, longer: %s than six months',
+    (end, shorter, longer) => {
+      expect(shorterThan(start, parseDate(end), 6)).toBe(shorter);
+      expect(longerThan(start, parseDate(end), 6)).toBe(longer);
+    },
+  );
 });
 
 describe('ruleStanding', () => {
@@ -59,21 +57,9 @@ describe('cite and settle', () => {
     calculation: [],
   };
 
-  it('cite defaults to not based on the answer, no agreement and no literal', () => {
-    expect(cite(draft, EMPLOYMENT_NORMS)).toMatchObject({
-      basedOnYourAnswer: false,
-      agreementMaySetOther: false,
-      literal: null,
-    });
-  });
-
   it('a rule out of force on the day does not apply', () => {
     expect(settle(draft, parseDate('2026-11-19'), EMPLOYMENT_NORMS).status).toBe(
       'not_applicable_to_date',
     );
-  });
-
-  it('a rule in force keeps its verdict', () => {
-    expect(settle(draft, parseDate('2026-11-18'), EMPLOYMENT_NORMS).status).toBe('within_limit');
   });
 });

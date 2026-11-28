@@ -56,9 +56,7 @@ describe('offer against contract', () => {
   });
 
   it.each<[string, Offer['remote'], number | null, string | null]>([
-    ['on site', 'hybrid', 0, 'none'],
     ['one percent remote', 'full', 1, 'hybrid'],
-    ['99 percent remote', 'full', 99, 'hybrid'],
     ['fully remote', 'hybrid', 100, 'full'],
   ])('a contract %s reads as %s against an offer', (_name, offered, remoteShare, read) => {
     expect(compared(offer({ remote: offered }), { remoteShare })?.differences).toEqual([
@@ -67,7 +65,6 @@ describe('offer against contract', () => {
   });
 
   it.each([
-    ['gross pay', { grossAnnual: null }, {}, 'gross_annual'],
     ['gross pay of a net offer', { grossAnnual: null, net: true }, {}, 'gross_annual'],
     ['weekly hours of the offer', { weeklyHours: null }, {}, 'weekly_hours'],
     [

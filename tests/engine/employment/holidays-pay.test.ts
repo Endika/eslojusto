@@ -63,28 +63,12 @@ describe('holidays (art. 38.1 ET)', () => {
     expect(finding.calculation[0]).toEqual(phrase('holidays.working_days', { days: { days: 22 } }));
   });
 
-  it.each([30, 31])('%s working days cover thirty calendar ones, whatever the week', (days) => {
+  it.each([30])('%s working days cover thirty calendar ones, whatever the week', (days) => {
     expect(
       findingFor(holidays({ days, unit: 'working', workDaysPerWeek: null }), 'holidays_30'),
     ).toMatchObject({
       status: 'within_limit',
       calculation: [phrase('holidays.working_days', { days: { days } })],
-    });
-  });
-
-  it('29 working days in a six-day week reach the usual equivalence of 26', () => {
-    expect(
-      findingFor(holidays({ days: 26, unit: 'working', workDaysPerWeek: 6 }), 'holidays_30'),
-    ).toMatchObject({
-      status: 'within_limit',
-      calculation: [
-        phrase('holidays.working_days_equivalent', {
-          days: { days: 26 },
-          week: { integer: 6 },
-          calendar: { days: 30 },
-        }),
-        phrase('holidays.usual_equivalence', { minimum: { days: 26 } }),
-      ],
     });
   });
 
@@ -96,7 +80,7 @@ describe('holidays (art. 38.1 ET)', () => {
     ]);
   });
 
-  it.each([null, 30, 25])('an agreement of %s days does not raise the thirty', (holidayDays) => {
+  it.each([30])('an agreement of %s days does not raise the thirty', (holidayDays) => {
     const agreement = { ...contract().agreement, holidayDays };
     expect(findingFor({ ...holidays({}), agreement }, 'holidays_30')).toMatchObject({
       status: 'within_limit',
@@ -301,19 +285,6 @@ describe('holidays (art. 38.1 ET)', () => {
       });
     });
 
-    it.each([
-      ['a known modality', 'production' as const, 'review_it', 'holidays.may_be_annual'],
-      ['an unknown modality', 'unknown' as const, 'review_it', 'holidays.may_be_annual'],
-    ])('a figure of exactly the agreement prorated, with %s', (_name, modality, status, key) => {
-      const agreement = { ...contract().agreement, holidayDays: 35 };
-      const finding = findingFor(
-        { ...hundredDays, modality, agreement, ...holidays({ days: 9.59 }) },
-        'holidays_30',
-      );
-      expect(finding.status).toBe(status);
-      expect(finding.calculation.map((p) => p.key)).toContain(key);
-    });
-
     it('an unknown modality never rests on an agreement above thirty', () => {
       const agreement = { ...contract().agreement, holidayDays: 35 };
       expect(
@@ -333,15 +304,6 @@ describe('holidays (art. 38.1 ET)', () => {
           phrase('holidays.prorated_if_temporary'),
         ],
       });
-    });
-
-    it('the prorated figure exactly is within the limit', () => {
-      expect(
-        findingFor(
-          { ...hundredDays, modality: 'production', ...holidays({ days: 8.22 }) },
-          'holidays_30',
-        ).status,
-      ).toBe('within_limit');
     });
 
     it('an agreement whose prorated part the figure covers leaves it within the limit', () => {

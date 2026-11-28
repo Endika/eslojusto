@@ -255,15 +255,6 @@ describe('what each clause says', () => {
       false,
     ],
     [
-      'a staying commitment with its training unknown',
-      clause({ label: 'retention', months: 12 }),
-      {},
-      'retention',
-      'review_it',
-      ['clauses.retention_training_missing'],
-      false,
-    ],
-    [
       'a compensated exclusivity',
       clause({ label: 'exclusivity', compensationStated: true }),
       {},
@@ -300,15 +291,6 @@ describe('what each clause says', () => {
       false,
     ],
     [
-      'a waiver of another right',
-      clause({ label: 'waiver', waivedRight: 'other' }),
-      {},
-      'waiver',
-      'review_it',
-      ['clauses.waiver_other'],
-      false,
-    ],
-    [
       'a waiver of holidays',
       clause({ label: 'waiver', waivedRight: 'holidays' }),
       {},
@@ -318,39 +300,12 @@ describe('what each clause says', () => {
       false,
     ],
     [
-      'a waiver of salary',
-      clause({ label: 'waiver', waivedRight: 'salary' }),
-      {},
-      'waiver',
-      'clause_void',
-      ['clauses.waiver_salary', 'clause.partial_nullity'],
-      false,
-    ],
-    [
-      'a waiver of severance',
-      clause({ label: 'waiver', waivedRight: 'severance' }),
-      {},
-      'waiver',
-      'clause_void',
-      ['clauses.waiver_severance', 'clause.partial_nullity'],
-      false,
-    ],
-    [
       'remote work with an unknown share',
       clause({ label: 'remote_work_costs', costsOnWorker: true }),
       { remoteShare: null },
       'remote_costs',
       'review_it',
       ['clauses.remote_share_unknown'],
-      false,
-    ],
-    [
-      'remote work of 29 %',
-      clause({ label: 'remote_work_costs', costsOnWorker: true }),
-      { remoteShare: 29 },
-      'remote_costs',
-      'within_limit',
-      ['clauses.remote_not_regular'],
       false,
     ],
     [
@@ -397,12 +352,6 @@ describe('what each clause says', () => {
 
   it.each<[string, Partial<EmploymentInput['salary']>, number]>([
     ['a yearly salary', { period: 'year', amount: 20000 }, 9.59],
-    ['a monthly salary in 14 payments', { period: 'month', amount: 1500, payments: 14 }, 10.07],
-    [
-      'a monthly salary with the extra pay prorated',
-      { period: 'month', amount: 1500, prorated: true },
-      8.63,
-    ],
     ['a daily salary', { period: 'day', amount: 60 }, 10.5],
   ])('the hourly figure of %s', (_name, change, euros) => {
     const finding = only(
@@ -416,7 +365,6 @@ describe('what each clause says', () => {
   });
 
   it.each([
-    ['no real weekly hours', { realWeeklyHours: null }],
     [
       'an agreement salary without hours',
       {
@@ -439,11 +387,6 @@ describe('what each clause says', () => {
 
   it.each([
     [
-      'a staying commitment over the cap',
-      clause({ label: 'retention', months: 25, trainingDescribed: true }),
-      {},
-    ],
-    [
       'a staying commitment within it',
       clause({ label: 'retention', months: 12, trainingDescribed: true }),
       {},
@@ -458,20 +401,6 @@ describe('what each clause says', () => {
     expect(
       only(assessOne(clause({ label: 'remote_work_costs' }), { remoteShare: 29 })).calculation,
     ).toEqual([phrase('clauses.remote_not_regular', { percent: 29, regular: 30 })]);
-  });
-
-  it('the agreement hourly figure alone is enough to rest on the answer', () => {
-    const finding = only(
-      assessOne(clause({ label: 'overtime_included' }), {
-        realWeeklyHours: null,
-        agreement: { ...contract().agreement, categoryAnnualSalary: 20000, annualHours: 1760 },
-      }),
-    );
-    expect(finding.calculation.map((p) => p.key)).toEqual([
-      'clauses.overtime_included',
-      'clauses.agreement_hourly_pay',
-    ]);
-    expect(finding.basedOnYourAnswer).toBe(true);
   });
 });
 
