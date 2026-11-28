@@ -85,15 +85,15 @@ const MAX_AMOUNT = 100_000;
 const MAX_MEMBERS = 20;
 const MAX_COMMITMENT_MONTHS = 120;
 
-const isAmount = (v: number): boolean => Number.isFinite(v) && v >= 0 && v <= MAX_AMOUNT;
-const isSignedAmount = (v: number): boolean => Number.isFinite(v) && Math.abs(v) <= MAX_AMOUNT;
+// A number that is not one, or not finite, is out of every one of these ranges.
+const isAmount = (v: number): boolean => v >= 0 && v <= MAX_AMOUNT;
+const isSignedAmount = (v: number): boolean => Math.abs(v) <= MAX_AMOUNT;
 const isDays = (v: number): boolean => Number.isInteger(v) && v >= 1 && v <= MAX_DAYS;
-const isKwh = (v: number): boolean => Number.isFinite(v) && v >= 0 && v <= MAX_KWH;
-const isPower = (v: number): boolean =>
-  Number.isFinite(v) && v >= MIN_POWER_KW && v <= MAX_POWER_KW;
+const isKwh = (v: number): boolean => v >= 0 && v <= MAX_KWH;
+const isPower = (v: number): boolean => v >= MIN_POWER_KW && v <= MAX_POWER_KW;
 // The scope gate turns away power over 15 kW first; any power is at least a positive number here.
 const isAnyPower = (v: number): boolean => Number.isFinite(v) && v > 0;
-const inRange = (v: number, max: number): boolean => Number.isFinite(v) && v >= 0 && v <= max;
+const inRange = (v: number, max: number): boolean => v >= 0 && v <= max;
 
 function collector<Field extends string>(today: CivilDate) {
   const errors: ValidationError<Field>[] = [];
@@ -138,7 +138,7 @@ export function validateElectricity(
 
   const { p1, p2 } = input.contractedPower;
   check('contractedPower', isPower(p1) && isPower(p2), 'power_range');
-  const used = [input.maxPowerUsed.p1, input.maxPowerUsed.p2].filter((v) => v !== null);
+  const used = [input.maxPowerUsed.p1 ?? 0, input.maxPowerUsed.p2 ?? 0];
   check(
     'maxPowerUsed',
     used.every((v) => inRange(v, MAX_USED_KW)),
@@ -159,13 +159,8 @@ export function validateElectricity(
   check('discounts', input.discounts.every(isAmount), 'amount_range');
   const tc = input.tollsAndCharges;
   if (tc !== null)
-    check(
-      'tollsAndCharges',
-      [tc.power, tc.energy].every((v) => v === null || isAmount(v)),
-      'amount_range',
-    );
-  if (input.socialBonusFunding !== null)
-    check('socialBonusFunding', isAmount(input.socialBonusFunding), 'amount_range');
+    check('tollsAndCharges', isAmount(tc.power ?? 0) && isAmount(tc.energy ?? 0), 'amount_range');
+  check('socialBonusFunding', isAmount(input.socialBonusFunding ?? 0), 'amount_range');
   const bonus = input.socialBonus;
   if (bonus !== null) {
     check('socialBonus', isAmount(bonus.amount), 'amount_range');
@@ -176,15 +171,15 @@ export function validateElectricity(
         'count_range',
       );
     for (const kwh of [bonus.discountedKwh, bonus.kwhSoFar])
-      if (kwh !== null) check('socialBonus', inRange(kwh, MAX_KWH * 12), 'kwh_range');
+      check('socialBonus', inRange(kwh ?? 0, MAX_KWH * 12), 'kwh_range');
   }
   if (input.excessPower !== null)
     check('excessPower', isAmount(input.excessPower.amount), 'amount_range');
   const tax = input.electricityTax;
   if (tax !== null) {
     check('electricityTax', isAmount(tax.amount), 'amount_range');
-    if (tax.base !== null) check('electricityTax', isAmount(tax.base), 'amount_range');
-    if (tax.percent !== null) check('electricityTax', inRange(tax.percent, 100), 'price_range');
+    check('electricityTax', isAmount(tax.base ?? 0), 'amount_range');
+    check('electricityTax', inRange(tax.percent ?? 0, 100), 'price_range');
   }
   const meter = input.meter;
   if (meter !== null) {
@@ -202,8 +197,8 @@ export function validateElectricity(
   const vat = input.vat;
   if (vat !== null) {
     check('vat', isAmount(vat.amount), 'amount_range');
-    if (vat.base !== null) check('vat', isAmount(vat.base), 'amount_range');
-    if (vat.percent !== null) check('vat', inRange(vat.percent, 100), 'price_range');
+    check('vat', isAmount(vat.base ?? 0), 'amount_range');
+    check('vat', inRange(vat.percent ?? 0, 100), 'price_range');
   }
   check('total', isSignedAmount(input.total), 'amount_range');
   return errors;
@@ -230,11 +225,9 @@ export function validateTelecom(
         commitment.months <= MAX_COMMITMENT_MONTHS,
       'count_range',
     );
-    if (commitment.agreedPenalty !== null)
-      check('commitment.agreedPenalty', isAmount(commitment.agreedPenalty), 'amount_range');
+    check('commitment.agreedPenalty', isAmount(commitment.agreedPenalty ?? 0), 'amount_range');
   }
-  if (input.penaltyCharged !== null)
-    check('penaltyCharged', isAmount(input.penaltyCharged), 'amount_range');
+  check('penaltyCharged', isAmount(input.penaltyCharged ?? 0), 'amount_range');
   if (input.handset !== null) check('handset.value', isAmount(input.handset.value), 'amount_range');
   const sent = input.changeNotice?.sentOn ?? null;
   const sentOk = sent !== null && past('changeNotice.sentOn', sent);
@@ -259,16 +252,16 @@ function dayOf(iso: string): CivilDate | null {
 
 const MAX_ANNUAL_KWH = MAX_KWH * 12;
 // A letter's prices are never free.
-const isPrice = (v: number, max: number): boolean => Number.isFinite(v) && v > 0 && v <= max;
+const isPrice = (v: number, max: number): boolean => v > 0 && v <= max;
 
 export function validateRenewal(
   input: RenewalInput,
   today: CivilDate,
 ): readonly ValidationError<RenewalField>[] {
-  const { errors, past, date, check } = collector<RenewalField>(today);
+  const { errors, past, check } = collector<RenewalField>(today);
   const [sent, renewal] = [dayOf(input.letterDate), dayOf(input.renewalDate)];
   const letter = sent !== null && past('letterDate', sent) ? sent : null;
-  if (renewal !== null && date('renewalDate', renewal) && letter !== null)
+  if (renewal !== null && letter !== null)
     check('renewalDate', compareDates(letter, renewal) <= 0, 'not_after_start');
   if (sent === null) check('letterDate', false, 'invalid_date');
   if (renewal === null) check('renewalDate', false, 'invalid_date');
@@ -294,6 +287,6 @@ export function validateRenewal(
     ['declared.withoutTax', input.declared.withoutTax],
     ['declared.withTax', input.declared.withTax],
   ] as const)
-    if (value !== null) check(field, isAmount(value), 'amount_range');
+    check(field, isAmount(value ?? 0), 'amount_range');
   return errors;
 }
