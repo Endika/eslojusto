@@ -1389,7 +1389,7 @@ export type Props<E extends EventName> = {
 export type Track = <E extends EventName>(event: E, props: Props<E>) => void;
 
 function matchesRule(rule: Rule, v: unknown): boolean {
-  if ('values' in rule) return typeof v === 'string' && rule.values.includes(v);
+  if ('values' in rule) return (rule.values as readonly unknown[]).includes(v);
   if ('pattern' in rule) return typeof v === 'string' && rule.pattern.test(v);
   if ('intRange' in rule)
     return (
