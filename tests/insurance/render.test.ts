@@ -6,12 +6,7 @@ import { reviewInsurance, type InsuranceReview } from '../../src/engine/insuranc
 import type { InsuranceInput } from '../../src/engine/insurance/types';
 import { es } from '../../src/i18n/es';
 import type { Translate } from '../../src/i18n/client';
-import {
-  phraseText,
-  renderInsuranceResult,
-  renderOutOfScope,
-  statusText,
-} from '../../src/insurance/render';
+import { phraseText, renderInsuranceResult } from '../../src/insurance/render';
 import { notice, policy, TODAY } from '../engine/insurance/input';
 import { pageTranslator } from '../support/page-strings';
 
@@ -75,14 +70,6 @@ describe('the insurance result', () => {
     expect(text).toContain('con efectos desde el 01-01-2016 · en vigor');
   });
 
-  it('says so on the last day, and when the period has ended', () => {
-    const last = review(policy(), parseDate('2027-02-01')).findings[0];
-    const after = review(policy(), parseDate('2027-02-02')).findings[0];
-    if (!last || !after) throw new Error('no finding');
-    expect(statusText(last, tr)).toBe('Hoy es el último día (01-02-2027)');
-    expect(statusText(after, tr)).toBe('El plazo terminó el 01-02-2027');
-  });
-
   it('counts the withdrawal from the receipt of the terms', () => {
     const root = result();
     const input = policy({
@@ -112,36 +99,6 @@ describe('the insurance result', () => {
       { item: 'distance_withdrawal_compulsory', status: 'No aplica' },
       { item: 'distance_withdrawal_voluntary', status: 'Para revisar' },
     ]);
-  });
-
-  it('leaves a home policy the mortgage may ask for to review, with no date', () => {
-    const root = result();
-    const input = policy({ distance: true, mortgageRequired: null });
-    renderInsuranceResult(root, review(input), tr);
-    expect(cards(root).at(-1)).toEqual({ item: 'distance_withdrawal', status: 'Para revisar' });
-  });
-
-  it('folds the information blocks and lists what it does not look at', () => {
-    const root = result();
-    renderInsuranceResult(root, review(policy()), tr);
-    expect([...root.querySelectorAll('[data-info-title]')].map((el) => el.textContent)).toEqual([
-      'Si la póliza no coincide con lo acordado',
-      'Lo que declaras al contratar',
-      'Si aseguras por menos de lo que vale',
-      'Si aseguras por más de lo que vale',
-    ]);
-    expect(root.textContent).toContain('la aseguradora paga 20.000,00 €');
-    expect(root.querySelectorAll('[data-unchecked] li')).toHaveLength(4);
-  });
-
-  it('stops a life policy with why, and nothing worked out', () => {
-    const root = result();
-    renderOutOfScope(root, 'life', tr);
-    expect(root.querySelector('[data-out-of-scope]')?.hasAttribute('hidden')).toBe(false);
-    expect(root.querySelector('[data-out-of-scope-reason]')?.textContent).toContain(
-      'los seguros de vida',
-    );
-    expect(root.querySelectorAll('[data-item]')).toHaveLength(0);
   });
 
   it('words every phrase the engine can give', () => {

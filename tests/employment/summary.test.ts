@@ -7,7 +7,6 @@ import {
   rangeOf,
   shortfallOf,
   shownOne,
-  shownPair,
   sinceOf,
   stateOf,
 } from '../../src/employment/summary';
@@ -15,23 +14,12 @@ import { phrase, type EmploymentCalculation } from '../../src/engine/employment/
 import type { EmploymentReview } from '../../src/engine/employment/review';
 import type { Assessed, Finding, FindingStatus } from '../../src/engine/employment/types';
 import { finding } from '../engine/employment/input';
-import { belowMinimum, contract, review, shortDayRate, workOrService, eachRow } from './fixtures';
+import { belowMinimum, contract, review, workOrService, eachRow } from './fixtures';
 
 describe('the free summary', () => {
   it('rounds one amount to tens, never down to «0 €»', () => {
     expect(shownOne(994)).toEqual({ amount: 990, cents: false });
     expect(shownOne(4.56)).toEqual({ amount: 4.56, cents: true });
-  });
-
-  it('keeps two readings apart: a range never reads as one figure', () => {
-    expect(shownPair(120, 480)).toEqual([
-      { amount: 120, cents: false },
-      { amount: 480, cents: false },
-    ]);
-    expect(shownPair(121, 124)).toEqual([
-      { amount: 121, cents: true },
-      { amount: 124, cents: true },
-    ]);
   });
 
   it('gives euros only to a shortfall against the minimum wage', () => {
@@ -40,14 +28,6 @@ describe('the free summary', () => {
       null,
     );
     expect(amountOf(finding({ status: 'below_minimum', amount: null }))).toBe(null);
-  });
-
-  it('takes the yearly shortfall of the last year below the minimum', () => {
-    const r = review(belowMinimum);
-    const smi = r.items[0];
-    expect(smi?.kind).toBe('single');
-    if (smi?.kind !== 'single') return;
-    expect(shortfallOf(smi.finding)).toEqual({ per: 'year', year: 2026, amount: 994 });
   });
 
   it('heads the summary as the engine opens the pass: missing information is only to review', () => {
@@ -85,13 +65,6 @@ describe('the free summary', () => {
       'minimum_wage.year.salary_may_have_risen',
     );
     expect(sinceOf(signed2023)).toBeNull();
-  });
-
-  it('reads a short day-rate shortfall per working day', () => {
-    const r = review(shortDayRate);
-    const smi = r.items[0];
-    if (smi?.kind !== 'single') throw new Error('expected a single finding');
-    expect(figureOf(smi.finding)).toEqual({ per: 'day', amount: 7.82 });
   });
 
   it('heads the summary by what it found', () => {

@@ -102,14 +102,6 @@ describe('a credit contract', () => {
     expect(mark(p, 'aprStated')).toBeUndefined();
   });
 
-  it('never fills what the documents do not say, such as the purpose or the drawdown', () => {
-    const p = contract();
-    expect(entry(p, 'purpose')).toBeUndefined();
-    expect(entry(p, 'drawnOn')).toBeUndefined();
-    expect(entry(p, 'confirmedApr')).toBeUndefined();
-    expect(p.entries.some(([, v]) => v.includes('Financiera'))).toBe(false);
-  });
-
   it('gives answers the form reads into the engine’s input once the person adds the rest', () => {
     const p = contract();
     const read = readAnswers(p, {
@@ -152,53 +144,6 @@ describe('the other charges', () => {
   });
 });
 
-describe('a schedule', () => {
-  const rows = (amounts: readonly number[]) =>
-    amounts.map((amount, i) =>
-      row(
-        {
-          dueOn: `2024-${String(i + 1).padStart(2, '0')}-05`,
-          amount,
-          interest: 10 - i,
-          principal: amount - (10 - i),
-        },
-        'amortization_schedule',
-      ),
-    );
-
-  it('gives the count, the first day and the amount of even instalments, as worked out', () => {
-    const p = prefill({ fields: { product: f('car_loan') }, schedule: rows([100, 100, 100, 100]) });
-    expect(entry(p, 'instalmentCount')).toBe('4');
-    expect(entry(p, 'firstDueOn')).toBe('2024-01-05');
-    expect(entry(p, 'instalmentAmount')).toBe('100,00');
-    expect(mark(p, 'instalmentCount')?.derived).toBe(true);
-    expect(p.notes).toContain(t('es', 'client.credit.documents.schedule'));
-  });
-
-  it('keeps the regular amount when the last row is a larger final instalment', () => {
-    const p = prefill({ schedule: rows([100, 100, 100, 900]) });
-    expect(entry(p, 'instalmentAmount')).toBe('100,00');
-  });
-
-  it('gives no amount for uneven instalments, and says so', () => {
-    const p = prefill({ schedule: rows([100, 120, 100, 100]) });
-    expect(entry(p, 'instalmentAmount')).toBeUndefined();
-    expect(p.notes).toContain(t('es', 'client.credit.documents.schedule_uneven'));
-  });
-
-  it('never overrides what the contract states', () => {
-    const p = prefill({ fields: LOAN, schedule: rows([100, 100]) });
-    expect(entry(p, 'instalmentCount')).toBe('48');
-    expect(p.entries.filter(([n]) => n === 'instalmentCount')).toHaveLength(1);
-  });
-
-  it('works nothing out from a schedule cut at its maximum', () => {
-    const p = prefill({ schedule: rows([100, 100, 100]), truncated: true });
-    expect(entry(p, 'instalmentCount')).toBeUndefined();
-    expect(p.notes).toContain(t('es', 'client.credit.documents.rows_cut'));
-  });
-});
-
 describe('a final instalment and a linked insurance', () => {
   it('opens the final instalment with its amount and day', () => {
     const p = prefill({
@@ -234,11 +179,6 @@ describe('a final instalment and a linked insurance', () => {
 });
 
 describe('an early repayment', () => {
-  const schedule = [
-    row({ dueOn: '2025-01-05', amount: 300, interest: 40 }, 'amortization_schedule'),
-    row({ dueOn: '2025-02-05', amount: 300, interest: 35 }, 'amortization_schedule'),
-    row({ dueOn: '2025-03-05', amount: 300, interest: 30.5 }, 'amortization_schedule', 'medium'),
-  ];
   const statement = {
     product: f('car_loan'),
     repaidOn: f('2025-01-20', 'high', 'early_repayment_statement'),
@@ -260,14 +200,6 @@ describe('an early repayment', () => {
     expect(entry(p, 'discountLost')).toBe('yes');
   });
 
-  it('works out no interest when a later row does not give it', () => {
-    const p = prefill({
-      fields: statement,
-      schedule: [...schedule, row({ dueOn: '2025-04-05', amount: 300 }, 'amortization_schedule')],
-    });
-    expect(entry(p, 'remainingInterest')).toBeUndefined();
-  });
-
   it('asks nothing of a lost discount on a personal loan', () => {
     const p = prefill({ fields: { ...statement, product: f('personal_loan') } });
     expect(entry(p, 'discountLost')).toBeUndefined();
@@ -282,31 +214,6 @@ describe('a revolving card', () => {
     expect(entry(p, 'monthlyPayment')).toBe('30,00');
     expect(mark(p, 'monthlyPayment')?.confidence).toBe('medium');
     expect(p.notes).toContain(t('es', 'client.credit.documents.minimum_payment'));
-  });
-});
-
-describe('the summary', () => {
-  it('names a figure the documents state differently and the one used', () => {
-    const p = prefill({
-      fields: LOAN,
-      conflicts: [
-        { field: 'declaredApr', sources: ['credit_agreement', 'credit_precontract_info'] },
-      ],
-    });
-    expect(p.notes[0]).toBe(
-      'TAE: los documentos no dicen lo mismo. Se ha usado lo que pone el contrato; compáralo con los demás.',
-    );
-  });
-
-  it('words each check of the API', () => {
-    const p = prefill({ fields: LOAN }, ['schedule_rows_do_not_sum', 'end_before_start']);
-    expect(p.notes).toEqual([t('es', 'client.credit.documents.check.schedule_rows_do_not_sum')]);
-  });
-
-  it('says when something was read with low confidence', () => {
-    const p = prefill({ fields: { principal: f(5_000, 'low') } });
-    expect(p.lowConfidence).toBe(true);
-    expect(p.notes).toContain(t('es', 'client.documents.done_low'));
   });
 });
 

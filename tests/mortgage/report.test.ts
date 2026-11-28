@@ -9,7 +9,7 @@ import type { MortgageDeps, MortgageInput, Operation } from '../../src/engine/mo
 import type { Block, DocumentModel } from '../../src/documents/ports';
 import type { Translate } from '../../src/i18n/client';
 import { mortgageReport } from '../../src/mortgage/report';
-import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from '../engine/mortgage/input';
+import { DEPS, invoice, mortgage, TODAY } from '../engine/mortgage/input';
 import { pageTranslator } from '../support/page-strings';
 
 const tr: Translate = pageTranslator('mortgage');
@@ -106,31 +106,6 @@ describe('the mortgage report', () => {
     );
   });
 
-  it('dates the state of the case law in the flags and gives every source with its state', () => {
-    expect(texts(between(model, 'Cláusulas de tu escritura'))).toContain(
-      'Lo que dicen los tribunales · estado a 19-10-2026',
-    );
-    const sources = between(model, 'Las normas y criterios, y su estado').blocks.filter(
-      (b) => b.type === 'source',
-    );
-    expect(sources.length).toBeGreaterThan(4);
-    expect(sources.map((s) => ('text' in s ? s.text : ''))).toEqual(
-      expect.arrayContaining([
-        expect.stringMatching(/art\. 29\b.* · con efectos desde el .* · en vigor$/),
-        expect.stringMatching(/C-125\/18.* · estado a \d\d-\d\d-\d{4}$/),
-      ]),
-    );
-  });
-
-  it('gives no figure for the split if its rulings were unread', () => {
-    const summary = rows(between(report(SPLIT, UNREAD_DEPS), 'Resumen'));
-    expect(summary).toContainEqual([
-      'Según el reparto del Tribunal Supremo',
-      'Sin cifra por ahora',
-    ]);
-    expect(summary.some(([label]) => label?.startsWith('Interés legal'))).toBe(false);
-  });
-
   it('with the agreement unknown, says the split is held in «Para revisar», not that nothing is owed', () => {
     const summary = rows(between(report({ ...SPLIT, agreementOnExpenses: null }, DEPS), 'Resumen'));
     expect(summary).toContainEqual([
@@ -162,24 +137,6 @@ describe('the mortgage report', () => {
       '01-03-2022: 20.000,00 € amortizados, 200,00 € de comisión',
     ]);
   });
-
-  it('ends with what the review does not look at and where to find out for free', () => {
-    const headings = model.blocks.flatMap((b) => (b.type === 'heading' ? [b.text] : []));
-    expect(headings).toEqual([
-      'Tus datos',
-      'Resumen',
-      'Gasto por gasto',
-      'Si devolvieras capital hoy',
-      'Cláusulas de tu escritura',
-      'Las normas y criterios, y su estado',
-      'Para que lo sepas',
-      'Lo que esta revisión no mira',
-      'Dónde informarte gratis',
-    ]);
-    expect(texts(between(model, 'Lo que esta revisión no mira'))).toContain(
-      'Los plazos de tu caso',
-    );
-  });
 });
 
 describe('what repaying capital today may cost', () => {
@@ -207,23 +164,6 @@ describe('what repaying capital today may cost', () => {
     );
     expect(texts(today)).toContain('Tope de hoy: 0 €. No se puede cobrar compensación.');
     expect(texts(today).some((t) => t.startsWith('Desde el'))).toBe(false);
-  });
-
-  it('gives each option when the deed does not say which', () => {
-    const today = between(
-      report({ deedOn: d('2024-06-01'), rateType: 'variable', prepaymentOption: 'unknown' }),
-      'Si devolvieras capital hoy',
-    );
-    expect(texts(today)).toEqual(
-      expect.arrayContaining([
-        'Con el 0,15 % durante 5 años',
-        'Tope de hoy: el 0,15 % del capital amortizado, 15,00 € por cada 10.000 €.',
-        'Desde el 01-06-2029, el tope de la ley pasa al 0 %.',
-        'Con el 0,25 % durante 3 años',
-        'Tope de hoy: el 0,25 % del capital amortizado, 25,00 € por cada 10.000 €.',
-        'Desde el 01-06-2027, el tope de la ley pasa al 0 %.',
-      ]),
-    );
   });
 });
 

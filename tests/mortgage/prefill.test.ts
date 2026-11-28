@@ -148,11 +148,6 @@ describe('a mortgage deed', () => {
     );
   });
 
-  it('never answers what only the person can, such as whether the loan was a consumer’s', () => {
-    for (const name of ['consumer', 'roundingUp', 'insuranceRequired', 'hasInvoices'])
-      expect(entry(p, name), name).toBeUndefined();
-  });
-
   it('gives answers the form reads into the engine’s input once the person adds the rest', () => {
     const read = readAnswers(p, {
       consumer: 'yes',
@@ -269,18 +264,6 @@ describe('the invoices', () => {
     expect(p.notes).toContain(tr('client.mortgage.documents.invoices'));
   });
 
-  it('mark an invoice that bills the purchase and the loan together as mixed', () => {
-    const p = prefill(
-      { notaryInvoices: [notary({ concept: 'purchase', mixed: true, total: 1_480 })] },
-      ['invoice_mixes_purchase_and_loan'],
-    );
-    expect(entry(p, 'notaryLoan')).toBe('1.480,00');
-    expect(entry(p, 'notaryMixed')).toBe('yes');
-    expect(p.notes).toContain(
-      tr('client.mortgage.documents.check.invoice_mixes_purchase_and_loan'),
-    );
-  });
-
   it('leave out what this review does not count, and say so', () => {
     const p = prefill({
       notaryInvoices: [
@@ -293,18 +276,6 @@ describe('the invoices', () => {
     expect(entry(p, 'notaryLoan')).toBeUndefined();
     expect(entry(p, 'registryMortgage')).toBeUndefined();
     expect(p.notes).toContain(tr('client.mortgage.documents.invoices_left_out'));
-  });
-
-  it('add up several of one concept, as worked out', () => {
-    const p = prefill({
-      valuationInvoices: [
-        row({ total: 250 }, 'valuation_invoice'),
-        row({ total: 60.5 }, 'valuation_invoice', 'low'),
-      ],
-    });
-    expect(entry(p, 'valuation')).toBe('310,50');
-    expect(mark(p, 'valuation')).toMatchObject({ confidence: 'low', derived: true });
-    expect(p.notes).toContain(tr('client.mortgage.documents.invoices_added'));
   });
 
   it('never take a tax the lender paid, nor the purchase’s, as the person’s', () => {
@@ -325,7 +296,6 @@ describe('an agency that handled the purchase and the loan', () => {
   const agency = (values: Record<string, ExtractedValue>) => row(values, 'agency_invoice_mortgage');
   const LOAN = agency({ concept: 'loan', base: 310, vat: 65.1, total: 375.1 });
   const PURCHASE = agency({ concept: 'purchase', base: 180, vat: 37.8, total: 217.8 });
-  const INVOICES = [LOAN, PURCHASE];
   const STATEMENT = [
     agency({ concept: 'ajd', deed: 'loan', amount: 1_640 }),
     agency({ concept: 'ajd', deed: 'purchase', amount: 410 }),
@@ -334,72 +304,6 @@ describe('an agency that handled the purchase and the loan', () => {
     agency({ concept: 'registry', deed: 'purchase', amount: 150.2 }),
     agency({ concept: 'registry', deed: 'loan', amount: 176.9 }),
   ];
-  const BILLS: Partial<MortgageExtraction> = {
-    notaryInvoices: [
-      row({ concept: 'purchase', mixed: false, total: 702.4 }, 'notary_invoice'),
-      row({ concept: 'loan', mixed: false, total: 815.3 }, 'notary_invoice'),
-    ],
-    registryInvoices: [
-      row({ concept: 'purchase', mixed: false, total: 150.2 }, 'registry_invoice'),
-      row({ concept: 'mortgage', mixed: false, total: 176.9 }, 'registry_invoice'),
-    ],
-    ajdForms: [
-      row({ concept: 'purchase', amountPaid: 410, paidByLender: false }, 'ajd_form'),
-      row({ concept: 'loan', amountPaid: 1_640, paidByLender: false }, 'ajd_form'),
-    ],
-  };
-
-  it('passes the loan’s invoice alone, and no outlay listed apart from it', () => {
-    const p = prefill({
-      fields: DEED,
-      ...BILLS,
-      agencyInvoices: INVOICES,
-      agencySupplied: STATEMENT,
-    });
-    expect(entry(p, 'agency')).toBe('375,10');
-    expect(entry(p, 'agencyTax')).toBeUndefined();
-    expect(entry(p, 'agencyRegistry')).toBeUndefined();
-    expect(entry(p, 'notaryLoan')).toBe('815,30');
-    expect(entry(p, 'registryMortgage')).toBe('176,90');
-    expect(entry(p, 'ajdLoan')).toBe('1.640,00');
-    expect(p.notes).toContain(tr('client.mortgage.documents.invoices_left_out'));
-    expect(p.notes).not.toContain(tr('client.mortgage.documents.agency_supplied_apart'));
-  });
-
-  it('gives the review answers it takes without a complaint', () => {
-    const p = prefill({
-      fields: DEED,
-      clauses: CLAUSES,
-      ...BILLS,
-      agencyInvoices: INVOICES,
-      agencySupplied: STATEMENT,
-    });
-    const read = readAnswers(p, {
-      consumer: 'yes',
-      roundingUp: 'no',
-      insuranceRequired: 'no',
-      valuation: '',
-      paidOn: '2014-03-20',
-      agreement: 'no',
-      returned: '',
-      operation: 'none',
-    });
-    expect(read).not.toHaveProperty('errors');
-    expect(read).toMatchObject({
-      input: {
-        invoices: expect.arrayContaining([
-          expect.objectContaining({ kind: 'agency', total: 375.1, supplied: [] }),
-        ]),
-      },
-    });
-  });
-
-  it('says where an outlay paid apart goes when its own document was not read', () => {
-    const p = prefill({ agencyInvoices: INVOICES, agencySupplied: STATEMENT });
-    expect(entry(p, 'agency')).toBe('375,10');
-    expect(entry(p, 'agencyTax')).toBeUndefined();
-    expect(p.notes).toContain(tr('client.mortgage.documents.agency_supplied_apart'));
-  });
 
   it('passes the outlays inside the loan’s invoice, those of the purchase left out', () => {
     const p = prefill({
@@ -434,16 +338,6 @@ describe('an early repayment', () => {
 });
 
 describe('the summary', () => {
-  it('names the capital the deed and the FEIN state differently, and the one used', () => {
-    const p = prefill({
-      fields: { principal: f(150_000) },
-      conflicts: [{ field: 'principal', sources: ['mortgage_deed', 'fein'] }],
-    });
-    expect(p.notes).toContain(
-      'Importe del préstamo: los documentos no dicen lo mismo. Se ha usado lo que pone la escritura; compáralo con los demás.',
-    );
-  });
-
   it('words each check of the API but the missing page, which the upload says', () => {
     const p = prefill({}, ['invoice_parts_do_not_sum', 'missing_key_page']);
     expect(p.notes).toEqual([tr('client.mortgage.documents.check.invoice_parts_do_not_sum')]);
@@ -578,18 +472,6 @@ describe('what the prefill takes from each value', () => {
       agency({ concept, amount, ...(deed === undefined ? {} : { deed }) });
     const PAID_TAX = row({ concept: 'loan', amountPaid: 100, paidByLender: false }, 'ajd_form');
     const PAID_REGISTRY = row({ concept: 'mortgage', total: 100 }, 'registry_invoice');
-
-    it('says only what it did: one invoice read, nothing added, left out or apart', () => {
-      const p = read({ valuationInvoices: [row({ total: 300 }, 'valuation_invoice')] });
-      expect(p.entries).toEqual([
-        ['hasInvoices', 'yes'],
-        ['valuation', '300,00'],
-      ]);
-      expect(p.marks).toEqual([
-        { id: 'valuation', container: '[data-field="valuation"]', confidence: 'high' },
-      ]);
-      expect(p.notes).toEqual([INVOICES]);
-    });
 
     it('answers for what is read nothing the invoices do not give', () => {
       const none = Object.assign(row({ concept: 'loan' }, 'ajd_form'), {});

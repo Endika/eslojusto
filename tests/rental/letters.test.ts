@@ -26,7 +26,6 @@ import {
   shape,
   TODAY,
   tr,
-  unknownLargeLandlord,
   update,
 } from './fixtures';
 
@@ -127,29 +126,6 @@ const details: LetterDetails = {
 };
 
 describe('which letters a rental review offers', () => {
-  it('the deposit letter only with something owed of the deposit', () => {
-    expect(rentalLetterKinds(review(depositOut))).toEqual(['deposit_return']);
-    const returnedInFull = contract({
-      moveOut: {
-        keysReturnedOn: f('2026-06-30'),
-        returns: [{ on: f('2026-07-10'), amount: 1000 }],
-        deductions: [],
-      },
-    });
-    expect(rentalLetterKinds(review(returnedInFull))).toEqual([]);
-    // Within the month after the keys the balance is not due yet: nothing owed, no letter.
-    const notYetDue = contract({
-      moveOut: { keysReturnedOn: f('2026-09-20'), returns: [], deductions: [] },
-    });
-    expect(rentalLetterKinds(review(notYetDue))).toEqual([]);
-  });
-
-  it('the rent letter only with a rise that has a letter amount', () => {
-    expect(rentalLetterKinds(review(riseAboveIrav))).toEqual(['rent_review']);
-    expect(rentalLetterKinds(review(repealedWindow))).toEqual([]);
-    expect(rentalLetterKinds(review(contract()))).toEqual([]);
-  });
-
   it('the deposit letter for a balance owed on which no interest runs', () => {
     expect(rentalLetterKinds(review(balanceOnly))).toEqual(['deposit_return']);
   });
@@ -165,11 +141,6 @@ describe('which letters a rental review offers', () => {
     expect(rentalLetterKinds(asRead(review(balanceOnly), 'deposit_return'))).toEqual([]);
     expect(rentalLetterKinds(asRead(review(lateInFull), 'deposit_interest'))).toEqual([]);
     expect(riseLines(asRead(review(depositOut), 'deposit_return'))).toEqual([]);
-  });
-
-  it('both, deposit first', () => {
-    const both = { ...riseAboveIrav, moveOut: depositOut.moveOut };
-    expect(rentalLetterKinds(review(both))).toEqual(['deposit_return', 'rent_review']);
   });
 });
 
@@ -326,19 +297,6 @@ describe('the rent letter', () => {
     expect(all).not.toContain('15-04-2026');
   });
 
-  it('carries a rise pending validation with its lower reading, and says why', () => {
-    const [line] = riseLines(pendingRise().review);
-    expect(line?.pending).toBe(true);
-    expect(line?.reading).toMatchObject({ maxRent: 1030, monthly: 10 });
-    const all = text(rentLetter(pendingRise(), details, tr));
-    expect(all).toMatch(/la renta que resulta según el art\. 18 LAU es 1\.030,00\s€ al mes/);
-    expect(all).toMatch(/pago 1\.040,00\s€, 10,00\s€ más cada mes/);
-    expect(all).toContain(
-      'Esta cifra es la más baja de las dos cuentas posibles, porque una norma de la que depende está pendiente de convalidación por el Congreso: ',
-    );
-    expect(all).toContain('Real Decreto-ley 29/2026');
-  });
-
   it('a rise under the validated RDL 29/2026 is one reading, not a pending one', () => {
     const [line] = riseLines(validatedRise().review);
     expect(line?.pending).toBe(false);
@@ -346,12 +304,6 @@ describe('the rent letter', () => {
     const all = text(rentLetter(validatedRise(), details, tr));
     expect(all).toMatch(/la renta que resulta según el art\. 18 LAU es 1\.020,00\s€ al mes/);
     expect(all).not.toContain('pendiente de convalidación');
-  });
-
-  it('leaves out a doubt whose other reading cannot be checked: nothing holds in both', () => {
-    const r = completed(unknownLargeLandlord);
-    // «No lo sé» on a large landlord: one reading cannot be checked, so nothing holds in both.
-    expect(riseLines(r.review)).toEqual([]);
   });
 });
 

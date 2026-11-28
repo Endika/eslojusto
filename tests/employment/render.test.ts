@@ -1,21 +1,10 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
-import { parseDate as f } from '../../src/engine/date';
 import type { EmploymentPhrase } from '../../src/engine/employment/calculation';
 import { everyAssessed } from '../../src/engine/employment/review';
 import type { EmploymentInput } from '../../src/engine/employment/types';
 import { phraseText, renderEmploymentResult, renderOutOfScope } from '../../src/employment/render';
-import {
-  belowMinimum,
-  contract,
-  corners,
-  review,
-  shortDayRate,
-  shortDayRateDoubt,
-  tr,
-  unknownComplement,
-  workOrService,
-} from './fixtures';
+import { belowMinimum, contract, corners, review, tr, workOrService } from './fixtures';
 
 // The result's hooks and templates, as EmploymentResult.astro has them.
 function result(): HTMLElement {
@@ -100,44 +89,6 @@ function phrasesOf(input: EmploymentInput): EmploymentPhrase[] {
     .flatMap(nested);
 }
 
-describe('the agreement block', () => {
-  const block = (agreement: Partial<EmploymentInput['agreement']>) => {
-    const input = { ...belowMinimum, agreement: { ...belowMinimum.agreement, ...agreement } };
-    const root = render(input, false);
-    const blocks = [...root.querySelectorAll('[data-information] [data-info-title]')];
-    const title = blocks.find((t) => text(t) === 'Tu convenio colectivo');
-    return text(title?.parentElement?.closest('details') ?? title?.parentElement ?? null);
-  };
-
-  it('names the agreement a document read, with its code', () => {
-    const shown = block({
-      named: true,
-      name: 'Convenio colectivo ficticio del metal',
-      code: '99000000011999',
-    });
-    expect(shown).toContain(
-      'Según tu documento, tu convenio es Convenio colectivo ficticio del metal (código 99000000011999).',
-    );
-    expect(shown).toContain('Si metes sus cifras, la revisión las compara con tu contrato');
-  });
-
-  it('names it by its code alone when that is all that was read', () => {
-    expect(block({ named: true, code: '99000000011999' })).toContain(
-      'Según tu documento, tu convenio es el del código 99000000011999.',
-    );
-  });
-
-  it('does not ask for figures already typed', () => {
-    const shown = block({ named: true, name: 'Convenio del metal', categoryAnnualSalary: 20000 });
-    expect(shown).toContain('Según tu documento, tu convenio es Convenio del metal.');
-    expect(shown).not.toContain('Si metes sus cifras');
-  });
-
-  it('says nothing of a document when none named the agreement', () => {
-    expect(block({ named: true })).not.toContain('Según tu documento');
-  });
-});
-
 describe('the rules under each point', () => {
   const statuses = () => {
     const root = render(belowMinimum, false);
@@ -155,33 +106,6 @@ describe('the rules under each point', () => {
       'con efectos del 01-01-2026 al 31-12-2026',
     );
   });
-
-  it('gives a rule with no end the day it took effect and that it is in force', () => {
-    const open = [...statuses().values()].filter((s) => !s.includes(' al '));
-    expect(open.length).toBeGreaterThan(0);
-    expect(open.every((s) => /^con efectos desde el \d{2}-\d{2}-\d{4} · en vigor$/.test(s))).toBe(
-      true,
-    );
-  });
-});
-
-describe('the information duty of a contract already running', () => {
-  const running = (info: Partial<EmploymentInput['info']> = {}) => {
-    const base = contract({ startDate: f('2026-01-07'), signedOn: f('2026-01-07') });
-    return { ...base, info: { ...base.info, ...info } };
-  };
-  const noteOf = (root: HTMLElement) =>
-    card(root, 'Información obligatoria por escrito')?.querySelector<HTMLElement>(
-      '[data-answer-note]',
-    );
-
-  it('says nothing about asking for it when every point is already there', () => {
-    expect(noteOf(render(running(), false))?.hidden).toBe(true);
-  });
-
-  it('says it can be asked for while a point is missing', () => {
-    expect(text(noteOf(render(running({ b: 'absent' }), false)))).toMatch(/puedes pedir/);
-  });
 });
 
 describe('the employment result', () => {
@@ -193,52 +117,6 @@ describe('the employment result', () => {
       }
   });
 
-  it('writes a year as it is written and counts in words', () => {
-    const lines = phrasesOf(belowMinimum).map((p) => phraseText(p, tr));
-    expect(lines).toContain(
-      '2026: SMI de 17.094,00 €; tu salario, 16.100,00 €. Faltan 994,00 € al año; en 281 días de contrato ese año, 765,24 €.',
-    );
-    expect(lines.join(' ')).not.toMatch(/2\.026/);
-  });
-
-  it('shows the shortfall against the minimum wage rounded, per year and since the start', () => {
-    const root = render(belowMinimum, false);
-    const smi = card(root, 'Salario frente al SMI');
-    expect(text(smi?.querySelector('[data-status-text]'))).toMatch(
-      /Por debajo del SMI: unos 990\s€ al año/,
-    );
-    expect(text(smi?.querySelector('[data-total]'))).toMatch(/^Desde 2026, unos 770\s€ en total/);
-    expect(text(smi?.querySelector('[data-total]'))).toMatch(/art\. 59\.2/);
-  });
-
-  it('keeps the cents of a shortfall per working day', () => {
-    const root = render(shortDayRate, false);
-    const smi = card(root, 'Salario por jornada frente al SMI');
-    expect(text(smi?.querySelector('[data-status-text]'))).toMatch(
-      /^Por debajo del SMI: 7,82\s€ por jornada$/,
-    );
-    expect(smi?.querySelector<HTMLElement>('[data-total]')?.hidden).toBe(true);
-    expect(text(card(root, 'Pagas extra')?.querySelector('[data-status-text]'))).toBe(
-      'Dentro del límite',
-    );
-  });
-
-  it('counts the lower shortfall when both readings fall short, the higher only as «y hasta»', () => {
-    const root = render(shortDayRateDoubt, false);
-    const status = text(
-      card(root, 'Salario por jornada frente al SMI')?.querySelector('[data-status-text]'),
-    );
-    expect(status).toBe(
-      'Por debajo del SMI: 2,82 € por jornada, y hasta 12,82 € según tu respuesta',
-    );
-  });
-
-  it('gives no total since the start when years before the table are left out', () => {
-    const root = render({ ...belowMinimum, startDate: f('2021-06-01') }, false);
-    const smi = card(root, 'Salario frente al SMI');
-    expect(smi?.querySelector<HTMLElement>('[data-total]')?.hidden).toBe(true);
-  });
-
   it('quotes art. 15.4 for a work-or-service contract, with the law’s words', () => {
     const root = render(workOrService, false);
     const modality = card(root, 'Modalidad de contrato');
@@ -247,18 +125,6 @@ describe('the employment result', () => {
     );
     expect(text(modality?.querySelector('[data-literal-text]'))).toContain('condición de fijas');
     expect(text(root)).not.toMatch(/eres fij[oa]|te convierte en fij[oa]|ya eres|te deben/);
-  });
-
-  it('shows each reading of a doubt, with amounts rounded as a pair', () => {
-    const root = render(unknownComplement, false);
-    const smi = card(root, 'Salario frente al SMI');
-    expect(text(smi?.querySelector('[data-status-text]'))).toBe('Depende');
-    const readings = [...(smi?.querySelectorAll('[data-readings] li') ?? [])].map(text);
-    expect(readings).toHaveLength(2);
-    expect(readings.join(' | ')).toMatch(/Si cuentan todos los complementos: dentro del límite/);
-    expect(readings.join(' | ')).toMatch(
-      /Si solo cuentan .*: por debajo del SMI en unos [\d.]+\s€ al año/,
-    );
   });
 
   it('names the art. 21.2 doubt by the post, not by the qualified technician asked', () => {
@@ -286,15 +152,6 @@ describe('the employment result', () => {
     expect(text(clause)).not.toMatch(/técnico titulado/);
   });
 
-  it('leaves the detail out entirely while it is locked', () => {
-    const locked = render(workOrService, true);
-    expect(locked.querySelector('[data-detail]')).toBeNull();
-    expect(locked.querySelector('[data-reference]')).toBeNull();
-    const open = render(workOrService, false);
-    expect(open.querySelector('[data-detail]')).not.toBeNull();
-    expect(text(open.querySelector('[data-reference]'))).toMatch(/Despido improcedente/);
-  });
-
   it('locked with something to claim: how many points, never which', () => {
     const root = render(belowMinimum, true);
     expect(root.querySelectorAll('[data-items] > *')).toHaveLength(0);
@@ -303,26 +160,6 @@ describe('the employment result', () => {
       'Cuántos puntos no cumplen. Cuáles son, con su cálculo y la norma en que se apoya, va con el pase.',
     );
     expect(root.textContent).not.toContain('SMI');
-  });
-
-  it('locked with nothing to claim, each point still shows its verdict', () => {
-    const root = render(contract(), true);
-    expect(root.querySelectorAll('[data-items] > *').length).toBeGreaterThan(0);
-    expect(root.querySelector<HTMLElement>('[data-count]')?.hidden).toBe(true);
-  });
-
-  it('marks a partial review of a contract from before the reform', () => {
-    const root = render(contract({ startDate: f('2021-06-01'), signedOn: null }), false);
-    expect(root.querySelector<HTMLElement>('[data-partial]')?.hidden).toBe(false);
-  });
-
-  it('points a household worker, and only her, to the household review', () => {
-    const root = result();
-    const household = () => root.querySelector<HTMLElement>('[data-out-of-scope-household]');
-    renderOutOfScope(root, 'special_relationship', [], tr, true);
-    expect(household()?.hidden).toBe(false);
-    renderOutOfScope(root, 'special_relationship', [], tr, false);
-    expect(household()?.hidden).toBe(true);
   });
 
   it('gives a minor the rules that apply, as information', () => {

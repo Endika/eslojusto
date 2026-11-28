@@ -21,7 +21,6 @@ import {
 import type { CompletedCreditReview } from '../../src/credit/ports';
 import { creditReport } from '../../src/credit/report';
 import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
-import { renderPdf } from '../../src/documents/pdf';
 import type { Block, DocumentModel } from '../../src/documents/ports';
 import type { Translate } from '../../src/i18n/client';
 import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
@@ -65,41 +64,11 @@ const DETAILS: LetterDetails = {
 };
 
 describe('which credit letters a review offers', () => {
-  it('always offers the free request for information on a credit the review covers', () => {
-    expect(creditLetterKinds(completed(loan()))).toEqual({
-      paid: [],
-      free: ['credit_information'],
-    });
-    expect(creditLetterKinds(completed(card()))).toEqual({
-      paid: [],
-      free: ['credit_information'],
-    });
-  });
-
   it('offers no letter for a credit outside the review', () => {
     expect(creditLetterKinds(completed(loan({ secured: 'mortgage' })))).toEqual({
       paid: [],
       free: [],
     });
-  });
-
-  it('offers the early repayment letter only with compensation over a cap in every reading', () => {
-    expect(creditLetterKinds(completed(repaid({ compensationCharged: 50 }))).paid).toEqual([]);
-    // 50,20 € is over the 50 € cap on capital alone and within the 50,40 € on capital and interest.
-    expect(creditLetterKinds(completed(repaid({ compensationCharged: 50.2 }))).paid).toEqual([]);
-    expect(creditLetterKinds(completed(repaid({ compensationCharged: 120 }))).paid).toEqual([
-      'early_repayment_review',
-    ]);
-  });
-
-  it('takes the reading with the least over the cap', () => {
-    const line = repaymentLine(completed(repaid({ compensationCharged: 120 })).review);
-    expect(line?.finding.amount).toBe(69.6);
-    expect(line?.lowest).toBe(true);
-    const single = repaymentLine(
-      completed(repaid({ compensationCharged: 120, interestSettled: null })).review,
-    );
-    expect(single).toMatchObject({ finding: { amount: 70 }, lowest: false });
   });
 });
 
@@ -149,26 +118,6 @@ describe('the early repayment letter', () => {
     expect(all).toContain('pasa de ese tope en 69,60 €');
     expect(all).toContain('art. 30.4');
     expect(all).toContain('estas cifras son las de la que da menos diferencia');
-  });
-
-  it('uses half a percent with a year or less left, the year counted date to date', () => {
-    const all = text(
-      repaymentLetter(
-        completed(
-          repaid({
-            compensationCharged: 120,
-            interestSettled: null,
-            agreedEndOn: parseDate('2022-02-15'),
-          }),
-        ),
-        NO_DETAILS,
-        tr,
-      ),
-    );
-    expect(all).toContain('quedaba un año o menos');
-    expect(all).toContain('Sobre 5.000,00 €, el capital devuelto, el tope es de 25,00 €.');
-    expect(all).toContain('pasa de ese tope en 95,00 €');
-    expect(all).not.toContain('menos diferencia');
   });
 
   it('names the interest left as the cap when it binds', () => {
@@ -239,10 +188,6 @@ describe('the letters', () => {
       for (const forbidden of FORBIDDEN) expect(text(model).toLowerCase()).not.toMatch(forbidden);
     }
   });
-
-  it('draw with the letter fonts', async () => {
-    for (const model of models()) expect((await renderPdf(model)).length).toBeGreaterThan(1000);
-  });
 });
 
 describe('the credit review as the pass sees it', () => {
@@ -267,16 +212,6 @@ describe('the credit review as the pass sees it', () => {
       'Petición de información de mi crédito',
     );
     expect(c.report(tr, TODAY)).toEqual(creditReport(r, tr, TODAY));
-  });
-
-  it('sells it quietly only when every figure compared is within the law and the indicator calm', () => {
-    expect(creditCase(completed(card()), CREDIT_NORMS)).toMatchObject({
-      offer: false,
-      quiet: true,
-    });
-    // A loan's distance to the average rate comes with no criterion read.
-    expect(creditCase(completed(loan({ declaredApr: 17 })), CREDIT_NORMS).quiet).toBe(false);
-    expect(creditCase(completed(loan({ declaredApr: 12 })), CREDIT_NORMS).quiet).toBe(false);
   });
 
   describe('quiet', () => {

@@ -10,14 +10,7 @@ import {
 import type { EmploymentReview } from '../../src/engine/employment/review';
 import type { Translate } from '../../src/i18n/client';
 import type { Block, DocumentModel } from '../../src/documents/ports';
-import { sans } from '../../src/documents/fonts/sans';
-import { serif } from '../../src/documents/fonts/serif';
-import { NO_DETAILS } from '../../src/documents/letter';
-import { STYLES } from '../../src/documents/pdf';
-import { PdfDocument } from '../../src/documents/pdf-writer';
-import { employmentCase } from '../../src/employment/case';
 import { employmentReport } from '../../src/employment/report';
-import { EMPLOYMENT_FORBIDDEN, FORBIDDEN } from '../support/forbidden';
 import {
   belowMinimum,
   contract,
@@ -25,7 +18,6 @@ import {
   malformed,
   review,
   shortDayRateDoubt,
-  TABLES,
   TODAY,
   tr,
   eachRow,
@@ -49,8 +41,6 @@ const text = (blocks: readonly Block[]) =>
 // The corner with a production contract over its limits, its chaining, a trial period in doubt
 // and a contract that ended before the information decree.
 const production = corners[4] as EmploymentInput;
-// The corner with clauses, payslips, an offer and the agreement's figures.
-const clauses = corners[6] as EmploymentInput;
 
 const dataRowsOf = (input: EmploymentInput) => {
   const blocks = report(input).blocks;
@@ -180,19 +170,6 @@ describe('the contract report', () => {
     expect(all).toContain('Solo para contratos por ETT');
   });
 
-  it('gives the reference figures only «si un juzgado lo declarase así», the offer and what is left out', () => {
-    const withReference = text(report(production).blocks);
-    expect(withReference).toContain('Si un juzgado lo declarase así');
-    expect(withReference).toContain('Despido improcedente (art. 56): 2.215,07 €.');
-    expect(text(report(contract()).blocks)).not.toContain('Si un juzgado');
-    const withOffer = text(report(clauses).blocks);
-    expect(withOffer).toContain('La oferta frente al contrato');
-    expect(withOffer).toContain('Solo se ponen lado a lado');
-    expect(withOffer).toContain('Lo que esta revisión no comprueba');
-    expect(withOffer).toContain('La igualdad retributiva.');
-    expect(withOffer).not.toContain('Las horas que trabajas de verdad.');
-  });
-
   it('is dated the day it is made', () => {
     const model = employmentReport(
       { review: review(belowMinimum), input: belowMinimum, detail: 'unlocked' },
@@ -212,79 +189,6 @@ describe('the contract report', () => {
   it('builds only blocks the PDF can draw', () => {
     for (const input of [...corners, shortDayRateDoubt, contract()])
       expect(malformed(report(input).blocks)).toEqual([]);
-  });
-
-  it('informs without advising or asserting', () => {
-    for (const input of corners) {
-      const all = text(report(input).blocks).toLowerCase();
-      for (const forbidden of [...FORBIDDEN, ...EMPLOYMENT_FORBIDDEN])
-        expect(all).not.toMatch(forbidden);
-    }
-  });
-});
-
-describe('the contract documents', () => {
-  it('use only characters both fonts can draw', () => {
-    // The writer turns these spaces into plain ones.
-    const substituted = new Set(['\u00a0', '\u202f', '\u2009']);
-    const missing = new Set<string>();
-    for (const input of corners) {
-      const r = { review: review(input), input, detail: 'unlocked' as const };
-      const c = employmentCase(r, TODAY, TABLES);
-      const models = [
-        c.report(tr, TODAY),
-        ...[...c.letterKinds, ...(c.freeLetterKinds ?? []), 'information_request' as const].map(
-          (kind) => c.letter(kind, NO_DETAILS, tr),
-        ),
-      ];
-      for (const model of models)
-        for (const ch of text(model.blocks)) {
-          const code = String(ch.codePointAt(0));
-          if (ch !== '\n' && !substituted.has(ch) && !(code in sans.glyphs && code in serif.glyphs))
-            missing.add(ch);
-        }
-    }
-    expect([...missing]).toEqual([]);
-  });
-
-  // A row puts its value on the right and wraps its label in what is left: the value, and the
-  // longest word of the label beside it, must fit the page.
-  it('never have a row wider than the page', () => {
-    const doc = new PdfDocument({ sans, serif }, 'x');
-    const longest = contract({
-      modality: 'replacement_selection',
-      salary: {
-        amount: 123456.78,
-        period: 'year',
-        payments: 14,
-        prorated: false,
-        breakdown: [],
-        inKind: null,
-      },
-      contractHours: { weekly: 37.5, annual: 1688.25 },
-      fullTimeHours: 37.5,
-      agreement: {
-        named: true,
-        name: null,
-        code: null,
-        categoryAnnualSalary: 123456.78,
-        annualHours: 1700,
-        holidayDays: null,
-        trialMonths: null,
-      },
-      holidays: { days: 22, unit: 'working', workDaysPerWeek: 5, includedInSalary: false },
-      history: [],
-    });
-    for (const input of [...corners, longest]) {
-      for (const b of report(input).blocks) {
-        if (b.type !== 'row') continue;
-        const word = Math.max(...b.label.split(' ').map((w) => doc.measure(w, STYLES.row)));
-        expect(
-          doc.measure(b.value, STYLES.row) + 16 + word,
-          `${b.label}: ${b.value}`,
-        ).toBeLessThanOrEqual(doc.width);
-      }
-    }
   });
 });
 

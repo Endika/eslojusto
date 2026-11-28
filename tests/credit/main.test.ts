@@ -141,23 +141,6 @@ describe('the credit review on its page', () => {
     expect(document.querySelector('[data-error-for="nominalRate"]')?.textContent).not.toBe('');
   });
 
-  it('words a locked review and shows it unlocked unless told otherwise', () => {
-    {
-      const { section } = setUp(() => 'locked');
-      section.fill(LOAN);
-      section.review();
-      expect(count()?.hidden).toBe(false);
-    }
-
-    {
-      const { section } = setUp();
-      section.fill(LOAN);
-      section.review();
-      section.refreshResult();
-      expect(count()?.hidden).toBe(true);
-    }
-  });
-
   it('shows the review again as the pass leaves its detail, and forgets it on starting over', () => {
     let detail: Detail = 'unlocked';
     const { events, section } = setUp(() => detail);

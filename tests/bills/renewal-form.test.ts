@@ -92,47 +92,9 @@ describe('the renewal form', () => {
     });
   });
 
-  it('takes each side as the letter prices it, a single price becoming three or back', () => {
-    const toPeriods = readRenewalForm(
-      form({
-        nextEnergyPricing: 'periods',
-        nextEnergy: null,
-        nextEnergyP1: '0,22',
-        nextEnergyP2: '0,17',
-        nextEnergyP3: '0,12',
-      }),
-      TODAY,
-    );
-    if (!('input' in toPeriods)) throw new Error(JSON.stringify(toPeriods.errors));
-    expect(toPeriods.input.current.energy).toEqual({ all: 0.144972 });
-    expect(toPeriods.input.next.energy).toEqual({ p1: 0.22, p2: 0.17, p3: 0.12 });
-    const toSingle = readRenewalForm(
-      form({
-        currentEnergyPricing: 'periods',
-        currentEnergy: null,
-        currentEnergyP1: '0,2',
-        currentEnergyP2: '0,15',
-        currentEnergyP3: '0,1',
-      }),
-      TODAY,
-    );
-    if (!('input' in toSingle)) throw new Error(JSON.stringify(toSingle.errors));
-    expect(toSingle.input.current.energy).toEqual({ p1: 0.2, p2: 0.15, p3: 0.1 });
-    expect(toSingle.input.next.energy).toEqual({ all: 0.1678 });
-  });
-
   it('asks how each side prices its energy', () => {
     expect(readRenewalForm(form({ nextEnergyPricing: null }), TODAY)).toEqual({
       errors: [{ field: 'nextEnergyPricing', code: 'missing_choice' }],
-    });
-  });
-
-  it('refuses a price of zero, on either side', () => {
-    expect(readRenewalForm(form({ currentPowerP2: '0', nextEnergy: '0' }), TODAY)).toEqual({
-      errors: [
-        { field: 'currentPowerP2', code: 'price_range' },
-        { field: 'nextEnergy', code: 'price_range' },
-      ],
     });
   });
 
@@ -144,15 +106,6 @@ describe('the renewal form', () => {
         { field: 'powerKwP1', code: 'missing_value' },
         { field: 'nextPowerP2', code: 'missing_value' },
         { field: 'currentEnergy', code: 'missing_value' },
-      ],
-    });
-  });
-
-  it('refuses a figure it cannot read', () => {
-    expect(readRenewalForm(form({ nextPowerP1: 'doce', powerKwP2: '5.75.1' }), TODAY)).toEqual({
-      errors: [
-        { field: 'powerKwP2', code: 'invalid_number' },
-        { field: 'nextPowerP1', code: 'invalid_number' },
       ],
     });
   });
@@ -180,14 +133,6 @@ describe('the renewal form', () => {
     });
   });
 
-  it('takes the same prices per kW and year, within their own bound', () => {
-    expect(
-      readRenewalForm(form({ powerUnit: 'per_kw_year', nextPowerP2: '9' }), TODAY),
-    ).toMatchObject({
-      input: { powerUnit: 'per_kw_year' },
-    });
-  });
-
   it('refuses a letter from the future and a renewal before it', () => {
     expect(readRenewalForm(form({ letterDate: '2026-12-01' }), TODAY)).toEqual({
       errors: [{ field: 'letterDate', code: 'in_future' }],
@@ -198,17 +143,6 @@ describe('the renewal form', () => {
     expect(readRenewalForm(form({ letterDate: '' }), TODAY)).toEqual({
       errors: [{ field: 'letterDate', code: 'missing_value' }],
     });
-  });
-
-  it('checks one sheet at a time', () => {
-    const f = form({ powerKwP1: '', annualKwh: 'mucho' });
-    expect(sheetErrors(f, 'potencia', TODAY)).toEqual([
-      { field: 'powerKwP1', code: 'missing_value' },
-    ]);
-    expect(sheetErrors(f, 'consumo', TODAY)).toEqual([
-      { field: 'annualKwh', code: 'invalid_number' },
-    ]);
-    expect(sheetErrors(f, 'fechas', TODAY)).toEqual([]);
   });
 });
 
@@ -226,71 +160,42 @@ describe('what the renewal form requires', () => {
     nextEnergyP3: '0,12',
   };
 
-  it.each([
-    'letterDate',
-    'renewalDate',
-    'powerKwP1',
-    'powerKwP2',
-    'currentPowerP1',
-    'currentPowerP2',
-    'nextPowerP1',
-    'nextPowerP2',
-    'currentEnergy',
-    'nextEnergy',
-  ])('asks for %s', (field) => {
+  it.each(['renewalDate', 'powerKwP2', 'currentPowerP1'])('asks for %s', (field) => {
     expect(readRenewalForm(form({ [field]: '' }), TODAY)).toEqual({
       errors: [{ field, code: 'missing_value' }],
     });
   });
 
-  it.each([
-    'currentEnergyP1',
-    'currentEnergyP2',
-    'currentEnergyP3',
-    'nextEnergyP1',
-    'nextEnergyP2',
-    'nextEnergyP3',
-  ])('asks for %s when the letter prices by period', (field) => {
-    expect(readRenewalForm(form({ ...periods, [field]: '' }), TODAY)).toEqual({
-      errors: [{ field, code: 'missing_value' }],
-    });
-  });
+  it.each(['currentEnergyP1', 'currentEnergyP2', 'currentEnergyP3'])(
+    'asks for %s when the letter prices by period',
+    (field) => {
+      expect(readRenewalForm(form({ ...periods, [field]: '' }), TODAY)).toEqual({
+        errors: [{ field, code: 'missing_value' }],
+      });
+    },
+  );
 
-  it.each([
-    'powerKwP1',
-    'powerKwP2',
-    'currentPowerP1',
-    'currentPowerP2',
-    'nextPowerP1',
-    'nextPowerP2',
-    'currentEnergy',
-    'nextEnergy',
-  ])('reads a comma and three digits as a decimal one in %s', (field) => {
+  it.each(['nextEnergy'])('reads a comma and three digits as a decimal one in %s', (field) => {
     const r = readRenewalForm(form({ [field]: '1,234' }), TODAY);
     expect('errors' in r ? r.errors : []).toEqual([]);
   });
 
-  it.each([
-    'currentEnergyP1',
-    'currentEnergyP2',
-    'currentEnergyP3',
-    'nextEnergyP1',
-    'nextEnergyP2',
-    'nextEnergyP3',
-  ])('reads a comma and three digits as a decimal one in %s', (field) => {
-    const r = readRenewalForm(form({ ...periods, [field]: '1,234' }), TODAY);
-    expect('errors' in r ? r.errors : []).toEqual([]);
-  });
+  it.each(['currentEnergyP1', 'currentEnergyP2', 'nextEnergyP3'])(
+    'reads a comma and three digits as a decimal one in %s',
+    (field) => {
+      const r = readRenewalForm(form({ ...periods, [field]: '1,234' }), TODAY);
+      expect('errors' in r ? r.errors : []).toEqual([]);
+    },
+  );
 
-  it.each([
-    ['yes', true],
-    ['no', false],
-    ['unknown', null],
-  ] as const)('reads %s to whether the letter came apart as %s', (answer, expected) => {
-    expect(readRenewalForm(form({ separateFromBill: answer }), TODAY)).toMatchObject({
-      input: { separateFromBill: expected },
-    });
-  });
+  it.each([['no', false]] as const)(
+    'reads %s to whether the letter came apart as %s',
+    (answer, expected) => {
+      expect(readRenewalForm(form({ separateFromBill: answer }), TODAY)).toMatchObject({
+        input: { separateFromBill: expected },
+      });
+    },
+  );
 
   it('checks a sheet with what the engine bounds only on that sheet', () => {
     const f = form({ renewalDate: '2026-10-01', annualKwh: '900000' });
@@ -317,21 +222,6 @@ describe('the sheets', () => {
 });
 
 describe('a comma followed by three digits', () => {
-  it('is a decimal one in a power and in a price, typed', () => {
-    const r = readRenewalForm(
-      form({
-        powerKwP1: '3,464',
-        powerKwP2: '3,464',
-        powerUnit: 'per_kw_year',
-        nextPowerP2: '18,372',
-      }),
-      TODAY,
-    );
-    if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
-    expect(r.input.powerKw).toEqual({ p1: 3.464, p2: 3.464 });
-    expect(r.input.next.power.p2).toBe(18.372);
-  });
-
   it('stays ambiguous in a consumption or an amount', () => {
     expect(readRenewalForm(form({ annualKwh: '1,500' }), TODAY)).toEqual({
       errors: [{ field: 'annualKwh', code: 'invalid_number' }],

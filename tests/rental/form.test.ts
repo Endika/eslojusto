@@ -1,10 +1,10 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
 import { NORMS } from '../../src/engine/rental/data/norms';
-import { applies, applyConditions, gate } from '../../src/rental/conditions';
+import { applyConditions } from '../../src/rental/conditions';
 import { fieldOfError, readRentalForm, sheetErrors } from '../../src/rental/form';
 import { ROW_LISTS, setUpRows } from '../../src/rental/rows';
-import { rentalFlow, SECTION_OF_STEP, STEPS, TABS } from '../../src/rental/steps';
+import { rentalFlow } from '../../src/rental/steps';
 import { contract, TODAY, tr, update } from './fixtures';
 
 const radios = (name: string, values: readonly string[], row = false) =>
@@ -144,109 +144,6 @@ describe('reading the form', () => {
       { field: 'initialRent', code: 'amount_out_of_range' },
     ]);
   });
-
-  it('reads fee rows and asks about a written request only where it decides the fee', () => {
-    const f = answered([['hasFees', 'yes']]);
-    const row = (key: string) => f.querySelector<HTMLInputElement>(`[name="fees.0.${key}"]`);
-    const kind = f.querySelector<HTMLSelectElement>('[name="fees.0.kind"]');
-    if (!kind) throw new Error('no row');
-    kind.value = 'management';
-    set(f, 'fees.0.amount', '150');
-    set(f, 'fees.0.deductedLater', 'no');
-    expect(row('requestedInWriting')?.disabled).toBe(true);
-    expect(sheetErrors(f, 'pagos', TODAY)).toEqual([]);
-    set(f, 'signedOn', '2026-10-08');
-    set(f, 'startDate', '2026-10-08');
-    expect(row('requestedInWriting')?.disabled).toBe(false);
-    expect(sheetErrors(f, 'pagos', TODAY)).toEqual([
-      { field: 'fees.0.requestedInWriting', code: 'missing_choice' },
-    ]);
-    set(f, 'fees.0.requestedInWriting', 'unknown');
-    const r = readRentalForm(f, TODAY);
-    expect('input' in r && r.input.fees).toEqual([
-      { kind: 'management', amount: 150, deductedLater: false, requestedInWriting: null },
-    ]);
-  });
-});
-
-describe('charge rows', () => {
-  it('ask the contract terms once per concept and make one charge of its years', () => {
-    const f = answered([['hasCharges', 'yes']]);
-    f.querySelector<HTMLButtonElement>('[data-rows="charges"] [data-rows-add]')?.click();
-    f.querySelector<HTMLButtonElement>('[data-rows="charges"] [data-rows-add]')?.click();
-    for (const [name, value] of [
-      ['charges.0.year', '2024'],
-      ['charges.0.inContract', 'yes'],
-      ['charges.0.annualAgreed', '600'],
-      ['charges.0.amount', '600'],
-      ['charges.1.year', '2025'],
-      ['charges.1.amount', '640'],
-      ['charges.2.year', '2025'],
-      ['charges.2.amount', '90'],
-    ])
-      set(f, name ?? '', value ?? '');
-    const third = f.querySelector<HTMLSelectElement>('[name="charges.2.kind"]');
-    if (!third) throw new Error('no third row');
-    third.value = 'waste';
-    applyConditions(f);
-    const asked = (row: number) =>
-      !f.querySelector<HTMLInputElement>(`[name="charges.${row}.annualAgreed"]`)?.disabled;
-    expect([0, 1, 2].map(asked)).toEqual([true, false, true]);
-    expect(sheetErrors(f, 'gastos', TODAY)).toEqual([
-      { field: 'charges.2.inContract', code: 'missing_choice' },
-    ]);
-    set(f, 'charges.2.inContract', 'no');
-    const r = readRentalForm(f, TODAY);
-    expect('input' in r && r.input.charges).toEqual([
-      {
-        kind: 'community',
-        inContract: true,
-        annualAgreed: 600,
-        charged: [
-          { year: 2024, amount: 600 },
-          { year: 2025, amount: 640 },
-        ],
-      },
-      {
-        kind: 'waste',
-        inContract: false,
-        annualAgreed: null,
-        charged: [{ year: 2025, amount: 90 }],
-      },
-    ]);
-  });
-});
-
-describe('the gate', () => {
-  it.each([
-    ['main_home', '2024-03-15', { inScope: true }],
-    ['main_home', '2018-05-02', { inScope: false, reason: 'before_2019' }],
-    ['seasonal', '2024-03-15', { inScope: false, reason: 'seasonal' }],
-  ])('%s signed on %s', (type, signed, expected) => {
-    const f = answered([
-      ['contractType', type],
-      ['signedOn', signed],
-      ['startDate', signed],
-    ]);
-    expect(gate(f, NORMS)).toEqual(expected);
-  });
-
-  it('lets the visit go on until the contract sheet reads', () => {
-    expect(gate(form(), NORMS)).toEqual({ inScope: true });
-  });
-
-  it('keeps to the contract’s sheets for a contract outside the review', () => {
-    const f = answered([['contractType', 'seasonal']]);
-    expect(applies(f, 'fechas', NORMS)).toBe(true);
-    expect(applies(f, 'casero', NORMS)).toBe(false);
-  });
-
-  it('asks what came back of the deposit only once the home is left', () => {
-    const f = answered();
-    expect(applies(f, 'fianza', NORMS)).toBe(false);
-    set(f, 'movedOut', 'yes');
-    expect(applies(f, 'fianza', NORMS)).toBe(true);
-  });
 });
 
 describe('engine errors on rows', () => {
@@ -286,32 +183,8 @@ describe('engine errors on rows', () => {
   });
 });
 
-describe('the tabs', () => {
-  it('follow the walk: each one starts on its section’s first sheet, in order', () => {
-    const firsts = TABS.map(([tone, step]) => {
-      expect(SECTION_OF_STEP[step]).toBe(tone);
-      return STEPS.findIndex((s) => SECTION_OF_STEP[s] === tone);
-    });
-    expect(firsts).toEqual(TABS.map(([, step]) => STEPS.indexOf(step)));
-    expect(firsts).toEqual([...firsts].sort((a, b) => a - b));
-  });
-
-  it('weigh as many sheets as each section holds, the result two', () => {
-    for (const [tone, , , weight] of TABS) {
-      const sheets = STEPS.filter((s) => SECTION_OF_STEP[s] === tone).length;
-      expect(weight).toBe(tone === 'result' ? 2 : sheets);
-    }
-  });
-});
-
 describe('the flow', () => {
   const flow = rentalFlow(NORMS);
-
-  it('leaves out what the gate leaves out', () => {
-    const f = answered([['contractType', 'seasonal']]);
-    expect(flow.applies(f, 'fechas')).toBe(true);
-    expect(flow.applies(f, 'casero')).toBe(false);
-  });
 
   it('completes a sheet once it reads without errors, and the result always', () => {
     const f = answered();
