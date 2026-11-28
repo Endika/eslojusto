@@ -152,15 +152,13 @@ describe('the telecom section', () => {
     expect(renderTelecomResult).not.toHaveBeenCalled();
   });
 
-  it('forgets the review when the exit leaves the scope', () => {
+  it('shows the review again unlocked when the pass does not lock it', () => {
     const own = config();
     vi.mocked(readTelecomForm).mockReturnValue({ input } as never);
     vi.mocked(reviewTelecom).mockReturnValue({ ok: true, review } as never);
     own.review(form, result, DAY);
-    vi.mocked(gate).mockReturnValue({ inScope: false, reason: 'exit_before_2022' } as never);
-    own.stopsAtGate(form, result);
     vi.mocked(renderTelecomResult).mockClear();
     own.refreshResult(result);
-    expect(renderTelecomResult).not.toHaveBeenCalled();
+    expect(renderTelecomResult).toHaveBeenCalledWith(result, review, 'norms', false, tr);
   });
 });

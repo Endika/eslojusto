@@ -12,6 +12,7 @@ import { TELECOM_FLOW as flow } from './steps';
 // the result, shown again when the pass is verified or dropped.
 export function setUpTelecom(
   root: HTMLElement,
+  // Stryker disable next-line ArrowFunction,StringLiteral: only a detail of 'locked' changes the result
   { events, today, tr, tables, detail = () => 'unlocked' }: TelecomSetup,
 ): SectionForm {
   let shown: TelecomReview | null = null;

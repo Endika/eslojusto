@@ -112,6 +112,11 @@ describe('a read of a phone contract', () => {
       tr,
     );
     expect(no.entries).toEqual([['hasHandset', 'no']]);
+    const unread = telecomPrefill(
+      fieldsOf({ handsetSubsidised: field(true), handsetValue: field('x') }),
+      tr,
+    );
+    expect(unread.entries).toEqual([['hasHandset', 'yes']]);
     const yes = telecomPrefill(fieldsOf({ handsetSubsidised: field(true) }), tr);
     expect(yes.entries).toEqual([['hasHandset', 'yes']]);
   });

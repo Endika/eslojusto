@@ -273,6 +273,7 @@ function billPrefill(
 
 // Oldest first; a bill without its last reading goes last, in the order read.
 const byLastReading = (a: BillRead, b: BillRead): number =>
+  // Stryker disable next-line StringLiteral: the texts are only compared when both are dates or both are missing
   Number(a.to === null) - Number(b.to === null) || (a.to ?? '').localeCompare(b.to ?? '');
 
 // What a read puts into the electricity review, bill by bill. Nothing here reviews anything: each

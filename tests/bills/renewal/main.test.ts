@@ -116,13 +116,13 @@ describe('the renewal section', () => {
     expect(events.reviewCompleted).toHaveBeenCalledWith({ review: drawn });
   });
 
-  it('draws nothing when the review with the prices fails', async () => {
-    vi.mocked(reviewRenewal).mockReturnValueOnce({ ok: true, review } as never);
-    vi.mocked(reviewRenewal).mockReturnValueOnce({ ok: false, errors: [] } as never);
-    c.review(form, result, DAY);
+  it('draws neither the review before a restart nor the one a restart leaves behind', async () => {
+    const own = setup();
+    own.review(form, result, DAY);
+    own.restarted();
+    own.review(form, result, DAY);
     await settle();
-    expect(renderRenewalResult).not.toHaveBeenCalled();
-    expect(events.reviewCompleted).not.toHaveBeenCalled();
+    expect(renderRenewalResult).toHaveBeenCalledOnce();
   });
 
   it('draws only the latest review, not one the person has moved past', async () => {
