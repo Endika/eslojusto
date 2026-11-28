@@ -6,7 +6,6 @@ import {
   compare,
   directionOf,
   LINE_TOLERANCE,
-  single,
   type BillFinding,
   type BillItem,
   type OfficialQuestion,
@@ -64,6 +63,11 @@ interface TaxLine {
 // A bill may print a rate rounded to two decimals, as 5,11 % for 5,11269632 %.
 const PRINTED_RATE_TOLERANCE = 0.005;
 
+function differsInRate(printed: number, rate: number): boolean {
+  // Stryker disable next-line EqualityOperator: two rates never differ by exactly the tolerance
+  return Math.abs(printed - rate) > PRINTED_RATE_TOLERANCE;
+}
+
 function assess(line: TaxLine, reading: TaxReading, norms: NormTable): BillFinding {
   const parts = { rows: line.rows, dependsOn: line.dependsOn };
   const calculation = [
@@ -72,7 +76,7 @@ function assess(line: TaxLine, reading: TaxReading, norms: NormTable): BillFindi
     billsPhrase('tolerance.line'),
     ...(line.dependsOn.length > 0 ? [billsPhrase('tax.rate_depends')] : []),
   ];
-  const { matches, difference } = compare(line.billed, reading.expected, LINE_TOLERANCE);
+  const { matches } = compare(line.billed, reading.expected, LINE_TOLERANCE);
   if (matches) return billFinding(line.id, 'matches', calculation, line.rules, norms, parts);
   if (
     reading.unsettled.length > 0 &&
@@ -90,13 +94,14 @@ function assess(line: TaxLine, reading: TaxReading, norms: NormTable): BillFindi
     line.printedPercent === null
       ? reading.atOtherRates.length > 0 &&
         compare(line.billed, reading.atOtherRates, LINE_TOLERANCE).matches
-      : Math.abs(line.printedPercent - reading.percent) > PRINTED_RATE_TOLERANCE;
+      : differsInRate(line.printedPercent, reading.percent);
   // A difference never rests on a treatment no primary source settles: it is to the nearest
   // figure, the unsettled ones included.
-  const nearest =
-    reading.unsettled.length > 0
-      ? compare(line.billed, [...reading.expected, ...reading.unsettled], LINE_TOLERANCE).difference
-      : difference;
+  const { difference: nearest } = compare(
+    line.billed,
+    [...reading.expected, ...reading.unsettled],
+    LINE_TOLERANCE,
+  );
   const why = otherRate
     ? billsPhrase(
         'tax.wrong_rate',
@@ -113,15 +118,14 @@ function assess(line: TaxLine, reading: TaxReading, norms: NormTable): BillFindi
   );
 }
 
-// The lowest and the highest rate that may apply, each its own reading; one when they agree. Each
-// reading has its figure, so the lowest counts.
+// The lowest and the highest rate that may apply, each its own reading; one when they agree, as
+// assessAcross gives. Each reading has its figure, so the lowest counts.
 export function acrossRates(
   line: TaxLine,
   low: TaxReading,
   high: TaxReading,
   norms: NormTable,
 ): BillItem {
-  if (low.percent === high.percent) return single(assess(line, low, norms));
   return assessAcross<OfficialQuestion, OfficialReading, BillFinding>(
     'official_value',
     ['lower_value', 'higher_value'],

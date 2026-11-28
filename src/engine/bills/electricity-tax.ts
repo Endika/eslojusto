@@ -60,7 +60,7 @@ export function checkElectricityTax(
   ]
     .filter((value) => value !== 0)
     .map((value) => [value, 0]);
-  const bases = possibleSums(certain, [...(funding > 0 ? [[funding, 0]] : []), ...otherParts]);
+  const bases = possibleSums(certain, [[funding, 0], ...otherParts]);
   const meter = input.meter?.amount ?? 0;
   const tableRates = distinct(tables.electricityTax.map((r) => r.value.percent));
 
@@ -68,13 +68,15 @@ export function checkElectricityTax(
     const floor = (rate.minimumPerMwh / 1000) * kwh;
     const tax = (base: number) => Math.max((rate.percent / 100) * base, floor);
     const shown = bases[0] ?? certain;
-    const atOthers = tableRates
-      .filter((p) => p !== rate.percent)
-      .flatMap((p) => bases.map((b) => Math.max((p / 100) * b, floor)));
+    // Stryker disable next-line ConditionalExpression,MethodExpression: its own rate gives the expected sums, which did not match when they are read
+    const otherRates = tableRates.filter((p) => p !== rate.percent);
+    const atOthers = otherRates.flatMap((p) => bases.map((b) => Math.max((p / 100) * b, floor)));
+    // Stryker disable next-line ConditionalExpression,EqualityOperator,ArrayDeclaration: with no rent the sums are the expected ones, which did not match when they are read
+    const unsettled = meter > 0 ? bases.map((b) => tax(b + meter)) : [];
     return {
       percent: rate.percent,
       expected: bases.map(tax),
-      unsettled: meter > 0 ? bases.map((b) => tax(b + meter)) : [],
+      unsettled,
       unsettledPhrase: 'electricity_tax.meter_outside',
       atOtherRates: atOthers,
       calculation: [
@@ -101,6 +103,7 @@ export function checkElectricityTax(
   const rates = on.rows.map((r) => r.value).sort((a, b) => a.percent - b.percent);
   const low = rates[0];
   const high = rates.at(-1);
+  // Stryker disable next-line ConditionalExpression,LogicalOperator,CallExpression: a day with a lookup has a row
   if (low === undefined || high === undefined) throw new RangeError(`No rate covers ${day}`);
   return acrossRates(
     {

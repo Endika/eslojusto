@@ -111,12 +111,12 @@ function regulated(
     if (matches) return billFinding(id, 'matches', calculation, rules, norms);
     const parts = { amount: Math.abs(difference), direction: directionOf(difference) };
     // Stryker disable next-line EqualityOperator: a difference of zero matches, so it never gets here
-    return difference > 0
-      ? billFinding(id, 'above_regulated_price', calculation, rules, norms, {
-          ...parts,
-          recurring: true,
-        })
-      : billFinding(id, 'differs_from_official', calculation, rules, norms, parts);
+    if (difference > 0)
+      return billFinding(id, 'above_regulated_price', calculation, rules, norms, {
+        ...parts,
+        recurring: true,
+      });
+    return billFinding(id, 'differs_from_official', calculation, rules, norms, parts);
   });
 }
 

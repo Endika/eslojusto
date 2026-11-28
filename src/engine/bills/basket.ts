@@ -83,11 +83,10 @@ export function reviewBasket(bills: readonly BasketBill[], deps: BasketDeps): Ba
     under: sum((r) => r.totals.under),
   };
   const days = reviews.reduce((total, { input }) => total + daysOf(input), 0);
+  // Stryker disable next-line MethodExpression: the readings of one item all carry its id, so some and every agree
+  const recursIn = (item: BillItem) => idsOf(item).some((id) => recurring.includes(id));
   const recurringAmount = sum((r) =>
-    r.items
-      // Stryker disable next-line MethodExpression: the readings of one item all carry its id, so some and every agree
-      .filter((item) => idsOf(item).some((id) => recurring.includes(id)))
-      .reduce((total, item) => total + countedAmount(item), 0),
+    r.items.filter(recursIn).reduce((total, item) => total + countedAmount(item), 0),
   );
   return {
     bills: counted,

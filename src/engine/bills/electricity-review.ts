@@ -54,6 +54,11 @@ type ElectricityResult =
   | { readonly ok: false; readonly errors: readonly ValidationError<ElectricityField>[] }
   | { readonly ok: true; readonly review: ElectricityReview };
 
+function recursEveryTime(item: BillItem): boolean {
+  // Stryker disable next-line MethodExpression: the readings of one counted item all carry the same recurring flag
+  return countedAmount(item) > 0 && findingsOf(item).every((f) => f.recurring);
+}
+
 const present = (item: BillItem | null): readonly BillItem[] => (item === null ? [] : [item]);
 
 // The whole review of a household electricity bill. `today` and the tables come in from the
@@ -97,10 +102,7 @@ export function reviewElectricityBill(
       scope: reach,
       items,
       totals: totalsOf(items),
-      recurring: items.some(
-        // Stryker disable next-line MethodExpression: the readings of one counted item all carry the same recurring flag
-        (item) => countedAmount(item) > 0 && findingsOf(item).every((f) => f.recurring),
-      ),
+      recurring: items.some(recursEveryTime),
       unchecked: UNCHECKED,
     },
   };
