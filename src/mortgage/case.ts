@@ -1,4 +1,5 @@
 import type { ExpenseStatus } from '../engine/mortgage/expenses';
+import { feeFindings } from '../engine/mortgage/fees';
 import type { MortgageReview } from '../engine/mortgage/review';
 import type { LegalInterestTable } from '../engine/law/interest';
 import type { LetterKind } from '../documents/letter';
@@ -26,9 +27,7 @@ const SETTLED: ReadonlySet<ExpenseStatus> = new Set([
 // in every reading, with at least one figure compared.
 function allClear(review: MortgageReview): boolean {
   const { items } = review.expenses;
-  const fees = review.fees.flatMap((f) =>
-    f.kind === 'single' ? [f.finding] : f.readings.map((r) => r.finding),
-  );
+  const fees = review.fees.flatMap(feeFindings);
   return (
     review.flags.every((f) => f.state === 'not_in_deed') &&
     items.every((i) => SETTLED.has(i.status)) &&
