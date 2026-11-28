@@ -192,12 +192,12 @@ describe('what a reading is worth', () => {
     expect(p.entries.map(([name]) => name)).toEqual(['hasNotice', 'noticeReceivedOn']);
   });
 
-  it.each([['a previous premium', { previousPremium: notice(300) }]])(
-    'opens the notice for %s alone',
-    (_, fields) => {
-      expect(entry(prefill({ fields }), 'hasNotice')).toBe('yes');
-    },
-  );
+  it.each([
+    ['a previous premium', { previousPremium: notice(300) }],
+    ['whether covers change', { coverChanges: notice(false) }],
+  ])('opens the notice for %s alone', (_, fields) => {
+    expect(entry(prefill({ fields }), 'hasNotice')).toBe('yes');
+  });
 
   it('only notes the notice date when there is one', () => {
     const p = prefill({ fields: { newPremium: notice(345) } });
